@@ -9,8 +9,8 @@ interface SectionProps {
 }
 
 const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, -5]);
+  const scale = useTransform(scrollYProgress, [0, 0.33], [1, 0.8]);
+  const rotate = useTransform(scrollYProgress, [0, 0.33], [0, -5]);
   return (
     <motion.section
       style={{ scale, rotate }}
@@ -26,8 +26,8 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
 };
 
 const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
-  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
+  const scale = useTransform(scrollYProgress, [0.33, 0.66], [0.8, 1]);
+  const rotate = useTransform(scrollYProgress, [0.33, 0.66], [5, 0]);
 
   return (
     <motion.section
@@ -36,7 +36,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
     >
       <div className='absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]'></div>
       <article className='container mx-auto relative z-10 '>
-        <h1 className='text-6xl leading-[100%] py-10 font-semibold tracking-tight '>
+        <h1 className='text-6xl leading-[100%] pt-20 pb-10 font-semibold tracking-tight '>
           Choose your personality game <br /> and discover yourself
         </h1>
         <div className='grid grid-cols-2 lg:grid-cols-4 gap-6'>
@@ -90,6 +90,26 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
   );
 };
 
+const Section3: React.FC<SectionProps> = ({ scrollYProgress }) => {
+  const scale = useTransform(scrollYProgress, [0.66, 1], [0.9, 1]);
+  const opacity = useTransform(scrollYProgress, [0.66, 0.8], [0, 1]);
+
+  return (
+    <motion.section
+      style={{ scale, opacity }}
+      className='relative h-screen bg-gray-900 text-white flex flex-col items-center justify-center'
+    >
+      <div className='container mx-auto text-center'>
+        <h2 className='text-4xl font-bold mb-8'>Ready to discover yourself?</h2>
+        <p className='text-xl mb-12 text-gray-300'>Choose a game above and start your personality journey</p>
+        <div className='text-lg'>
+          <p>&copy; 2024 myPlace. All rights reserved.</p>
+        </div>
+      </div>
+    </motion.section>
+  );
+};
+
 const Component = forwardRef<HTMLElement>((props, ref) => {
   const container = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -99,15 +119,10 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
 
   return (
     <>
-      <main ref={container} className='relative h-[200vh] bg-black'>
+      <main ref={container} className='relative h-[300vh] bg-black'>
         <Section1 scrollYProgress={scrollYProgress} />
         <Section2 scrollYProgress={scrollYProgress} />
-        <footer className='group bg-[#06060e] '>
-          <h1 className='text-[16vw] translate-y-20 leading-[100%] uppercase font-semibold text-center bg-gradient-to-r from-gray-400 to-gray-800 bg-clip-text text-transparent transition-all ease-linear'>
-            myPlace
-          </h1>
-          <div className='bg-black text-white h-40 relative z-10 grid place-content-center text-2xl rounded-tr-full rounded-tl-full'></div>
-        </footer>
+        <Section3 scrollYProgress={scrollYProgress} />
       </main>
     </>
   );
