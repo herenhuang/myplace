@@ -84,34 +84,22 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </defs>
       </svg>
 
-      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 bg-white border rounded-lg p-5 max-w-6xl mx-auto'>
+      <section className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 bg-white border rounded-lg p-5 max-w-4xl mx-auto'>
         <figure className='wiggle' style={{ clipPath: 'url(#clip-pattern)' }}>
           <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="block">
             <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-blue-400 to-blue-600 hover:scale-110 w-full cursor-pointer' />
           </a>
         </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern1)' }}>
+        <figure className='wiggle' style={{ clipPath: 'url(#clip-pattern1)' }}>
           <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-purple-400 to-purple-600 hover:scale-110 w-full' />
         </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern2)' }}>
+        <figure className='wiggle' style={{ clipPath: 'url(#clip-pattern2)' }}>
           <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-green-400 to-green-600 hover:scale-110 w-full' />
         </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern3)' }}>
-          <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-orange-400 to-orange-600 hover:scale-110 w-full' />
-        </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern4)' }}>
-          <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-pink-400 to-pink-600 hover:scale-110 w-full' />
-        </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern5)' }}>
-          <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-teal-400 to-teal-600 hover:scale-110 w-full' />
-        </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern6)' }}>
-          <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-indigo-400 to-indigo-600 hover:scale-110 w-full' />
-        </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern7)' }}>
+        <figure className='wiggle' style={{ clipPath: 'url(#clip-pattern7)' }}>
           <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-red-400 to-red-600 hover:scale-110 w-full' />
         </figure>
-        <figure style={{ clipPath: 'url(#clip-pattern8)' }}>
+        <figure className='wiggle' style={{ clipPath: 'url(#clip-pattern8)' }}>
           <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-yellow-400 to-yellow-600 hover:scale-110 w-full' />
         </figure>
       </section>
