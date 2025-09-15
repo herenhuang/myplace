@@ -9,8 +9,8 @@ interface SectionProps {
 }
 
 const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
-  const scale = useTransform(scrollYProgress, [0, 0.33], [1, 0.8]);
-  const rotate = useTransform(scrollYProgress, [0, 0.33], [0, -5]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, -5]);
   return (
     <motion.section
       style={{ scale, rotate }}
@@ -26,8 +26,8 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
 };
 
 const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
-  const scale = useTransform(scrollYProgress, [0.33, 0.66], [0.8, 1]);
-  const rotate = useTransform(scrollYProgress, [0.33, 0.66], [5, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
 
   return (
     <motion.section
@@ -85,30 +85,18 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
             </div>
           </div>
         </div>
+        
+        {/* Footer content integrated into games section */}
+        <div className='mt-20 text-center border-t border-gray-700 pt-12'>
+          <p className='text-gray-400'>
+            &copy; 2024 myPlace. All rights reserved.
+          </p>
+        </div>
       </article>
     </motion.section>
   );
 };
 
-const Section3: React.FC<SectionProps> = ({ scrollYProgress }) => {
-  const scale = useTransform(scrollYProgress, [0.66, 1], [0.9, 1]);
-  const opacity = useTransform(scrollYProgress, [0.66, 0.8], [0, 1]);
-
-  return (
-    <motion.section
-      style={{ scale, opacity }}
-      className='relative h-screen bg-gray-900 text-white flex flex-col items-center justify-center'
-    >
-      <div className='container mx-auto text-center'>
-        <h2 className='text-4xl font-bold mb-8'>Ready to discover yourself?</h2>
-        <p className='text-xl mb-12 text-gray-300'>Choose a game above and start your personality journey</p>
-        <div className='text-lg'>
-          <p>&copy; 2024 myPlace. All rights reserved.</p>
-        </div>
-      </div>
-    </motion.section>
-  );
-};
 
 const Component = forwardRef<HTMLElement>((props, ref) => {
   const container = useRef<HTMLDivElement>(null);
@@ -119,10 +107,9 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
 
   return (
     <>
-      <main ref={container} className='relative h-[300vh] bg-black'>
+      <main ref={container} className='relative h-[200vh] bg-black'>
         <Section1 scrollYProgress={scrollYProgress} />
         <Section2 scrollYProgress={scrollYProgress} />
-        <Section3 scrollYProgress={scrollYProgress} />
       </main>
     </>
   );
