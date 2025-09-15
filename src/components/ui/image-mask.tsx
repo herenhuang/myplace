@@ -84,7 +84,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </defs>
       </svg>
 
-      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 bg-white border rounded-lg p-6 w-full'>
+      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 p-6 w-full'>
         <div className='wiggle max-w-xs mx-auto'>
           <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="block group">
             <figure style={{ clipPath: 'url(#clip-pattern)' }}>
