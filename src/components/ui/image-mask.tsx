@@ -87,93 +87,103 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       </svg>
 
       <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 p-6 w-full'>
-        <div className='wiggle max-w-xs mx-auto'>
-          <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="block group">
-            <figure style={{ clipPath: 'url(#clip-pattern)' }}>
-              <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-blue-400 to-blue-600 group-hover:scale-110 w-full cursor-pointer' />
-            </figure>
-            <div className='bg-gray-50 border border-gray-200 p-1.5 w-full'>
-              <h3 className='font-semibold text-gray-900 text-xs mb-1'>Music Crisis Sim</h3>
-              <div className='flex flex-wrap gap-1 text-xs text-gray-600'>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+        <div className='max-w-xs mx-auto'>
+          <div className='wiggle'>
+            <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="block group">
+              <figure style={{ clipPath: 'url(#clip-pattern)' }}>
+                <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-blue-400 to-blue-600 group-hover:scale-110 w-full cursor-pointer' />
+              </figure>
+              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+                </div>
               </div>
-            </div>
-          </a>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs text-gray-700 transition-colors'>
+            </a>
+          </div>
+          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
             👍 88
           </button>
         </div>
-        <div className='wiggle max-w-xs mx-auto'>
-          <a href="#" className="block group">
-            <figure style={{ clipPath: 'url(#clip-pattern1)' }}>
-              <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-purple-400 to-purple-600 group-hover:scale-110 w-full cursor-pointer' />
-            </figure>
-            <div className='bg-gray-50 border border-gray-200 p-1.5 w-full'>
-              <h3 className='font-semibold text-gray-900 text-xs mb-1'>Music Crisis Sim</h3>
-              <div className='flex flex-wrap gap-1 text-xs text-gray-600'>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+        <div className='max-w-xs mx-auto'>
+          <div className='wiggle'>
+            <a href="#" className="block group">
+              <figure style={{ clipPath: 'url(#clip-pattern1)' }}>
+                <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-purple-400 to-purple-600 group-hover:scale-110 w-full cursor-pointer' />
+              </figure>
+              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+                </div>
               </div>
-            </div>
-          </a>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs text-gray-700 transition-colors'>
+            </a>
+          </div>
+          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
             👍 88
           </button>
         </div>
-        <div className='wiggle max-w-xs mx-auto'>
-          <a href="#" className="block group">
-            <figure style={{ clipPath: 'url(#clip-pattern2)' }}>
-              <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-green-400 to-green-600 group-hover:scale-110 w-full cursor-pointer' />
-            </figure>
-            <div className='bg-gray-50 border border-gray-200 p-1.5 w-full'>
-              <h3 className='font-semibold text-gray-900 text-xs mb-1'>Music Crisis Sim</h3>
-              <div className='flex flex-wrap gap-1 text-xs text-gray-600'>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+        <div className='max-w-xs mx-auto'>
+          <div className='wiggle'>
+            <a href="#" className="block group">
+              <figure style={{ clipPath: 'url(#clip-pattern2)' }}>
+                <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-green-400 to-green-600 group-hover:scale-110 w-full cursor-pointer' />
+              </figure>
+              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+                </div>
               </div>
-            </div>
-          </a>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs text-gray-700 transition-colors'>
+            </a>
+          </div>
+          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
             👍 88
           </button>
         </div>
-        <div className='wiggle max-w-xs mx-auto'>
-          <a href="#" className="block group">
-            <figure style={{ clipPath: 'url(#clip-pattern7)' }}>
-              <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-red-400 to-red-600 group-hover:scale-110 w-full cursor-pointer' />
-            </figure>
-            <div className='bg-gray-50 border border-gray-200 p-1.5 w-full'>
-              <h3 className='font-semibold text-gray-900 text-xs mb-1'>Music Crisis Sim</h3>
-              <div className='flex flex-wrap gap-1 text-xs text-gray-600'>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+        <div className='max-w-xs mx-auto'>
+          <div className='wiggle'>
+            <a href="#" className="block group">
+              <figure style={{ clipPath: 'url(#clip-pattern7)' }}>
+                <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-red-400 to-red-600 group-hover:scale-110 w-full cursor-pointer' />
+              </figure>
+              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+                </div>
               </div>
-            </div>
-          </a>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs text-gray-700 transition-colors'>
+            </a>
+          </div>
+          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
             👍 88
           </button>
         </div>
-        <div className='wiggle max-w-xs mx-auto'>
-          <a href="#" className="block group">
-            <figure style={{ clipPath: 'url(#clip-pattern8)' }}>
-              <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-yellow-400 to-yellow-600 group-hover:scale-110 w-full cursor-pointer' />
-            </figure>
-            <div className='bg-gray-50 border border-gray-200 p-1.5 w-full'>
-              <h3 className='font-semibold text-gray-900 text-xs mb-1'>Music Crisis Sim</h3>
-              <div className='flex flex-wrap gap-1 text-xs text-gray-600'>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
-                <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+        <div className='max-w-xs mx-auto'>
+          <div className='wiggle'>
+            <a href="#" className="block group">
+              <figure style={{ clipPath: 'url(#clip-pattern8)' }}>
+                <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-yellow-400 to-yellow-600 group-hover:scale-110 w-full cursor-pointer' />
+              </figure>
+              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+                </div>
               </div>
-            </div>
-          </a>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-xs text-gray-700 transition-colors'>
+            </a>
+          </div>
+          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
             👍 88
           </button>
         </div>
