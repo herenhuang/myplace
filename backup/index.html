@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>myPlace - Personality Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Top-left logo placeholder -->
+    <div class="fixed top-6 left-6 z-10">
+        <img src="logo-placeholder.png" alt="myPlace" class="h-10 w-auto drop-shadow-lg">
+    </div>
+
+    <!-- Corner mascot placeholders -->
+    <div class="fixed top-6 right-6 z-10 hidden md:block">
+        <img src="mascot1-placeholder.png" alt="mascot" class="h-16 w-auto drop-shadow-lg hover:scale-110 transition-transform duration-300">
+    </div>
+    <div class="fixed bottom-6 left-6 z-10 hidden md:block">
+        <img src="mascot2-placeholder.png" alt="mascot" class="h-16 w-auto drop-shadow-lg hover:scale-110 transition-transform duration-300">
+    </div>
+    <div class="fixed bottom-6 right-6 z-10 hidden md:block">
+        <img src="mascot3-placeholder.png" alt="mascot" class="h-16 w-auto drop-shadow-lg hover:scale-110 transition-transform duration-300">
+    </div>
+
+    <!-- Hero Section -->
+    <section class="pt-20 pb-16 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                Personality quizzes you can play
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-600 font-medium">
+                Play games → learn about yourself → show off
+            </p>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section class="pb-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Story Explorer -->
+                <div class="group bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl p-6 shadow-2xl hover:shadow-3xl hover:-translate-y-2 hover:rotate-1 transition-all duration-300 cursor-pointer">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 h-full flex flex-col justify-between border border-white/30">
+                        <h3 class="text-xl font-bold text-white mb-4 drop-shadow-sm">Story Explorer</h3>
+                        <div class="space-y-2">
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Interactive Fiction</span>
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Measures: Emotional Intelligence</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Myers-Briggs Test -->
+                <div class="group bg-gradient-to-br from-blue-400 to-indigo-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl hover:-translate-y-2 hover:rotate-1 transition-all duration-300 cursor-pointer">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 h-full flex flex-col justify-between border border-white/30">
+                        <h3 class="text-xl font-bold text-white mb-4 drop-shadow-sm">Myers-Briggs Test</h3>
+                        <div class="space-y-2">
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Classic Assessment</span>
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Measures: Personality Type</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mystery Challenge -->
+                <div class="group bg-gradient-to-br from-green-400 to-emerald-600 rounded-3xl p-6 shadow-2xl hover:shadow-3xl hover:-translate-y-2 hover:rotate-1 transition-all duration-300 cursor-pointer md:col-span-2 lg:col-span-1">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 h-full flex flex-col justify-between border border-white/30">
+                        <h3 class="text-xl font-bold text-white mb-4 drop-shadow-sm">Mystery Challenge</h3>
+                        <div class="space-y-2">
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Problem Solving</span>
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Measures: Critical Thinking</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Quiz -->
+                <div class="group bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-6 shadow-2xl hover:shadow-3xl hover:-translate-y-2 hover:rotate-1 transition-all duration-300 cursor-pointer">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 h-full flex flex-col justify-between border border-white/30">
+                        <h3 class="text-xl font-bold text-white mb-4 drop-shadow-sm">Quick Quiz</h3>
+                        <div class="space-y-2">
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Fast Assessment</span>
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Measures: Core Traits</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Surprise Box -->
+                <div class="group bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl p-6 shadow-2xl hover:shadow-3xl hover:-translate-y-2 hover:rotate-1 transition-all duration-300 cursor-pointer">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 h-full flex flex-col justify-between border border-white/30">
+                        <h3 class="text-xl font-bold text-white mb-4 drop-shadow-sm">Surprise Box</h3>
+                        <div class="space-y-2">
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Random Challenge</span>
+                            <span class="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Measures: Adaptability</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="bg-white border-t border-gray-200 py-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold text-gray-900 text-center mb-16">
+                Frequently Asked Questions
+            </h2>
+            <div class="space-y-6">
+                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">How long do the games take?</h3>
+                    <p class="text-gray-600 leading-relaxed">Most games take between 5-15 minutes to complete, with some longer story-based games taking up to 30 minutes.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Are my results private?</h3>
+                    <p class="text-gray-600 leading-relaxed">Yes, all your results are private by default. You can choose to share them if you want to show off your personality insights.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Can I retake the assessments?</h3>
+                    <p class="text-gray-600 leading-relaxed">Absolutely! You can retake any assessment to see how your results change over time or to explore different response patterns.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-200 py-8 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <p class="text-white">&copy; 2024 myPlace. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
