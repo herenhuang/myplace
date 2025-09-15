@@ -3,13 +3,15 @@ import React from 'react';
 const wiggleStyle = `
   @keyframes wiggle {
     0% { transform: rotate(0deg); }
-    25% { transform: rotate(5deg); }
-    50% { transform: rotate(0deg); }
-    75% { transform: rotate(-5deg); }
+    15% { transform: rotate(5deg); }
+    30% { transform: rotate(-5deg); }
+    45% { transform: rotate(3deg); }
+    60% { transform: rotate(-3deg); }
+    75% { transform: rotate(1deg); }
     100% { transform: rotate(0deg); }
   }
   .wiggle:hover {
-    animation: wiggle 0.2s ease-in-out infinite;
+    animation: wiggle 0.4s ease-out;
   }
 `;
 
