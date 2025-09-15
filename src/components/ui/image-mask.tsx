@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const wiggleStyle = `
   @keyframes wiggle {
@@ -18,7 +18,26 @@ const wiggleStyle = `
 type ComponentProps = React.HTMLAttributes<HTMLDivElement>;
 
 const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, ...props }, ref) => {
+    const [votes, setVotes] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+      const savedVotes = localStorage.getItem('card-votes');
+      if (savedVotes) {
+        setVotes(JSON.parse(savedVotes));
+      }
+    }, []);
+
+    const handleVote = (cardId: string) => {
+      const newVotes = {
+        ...votes,
+        [cardId]: (votes[cardId] || 0) + 1
+      };
+      setVotes(newVotes);
+      localStorage.setItem('card-votes', JSON.stringify(newVotes));
+    };
+
+    return (
     <div ref={ref} className={className} {...props}>
       <style>{wiggleStyle}</style>
       <svg className='clipppy absolute -top-[999px] -left-[999px] w-0 h-0'>
@@ -103,8 +122,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
-            👍 88
+          <button 
+            onClick={() => handleVote('card-1')}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+          >
+            👍 {votes['card-1'] || 0}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform -rotate-1'>
@@ -123,8 +145,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
-            👍 88
+          <button 
+            onClick={() => handleVote('card-2')}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+          >
+            👍 {votes['card-2'] || 0}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform rotate-1'>
@@ -143,8 +168,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
-            👍 88
+          <button 
+            onClick={() => handleVote('card-3')}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+          >
+            👍 {votes['card-3'] || 0}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform -rotate-2'>
@@ -163,8 +191,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
-            👍 88
+          <button 
+            onClick={() => handleVote('card-4')}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+          >
+            👍 {votes['card-4'] || 0}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform rotate-3'>
@@ -183,13 +214,17 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors'>
-            👍 88
+          <button 
+            onClick={() => handleVote('card-5')}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+          >
+            👍 {votes['card-5'] || 0}
           </button>
         </div>
       </section>
     </div>
-  )
+    );
+  }
 );
 
 Component.displayName = 'ImageMask';
