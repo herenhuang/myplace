@@ -3,6 +3,7 @@
 
 import { useScroll, useTransform, motion, MotionValue } from 'motion/react';
 import React, { useRef, forwardRef, useState } from 'react';
+import ImageMask from '@/components/ui/image-mask';
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
@@ -181,6 +182,11 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
               </button>
             </div>
           </div>
+        </div>
+        
+        {/* Image Mask Section */}
+        <div className='mt-20'>
+          <ImageMask />
         </div>
         
         {/* Footer content integrated into games section */}
