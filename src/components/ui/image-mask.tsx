@@ -1,10 +1,24 @@
 import React from 'react';
 
+const wiggleStyle = `
+  @keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+  }
+  .wiggle:hover {
+    animation: wiggle 0.2s ease-in-out infinite;
+  }
+`;
+
 type ComponentProps = React.HTMLAttributes<HTMLDivElement>;
 
 const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={className} {...props}>
+      <style>{wiggleStyle}</style>
       <svg className='clipppy absolute -top-[999px] -left-[999px] w-0 h-0'>
         <defs>
           <clipPath id='clip-pattern' clipPathUnits={'objectBoundingBox'}>
@@ -71,7 +85,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       </svg>
 
       <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 bg-white border rounded-lg p-5 max-w-6xl mx-auto'>
-        <figure style={{ clipPath: 'url(#clip-pattern)' }}>
+        <figure className='wiggle' style={{ clipPath: 'url(#clip-pattern)' }}>
           <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="block">
             <div className='transition-all duration-300 aspect-[4/5] min-h-full align-bottom bg-gradient-to-br from-blue-400 to-blue-600 hover:scale-110 w-full cursor-pointer' />
           </a>
