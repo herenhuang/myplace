@@ -269,36 +269,26 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             </button>
           </div>
         </div>
-        <div className='w-75 mx-auto transform -rotate-1'>
-          <div className='wiggle'>
-            <div className="block group cursor-pointer">
-              <figure>
-                <Image 
-                  src='/comingsoon.svg' 
-                  alt='Coming Soon' 
-                  width={300}
-                  height={400}
-                  className='transition-all duration-300 aspect-[3/4] w-full group-hover:scale-110 object-contain'
-                />
-              </figure>
-              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6 min-h-32'>
-                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Coming Soon</h3>
-                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>More</span>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Games</span>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Soon</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className='flex justify-end mt-3'>
-            <button 
-              disabled
-              className='w-fit py-2 px-3 bg-gray-50 border border-gray-200 text-base text-gray-400 cursor-not-allowed'
-            >
-              👍 Coming Soon
-            </button>
-          </div>
+        <div className='w-96 mx-auto transform -rotate-1 hover:rotate-6 transition-transform duration-300 group'>
+          <a href="https://tally.so/r/mR91yP" target="_blank" rel="noopener noreferrer" className="block">
+            <Image 
+              src='/comingsoon.svg' 
+              alt='Coming Soon' 
+              width={300}
+              height={400}
+              className='aspect-[3/4] w-full object-contain transition-all duration-300'
+            />
+          </a>
+          <style jsx>{`
+            .group:hover :global(svg .accents),
+            .group:active :global(svg .accents) {
+              opacity: 1;
+            }
+            :global(svg .accents) {
+              opacity: 0;
+              transition: opacity 0.3s ease;
+            }
+          `}</style>
         </div>
       </section>
     </div>

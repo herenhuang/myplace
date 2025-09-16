@@ -49,7 +49,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
       className='relative min-h-screen bg-gradient-to-t to-[#1a1919] from-[#06060e] text-white '
     >
       <div className='absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]'></div>
-      <article className='container mx-auto relative z-10 pb-20'>
+      <article className='container mx-auto relative z-10 pb-12'>
         <h1 className='text-4xl md:text-6xl leading-[100%] pt-20 pb-16 md:pb-20 font-semibold tracking-tight '>
           Play games, discover your traits <br /> and show them off in
           <a 
@@ -76,7 +76,12 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
           <h1 className='text-3xl md:text-5xl text-white font-semibold mb-8 w-full'>
             Let us know what you like by clicking to vote!
           </h1>
-          <div className='mb-8'>
+          <p className='text-white text-base mb-8'>
+            <a href="https://tally.so/r/mR91yP" target="_blank" rel="noopener noreferrer" className="hover:underline">
+              contact here
+            </a>
+          </p>
+          <div className='mt-12 mb-8'>
             <Image 
               src='/MyplaceWhite.png' 
               alt='MyPlace Logo' 
