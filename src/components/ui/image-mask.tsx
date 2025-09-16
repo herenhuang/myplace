@@ -154,13 +154,15 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button 
-            onClick={() => handleVote('card-1')}
-            disabled={loading['card-1']}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
-          >
-            👍 {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
-          </button>
+          <div className='flex justify-end mt-3'>
+            <button 
+              onClick={() => handleVote('card-1')}
+              disabled={loading['card-1']}
+              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+            >
+              👍 {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
+            </button>
+          </div>
         </div>
         <div className='max-w-xs mx-auto transform -rotate-1'>
           <div className='wiggle'>
@@ -178,13 +180,15 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button 
-            onClick={() => handleVote('card-2')}
-            disabled={loading['card-2']}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
-          >
-            👍 {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
-          </button>
+          <div className='flex justify-end mt-3'>
+            <button 
+              onClick={() => handleVote('card-2')}
+              disabled={loading['card-2']}
+              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+            >
+              👍 {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
+            </button>
+          </div>
         </div>
         <div className='max-w-xs mx-auto transform rotate-1'>
           <div className='wiggle'>
@@ -202,13 +206,15 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button 
-            onClick={() => handleVote('card-3')}
-            disabled={loading['card-3']}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
-          >
-            👍 {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
-          </button>
+          <div className='flex justify-end mt-3'>
+            <button 
+              onClick={() => handleVote('card-3')}
+              disabled={loading['card-3']}
+              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+            >
+              👍 {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
+            </button>
+          </div>
         </div>
         <div className='max-w-xs mx-auto transform -rotate-2'>
           <div className='wiggle'>
@@ -226,13 +232,15 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button 
-            onClick={() => handleVote('card-4')}
-            disabled={loading['card-4']}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
-          >
-            👍 {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
-          </button>
+          <div className='flex justify-end mt-3'>
+            <button 
+              onClick={() => handleVote('card-4')}
+              disabled={loading['card-4']}
+              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+            >
+              👍 {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
+            </button>
+          </div>
         </div>
         <div className='max-w-xs mx-auto transform rotate-3'>
           <div className='wiggle'>
@@ -250,13 +258,15 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-          <button 
-            onClick={() => handleVote('card-5')}
-            disabled={loading['card-5']}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
-          >
-            👍 {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
-          </button>
+          <div className='flex justify-end mt-3'>
+            <button 
+              onClick={() => handleVote('card-5')}
+              disabled={loading['card-5']}
+              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+            >
+              👍 {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
+            </button>
+          </div>
         </div>
       </section>
     </div>
