@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "myPlace - Personality Games",
-  description: "Interactive personality quizzes and games to discover yourself",
+  title: "MyPlace - Personality quizzes you can play",
+  description: "Play games, learn about yourself and show them off in your own digital space. Interactive personality quizzes and games to discover yourself.",
 };
 
 export default function RootLayout({

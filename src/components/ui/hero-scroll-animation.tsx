@@ -22,13 +22,15 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
       
       {/* Logo in top-left corner */}
       <div className='absolute top-6 left-6 z-10'>
-        <Image 
-          src='/MyPlace2.png' 
-          alt='MyPlace Logo' 
-          width={500}
-          height={300}
-          className='w-40 h-auto object-contain'
-        />
+        <a href="/" className="block hover:scale-105 transition-transform duration-200">
+          <Image 
+            src='/MyPlace2.png' 
+            alt='MyPlace Logo' 
+            width={500}
+            height={300}
+            className='w-40 h-auto object-contain'
+          />
+        </a>
       </div>
 
       <h1 className='2xl:text-8xl text-7xl px-8 font-semibold text-center tracking-tight leading-[120%] relative z-10'>
@@ -49,19 +51,20 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
       className='relative min-h-screen bg-gradient-to-t to-[#1a1919] from-[#06060e] text-white '
     >
       <div className='absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]'></div>
-      <article className='container mx-auto relative z-10 pb-12'>
-        <h1 className='text-4xl md:text-6xl leading-[100%] pt-20 pb-16 md:pb-20 font-semibold tracking-tight '>
-          Play games, discover your traits <br /> and show them off in
+      <article className='container mx-auto relative z-10 pb-12 px-4 md:px-6 lg:px-8'>
+        <h1 className='text-4xl md:text-6xl leading-[110%] pt-20 pb-16 md:pb-20 font-semibold tracking-tight max-w-5xl'>
+          <span className="block sm:inline">Play games, discover your traits</span>
+          <span className="block sm:inline"> and show them off in </span>
           <a 
             href="/welcome" 
-            className="inline-block ml-2 hover:scale-105 transition-transform duration-200"
+            className="inline-block hover:scale-105 transition-transform duration-200"
           >
             <Image 
               src="/LogoWhite.png" 
               alt="myPlace Logo" 
               width={400}
               height={100}
-              className="inline-block w-72 md:w-96 h-auto object-contain"
+              className="inline-block w-48 md:w-72 lg:w-96 h-auto object-contain"
             />
           </a>
         </h1>
@@ -82,13 +85,15 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
             </a>
           </p>
           <div className='mt-12 mb-8'>
-            <Image 
-              src='/MyplaceWhite.png' 
-              alt='MyPlace Logo' 
-              width={500}
-              height={300}
-              className='mx-auto w-40 h-auto object-contain'
-            />
+            <a href="/" className="block hover:scale-105 transition-transform duration-200">
+              <Image 
+                src='/MyplaceWhite.png' 
+                alt='MyPlace Logo' 
+                width={500}
+                height={300}
+                className='mx-auto w-40 h-auto object-contain'
+              />
+            </a>
           </div>
         </div>
       </article>
