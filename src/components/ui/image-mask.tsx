@@ -138,9 +138,9 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       </svg>
 
       <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 p-6 w-full'>
-        <div className='max-w-xs mx-auto transform rotate-2'>
+        <div className='w-75 mx-auto transform rotate-2'>
           <div className='wiggle'>
-            <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" className="block group">
+            <a href="https://work-sim.netlify.app/remix-simulation/intro" target="_blank" rel="noopener noreferrer" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern)' }}>
                 <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-blue-400 to-blue-600 group-hover:scale-110 w-full cursor-pointer' />
               </figure>
@@ -164,17 +164,17 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             </button>
           </div>
         </div>
-        <div className='max-w-xs mx-auto transform -rotate-1'>
+        <div className='w-75 mx-auto transform -rotate-1'>
           <div className='wiggle'>
-            <a href="#" className="block group">
+            <a href="https://tryorange.vercel.app/word" target="_blank" rel="noopener noreferrer" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern1)' }}>
                 <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-purple-400 to-purple-600 group-hover:scale-110 w-full cursor-pointer' />
               </figure>
               <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
-                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Word Association</h3>
                 <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Word</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Quick</span>
                   <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
                 </div>
               </div>
@@ -190,7 +190,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             </button>
           </div>
         </div>
-        <div className='max-w-xs mx-auto transform rotate-1'>
+        <div className='w-75 mx-auto transform rotate-1'>
           <div className='wiggle'>
             <a href="#" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern2)' }}>
@@ -216,14 +216,14 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             </button>
           </div>
         </div>
-        <div className='max-w-xs mx-auto transform -rotate-2'>
+        <div className='w-75 mx-auto transform -rotate-2'>
           <div className='wiggle'>
-            <a href="#" className="block group">
+            <a href="https://work-sim.netlify.app/workplace-simulation" target="_blank" rel="noopener noreferrer" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern7)' }}>
                 <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-red-400 to-red-600 group-hover:scale-110 w-full cursor-pointer' />
               </figure>
               <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
-                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Workplace Crisis</h3>
                 <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
                   <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
                   <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
@@ -242,7 +242,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             </button>
           </div>
         </div>
-        <div className='max-w-xs mx-auto transform rotate-3'>
+        <div className='w-75 mx-auto transform rotate-3'>
           <div className='wiggle'>
             <a href="#" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern8)' }}>
