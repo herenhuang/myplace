@@ -9,7 +9,7 @@ export default function Welcome() {
       
       {/* Logo in top-left corner */}
       <div className='absolute top-6 left-6 z-10'>
-        <a href="/" className="block hover:scale-105 transition-transform duration-200">
+        <Link href="/" className="block hover:scale-105 transition-transform duration-200">
           <Image 
             src='/MyplaceWhite.png' 
             alt='MyPlace Logo' 
@@ -17,7 +17,7 @@ export default function Welcome() {
             height={300}
             className='w-40 h-auto object-contain'
           />
-        </a>
+        </Link>
       </div>
 
       {/* Main content */}
@@ -32,7 +32,7 @@ export default function Welcome() {
             <p>Now that AI can mimic our words and even fake our work, the one thing it can&apos;t copy is our judgment, our character, the way we move through the world. That&apos;s ours 🧩 to keep. And it&apos;s worth sharing with each other, and with the tools we rely on.</p>
             <p>A living record of our human edge.</p>
             
-            <p>If any of that resonates, there's a place for you here.</p>
+            <p>If any of that resonates, there&apos;s a place for you here.</p>
           </div>
         </div>
       </div>
