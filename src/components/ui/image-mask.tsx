@@ -192,16 +192,16 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </div>
         <div className='w-75 mx-auto transform rotate-1'>
           <div className='wiggle'>
-            <a href="#" className="block group">
+            <a href="https://yellow-gypsum.netlify.app/story/dinner-helen-2" target="_blank" rel="noopener noreferrer" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern2)' }}>
                 <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-green-400 to-green-600 group-hover:scale-110 w-full cursor-pointer' />
               </figure>
               <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
-                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Bill Splitting</h3>
                 <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>MBTI</span>
                   <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
                 </div>
               </div>
             </a>
@@ -225,7 +225,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
                 <h3 className='font-semibold text-gray-900 text-lg mb-3'>Workplace Crisis</h3>
                 <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Open Input</span>
                   <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
                   <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
                 </div>
@@ -244,15 +244,15 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </div>
         <div className='w-75 mx-auto transform rotate-3'>
           <div className='wiggle'>
-            <a href="#" className="block group">
+            <a href="https://tryorange.vercel.app/block" target="_blank" rel="noopener noreferrer" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern8)' }}>
                 <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-yellow-400 to-yellow-600 group-hover:scale-110 w-full cursor-pointer' />
               </figure>
               <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
-                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Music Crisis Sim</h3>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Block Game</h3>
                 <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
-                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Shapes</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Quick</span>
                   <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
                 </div>
               </div>
