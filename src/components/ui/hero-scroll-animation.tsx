@@ -3,6 +3,7 @@
 
 import { useScroll, useTransform, motion, MotionValue } from 'motion/react';
 import React, { useRef, forwardRef } from 'react';
+import Image from 'next/image';
 import ImageMask from '@/components/ui/image-mask';
 
 interface SectionProps {
@@ -18,6 +19,17 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
       className='sticky font-semibold top-0 h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-center text-gray-900'
     >
       <div className='absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle,#e2e8f0_1px,transparent_1px)] bg-[size:20px_20px]'></div>
+      
+      {/* Logo in top-left corner */}
+      <div className='absolute top-6 left-6 z-10'>
+        <Image 
+          src='/Myplacelogo.png' 
+          alt='MyPlace Logo' 
+          width={64}
+          height={64}
+          className='w-16 h-16 object-contain'
+        />
+      </div>
 
       <h1 className='2xl:text-7xl text-6xl px-8 font-semibold text-center tracking-tight leading-[120%]'>
         Personality quizzes you can play <br /> 👇👇👇
