@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Welcome() {
   return (
@@ -23,12 +24,12 @@ export default function Welcome() {
       <div className='flex-1 container mx-auto relative z-10 px-4 md:px-6 lg:px-8 pt-48 pb-16'>
         <div className='max-w-4xl mx-auto'>
           <div className='text-white text-2xl md:text-4xl font-medium leading-relaxed space-y-12'>
-            <p>We were built for 🎲 play. It's how kids learn, how friends bond, how we reveal ourselves without even trying.</p>
+            <p>We were built for 🎲 play. It&apos;s how kids learn, how friends bond, how we reveal ourselves without even trying.</p>
             
             <p>Somewhere along the way, many of us were told to grow up: fill out forms, take tests, polish résumés 📝.</p>
-            <p>But that doesn't capture who we are. Interviews, personality tests, even social media reflect what we say, not how we act. None of them hold the living record of how we actually show up: in the small choices, under real pressure, over ⏳ time.</p>
+            <p>But that doesn&apos;t capture who we are. Interviews, personality tests, even social media reflect what we say, not how we act. None of them hold the living record of how we actually show up: in the small choices, under real pressure, over ⏳ time.</p>
             
-            <p>Now that AI can mimic our words and even fake our work, the one thing it can't copy is our judgment, our character, the way we move through the world. That's ours 🧩 to keep. And it's worth sharing with each other, and with the tools we rely on.</p>
+            <p>Now that AI can mimic our words and even fake our work, the one thing it can&apos;t copy is our judgment, our character, the way we move through the world. That&apos;s ours 🧩 to keep. And it&apos;s worth sharing with each other, and with the tools we rely on.</p>
             <p>A living record of our human edge.</p>
             
             <p>If any of that resonates, there's a place for you here.</p>
@@ -45,7 +46,7 @@ export default function Welcome() {
             </a>
           </p>
           <div className='mt-12 mb-8'>
-            <a href="/" className="block hover:scale-105 transition-transform duration-200">
+            <Link href="/" className="block hover:scale-105 transition-transform duration-200">
               <Image 
                 src='/MyplaceWhite.png' 
                 alt='MyPlace Logo' 
@@ -53,7 +54,7 @@ export default function Welcome() {
                 height={300}
                 className='mx-auto w-40 h-auto object-contain'
               />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

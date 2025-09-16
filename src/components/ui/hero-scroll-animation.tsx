@@ -4,6 +4,7 @@
 import { useScroll, useTransform, motion, MotionValue } from 'motion/react';
 import React, { useRef, forwardRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import ImageMask from '@/components/ui/image-mask';
 
 interface SectionProps {
@@ -22,7 +23,7 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
       
       {/* Logo in top-left corner */}
       <div className='absolute top-6 left-6 z-10'>
-        <a href="/" className="block hover:scale-105 transition-transform duration-200">
+        <Link href="/" className="block hover:scale-105 transition-transform duration-200">
           <Image 
             src='/MyPlace2.png' 
             alt='MyPlace Logo' 
@@ -30,7 +31,7 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
             height={300}
             className='w-40 h-auto object-contain'
           />
-        </a>
+        </Link>
       </div>
 
       <h1 className='2xl:text-8xl text-7xl px-8 font-semibold text-center tracking-tight leading-[120%] relative z-10'>
@@ -55,7 +56,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
         <h1 className='text-4xl md:text-6xl leading-[110%] pt-20 pb-16 md:pb-20 font-semibold tracking-tight max-w-5xl'>
           <span className="block sm:inline">Play games, discover your traits</span>
           <span className="block sm:inline"> and show them off in </span>
-          <a 
+          <Link 
             href="/welcome" 
             className="inline-block hover:scale-105 transition-transform duration-200"
           >
@@ -66,7 +67,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
               height={100}
               className="inline-block w-48 md:w-72 lg:w-96 h-auto object-contain"
             />
-          </a>
+          </Link>
         </h1>
         
         {/* Image Mask Section */}
@@ -85,7 +86,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
             </a>
           </p>
           <div className='mt-12 mb-8'>
-            <a href="/" className="block hover:scale-105 transition-transform duration-200">
+            <Link href="/" className="block hover:scale-105 transition-transform duration-200">
               <Image 
                 src='/MyplaceWhite.png' 
                 alt='MyPlace Logo' 
@@ -93,7 +94,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
                 height={300}
                 className='mx-auto w-40 h-auto object-contain'
               />
-            </a>
+            </Link>
           </div>
         </div>
       </article>
@@ -102,7 +103,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
 };
 
 
-const Component = forwardRef<HTMLElement>((_props, _ref) => {
+const Component = forwardRef<HTMLElement>(() => {
   const container = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: container,
