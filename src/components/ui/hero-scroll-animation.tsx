@@ -23,11 +23,11 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
       {/* Logo in top-left corner */}
       <div className='absolute top-6 left-6 z-10'>
         <Image 
-          src='/Myplacelogo.png' 
+          src='/MyPlace2.png' 
           alt='MyPlace Logo' 
-          width={64}
-          height={64}
-          className='w-16 h-16 object-contain'
+          width={500}
+          height={300}
+          className='w-40 h-auto object-contain'
         />
       </div>
 
