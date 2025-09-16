@@ -31,8 +31,8 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
         />
       </div>
 
-      <h1 className='2xl:text-7xl text-6xl px-8 font-semibold text-center tracking-tight leading-[120%]'>
-        Personality quizzes you can play <br /> 👇👇👇
+      <h1 className='2xl:text-8xl text-7xl px-8 font-semibold text-center tracking-tight leading-[120%] relative z-10'>
+        Personality quizzes you can play <br /> <span className='text-6xl'>👇👇👇</span>
       </h1>
     </motion.section>
   );
