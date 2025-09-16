@@ -73,9 +73,18 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
         
         {/* Footer content integrated into games section */}
         <div className='mt-20 text-center border-t border-gray-700 pt-12'>
-          <p className='text-gray-400'>
-            &copy; 2024 myPlace. All rights reserved.
-          </p>
+          <h1 className='text-3xl md:text-5xl text-white font-semibold mb-8 w-full'>
+            Let us know what you like by clicking to vote!
+          </h1>
+          <div className='mb-8'>
+            <Image 
+              src='/MyPlace2.png' 
+              alt='MyPlace Logo' 
+              width={500}
+              height={300}
+              className='mx-auto w-40 h-auto object-contain'
+            />
+          </div>
         </div>
       </article>
     </motion.section>
