@@ -20,21 +20,53 @@ type ComponentProps = React.HTMLAttributes<HTMLDivElement>;
 const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
   ({ className, ...props }, ref) => {
     const [votes, setVotes] = useState<Record<string, number>>({});
+    const [loading, setLoading] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
-      const savedVotes = localStorage.getItem('card-votes');
-      if (savedVotes) {
-        setVotes(JSON.parse(savedVotes));
-      }
+      // Fetch initial vote counts from the API
+      fetch('/.netlify/functions/reactions-get')
+        .then(response => response.json())
+        .then(data => {
+          // Convert string values to numbers
+          const numericVotes: Record<string, number> = {};
+          Object.entries(data).forEach(([key, value]) => {
+            numericVotes[key] = typeof value === 'string' ? parseInt(value) : value as number;
+          });
+          setVotes(numericVotes);
+        })
+        .catch(error => {
+          console.error('Error fetching votes:', error);
+        });
     }, []);
 
-    const handleVote = (cardId: string) => {
-      const newVotes = {
-        ...votes,
-        [cardId]: (votes[cardId] || 0) + 1
-      };
-      setVotes(newVotes);
-      localStorage.setItem('card-votes', JSON.stringify(newVotes));
+    const handleVote = async (cardId: string) => {
+      if (loading[cardId]) return;
+      
+      setLoading(prev => ({ ...prev, [cardId]: true }));
+      
+      try {
+        const response = await fetch('/.netlify/functions/reactions-vote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ cardId }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setVotes(prev => ({
+            ...prev,
+            [cardId]: data.count
+          }));
+        } else {
+          console.error('Failed to vote');
+        }
+      } catch (error) {
+        console.error('Error voting:', error);
+      } finally {
+        setLoading(prev => ({ ...prev, [cardId]: false }));
+      }
     };
 
     return (
@@ -124,9 +156,10 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <button 
             onClick={() => handleVote('card-1')}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+            disabled={loading['card-1']}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
           >
-            👍 {votes['card-1'] || 0}
+            👍 {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform -rotate-1'>
@@ -147,9 +180,10 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <button 
             onClick={() => handleVote('card-2')}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+            disabled={loading['card-2']}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
           >
-            👍 {votes['card-2'] || 0}
+            👍 {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform rotate-1'>
@@ -170,9 +204,10 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <button 
             onClick={() => handleVote('card-3')}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+            disabled={loading['card-3']}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
           >
-            👍 {votes['card-3'] || 0}
+            👍 {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform -rotate-2'>
@@ -193,9 +228,10 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <button 
             onClick={() => handleVote('card-4')}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+            disabled={loading['card-4']}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
           >
-            👍 {votes['card-4'] || 0}
+            👍 {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
           </button>
         </div>
         <div className='max-w-xs mx-auto transform rotate-3'>
@@ -216,9 +252,10 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <button 
             onClick={() => handleVote('card-5')}
-            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
+            disabled={loading['card-5']}
+            className='w-fit mt-3 py-1 px-1.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-sm text-gray-700 transition-colors cursor-pointer'
           >
-            👍 {votes['card-5'] || 0}
+            👍 {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
           </button>
         </div>
       </section>
