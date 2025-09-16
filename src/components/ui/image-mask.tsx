@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const wiggleStyle = `
   @keyframes wiggle {
@@ -265,6 +266,37 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
             >
               👍 {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
+            </button>
+          </div>
+        </div>
+        <div className='w-75 mx-auto transform -rotate-1'>
+          <div className='wiggle'>
+            <div className="block group cursor-pointer">
+              <figure>
+                <Image 
+                  src='/comingsoon.svg' 
+                  alt='Coming Soon' 
+                  width={300}
+                  height={400}
+                  className='transition-all duration-300 aspect-[3/4] w-full group-hover:scale-110 object-contain'
+                />
+              </figure>
+              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6 min-h-32'>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>Coming Soon</h3>
+                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>More</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Games</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Soon</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='flex justify-end mt-3'>
+            <button 
+              disabled
+              className='w-fit py-2 px-3 bg-gray-50 border border-gray-200 text-base text-gray-400 cursor-not-allowed'
+            >
+              👍 Coming Soon
             </button>
           </div>
         </div>

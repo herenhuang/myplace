@@ -78,7 +78,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
           </h1>
           <div className='mb-8'>
             <Image 
-              src='/MyPlace2.png' 
+              src='/MyplaceWhite.png' 
               alt='MyPlace Logo' 
               width={500}
               height={300}
