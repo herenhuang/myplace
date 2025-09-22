@@ -188,7 +188,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 p-6 w-full'>
         <div className='w-75 mx-auto transform rotate-2 relative'>
           <div className='wiggle'>
-            <a href="https://yellow-gypsum.netlify.app/story/mh791g0p56xg8j081sn80ysb6h7qwbv8/session/ks70j7w67bd68tvq5zdgm695bx7r2xeg/node/ms7fj42y6s1839913x0myyyxw97qxm5g" target="_blank" rel="noopener noreferrer" className="block group">
+            <a href="https://yellow-gypsum.netlify.app/story/francis1" target="_blank" rel="noopener noreferrer" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern5)' }}>
                 <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-orange-400 to-red-500 group-hover:scale-110 w-full cursor-pointer' />
               </figure>
