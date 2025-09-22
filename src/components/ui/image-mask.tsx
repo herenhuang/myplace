@@ -26,7 +26,16 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
     useEffect(() => {
       // Fetch initial vote counts from the API
       fetch('/.netlify/functions/reactions-get')
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Response is not JSON');
+          }
+          return response.json();
+        })
         .then(data => {
           // Convert string values to numbers
           const numericVotes: Record<string, number> = {};
@@ -36,7 +45,16 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           setVotes(numericVotes);
         })
         .catch(error => {
-          console.error('Error fetching votes:', error);
+          console.error('Error fetching votes (API may not be available in development):', error);
+          // Set default votes for development (all start at 0)
+          setVotes({
+            'card-1': 0,
+            'card-2': 0,
+            'card-3': 0,
+            'card-4': 0,
+            'card-5': 0,
+            'card-6': 0
+          });
         });
     }, []);
 
@@ -55,16 +73,26 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         });
         
         if (response.ok) {
-          const data = await response.json();
-          setVotes(prev => ({
-            ...prev,
-            [cardId]: data.count
-          }));
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            setVotes(prev => ({
+              ...prev,
+              [cardId]: data.count
+            }));
+          } else {
+            throw new Error('Response is not JSON');
+          }
         } else {
-          console.error('Failed to vote');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
       } catch (error) {
-        console.error('Error voting:', error);
+        console.error('Error voting (API may not be available in development):', error);
+        // Simulate vote increment for development
+        setVotes(prev => ({
+          ...prev,
+          [cardId]: (prev[cardId] || 0) + 1
+        }));
       } finally {
         setLoading(prev => ({ ...prev, [cardId]: false }));
       }
@@ -139,6 +167,35 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       </svg>
 
       <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16 p-6 w-full'>
+        <div className='w-75 mx-auto transform rotate-2 relative'>
+          <div className='wiggle'>
+            <a href="https://yellow-gypsum.netlify.app/story/mh791g0p56xg8j081sn80ysb6h7qwbv8/session/ks70j7w67bd68tvq5zdgm695bx7r2xeg/node/ms7fj42y6s1839913x0myyyxw97qxm5g" target="_blank" rel="noopener noreferrer" className="block group">
+              <figure style={{ clipPath: 'url(#clip-pattern5)' }}>
+                <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-orange-400 to-red-500 group-hover:scale-110 w-full cursor-pointer' />
+              </figure>
+              <div className='bg-gray-50 border border-gray-200 p-4 w-full mt-6'>
+                <h3 className='font-semibold text-gray-900 text-lg mb-3'>A First Date</h3>
+                <div className='flex flex-wrap gap-1 text-sm text-gray-600'>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Interactive Fiction</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Text</span>
+                  <span className='bg-gray-100 px-2 py-1 rounded'>Personality</span>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div className='absolute -top-3 -right-3 bg-red-500 text-white text-sm font-bold px-3 py-2 rounded-full shadow-lg z-10 animate-pulse'>
+            NEW
+          </div>
+          <div className='flex justify-end mt-3'>
+            <button 
+              onClick={() => handleVote('card-1')}
+              disabled={loading['card-1']}
+              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+            >
+              👍 {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
+            </button>
+          </div>
+        </div>
         <div className='w-75 mx-auto transform rotate-2'>
           <div className='wiggle'>
             <a href="https://work-sim.netlify.app/remix-simulation/intro" target="_blank" rel="noopener noreferrer" className="block group">
@@ -157,11 +214,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <div className='flex justify-end mt-3'>
             <button 
-              onClick={() => handleVote('card-1')}
-              disabled={loading['card-1']}
+              onClick={() => handleVote('card-2')}
+              disabled={loading['card-2']}
               className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
             >
-              👍 {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
+              👍 {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
             </button>
           </div>
         </div>
@@ -183,11 +240,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <div className='flex justify-end mt-3'>
             <button 
-              onClick={() => handleVote('card-2')}
-              disabled={loading['card-2']}
+              onClick={() => handleVote('card-3')}
+              disabled={loading['card-3']}
               className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
             >
-              👍 {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
+              👍 {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
             </button>
           </div>
         </div>
@@ -209,11 +266,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <div className='flex justify-end mt-3'>
             <button 
-              onClick={() => handleVote('card-3')}
-              disabled={loading['card-3']}
+              onClick={() => handleVote('card-4')}
+              disabled={loading['card-4']}
               className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
             >
-              👍 {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
+              👍 {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
             </button>
           </div>
         </div>
@@ -235,11 +292,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <div className='flex justify-end mt-3'>
             <button 
-              onClick={() => handleVote('card-4')}
-              disabled={loading['card-4']}
+              onClick={() => handleVote('card-5')}
+              disabled={loading['card-5']}
               className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
             >
-              👍 {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
+              👍 {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
             </button>
           </div>
         </div>
@@ -261,11 +318,11 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
           <div className='flex justify-end mt-3'>
             <button 
-              onClick={() => handleVote('card-5')}
-              disabled={loading['card-5']}
+              onClick={() => handleVote('card-6')}
+              disabled={loading['card-6']}
               className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
             >
-              👍 {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
+              👍 {loading['card-6'] ? '...' : (votes['card-6'] || 0)}
             </button>
           </div>
         </div>

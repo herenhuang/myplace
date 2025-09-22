@@ -1,0 +1,320 @@
+{
+  "nodes": [
+    {
+      "key": "intro",
+      "kind": "page",
+      "title": "First Date",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "Your date walks in 30 minutes late. \n\n\"Hi! Have you been waiting long?\" they say. \n\n[👉 Brush it off like it doesn’t matter.](/action/wave-it-off) \nYou genuinely don't care. \n\n[👉 Point it out lightly.](/action/point-lightly) \nIt matters (but not that much). \n\n[👉 Address it directly.](/action/address-directly) \nIt's worth it to mention.",
+          "type": "markdown"
+        }
+      ],
+      "onEnter": []
+    },
+    {
+      "key": "wave-it-off",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "You decide to brush it off. \n\nWhy though? Most people would be annoyed.",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "wave_it_off_longform",
+          "maxCharacters": 500,
+          "minCharacters": 20,
+          "placeholder": "What's your thought process here?",
+          "submitLabel": "Submit Answer",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: This is a first date simulation, where the User is on a first date. Their date arrives 30 minutes late but doesn't mention that they are late. User's first reaction to this was 'Wave it off — act like it’s no big deal.'",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "point-lightly",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "You decide to point it out playfully. \n\nWhat exactly do you say?",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "point_lightly_longform",
+          "maxCharacters": 200,
+          "minCharacters": 20,
+          "placeholder": "Share what you'd say here!",
+          "submitLabel": "Submit",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: This is a first date simulation, where the User is on a first date. Their date arrives 30 minutes late but doesn't mention that they are late. User's first reaction was 'Point it out lightly. It matters (but not that much).' ",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "address-directly",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "You decide to address it directly. \n\nYou say hi (obviously), and after your date has sat down you say...",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "address_directly_longform",
+          "maxCharacters": 500,
+          "minCharacters": 20,
+          "placeholder": "What exactly do you say?",
+          "submitLabel": "Submit",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: This is a first date simulation, where the User is on a first date. Their date arrives 30 minutes late but doesn't mention that they are late. User's first reaction was 'Address it directly. It's worth it to mention.' ",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "1-conclusion",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": true,
+          "text": "",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "arc_1_done",
+          "label": "Click only AFTER story loads",
+          "type": "button"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: The user is sharing their thoughts or actions about the first reaction/choice they had/took in this first date scenario. They wrote: \"{{vars.wave_it_off_longform}}{{vars.point_lightly_longform}}{{vars.address_directly_longform}}\"",
+          "type": "pushThreadMessage"
+        },
+        {
+          "agentId": "kx78rdssjs8z0nv8shdc28b0bs7qt4fh",
+          "type": "runAgent"
+        }
+      ]
+    },
+    {
+      "key": "arc2-intro",
+      "kind": "page",
+      "title": "The Ex Talk",
+      "bgColor": "#F3F3FF",
+      "components": [
+        {
+          "text": "Twenty minutes into the date, your date suddenly perks up. \n\n\"Oh my god, you'll never believe what my ex did last week!\" they say, launching into a detailed story about their ex's drama and some mutual friend gossip. \n\n[👉 Listen attentively.](/action/listen) \nYou're genuinely interested. \n\n[👉 Redirect the conversation.](/action/redirect) \nYou'd rather talk about something else. \n\n[👉 Match their energy with your own ex story.](/action/match-energy) \nYou have your own ex drama to share.",
+          "type": "markdown"
+        }
+      ],
+      "onEnter": []
+    },
+    {
+      "key": "listen",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "You decide to listen attentively to their ex story. \n\nBut how are you actually feeling while you listen?",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "listen_feeling_longform",
+          "maxCharacters": 300,
+          "minCharacters": 20,
+          "placeholder": "Are you listening begrudgingly or are you actually happy to hear this? Describe your internal state.",
+          "submitLabel": "Submit",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: This is a first date simulation. The date started talking about their ex and gossip. User chose to 'Listen attentively — genuinely interested.'",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "redirect",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "You decide to redirect the conversation away from their ex. \n\nWhat do you steer the conversation toward instead?",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "redirect_topic_longform",
+          "maxCharacters": 300,
+          "minCharacters": 20,
+          "placeholder": "What do you usually like to talk about? What topic do you bring up?",
+          "submitLabel": "Submit",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: This is a first date simulation. The date started talking about their ex and gossip. User chose to 'Redirect the conversation — would rather talk about something else.'",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "match-energy",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "You decide to match their energy by sharing your own ex story. \n\nAfter you both finish sharing, do you think talking about exes on a first date is a red flag?",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "match_energy_redflag_longform",
+          "maxCharacters": 400,
+          "minCharacters": 20,
+          "placeholder": "Share your thoughts on whether discussing exes on first dates is appropriate or a red flag.",
+          "submitLabel": "Submit",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: This is a first date simulation. The date started talking about their ex and gossip. User chose to 'Match their energy with own ex story.'",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "2-conclusion",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": true,
+          "text": "",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "arc_2_done",
+          "label": "Click only AFTER story loads",
+          "type": "button"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: The user is sharing their thoughts about how they handled their date talking about exes and gossip. They wrote: \"{{vars.listen_feeling_longform}}{{vars.redirect_topic_longform}}{{vars.match_energy_redflag_longform}}\"",
+          "type": "pushThreadMessage"
+        },
+        {
+          "agentId": "kx78rdssjs8z0nv8shdc28b0bs7qt4fh",
+          "type": "runAgent"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "fromKey": "intro",
+      "toKey": "wave-it-off",
+      "event": "wave-it-off",
+      "priority": 0
+    },
+    {
+      "fromKey": "intro",
+      "toKey": "point-lightly",
+      "event": "point-lightly",
+      "priority": 0
+    },
+    {
+      "fromKey": "intro",
+      "toKey": "address-directly",
+      "event": "address-directly",
+      "priority": 0
+    },
+    {
+      "fromKey": "point-lightly",
+      "toKey": "1-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "wave-it-off",
+      "toKey": "1-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "address-directly",
+      "toKey": "1-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "arc2-intro",
+      "toKey": "listen",
+      "event": "listen",
+      "priority": 0
+    },
+    {
+      "fromKey": "arc2-intro",
+      "toKey": "redirect",
+      "event": "redirect",
+      "priority": 0
+    },
+    {
+      "fromKey": "arc2-intro",
+      "toKey": "match-energy",
+      "event": "match-energy",
+      "priority": 0
+    },
+    {
+      "fromKey": "listen",
+      "toKey": "2-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "redirect",
+      "toKey": "2-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "match-energy",
+      "toKey": "2-conclusion",
+      "event": "continue",
+      "priority": 0
+    }
+  ]
+}

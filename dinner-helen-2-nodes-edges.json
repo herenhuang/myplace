@@ -1,0 +1,712 @@
+{
+  "nodes": [
+    {
+      "key": "intro",
+      "kind": "page",
+      "title": "The Promotion Decision",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "You're in your manager's office for what you thought was a routine check-in. Instead, she closes the door and sits down with a serious expression.\n\n\"I have some news,\" she says. \"The senior developer position just opened up unexpectedly. I need to make a recommendation by tomorrow morning.\"\n\nShe pauses. \"It's between you, Jordan, and Sam. You all have different strengths.\" You glance at the team photos on her wall - Jordan who's been [working overtime](/action/overtime-worker) on every project, Sam who [takes initiative](/action/initiative-taker) on new features, and you.\n\n\"I'd like your perspective on this,\" she continues. \"Who do you think would be the best fit?\"",
+          "type": "markdown"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: the MBTI for the user is: {{vars.mbti}}",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "recommend-yourself-page",
+      "kind": "page",
+      "title": "Recommend Yourself",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "You take a breath and say, \"Honestly, I think I'd be the best fit for this role.\"\n\nYour manager raises an eyebrow. You continue, \"I've been consistent in my work, I understand the codebase well, and I think I'm ready for the leadership responsibilities.\"\n\nShe nods thoughtfully. \"That's good self-awareness. But what about [Jordan's dedication](/action/acknowledge-jordan) - those late nights have really moved projects forward. And [Sam's innovations](/action/acknowledge-sam) have impressed the clients.\"\n\nYou feel the weight of [defending your choice](/action/defend-self-recommendation).",
+          "type": "markdown"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User chose to recommend themselves for the promotion, showing confidence in their abilities.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "decision-page",
+      "kind": "page",
+      "title": "The Decision",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "Your manager's patient expression never wavers, pen 🖊️ hovering above the action items. Their patience is thinning as the client deadline approaches. Everyone else shifts in their seats, waiting. You feel the weight of being the one to break the stalemate 🫣.",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "decision_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "What do you decide to do? Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's third click was 'decision' - they reached the final decision point and are now making their choice about how to handle the budget crisis.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "overtime-worker-page",
+      "kind": "page",
+      "title": "The Overtime Worker",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "You think about Jordan - always the first to arrive and last to leave. \"Jordan has really shown dedication,\" you say. \"The late nights, the weekend work...\"\n\nYour manager nods. \"That's true. Jordan's work ethic is impressive.\" She pauses. \"But I'm concerned about [work-life balance](/action/jordan-burnout) - can that pace be sustained in a senior role?\"\n\nYou consider this. Jordan does look [exhausted lately](/action/jordan-exhaustion). But there's also the question of whether [hard work alone](/action/jordan-merit) makes someone the best leader.",
+          "type": "markdown"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User chose to focus on Jordan, the colleague who works overtime and shows dedication through long hours.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "initiative-taker-page",
+      "kind": "page",
+      "title": "The Initiative Taker",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "You think about Sam - always proposing new features, jumping on emerging technologies. \"Sam brings a lot of innovation to the team,\" you say.\n\nYour manager smiles. \"Sam definitely thinks outside the box.\" Her expression shifts slightly. \"Though sometimes I wonder if the focus on [new initiatives](/action/sam-scattered) means other responsibilities get overlooked.\"\n\nYou remember Sam's [brilliant solutions](/action/sam-innovations) that impressed clients, but also the [unfinished projects](/action/sam-follow-through) that others had to complete.",
+          "type": "markdown"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User chose to focus on Sam, the colleague who takes initiative and brings innovation but may lack follow-through.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "split-evenly-salad-page",
+      "kind": "page",
+      "title": "The Minimal User",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "Sarah's laptop 💻 closes with a quiet click. Her silence says enough: $12,500 is nearly triple 🤡 her team's actual costs. ",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "split_evenly_minimal_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "What do you decide to do? Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'minimal user' - they chose the split evenly path and then focused on Sarah's perspective, experiencing the unfairness of the $12,500 split.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'minimal user reflection' - they are now reflecting on the unfairness of the $12,500 split for a team that used minimal resources.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "split-evenly-glasses-page",
+      "kind": "page",
+      "title": "The Wine Glasses",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "The 🍷 empty wine glasses 🍷 glisten under the low light, quiet proof of who really drove the total up. No one else seems ready to call it out. Your throat tightens with the question: should you?",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "split_evenly_glasses_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "How do you handle this situation? Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'wine glasses' - they chose the split evenly path and then focused on the wine glasses, considering whether to speak up about who drove up the bill.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'wine glasses reflection' - they are now reflecting on whether to speak up about who really drove up the bill with multiple drinks.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "small-salad-numbers-page",
+      "kind": "page",
+      "title": "The Numbers",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "$280 🙃 is definitely... not nothing, and is definitely more than you were anticipating spending, especially because you got here late and only had 🍮 dessert.",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "small_salad_numbers_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "What do you decide to do? Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'numbers' - they chose the uneasy friend path and then focused on the numbers, realizing the $280 total is more than expected.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'numbers reflection' - they are now reflecting on the $280 total being more than expected, especially since they only had dessert.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "small-salad-awkward-page",
+      "kind": "page",
+      "title": "The Awkward Silence",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "The silence gnaws at you — the shifting eyes, the forced smiles. You click into the awkward air 💨 itself, wanting it to break.\n\nYou clear your throat, maybe make a 😅 joke, anything to smooth the tension.\n\nOne friend laughs, another looks relieved. But the 🧾 bill still sits there, untouched.",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "small_salad_awkward_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "What's your next move?  Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'awkward silence' - they chose the uneasy friend path and then focused on the awkward silence, trying to diffuse tension with humor.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'awkward silence reflection' - they are now reflecting on the tension and their attempt to diffuse it with humor.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "small-salad-pay-it-all-page",
+      "kind": "page",
+      "title": "Pay It All",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "Yeah. Maybe you should just 🧐 handle it completely for the group?",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "small_salad_pay_it_all_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "Do you decide to pay for everyone? How do you handle this situation?  Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'pay it all' - they chose the uneasy friend path and then considered paying for everyone to resolve the situation.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'pay it all reflection' - they are now reflecting on whether to take on the entire bill to resolve the situation.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "heavy-drinks-group-shifts-page",
+      "kind": "page",
+      "title": "Group Shifts",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "The silence gnaws at you - 🙂 the shifting eyes, the forced smiles. You lean into the tension, trying to break it with a joke or a clearing of your throat.\n\nA couple of people laugh, one looks relieved. But the 🧾 bill still sits there, untouched.",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "heavy_drinks_group_shifts_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "The tension persists. How do you handle this situation?  Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'group shifts' - they chose the heavy drinker path and then focused on the group shifts, trying to diffuse tension with humor.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'group shifts reflection' - they are now reflecting on the tension and their attempt to diffuse it with humor.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "heavy-drinks-half-empty-page",
+      "kind": "page",
+      "title": "Half Empty Drinks",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "Four semi-empty wine glasses sit on the table. You can't stop tallying the extra cost - 🍻 round after round 🍻 that tipped the bill upward. \n\nThe salad-eater 🥗 glances down, avoiding your eyes. The drinker scrolls their phone, pretending not to notice. ",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "heavy_drinks_half_empty_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "What do you decide to do? Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'half-empty drinks' - they chose the heavy drinker path and then focused on the half-empty drinks, feeling the unfairness and tallying extra costs.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'half-empty drinks reflection' - they are now reflecting on the unfairness of the situation and the extra costs from multiple drinks.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "heavy-drinks-scene-page",
+      "kind": "page",
+      "title": "The Scene",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "You can feel it rising — the bill still unpaid, the shifting looks, the friend's 💳 card still tucked away. One spark 🧨 and this could become a bit of a scene.\n\nYou picture voices raised, the night curdling into resentment. Obviously that wouldn't happen 😅 right? Maybe silent resentment at best...",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "continue",
+          "field": "heavy_drinks_scene_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "How do you handle this situation?  Explain your thought process.",
+          "submitLabel": "Submit Decision",
+          "type": "longform"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: User's second click was 'potential scene' - they chose the heavy drinker path and then focused on the potential scene, sensing rising tension and potential conflict.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "context: User's third click was 'potential scene reflection' - they are now reflecting on the rising tension and potential for conflict.",
+          "type": "pushThreadMessage"
+        }
+      ]
+    },
+    {
+      "key": "story-conclusion",
+      "kind": "page",
+      "title": "",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "fromThread": true,
+          "text": "",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "find_out_next",
+          "label": "Find out what happens next",
+          "type": "button"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: The user has made their decision about the dinner bill situation. They wrote: \"{{vars.split_evenly_salad_longform}}{{vars.split_evenly_glasses_longform}}{{vars.small_salad_numbers_longform}}{{vars.small_salad_awkward_longform}}{{vars.small_salad_pay_it_all_longform}}{{vars.heavy_drinks_group_shifts_longform}}{{vars.heavy_drinks_half_empty_longform}}{{vars.heavy_drinks_scene_longform}}{{vars.decision_longform}}\"",
+          "type": "pushThreadMessage"
+        },
+        {
+          "agentId": "kx7dccq0pgzxcahcsh35yma56d7qkxj1",
+          "type": "runAgent"
+        }
+      ]
+    },
+    {
+      "key": "rideshare-scene",
+      "kind": "page",
+      "title": "Back at Your Desk",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "text": "The meeting is over and you're back at your desk 💻. The office hum continues around you. You're replaying the budget discussion in your head *(your team's involvement was minimal really...)* when your phone buzzes with a 📱 message from your manager, Alex.\n\n[Open phone](/action/open_phone)",
+          "type": "markdown"
+        }
+      ],
+      "onEnter": []
+    },
+    {
+      "key": "phone-notification",
+      "kind": "page",
+      "title": "",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "delayMs": 30,
+          "message": "Hi! I need your department to cover $12,500 of the budget shortfall by end of week. Thanks!",
+          "replyActionKey": "reply_to_alex",
+          "type": "iphoneNotification",
+          "viewActionKey": "view_message"
+        }
+      ],
+      "onEnter": []
+    },
+    {
+      "key": "phone-chat",
+      "kind": "chat",
+      "title": "",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "continueActionKey": "continue_chat",
+          "type": "iphoneChat"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: you are alex, a manager in a text conversation with a team member. you made a decision about budget allocation without consulting everyone, but now you need them to cover costs. your goal is ultimately to get the budget resolved ASAP. reminder send short messages because you are texting.\n\nIMPORTANT: Start the conversation with the message \"Hi! I need your department to cover $12,500 of the budget shortfall by end of week. Thanks!\"",
+          "type": "pushThreadMessage"
+        },
+        {
+          "agent": "chat",
+          "type": "runAgent"
+        }
+      ]
+    },
+    {
+      "key": "chat-reflection",
+      "kind": "page",
+      "title": "Reflection",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "So that's the message exchange you had with your manager Alex. But what were you actually thinking 💭? ",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "finalendingconclusion",
+          "field": "chat_reflection_longform",
+          "maxCharacters": 500,
+          "minCharacters": 50,
+          "placeholder": "What were you really thinking during that exchange with your manager Alex? How did it make you feel?",
+          "submitLabel": "Submit Reflection",
+          "type": "longform"
+        }
+      ],
+      "onEnter": []
+    },
+    {
+      "key": "personality-assessment",
+      "kind": "page",
+      "title": "Personality Assessment",
+      "bgColor": "#FFFAF3",
+      "components": [
+        {
+          "fromThread": true,
+          "json": "",
+          "type": "insights"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "context: Based on the user's behavior throughout this workplace budget crisis - their decisions, responses, and reflections - provide a personality assessment. Analyze their choices, communication style, conflict resolution approach, and emotional responses. Give insights into their character, values, and how they handle workplace situations.",
+          "type": "pushThreadMessage"
+        },
+        {
+          "agentId": "kx7cg2ft1nd1fvhpc23vb2mh1n7qksj2",
+          "type": "runAgent"
+        }
+      ]
+    },
+    {
+      "key": "scene2conclusion",
+      "kind": "page",
+      "title": "",
+      "components": [
+        {
+          "fromThread": true,
+          "text": "",
+          "type": "markdown"
+        },
+        {
+          "actionKey": "koko",
+          "label": "What did my actions say about me?",
+          "type": "button"
+        }
+      ],
+      "onEnter": [
+        {
+          "text": "Using all the context you have from this entire conversation, follow the prompt below. Use second person. ",
+          "type": "pushThreadMessage"
+        },
+        {
+          "text": "cont: {{vars.chat_reflection_longform}}",
+          "type": "pushThreadMessage"
+        },
+        {
+          "agentId": "kx79t47cy1yzq3nqeg18pre2yh7qj4x4",
+          "type": "runAgent"
+        }
+      ]
+    },
+    {
+      "key": "mbti",
+      "kind": "page",
+      "title": "Welcome to the Workplace Simulation! 🎉",
+      "components": [
+        {
+          "fromThread": false,
+          "text": "This is a new type of workplace assessment - where your professional persona is evaluated not through theoretical answers but through your actual decisions 👀. \n\nReally consider 🤔 what you would actually do in this workplace scenario. The more context and thoughts you provide, the more accurate your assessment will be. \n\nTo begin, please enter your expected MBTI ⤵️ below: ",
+          "type": "markdown"
+        },
+        {
+          "field": "mbti",
+          "placeholder": "this is the spot",
+          "type": "input"
+        },
+        {
+          "actionKey": "mbti_submit",
+          "label": "Enter the workplace simulation! ",
+          "type": "button"
+        }
+      ],
+      "onEnter": []
+    }
+  ],
+  "edges": [
+    {
+      "fromKey": "intro",
+      "toKey": "recommend-yourself-page",
+      "event": "recommend-yourself",
+      "priority": 0
+    },
+    {
+      "fromKey": "split-evenly-page",
+      "toKey": "decision-page",
+      "event": "split-evenly-decision",
+      "priority": 0
+    },
+    {
+      "fromKey": "intro",
+      "toKey": "overtime-worker-page",
+      "event": "overtime-worker",
+      "priority": 0
+    },
+    {
+      "fromKey": "intro",
+      "toKey": "initiative-taker-page",
+      "event": "initiative-taker",
+      "priority": 0
+    },
+    {
+      "fromKey": "split-evenly-page",
+      "toKey": "split-evenly-salad-page",
+      "event": "split-evenly-minimal",
+      "priority": 0
+    },
+    {
+      "fromKey": "split-evenly-page",
+      "toKey": "split-evenly-glasses-page",
+      "event": "split-evenly-excessive",
+      "priority": 0
+    },
+    {
+      "fromKey": "small-salad-page",
+      "toKey": "small-salad-numbers-page",
+      "event": "small-scope-numbers",
+      "priority": 0
+    },
+    {
+      "fromKey": "small-salad-page",
+      "toKey": "small-salad-awkward-page",
+      "event": "small-scope-awkward",
+      "priority": 0
+    },
+    {
+      "fromKey": "small-salad-page",
+      "toKey": "small-salad-pay-it-all-page",
+      "event": "small-scope-cover-all",
+      "priority": 0
+    },
+    {
+      "fromKey": "heavy-drinks-page",
+      "toKey": "heavy-drinks-group-shifts-page",
+      "event": "heavy-spending-group-shifts",
+      "priority": 0
+    },
+    {
+      "fromKey": "heavy-drinks-page",
+      "toKey": "heavy-drinks-half-empty-page",
+      "event": "heavy-spending-unused",
+      "priority": 0
+    },
+    {
+      "fromKey": "heavy-drinks-page",
+      "toKey": "heavy-drinks-scene-page",
+      "event": "heavy-spending-scene",
+      "priority": 0
+    },
+    {
+      "fromKey": "split-evenly-salad-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "split-evenly-glasses-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "small-salad-numbers-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "small-salad-awkward-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "small-salad-pay-it-all-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "heavy-drinks-group-shifts-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "heavy-drinks-half-empty-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "heavy-drinks-scene-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "decision-page",
+      "toKey": "story-conclusion",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "story-conclusion",
+      "toKey": "rideshare-scene",
+      "event": "find_out_next",
+      "priority": 0
+    },
+    {
+      "fromKey": "rideshare-scene",
+      "toKey": "phone-notification",
+      "event": "open_phone",
+      "priority": 0
+    },
+    {
+      "fromKey": "phone-notification",
+      "toKey": "phone-chat",
+      "event": "view_message",
+      "priority": 0
+    },
+    {
+      "fromKey": "phone-notification",
+      "toKey": "phone-chat",
+      "event": "reply_to_alex",
+      "priority": 0
+    },
+    {
+      "fromKey": "phone-chat",
+      "toKey": "chat-reflection",
+      "event": "continue_chat",
+      "priority": 0
+    },
+    {
+      "fromKey": "chat-reflection",
+      "toKey": "personality-assessment",
+      "event": "continue",
+      "priority": 0
+    },
+    {
+      "fromKey": "chat-reflection",
+      "toKey": "scene2conclusion",
+      "event": "finalendingconclusion",
+      "priority": 0
+    },
+    {
+      "fromKey": "scene2conclusion",
+      "toKey": "personality-assessment",
+      "event": "koko",
+      "priority": 0
+    },
+    {
+      "fromKey": "mbti",
+      "toKey": "intro",
+      "event": "mbti_submit",
+      "priority": 0
+    }
+  ]
+}
