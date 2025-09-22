@@ -22,8 +22,15 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
   ({ className, ...props }, ref) => {
     const [votes, setVotes] = useState<Record<string, number>>({});
     const [loading, setLoading] = useState<Record<string, boolean>>({});
+    const [votedCards, setVotedCards] = useState<Set<string>>(new Set());
 
     useEffect(() => {
+      // Load voted cards from localStorage
+      const storedVotedCards = localStorage.getItem('orangeVotedCards');
+      if (storedVotedCards) {
+        setVotedCards(new Set(JSON.parse(storedVotedCards)));
+      }
+
       // Fetch initial vote counts from the API
       fetch('/.netlify/functions/reactions-get')
         .then(response => {
@@ -59,7 +66,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
     }, []);
 
     const handleVote = async (cardId: string) => {
-      if (loading[cardId]) return;
+      if (loading[cardId] || votedCards.has(cardId)) return;
       
       setLoading(prev => ({ ...prev, [cardId]: true }));
       
@@ -80,6 +87,12 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               ...prev,
               [cardId]: data.count
             }));
+            
+            // Mark this card as voted and save to localStorage
+            const newVotedCards = new Set(votedCards);
+            newVotedCards.add(cardId);
+            setVotedCards(newVotedCards);
+            localStorage.setItem('orangeVotedCards', JSON.stringify([...newVotedCards]));
           } else {
             throw new Error('Response is not JSON');
           }
@@ -93,6 +106,12 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           ...prev,
           [cardId]: (prev[cardId] || 0) + 1
         }));
+        
+        // Mark this card as voted and save to localStorage
+        const newVotedCards = new Set(votedCards);
+        newVotedCards.add(cardId);
+        setVotedCards(newVotedCards);
+        localStorage.setItem('orangeVotedCards', JSON.stringify([...newVotedCards]));
       } finally {
         setLoading(prev => ({ ...prev, [cardId]: false }));
       }
@@ -189,10 +208,14 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           <div className='flex justify-end mt-3'>
             <button 
               onClick={() => handleVote('card-1')}
-              disabled={loading['card-1']}
-              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+              disabled={loading['card-1'] || votedCards.has('card-1')}
+              className={`w-fit py-2 px-3 border border-gray-200 text-base transition-colors ${
+                votedCards.has('card-1') 
+                  ? 'bg-green-100 text-green-700 cursor-not-allowed' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer'
+              } ${loading['card-1'] ? 'bg-gray-50 cursor-not-allowed' : ''}`}
             >
-              👍 {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
+              {votedCards.has('card-1') ? '✅' : '👍'} {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
             </button>
           </div>
         </div>
@@ -215,10 +238,14 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           <div className='flex justify-end mt-3'>
             <button 
               onClick={() => handleVote('card-2')}
-              disabled={loading['card-2']}
-              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+              disabled={loading['card-2'] || votedCards.has('card-2')}
+              className={`w-fit py-2 px-3 border border-gray-200 text-base transition-colors ${
+                votedCards.has('card-2') 
+                  ? 'bg-green-100 text-green-700 cursor-not-allowed' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer'
+              } ${loading['card-2'] ? 'bg-gray-50 cursor-not-allowed' : ''}`}
             >
-              👍 {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
+              {votedCards.has('card-2') ? '✅' : '👍'} {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
             </button>
           </div>
         </div>
@@ -241,10 +268,14 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           <div className='flex justify-end mt-3'>
             <button 
               onClick={() => handleVote('card-3')}
-              disabled={loading['card-3']}
-              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+              disabled={loading['card-3'] || votedCards.has('card-3')}
+              className={`w-fit py-2 px-3 border border-gray-200 text-base transition-colors ${
+                votedCards.has('card-3') 
+                  ? 'bg-green-100 text-green-700 cursor-not-allowed' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer'
+              } ${loading['card-3'] ? 'bg-gray-50 cursor-not-allowed' : ''}`}
             >
-              👍 {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
+              {votedCards.has('card-3') ? '✅' : '👍'} {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
             </button>
           </div>
         </div>
@@ -267,10 +298,14 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           <div className='flex justify-end mt-3'>
             <button 
               onClick={() => handleVote('card-4')}
-              disabled={loading['card-4']}
-              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+              disabled={loading['card-4'] || votedCards.has('card-4')}
+              className={`w-fit py-2 px-3 border border-gray-200 text-base transition-colors ${
+                votedCards.has('card-4') 
+                  ? 'bg-green-100 text-green-700 cursor-not-allowed' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer'
+              } ${loading['card-4'] ? 'bg-gray-50 cursor-not-allowed' : ''}`}
             >
-              👍 {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
+              {votedCards.has('card-4') ? '✅' : '👍'} {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
             </button>
           </div>
         </div>
@@ -293,10 +328,14 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           <div className='flex justify-end mt-3'>
             <button 
               onClick={() => handleVote('card-5')}
-              disabled={loading['card-5']}
-              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+              disabled={loading['card-5'] || votedCards.has('card-5')}
+              className={`w-fit py-2 px-3 border border-gray-200 text-base transition-colors ${
+                votedCards.has('card-5') 
+                  ? 'bg-green-100 text-green-700 cursor-not-allowed' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer'
+              } ${loading['card-5'] ? 'bg-gray-50 cursor-not-allowed' : ''}`}
             >
-              👍 {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
+              {votedCards.has('card-5') ? '✅' : '👍'} {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
             </button>
           </div>
         </div>
@@ -319,10 +358,14 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           <div className='flex justify-end mt-3'>
             <button 
               onClick={() => handleVote('card-6')}
-              disabled={loading['card-6']}
-              className='w-fit py-2 px-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed border border-gray-200 text-base text-gray-700 transition-colors cursor-pointer'
+              disabled={loading['card-6'] || votedCards.has('card-6')}
+              className={`w-fit py-2 px-3 border border-gray-200 text-base transition-colors ${
+                votedCards.has('card-6') 
+                  ? 'bg-green-100 text-green-700 cursor-not-allowed' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer'
+              } ${loading['card-6'] ? 'bg-gray-50 cursor-not-allowed' : ''}`}
             >
-              👍 {loading['card-6'] ? '...' : (votes['card-6'] || 0)}
+              {votedCards.has('card-6') ? '✅' : '👍'} {loading['card-6'] ? '...' : (votes['card-6'] || 0)}
             </button>
           </div>
         </div>
