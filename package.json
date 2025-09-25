@@ -9,12 +9,19 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@auth/core": "^0.40.0",
+    "@convex-dev/auth": "^0.0.90",
+    "@radix-ui/react-slot": "^1.2.3",
     "@upstash/redis": "^1.35.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "convex": "^1.19.0",
     "dotenv": "^17.2.2",
     "motion": "^12.23.12",
     "next": "15.5.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

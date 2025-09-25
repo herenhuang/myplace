@@ -6,6 +6,9 @@ import React, { useRef, forwardRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ImageMask from '@/components/ui/image-mask';
+import { AuthButton } from '@/components/AuthButton';
+import { UserProfile } from '@/components/UserProfile';
+import { Authenticated, Unauthenticated } from "convex/react";
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
@@ -37,6 +40,16 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
       <h1 className='2xl:text-8xl text-7xl px-8 font-semibold text-center tracking-tight leading-[120%] relative z-10'>
         Personality quizzes you can play <br /> <span className='text-6xl'>👇👇👇</span>
       </h1>
+
+      <div className="p-4 z-10">
+        <Unauthenticated>
+          <AuthButton />
+        </Unauthenticated>
+        <Authenticated>
+          <UserProfile />
+        </Authenticated>
+      </div>
+
     </motion.section>
   );
 };
