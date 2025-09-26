@@ -6,12 +6,15 @@ import React, { useRef, forwardRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ImageMask from '@/components/ui/image-mask';
+import type { User } from '@supabase/supabase-js';
+import { signOut } from '@/app/auth/actions';
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
+  user: User | null;
 }
 
-const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
+const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = ({ scrollYProgress, user }) => {
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, -5]);
   return (
@@ -37,11 +40,34 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
       <h1 className='2xl:text-8xl text-7xl px-8 font-semibold text-center tracking-tight leading-[120%] relative z-10'>
         Personality quizzes you can play <br /> <span className='text-6xl'>👇👇👇</span>
       </h1>
+      {!user && (
+        <div className="mt-8 z-10">
+          <Link href="/signup" className="px-8 py-4 bg-black text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition-colors duration-200">
+              Sign In
+          </Link>
+        </div>
+      )}
+      {user && (
+        <div className="mt-8 z-10 bg-white/30 backdrop-blur-lg p-3 rounded-full flex items-center space-x-4 shadow-lg">
+          <div>
+            <p className="font-semibold text-gray-900">{user.user_metadata.full_name}</p>
+            <p className="text-sm text-gray-700">{user.email}</p>
+          </div>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-black text-white font-semibold rounded-full shadow-md hover:bg-gray-800 transition-colors duration-200"
+            >
+              Sign Out
+            </button>
+          </form>
+        </div>
+      )}
     </motion.section>
   );
 };
 
-const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
+const Section2: React.FC<Omit<SectionProps, 'user'>> = ({ scrollYProgress }) => {
   const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
   const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
   
@@ -103,8 +129,15 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
 };
 
 
-const Component = forwardRef<HTMLElement>(() => {
+interface ComponentProps {
+    user: User | null;
+}
+
+const Component = forwardRef<HTMLElement, ComponentProps>(({ user }, ref) => {
   const container = useRef<HTMLDivElement>(null);
+  
+  React.useImperativeHandle(ref, () => container.current as HTMLElement);
+
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ['start start', 'end end'],
@@ -113,7 +146,7 @@ const Component = forwardRef<HTMLElement>(() => {
   return (
     <>
       <main ref={container} className='relative h-[200vh] bg-black'>
-        <Section1 scrollYProgress={scrollYProgress} />
+        <Section1 scrollYProgress={scrollYProgress} user={user} />
         <Section2 scrollYProgress={scrollYProgress} />
       </main>
     </>
