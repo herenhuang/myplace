@@ -4,7 +4,7 @@ import Component from '@/components/ui/hero-scroll-animation';
 
 function ComponentDemo() {
   return (
-    <Component />
+    <Component user={null} />
   );
 }
 

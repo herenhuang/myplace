@@ -2,28 +2,30 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { cookies, headers } from 'next/headers'
+import { headers } from 'next/headers'
+import { type Provider } from '@supabase/supabase-js'
+
+const PROVIDERS: Provider[] = ['google', 'github']
 
 export async function signOut() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createClient()
   await supabase.auth.signOut()
   return redirect('/')
 }
 
 export async function oAuthSignIn(formData: FormData) {
-  const provider = formData.get('provider')
+  const provider = formData.get('provider') as Provider
 
-  if (!provider || typeof provider !== 'string') {
-    return redirect('/login?message=No provider selected')
+  if (provider && !PROVIDERS.includes(provider)) {
+    return redirect('/login?message=Unsupported provider')
   }
 
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
-  const origin = headers().get('origin')
+  const supabase = await createClient()
+  const heads = await headers()
+  const origin = heads.get('origin')
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: provider as any,
+    provider,
     options: {
       redirectTo: `${origin}/auth/callback`,
     },

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signup } from './actions';
 import { oAuthSignIn } from '../auth/actions';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +110,7 @@ export default function SignupPage() {
                 type="submit"
                 className="w-full flex justify-center items-center px-4 py-2.5 border border-gray-300 rounded-lg cursor-pointer shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >
-                <img src="/google.svg" alt="Google" className="w-4 h-4 mr-2" />
+                <Image src="/google.svg" alt="Google" width={16} height={16} className="mr-2" />
                 <span className="text-sm font-medium tracking-tight text-gray-700"> Continue with Google </span>
               </button>
             </form>
