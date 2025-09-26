@@ -42,7 +42,7 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
       </h1>
       {!user && (
         <div className="mt-8 z-10">
-          <Link href="/signup" className="px-8 py-4 bg-black text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition-colors duration-200">
+          <Link href="/signup" className="px-5 py-3 bg-orange-500 hover:bg-orange-600 text-white text-base font-bold tracking-tight rounded-full shadow-md transition-colors duration-200">
               Sign In
           </Link>
         </div>
@@ -50,8 +50,8 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
       {user && (
         <div className="mt-8 z-10 bg-white/30 backdrop-blur-lg p-3 rounded-full flex items-center space-x-4 shadow-lg">
           <div>
-            <p className="font-semibold text-gray-900">{user.user_metadata.full_name}</p>
-            <p className="text-sm text-gray-700">{user.email}</p>
+            <p className="font-semibold tracking-tight text-black">{user.user_metadata.full_name}</p>
+            <p className="font-medium tracking-tight text-sm text-gray-700">{user.email}</p>
           </div>
           <form action={signOut}>
             <button

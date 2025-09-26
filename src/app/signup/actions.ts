@@ -40,5 +40,5 @@ export async function signup(formData: FormData) {
     return { error: 'Could not authenticate user' }
   }
 
-  return redirect('/welcome')
+  return { success: true }
 }
