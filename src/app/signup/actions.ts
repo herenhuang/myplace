@@ -2,16 +2,16 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { headers, cookies } from 'next/headers'
+import { headers } from 'next/headers'
 
 export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirmPassword') as string
   const name = formData.get('name') as string
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
-  const origin = headers().get('origin')
+  const supabase = await createClient()
+  const heads = await headers()
+  const origin = heads.get('origin')
 
   if (password !== confirmPassword) {
     return { error: 'Passwords do not match' }
