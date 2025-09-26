@@ -7,7 +7,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ImageMask from '@/components/ui/image-mask';
 import type { User } from '@supabase/supabase-js';
-import { signOut } from '@/app/auth/actions';
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
@@ -48,20 +47,17 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
         </div>
       )}
       {user && (
-        <div className="mt-8 z-10 bg-white/30 backdrop-blur-lg p-3 rounded-full flex items-center space-x-4 shadow-lg">
-          <div>
-            <p className="font-semibold tracking-tight text-black">{user.user_metadata.full_name}</p>
-            <p className="font-medium tracking-tight text-sm text-gray-700">{user.email}</p>
+        <Link href="/profile" className="mt-8 z-10 block">
+          <div className="bg-white/30 backdrop-blur-lg p-3 rounded-full flex items-center space-x-4 shadow-lg hover:bg-white/40 transition-all duration-200 cursor-pointer">
+            <div>
+              <p className="font-semibold tracking-tight text-black">{user.user_metadata.full_name}</p>
+              <p className="font-medium tracking-tight text-sm text-gray-700">{user.email}</p>
+            </div>
+            <div className="px-4 py-2 bg-black/10 text-black font-semibold rounded-full">
+              View Profile
+            </div>
           </div>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-black text-white font-semibold rounded-full shadow-md hover:bg-gray-800 transition-colors duration-200"
-            >
-              Sign Out
-            </button>
-          </form>
-        </div>
+        </Link>
       )}
     </motion.section>
   );

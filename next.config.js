@@ -8,6 +8,9 @@ const nextConfig = {
     // number of pages that should be kept simultaneously without being disposed
     pagesBufferLength: 2,
   },
+  images: {
+    domains: ['lh3.googleusercontent.com'],
+  },
 }
 
 module.exports = nextConfig
