@@ -169,7 +169,7 @@ export default function ProfilePage() {
 								</div>
 							) : (
 								<div className="text-center py-8 bg-gray-50 rounded-lg">
-									<p className="text-gray-600">You haven't played any games yet.</p>
+									<p className="text-gray-600">You haven&apos;t played any games yet.</p>
 									<Link href="/" className="text-orange-500 hover:text-orange-600 font-medium mt-2 inline-block">
 										Play a game
 									</Link>
