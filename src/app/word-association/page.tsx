@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useTransition } from 'react';
+import { useState, useEffect, useRef, useTransition, useCallback } from 'react';
 import { getInterleavedWords } from '../../lib/word_bank';
 import StartScreen from '../../components/word-association/StartScreen';
 import ResultsScreen from '../../components/word-association/ResultsScreen';
@@ -74,12 +74,12 @@ export default function WordAssociationPage() {
 		}, 30);
 	};
 
-	const clearTimer = () => {
+	const clearTimer = useCallback(() => {
 		if (timerIntervalRef.current) {
 			clearInterval(timerIntervalRef.current);
 			timerIntervalRef.current = null;
 		}
-	};
+	}, []);
 
 	const commitCurrent = () => {
 		const currentWord = words[index];
@@ -145,14 +145,14 @@ export default function WordAssociationPage() {
 		}
 	};
 
-	const exitGame = () => {
+	const exitGame = useCallback(() => {
 		clearTimer();
 		setStarted(false);
 		setFinished(false);
 		setInputValue('');
 		setElapsedMs(0);
 		setIndex(0);
-	};
+	}, [clearTimer]);
 
 	useEffect(() => {
 		const handleGlobalKeydown = (event: KeyboardEvent) => {
@@ -167,7 +167,7 @@ export default function WordAssociationPage() {
 			window.removeEventListener('keydown', handleGlobalKeydown);
 			clearTimer();
 		};
-	}, [started]);
+	}, [started, exitGame, clearTimer]);
 
 	useEffect(() => {
 		if (started && inputRef.current) {

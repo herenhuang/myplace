@@ -51,7 +51,8 @@ const words = [
 	'slavery'
 ];
 
-function shuffle(array) {
+
+function shuffle<T>(array: T[]): T[] {
 	let currentIndex = array.length,
 		randomIndex;
 
@@ -64,6 +65,6 @@ function shuffle(array) {
 	return array;
 }
 
-export function getInterleavedWords(length) {
+export function getInterleavedWords(length: number): string[] {
 	return shuffle([...words]).slice(0, length);
 }
