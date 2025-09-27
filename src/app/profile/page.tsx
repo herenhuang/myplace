@@ -144,7 +144,7 @@ export default function ProfilePage() {
 					<div className="px-8 py-8">
 
 						{/* Game Sessions */}
-						<div className="mt-8 pt-6 border-t border-gray-200 col-span-1 md:col-span-2">
+						<div className="col-span-1 md:col-span-2">
 							<h2 className="text-2xl font-semibold text-gray-900 mb-6">Your Game Sessions</h2>
 							{sessions.length > 0 ? (
 								<div className="grid grid-cols-1 gap-6">
