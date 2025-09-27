@@ -1,5 +1,8 @@
 'use client';
 
+import type { User } from '@supabase/supabase-js';
+import UserButton from '../ui/UserButton';
+
 interface StartScreenProps {
 	title: string;
 	subtitle: string;
@@ -9,6 +12,7 @@ interface StartScreenProps {
 	setSelectedLength: (length: number) => void;
 	timePerWordMs: number;
 	setTimePerWordMs: (time: number) => void;
+	user: User | null;
 }
 
 const StartScreen = ({
@@ -19,10 +23,14 @@ const StartScreen = ({
 	selectedLength,
 	setSelectedLength,
 	timePerWordMs,
-	setTimePerWordMs
+	setTimePerWordMs,
+	user
 }: StartScreenProps) => {
 	return (
 		<section className="config">
+			<div className="absolute top-6 right-6 z-10">
+				<UserButton user={user} />
+			</div>
 			<div className="mast">
 				<h1 className="title">{title}</h1>
 				<p className="hint">{subtitle}</p>

@@ -1,6 +1,7 @@
 'use server';
 
 import Groq from 'groq-sdk';
+import { createClient } from '@/lib/supabase/server';
 
 function parseAnalysisJson(text: string): { summary: string; scores: number[] } | null {
 	try {
@@ -19,6 +20,11 @@ function parseAnalysisJson(text: string): { summary: string; scores: number[] } 
 }
 
 export async function analyze(userResponses: string) {
+	const supabase = await createClient();
+	const {
+		data: { user }
+	} = await supabase.auth.getUser();
+
 	const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 	if (!userResponses) {
@@ -71,6 +77,28 @@ Example output format:
 
 		if (!parsedAnalysis) {
 			return { error: 'Failed to parse analysis from AI response.' };
+		}
+
+		if (user) {
+			try {
+				const gameData = JSON.parse(userResponses);
+				const sessionData = {
+					game_id: 'word-association',
+					user_id: user.id,
+					data: gameData,
+					result: parsedAnalysis
+				};
+
+				const { error } = await supabase.from('sessions').insert([sessionData]);
+
+                console.log(sessionData);
+
+				if (error) {
+					console.error('Error saving game session:', error);
+				}
+			} catch (e) {
+				console.error('Could not save game session', e);
+			}
 		}
 
 		return { success: true, analysis: parsedAnalysis };

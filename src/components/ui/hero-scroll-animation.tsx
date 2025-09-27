@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ImageMask from '@/components/ui/image-mask';
 import type { User } from '@supabase/supabase-js';
+import UserButton from './UserButton';
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
@@ -35,30 +36,13 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
           />
         </Link>
       </div>
+      <div className="absolute top-6 right-6 z-10">
+				<UserButton user={user} />
+			</div>
 
       <h1 className='2xl:text-8xl text-7xl px-8 font-semibold text-center tracking-tight leading-[120%] relative z-10'>
         Personality quizzes you can play <br /> <span className='text-6xl'>👇👇👇</span>
       </h1>
-      {!user && (
-        <div className="mt-8 z-10">
-          <Link href="/signup" className="px-5 py-3 bg-orange-500 hover:bg-orange-600 text-white text-base font-bold tracking-tight rounded-full shadow-md transition-colors duration-200">
-              Sign In
-          </Link>
-        </div>
-      )}
-      {user && (
-        <Link href="/profile" className="mt-8 z-10 block">
-          <div className="bg-white/30 backdrop-blur-lg p-3 rounded-full flex items-center space-x-4 shadow-lg hover:bg-white/40 transition-all duration-200 cursor-pointer">
-            <div>
-              <p className="font-semibold tracking-tight text-black">{user.user_metadata.full_name}</p>
-              <p className="font-medium tracking-tight text-sm text-gray-700">{user.email}</p>
-            </div>
-            <div className="px-4 py-2 bg-black/10 text-black font-semibold rounded-full">
-              View Profile
-            </div>
-          </div>
-        </Link>
-      )}
     </motion.section>
   );
 };

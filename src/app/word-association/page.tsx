@@ -6,6 +6,8 @@ import StartScreen from '../../components/word-association/StartScreen';
 import ResultsScreen from '../../components/word-association/ResultsScreen';
 import { analyze } from './actions';
 import './styles.css';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 const CACHE_KEY = 'word-association-cache';
 
@@ -40,6 +42,7 @@ export default function WordAssociationPage() {
 	const [isAnalyzing, startAnalysis] = useTransition();
 	const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 	const [analysisError, setAnalysisError] = useState<string | null>(null);
+	const [user, setUser] = useState<User | null>(null);
 
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -173,6 +176,15 @@ export default function WordAssociationPage() {
 	}, [started, index]);
 
 	useEffect(() => {
+		const supabase = createClient();
+		const getUser = async () => {
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
+			setUser(user);
+		};
+		getUser();
+
 		const cachedResults = localStorage.getItem(CACHE_KEY);
 		if (cachedResults) {
 			try {
@@ -205,6 +217,7 @@ export default function WordAssociationPage() {
 							timePerWordMs={timePerWordMs}
 							setTimePerWordMs={setTimePerWordMs}
 							onStart={startGame}
+							user={user}
 						/>
 					</div>
 				)}
