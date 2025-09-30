@@ -8,6 +8,7 @@ import { analyze } from './actions';
 import './styles.css';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { getOrCreateSessionId } from '@/lib/session';
 
 const CACHE_KEY = 'word-association-cache';
 
@@ -43,6 +44,7 @@ export default function WordAssociationPage() {
 	const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 	const [analysisError, setAnalysisError] = useState<string | null>(null);
 	const [user, setUser] = useState<User | null>(null);
+	const [sessionId, setSessionId] = useState<string>('');
 
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -123,7 +125,7 @@ export default function WordAssociationPage() {
 		);
 
 		startAnalysis(async () => {
-			const result = await analyze(resultsJson);
+			const result = await analyze(resultsJson, sessionId);
 			if (result.success && result.analysis) {
 				setAnalysisResult(result.analysis);
 				const cacheData = { analysisResult: result.analysis, resultsJson };
@@ -184,6 +186,20 @@ export default function WordAssociationPage() {
 			setUser(user);
 		};
 		getUser();
+
+		// Ensure a persistent session id and create anonymous auth if needed
+		(async () => {
+			const sid = getOrCreateSessionId();
+			setSessionId(sid);
+			try {
+				const { data } = await supabase.auth.getSession();
+				if (!data.session) {
+					await supabase.auth.signInAnonymously();
+				}
+			} catch {
+				// non-fatal
+			}
+		})();
 
 		const cachedResults = localStorage.getItem(CACHE_KEY);
 		if (cachedResults) {
