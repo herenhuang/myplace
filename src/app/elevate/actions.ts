@@ -18,12 +18,18 @@ export interface StepData {
 }
 
 export async function startSession(clientSessionId?: string) {
-  const supabase = await createClient()
-  const {
-    data: { user }
-  } = await supabase.auth.getUser()
-
   try {
+    const supabase = await createClient()
+    
+    // Validate Supabase environment variables
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error('❌ [SESSION] Supabase environment variables not found')
+      return { error: 'Database configuration error. Please try again.' }
+    }
+    
+    const {
+      data: { user }
+    } = await supabase.auth.getUser()
     const hdrs = await headers()
     const ipHeader = hdrs.get('x-forwarded-for') || hdrs.get('x-real-ip') || null
     const clientIp = ipHeader ? ipHeader.split(',')[0]?.trim() || null : null
@@ -62,9 +68,19 @@ export async function recordStep(
   sessionId: string,
   stepData: StepData
 ) {
-  const supabase = await createClient()
-
   try {
+    const supabase = await createClient()
+    
+    // Validate required parameters
+    if (!sessionId) {
+      console.error('❌ [RECORD] Session ID is required')
+      return { error: 'Invalid session. Please try again.' }
+    }
+    
+    if (!stepData || !stepData.userResponse) {
+      console.error('❌ [RECORD] Step data is required')
+      return { error: 'Invalid step data. Please try again.' }
+    }
     // Get current session
     const { data: sessionData, error: fetchError } = await supabase
       .from('sessions')
@@ -129,24 +145,11 @@ async function generateStepImage(scenarioText: string, stepNumber: number): Prom
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-image-preview' })
     console.log('✅ [IMAGE GEN] Gemini model initialized')
 
-    // Read the style reference images for steps 3+
-    const publicDir = path.join(process.cwd(), 'public', 'elevate')
-    const styleImage1Path = path.join(publicDir, 'marble.png')
-    const styleImage2Path = path.join(publicDir, 'marble-1.png')
-    
-    console.log(`📂 [IMAGE GEN] Looking for reference images at:`)
-    console.log(`   - ${styleImage1Path}`)
-    console.log(`   - ${styleImage2Path}`)
+    // For serverless environments, skip file system operations and use a simpler approach
+    console.log('🔄 [IMAGE GEN] Using text-only generation for serverless compatibility')
 
-    const [styleImage1] = await Promise.all([
-      fs.readFile(styleImage1Path),
-    ])
-    
-    console.log(`✅ [IMAGE GEN] Reference images loaded:`)
-    console.log(`   - marble.png: ${styleImage1.length} bytes`)
-
-    // Create the prompt for image generation
-    const imagePrompt = `Create a simple, 3d, minimalist POV illustration in the style of the reference images provided. The scene should depict: ${scenarioText}
+    // Create the prompt for image generation without file references
+    const imagePrompt = `Create a simple, 3d, minimalist POV illustration. The scene should depict: ${scenarioText}
 
 Style requirements:
 - Use warm orange tones and simple geometric shapes
@@ -154,20 +157,12 @@ Style requirements:
 - Professional conference/tech event aesthetic
 - 3d marble aesthetic
 - Abstract and modern
-- Similar composition and style to the reference images`
+- Clean composition with good contrast`
 
     console.log('🚀 [IMAGE GEN] Sending request to Gemini API...')
     
-    // Generate image with style references
-    const result = await model.generateContent([
-      imagePrompt,
-      {
-        inlineData: {
-          data: styleImage1.toString('base64'),
-          mimeType: 'image/png'
-        }
-      }
-    ])
+    // Generate image without style references for serverless compatibility
+    const result = await model.generateContent([imagePrompt])
 
     console.log('✅ [IMAGE GEN] Received response from Gemini API')
     
@@ -317,6 +312,13 @@ export async function generateNextStep(
   currentStep: number
 ) {
   const supabase = await createClient()
+  
+  // Validate required environment variables
+  if (!process.env.GROQ_API_KEY) {
+    console.error('❌ [STEP GEN] GROQ_API_KEY not found in environment variables')
+    return { error: 'Service configuration error. Please try again.' }
+  }
+  
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
   try {
@@ -337,20 +339,25 @@ export async function generateNextStep(
     // Get step-specific prompt and combine with base system prompt
     const stepSpecificPrompt = getStepPrompt(currentStep, steps)
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        { 
-          role: 'system', 
-          content: BASE_SYSTEM_PROMPT
-        },
-        { 
-          role: 'user', 
-          content: stepSpecificPrompt
-        }
-      ],
-      model: 'openai/gpt-oss-20b',
-      response_format: { type: 'json_object' }
-    })
+    const chatCompletion = await Promise.race([
+      groq.chat.completions.create({
+        messages: [
+          { 
+            role: 'system', 
+            content: BASE_SYSTEM_PROMPT
+          },
+          { 
+            role: 'user', 
+            content: stepSpecificPrompt
+          }
+        ],
+        model: 'openai/gpt-oss-20b',
+        response_format: { type: 'json_object' }
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('API request timeout')), 30000)
+      )
+    ]) as any
 
     const response = chatCompletion.choices[0]?.message?.content || '{}'
     const stepContent = JSON.parse(response)
@@ -428,6 +435,13 @@ export async function generateStepImageForStep(
 
 export async function analyzeArchetype(sessionId: string) {
   const supabase = await createClient()
+  
+  // Validate required environment variables
+  if (!process.env.GROQ_API_KEY) {
+    console.error('❌ [ANALYSIS] GROQ_API_KEY not found in environment variables')
+    return { error: 'Service configuration error. Please try again.' }
+  }
+  
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
   try {
@@ -485,11 +499,16 @@ Analyze their choices and response patterns. Return a JSON object with:
 
 Return ONLY the JSON - no other text.`
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: analysisPrompt }],
-      model: 'openai/gpt-oss-20b',
-      response_format: { type: 'json_object' }
-    })
+    const chatCompletion = await Promise.race([
+      groq.chat.completions.create({
+        messages: [{ role: 'user', content: analysisPrompt }],
+        model: 'openai/gpt-oss-20b',
+        response_format: { type: 'json_object' }
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('API request timeout')), 30000)
+      )
+    ]) as any
 
     const response = chatCompletion.choices[0]?.message?.content || '{}'
     const analysis = JSON.parse(response)
