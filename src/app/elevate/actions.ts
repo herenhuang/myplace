@@ -1,6 +1,7 @@
 'use server'
 
 import Anthropic from '@anthropic-ai/sdk'
+// import Groq from 'groq-sdk'  // Available for rollback
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { GoogleGenerativeAI } from '@google/generative-ai'
