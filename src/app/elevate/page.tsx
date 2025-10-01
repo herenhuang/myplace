@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
-import { startSession, recordStep, generateNextStep, type StepData } from './actions'
+import { startSession, recordStep, generateNextStep, generateStepImageForStep, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
 
@@ -107,6 +107,8 @@ export default function ElevateSimulation() {
   const [isLoading, setIsLoading] = useState(false)
   const [stepStartTime, setStepStartTime] = useState(0)
   const [previousResponses, setPreviousResponses] = useState<string[]>([])
+  const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null)
+  const [isImageLoading, setIsImageLoading] = useState(false)
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -130,9 +132,16 @@ export default function ElevateSimulation() {
       
       if (result.success && result.sessionId) {
         setDbSessionId(result.sessionId)
+        const firstStep = PREDEFINED_STEPS[1] as Step
         setCurrentStepNumber(1)
-        setCurrentStep(PREDEFINED_STEPS[1] as Step)
+        setCurrentStep(firstStep)
         setStepStartTime(Date.now())
+        
+        // Set initial background image
+        if (firstStep.imageUrl) {
+          setBackgroundImageUrl(firstStep.imageUrl)
+          setIsImageLoading(false)
+        }
       }
     } catch (error) {
       console.error('Error starting simulation:', error)
@@ -187,8 +196,14 @@ export default function ElevateSimulation() {
         } else {
           nextStep = stepDef
         }
+        
+        // For predefined steps, set the image immediately
+        if (nextStep?.imageUrl) {
+          setBackgroundImageUrl(nextStep.imageUrl)
+          setIsImageLoading(false)
+        }
       } else {
-        // Generate with AI
+        // Generate with AI - get text content first
         console.log(`\n🎬 [FRONTEND] Requesting AI generation for step ${nextStepNumber}`)
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         
@@ -202,10 +217,7 @@ export default function ElevateSimulation() {
           success: result.success,
           hasText: !!result.text,
           hasQuestion: !!result.question,
-          choicesCount: result.choices?.length || 0,
-          hasImageUrl: !!result.imageUrl,
-          imageUrlType: typeof result.imageUrl,
-          imageUrlPreview: result.imageUrl ? result.imageUrl.substring(0, 80) + '...' : 'undefined/null'
+          choicesCount: result.choices?.length || 0
         })
         
         if (result.success) {
@@ -214,27 +226,43 @@ export default function ElevateSimulation() {
             text: result.text || '',
             question: result.question || '',
             choices: (result.choices || []).map((c: string) => ({ label: c, value: c })),
-            allowCustomInput: true,
-            imageUrl: result.imageUrl || undefined
+            allowCustomInput: true
           }
+          
+          // Clear previous background image and start loading new one
+          setBackgroundImageUrl(null)
+          setIsImageLoading(true)
           
           console.log(`\n✅ [FRONTEND] Next step object created:`, {
             stepNumber: nextStep.stepNumber,
             hasText: !!nextStep.text,
             hasQuestion: !!nextStep.question,
-            choicesCount: nextStep.choices.length,
-            hasImageUrl: !!nextStep.imageUrl,
-            imageUrlValue: nextStep.imageUrl
+            choicesCount: nextStep.choices.length
+          })
+          
+          // Generate image in background (don't await) - pass the step text directly
+          const stepTextForImage = nextStep.text
+          generateStepImageForStep(nextStepNumber, stepTextForImage).then((imageResult) => {
+            if ('error' in imageResult) {
+              console.error('❌ [FRONTEND] Error generating image:', imageResult.error)
+              setIsImageLoading(false)
+            } else if (imageResult.success && imageResult.imageUrl) {
+              console.log('✅ [FRONTEND] Background image loaded successfully')
+              setBackgroundImageUrl(imageResult.imageUrl)
+              setIsImageLoading(false)
+            } else {
+              console.log('⚠️ [FRONTEND] No image generated')
+              setIsImageLoading(false)
+            }
+          }).catch((error) => {
+            console.error('❌ [FRONTEND] Error in background image generation:', error)
+            setIsImageLoading(false)
           })
         }
       }
       
       if (nextStep) {
-        console.log(`\n🎯 [FRONTEND] Setting current step to ${nextStepNumber}:`, {
-          stepNumber: nextStep.stepNumber,
-          hasImageUrl: !!nextStep.imageUrl,
-          imageUrlPreview: nextStep.imageUrl?.substring(0, 80)
-        })
+        console.log(`\n🎯 [FRONTEND] Setting current step to ${nextStepNumber}`)
         setCurrentStep(nextStep)
         setCurrentStepNumber(nextStepNumber)
         setCustomInput('')
@@ -266,11 +294,8 @@ export default function ElevateSimulation() {
         <div className={styles.welcomeContainer}>
           <div className={styles.welcomeHeader}>
             <h1 className={styles.welcomeTitle}>
-              Elevate Conference
+              Welcome to Elevate
             </h1>
-            <p className={styles.welcomeSubtitle}>
-              Step into a day at the Elevate conference. Your choices will reveal your conference archetype.
-            </p>
           </div>
           
           <div className={styles.welcomeInfoBox}>
@@ -294,7 +319,7 @@ export default function ElevateSimulation() {
                 Starting...
               </div>
             ) : (
-              'Begin Your Journey'
+              'Start'
             )}
           </button>
         </div>
@@ -325,7 +350,11 @@ export default function ElevateSimulation() {
           <div className={styles.stepContent}>
 
       
-              <div className={styles.imageContainer} style={{ backgroundImage: `url(${currentStep.imageUrl})` }}>
+              <div 
+                className={styles.imageContainer} 
+                style={{ backgroundImage: backgroundImageUrl ? `url(${backgroundImageUrl})` : 'none' }}
+                data-image-loading={isImageLoading}
+              >
 
                   <div className={styles.textContainer}>
 
@@ -381,13 +410,21 @@ export default function ElevateSimulation() {
                         disabled={isLoading || !customInput.trim()}
                         className={styles.submitButton}
                       >
-                        {isLoading ? (
-                          <div className={styles.submitSpinner}>
-                            <div className={styles.spinner}></div>
-                          </div>
-                        ) : (
-                          'Submit'
-                        )}
+                      
+
+                         {/* Loading indicator */}
+                          {isLoading && (
+                            <div className={styles.loadingIndicator}>
+                              <div className={styles.loadingContent}>
+                                <div className={styles.spinner}></div>
+  
+                              </div>
+                            </div>
+                          )}
+
+                          {!isLoading && (
+                              <span className="material-symbols-rounded"> arrow_upward </span>
+                          )}
                       </button>
                     </div>
                   </div>
@@ -402,15 +439,7 @@ export default function ElevateSimulation() {
           
             </div>
 
-            {/* Loading indicator */}
-            {isLoading && (
-              <div className={styles.loadingIndicator}>
-                <div className={styles.loadingContent}>
-                  <div className={styles.spinner}></div>
-                  <span>Loading next step...</span>
-                </div>
-              </div>
-            )}
+           
           </div>
         )}
       </div>

@@ -290,37 +290,48 @@ IMPORTANT:
     console.log(`   - Question: "${stepContent.question}"`)
     console.log(`   - Choices count: ${stepContent.choices?.length || 0}`)
 
-    // Generate image for steps 3-10
-    let imageUrl: string | null = null
-    if (currentStep >= 3) {
-      console.log(`\n🖼️ [STEP GEN] Step ${currentStep} requires image generation (step >= 3)`)
-      imageUrl = await generateStepImage(stepContent.text, currentStep)
-      console.log(`\n🖼️ [STEP GEN] Image generation result:`, imageUrl ? `✅ Success (${imageUrl.substring(0, 50)}...)` : '❌ Failed (null)')
-    } else {
-      console.log(`\n🖼️ [STEP GEN] Step ${currentStep} does not require image generation (step < 3)`)
-    }
-
     const result = { 
       success: true, 
       text: stepContent.text,
       question: stepContent.question,
-      choices: stepContent.choices || [],
-      imageUrl: imageUrl
+      choices: stepContent.choices || []
     }
     
     console.log(`\n✅ [STEP GEN] Returning result for step ${currentStep}:`, {
       success: result.success,
       hasText: !!result.text,
       hasQuestion: !!result.question,
-      choicesCount: result.choices.length,
-      hasImageUrl: !!result.imageUrl,
-      imageUrlPreview: result.imageUrl ? result.imageUrl.substring(0, 50) + '...' : 'null'
+      choicesCount: result.choices.length
     })
 
     return result
   } catch (error) {
     console.error('Error generating next step:', error)
     return { error: 'Failed to generate next step.' }
+  }
+}
+
+export async function generateStepImageForStep(
+  stepNumber: number,
+  scenarioText: string
+) {
+  try {
+    // Only generate images for steps 3+
+    if (stepNumber < 3) {
+      console.log(`\n🖼️ [IMAGE GEN] Skipping image generation for step ${stepNumber} (< 3)`)
+      return { success: true, imageUrl: null }
+    }
+
+    console.log(`\n🖼️ [IMAGE GEN] Generating image for step ${stepNumber}`)
+    const imageUrl = await generateStepImage(scenarioText, stepNumber)
+    
+    return { 
+      success: true, 
+      imageUrl: imageUrl 
+    }
+  } catch (error) {
+    console.error('Error generating step image:', error)
+    return { error: 'Failed to generate image.' }
   }
 }
 
