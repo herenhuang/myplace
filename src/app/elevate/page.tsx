@@ -805,7 +805,7 @@ export default function ElevateSimulation() {
 
             <div className={styles.welcomeHeader}>
 
-              <div className="text-center mb-10 mt-10 px-8">
+              <div className="text-center mb-10 mt-10 px-8 box-border">
                 <div className={styles.resultCard}></div>
                 <h1 className="text-2xl font-bold tracking-tight text-gray-800 mb-2 mt-8">{archetype}</h1>
                 <p className="text-lg font-medium tracking-tight leading-5 text-black/40">
