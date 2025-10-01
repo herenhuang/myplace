@@ -101,6 +101,17 @@ export async function recordStep(
   }
 }
 
+// Base system prompt applied to all AI generations
+const BASE_SYSTEM_PROMPT = `You are a narrative guide for the Elevate tech conference simulation.
+
+Context and Guidelines:
+- The user is attending the Elevate tech conference, a professional startup/tech industry event
+- All generated scenarios must be concise, easy to read, and scannable
+- Always address the user in second person ("you")
+- This simulation walks users through realistic conference scenarios to analyze their actions and determine their personality archetype
+
+Your role is to create engaging, authentic conference experiences that feel true to a modern tech/startup event while gathering insights about the user's behavioral patterns and preferences.`
+
 async function generateStepImage(scenarioText: string, stepNumber: number): Promise<string | null> {
   console.log(`\n🎨 [IMAGE GEN] Starting image generation for Step ${stepNumber}`)
   console.log(`📝 [IMAGE GEN] Scenario text: "${scenarioText.substring(0, 100)}..."`)
@@ -199,6 +210,108 @@ Style requirements:
   }
 }
 
+function getStepPrompt(stepNumber: number, steps: StepData[]): string {
+  if (stepNumber === 2) {
+    // Generate Page 2 from Page 1
+    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
+    return `You're setting the scene for a conference attendee's next moment, which inevitably leads to a mishap. Write a single, engaging sentence that captures their immediate action or thought right before an unfortunate incident.
+
+Their Focus
+User's last action: ${page1Input}
+
+Writing Instructions
+Write in second person ("you") - you're describing THEIR immediate experience.
+Keep it concise and impactful, like a narrative beat in a story.
+One sentence only.
+If the user's input isn't suitable for a professional conference setting (e.g., gibberish, NSFW), elegantly pivot to a generic but still active conference-related action.
+The sentence must clearly set up the user's immediate intention, then lead directly into "you suddenly trip, dropping your bag and scattering its contents everywhere!"
+
+Format
+Generate a JSON response with:
+{
+  "text": "SENTENCE - A single sentence (~100-150 chars) describing their immediate action/thought that leads directly into them tripping and dropping their bag, scattering its contents everywhere"
+}
+
+Write a single sentence describing the conference attendee's next moment, culminating in a dropped bag.`
+  } else if (stepNumber === 3) {
+    // Generate Page 3 from Page 2
+    const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
+    return `You are a creative storyteller and an insightful guide, observing a chaotic moment unfold at a fast-paced tech conference. Following the dropped bag incident, craft a narrative that naturally leads the user to reflect on their approach to this specific environment and, by extension, their core archetype.
+
+Current Scenario Context
+You've just tripped at a tech conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}"
+
+Writing Instructions
+The "text" should be a single, vivid sentence acknowledging what fell out and setting a reflective or immediate action-oriented tone, keeping it grounded in the tech conference vibe. Naturally incorporate what fell out in a way that makes grammatical sense (e.g., if they said "my laptop," you would say "your laptop" when addressing them).
+The "question" must subtly probe the user's motivations, strategies, or primary focus for navigating this conference, using what fell out as context. It should be designed to differentiate between the provided archetypes.
+Each "choice" should be casual, authentic, and reflective of a real-world startup/tech conference attendee's mindset. Avoid overly formal or generic corporate language. They should align with the essence of a distinct archetype, offering a concise, relatable reflection of a mindset or approach.
+Ensure the question and choices are directly helpful in narrowing down the user's final archetype.
+
+Archetypes (for reference to inform question/choices)
+• The Icebreaker → You thrive in groups and make others feel at ease.
+• The Planner → You prepare well and others can count on you.
+• The Floater → You embrace spontaneity and find unexpected gems.
+• The Note-Taker → You're detail-oriented and curious to understand fully
+• The Action-Taker → You move quickly from ideas to action and bring energy with you.
+• The Observer → You notice what others miss and reflect before acting.
+• The Poster → You capture the vibe and make it memorable for others.
+• The Big-Idea Person → You think in possibilities and spark expansive conversations.
+• The Anchor → You're steady, grounding, and people naturally orbit you.
+
+Format
+Generate a JSON response with:
+{
+  "text": "A short 1 sentence narrative (naturally incorporating what fell out, ~150 chars, casual tone)",
+  "question": "A short sentence (designed to narrow archetype, ~100 chars, casual tone)",
+  "choices": [
+    "🎯 First choice option (~40 chars, starts with emoji, casual tone)",
+    "💡 Second choice option (~40 chars, starts with emoji, casual tone)",
+    "✨ Third choice option (~40 chars, starts with emoji, casual tone)"
+  ]
+}
+
+IMPORTANT:
+• Keep the choices brief and under 40 characters.
+• Start each choice with a relevant emoji.
+• Naturally incorporate what the user said fell out, adjusting the language for second-person address (their "my" becomes your "your").
+• Maintain a casual, conversational, and authentic tone throughout, reflective of a modern tech/startup environment.
+
+Generate the next narrative step, question, and choices.`
+  } else if (stepNumber === 4) {
+    // Generate Page 4 - conclusion
+    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
+    const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
+    return `You are a narrative expert, crafting a super concise and validating recap for the user's journey through the morning of Day 1 at a tech conference. This output acts as a brief, affirming bridge to the next phase.
+
+Contextual Information
+The user initially said they wanted to: "${page1Input}"
+When asked what fell out of their bag, they said: "${page2Response}"
+
+Writing Instructions
+The first paragraph should provide a concise, validating statement, acknowledging their journey and the recent "bag mishap." When referencing what fell out, naturally rephrase it in second person (e.g., if they said "my laptop," you say "your laptop").
+The second paragraph should briefly set the stage for moving forward, connecting back to what they initially wanted to do.
+Keep the tone professional, conversational, and authentic to a tech/startup environment.
+The entire output should be short and punchy, as indicated by the character limits.
+
+Format
+Generate a JSON response with:
+{
+  "paragraph1": "A short, validating statement and recap (~75-100 chars)",
+  "paragraph2": "A short, forward-looking transition (~75-100 chars)"
+}
+
+IMPORTANT:
+• The total combined length of both paragraphs should be roughly 150-200 characters.
+• Naturally incorporate the context provided, adjusting pronouns appropriately for second-person address.
+• Maintain a casual, conversational, and authentic tone.
+
+Generate the two-paragraph conclusion for the first half of Day 1.`
+  }
+  
+  console.log('prompt failed, returning default prompt')
+  return `Generate the next step in the story.`
+}
+
 export async function generateNextStep(
   sessionId: string,
   currentStep: number
@@ -221,61 +334,18 @@ export async function generateNextStep(
 
     const steps = sessionData.data?.steps || []
     
-    // Build context from previous steps
-    const context = steps
-      .map((s: StepData) => `Step ${s.stepNumber}: ${s.question}\nUser answered: ${s.userResponse}`)
-      .join('\n\n')
-
-    const isLastStep = currentStep === 10
-    
-    const systemPrompt = isLastStep
-      ? `You are a creative storyteller. Based on the user's journey at the Elevate conference, write a natural and conclusive ending for their story.
-      
-The user is at step 10 of 10, so this is the final step. Bring their conference experience to a satisfying, thoughtful conclusion.
-
-Generate a JSON response with:
-{
-  "text": "A SHORT concluding narrative (2-3 sentences max) that wraps up their conference experience",
-  "question": "A reflective final question about their overall experience or key takeaway",
-  "choices": [
-    "🎯 First choice option",
-    "💡 Second choice option", 
-    "✨ Third choice option"
-  ]
-}
-
-IMPORTANT: 
-- Keep the text BRIEF (2-3 sentences maximum)
-- START EACH choice with a relevant emoji
-- Make it meaningful and conclude their Elevate conference journey naturally
-- The question should invite reflection on the overall experience`
-      : `You are a creative storyteller continuing an interactive narrative about someone attending the Elevate conference.
-
-Based on the user's previous choices, generate the next step in their conference story. Keep it engaging, authentic, and appropriate for a professional conference setting.
-
-Generate a JSON response with:
-{
-  "text": "A SHORT narrative (2-3 sentences max) describing what happens next based on their previous choice",
-  "question": "A question about what they do next or how they respond",
-  "choices": [
-    "🎯 First choice option",
-    "💡 Second choice option",
-    "✨ Third choice option"
-  ]
-}
-
-IMPORTANT:
-- Keep the text BRIEF (2-3 sentences maximum)
-- START EACH choice with a relevant emoji that fits the action/mood
-- Make the narrative flow naturally from their previous responses
-- The story should feel personalized and coherent`
+    // Get step-specific prompt and combine with base system prompt
+    const stepSpecificPrompt = getStepPrompt(currentStep, steps)
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [
-        { role: 'system', content: systemPrompt },
+        { 
+          role: 'system', 
+          content: BASE_SYSTEM_PROMPT
+        },
         { 
           role: 'user', 
-          content: `Here's the story so far:\n\n${context}\n\nGenerate step ${currentStep} of the story.` 
+          content: stepSpecificPrompt
         }
       ],
       model: 'openai/gpt-oss-20b',
@@ -290,11 +360,32 @@ IMPORTANT:
     console.log(`   - Question: "${stepContent.question}"`)
     console.log(`   - Choices count: ${stepContent.choices?.length || 0}`)
 
-    const result = { 
-      success: true, 
-      text: stepContent.text,
-      question: stepContent.question,
-      choices: stepContent.choices || []
+    // Handle step-specific response formats
+    let result
+    if (currentStep === 2) {
+      // Page 2: AI generates only the text, question and choices are hard-coded
+      result = { 
+        success: true, 
+        text: stepContent.text || '',
+        question: '', // Will be set in frontend
+        choices: [] // Will be set in frontend
+      }
+    } else if (currentStep === 4) {
+      // Page 4: Conclusion format
+      result = { 
+        success: true, 
+        text: `${stepContent.paragraph1 || ''}\n\n${stepContent.paragraph2 || ''}`,
+        question: '',
+        choices: []
+      }
+    } else {
+      // Page 3 and others: Full generation
+      result = { 
+        success: true, 
+        text: stepContent.text || '',
+        question: stepContent.question || '',
+        choices: stepContent.choices || []
+      }
     }
     
     console.log(`\n✅ [STEP GEN] Returning result for step ${currentStep}:`, {
