@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import styles from './BlobbertTip.module.css'
 
 interface BlobbertTipProps {
@@ -31,7 +32,14 @@ const BlobbertTip: React.FC<BlobbertTipProps> = ({ tip, isVisible = true }) => {
             ease: "easeInOut"
           }}
         >
-          <img src="/elevate/blobbert.png" alt="Blobbert" className={styles.blobbertImage} />
+          <Image 
+            src="/elevate/blobbert.png" 
+            alt="Blobbert" 
+            width={64} 
+            height={64}
+            className={styles.blobbertImage}
+            priority
+          />
         </motion.div>
       </div>
       <div className={styles.blobbertMessage}>

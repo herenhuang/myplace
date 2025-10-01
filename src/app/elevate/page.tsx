@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
@@ -128,7 +127,6 @@ export default function ElevateSimulation() {
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
   
-  const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Get current Blobbert tip

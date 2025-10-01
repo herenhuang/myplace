@@ -4,8 +4,6 @@ import Groq from 'groq-sdk'
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { promises as fs } from 'fs'
-import path from 'path'
 
 export interface StepData {
   stepNumber: number
@@ -354,10 +352,10 @@ export async function generateNextStep(
         model: 'openai/gpt-oss-20b',
         response_format: { type: 'json_object' }
       }),
-      new Promise((_, reject) => 
+      new Promise<never>((_, reject) => 
         setTimeout(() => reject(new Error('API request timeout')), 30000)
       )
-    ]) as any
+    ])
 
     const response = chatCompletion.choices[0]?.message?.content || '{}'
     const stepContent = JSON.parse(response)
@@ -505,10 +503,10 @@ Return ONLY the JSON - no other text.`
         model: 'openai/gpt-oss-20b',
         response_format: { type: 'json_object' }
       }),
-      new Promise((_, reject) => 
+      new Promise<never>((_, reject) => 
         setTimeout(() => reject(new Error('API request timeout')), 30000)
       )
-    ]) as any
+    ])
 
     const response = chatCompletion.choices[0]?.message?.content || '{}'
     const analysis = JSON.parse(response)
