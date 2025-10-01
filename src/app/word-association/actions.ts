@@ -2,6 +2,7 @@
 
 import Groq from 'groq-sdk';
 import { createClient } from '@/lib/supabase/server';
+import { headers } from 'next/headers';
 
 function parseAnalysisJson(text: string): { summary: string; scores: number[] } | null {
 	try {
@@ -19,7 +20,7 @@ function parseAnalysisJson(text: string): { summary: string; scores: number[] } 
 	return null;
 }
 
-export async function analyze(userResponses: string) {
+export async function analyze(userResponses: string, clientSessionId?: string) {
 	const supabase = await createClient();
 	const {
 		data: { user }
@@ -79,26 +80,35 @@ Example output format:
 			return { error: 'Failed to parse analysis from AI response.' };
 		}
 
-		if (user) {
-			try {
-				const gameData = JSON.parse(userResponses);
-				const sessionData = {
-					game_id: 'word-association',
-					user_id: user.id,
-					data: gameData,
-					result: parsedAnalysis
-				};
+		try {
+			const gameData = JSON.parse(userResponses);
 
-				const { error } = await supabase.from('sessions').insert([sessionData]);
+			// Best-effort client IP and User-Agent for additional tracking context
+			const hdrs = await headers();
+			const ipHeader = hdrs.get('x-forwarded-for') || hdrs.get('x-real-ip') || null;
+			const clientIp = ipHeader ? ipHeader.split(',')[0]?.trim() || null : null;
+			const userAgent = hdrs.get('user-agent') || null;
 
-                console.log(sessionData);
+			const sessionData = {
+				game_id: 'word-association',
+				user_id: user?.id ?? null,
+				session_id: clientSessionId ?? null,
+				data: {
+					...gameData,
+					meta: { clientIp, userAgent }
+				},
+				result: parsedAnalysis
+			};
 
-				if (error) {
-					console.error('Error saving game session:', error);
-				}
-			} catch (e) {
-				console.error('Could not save game session', e);
+			const { error } = await supabase.from('sessions').insert([sessionData]);
+
+			console.log(sessionData);
+
+			if (error) {
+				console.error('Error saving game session:', error);
 			}
+		} catch (e) {
+			console.error('Could not save game session', e);
 		}
 
 		return { success: true, analysis: parsedAnalysis };
