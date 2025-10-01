@@ -378,6 +378,7 @@ export default function ElevateSimulation() {
 
     const fullText = currentStep.text
     const fullQuestion = currentStep.question
+    const intervals = streamingIntervals.current
 
     setDisplayedText('')
     setDisplayedQuestion('')
@@ -388,26 +389,26 @@ export default function ElevateSimulation() {
     let questionIndex = 0
 
     // Stream the main text first
-    streamingIntervals.current.text = setInterval(() => {
+    intervals.text = setInterval(() => {
       if (textIndex < fullText.length) {
         setDisplayedText(fullText.slice(0, textIndex + 1))
         textIndex++
       } else {
-        if (streamingIntervals.current.text) {
-          clearInterval(streamingIntervals.current.text)
-          streamingIntervals.current.text = undefined
+        if (intervals.text) {
+          clearInterval(intervals.text)
+          intervals.text = undefined
         }
         
         // Start streaming the question after text is done
         if (fullQuestion) {
-          streamingIntervals.current.question = setInterval(() => {
+          intervals.question = setInterval(() => {
             if (questionIndex < fullQuestion.length) {
               setDisplayedQuestion(fullQuestion.slice(0, questionIndex + 1))
               questionIndex++
             } else {
-              if (streamingIntervals.current.question) {
-                clearInterval(streamingIntervals.current.question)
-                streamingIntervals.current.question = undefined
+              if (intervals.question) {
+                clearInterval(intervals.question)
+                intervals.question = undefined
               }
               setIsStreaming(false)
             }
@@ -419,13 +420,11 @@ export default function ElevateSimulation() {
     }, 5) // 25ms per character for main text
 
     return () => {
-      if (streamingIntervals.current.text) {
-        clearInterval(streamingIntervals.current.text)
-        streamingIntervals.current.text = undefined
+      if (intervals.text) {
+        clearInterval(intervals.text)
       }
-      if (streamingIntervals.current.question) {
-        clearInterval(streamingIntervals.current.question)
-        streamingIntervals.current.question = undefined
+      if (intervals.question) {
+        clearInterval(intervals.question)
       }
     }
   }, [currentStep, screenState])
@@ -620,7 +619,7 @@ export default function ElevateSimulation() {
                     Analyzing Your Journey...
                   </h2>
                   <p className="text-gray-600 font-light text-center max-w-md">
-                    We're reviewing your choices and discovering your conference archetype.
+                    We&apos;re reviewing your choices and discovering your conference archetype.
                   </p>
                 </div>
               </div>
