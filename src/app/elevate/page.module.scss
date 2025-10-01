@@ -64,6 +64,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   flex-direction: column;
   align-items: center;
   justify-content: center;
+ 
   gap: 1rem;
 }
 
@@ -187,12 +188,11 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   width: 50vh;
   max-height: 90vh;
   aspect-ratio: 4/7;
-  border-radius: $border-radius-2xl;
-  border: 1px solid white;
+  border-radius: 36px;
   background-size: cover;
   background-position: center;
   position: relative;
-  box-shadow: -4px 24px 48px rgba(0, 0, 0, 0.25);
+  box-shadow: -12px 36px 48px rgba(0, 0, 0, 0.12);
   background-color: $primary-orange;
   transition: background-image 0.8s ease-in-out;
 
@@ -232,10 +232,18 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
 }
 
+.blobbertInline {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 24px 0;
+  z-index: 10;
+}
+
 .topText{
     flex: 1;
     overflow-y: scroll;
-    padding: 24px 24px 0 24px;
+    padding: 28px 28px 0 28px;
     z-index: 3;
 
     display: flex;
@@ -247,6 +255,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  overflow-y: scroll;
 }
 
 .stepText {
@@ -260,7 +269,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .stepQuestion {
-  margin-bottom: 1.5rem;
+  margin: 16px 0;
 
   h2 {
     font-size: 18px;
@@ -293,6 +302,11 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.2);
   line-height: 1.1 !important;
 
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 
   &:not(:disabled) {
     color: $gray-800;
@@ -310,6 +324,44 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     line-height: 1.1 !important;
   }
 }
+
+.appButton {
+    width: 80%;
+    text-align: left;
+    padding: 12px 16px 12px 14px;
+    border-radius: 22px;
+    border: 2px solid rgba(255,255,255, 0.25);
+    @include transition-all(200ms);
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    background-color: $primary-orange;
+    box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.2);
+    line-height: 1.1 !important;
+  
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin: auto;
+  
+    &:not(:disabled) {
+      color: $gray-800;
+  
+      &:hover {
+        background-color: $primary-orange-dark;
+      }
+    }
+  
+    span {
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.36px;
+      line-height: 1.1 !important;
+    }
+  }
 
 // Custom Input
 .customInputContainer {
@@ -433,6 +485,30 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
 }
 
+.resultCard{
+    width: 400px;
+    max-width: calc(50vw * 0.5);
+    aspect-ratio: 4/5.5;
+    background-color: $gray-100;
+    border-radius: 8px;
+    margin: auto;
+    padding: 16px;
+    box-shadow: -4px 24px 48px rgba(0, 0, 0, 0.2);
+    margin-bottom: 16px;
+
+    animation: fadeUp 0.5s ease-in-out;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 @media screen and (max-width: 768px) {
   .stepContainer {
@@ -448,7 +524,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     top: 0;
     left: 0;
     width: 100dvw;
-    height: 100dvh;
+    height: 95dvh;
     max-height: 100dvh;
     z-index: 10;
     border-radius: 0;
