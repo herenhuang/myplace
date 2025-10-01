@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
+import BlobbertTip from '@/components/BlobbertTip'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
@@ -78,6 +79,34 @@ const ARCHETYPE_DESCRIPTIONS: Record<string, { tagline: string; emoji: string }>
   }
 }
 
+// Blobbert tips for each screen
+const BLOBBERT_TIPS: Record<string, string> = {
+  'welcome': "Ready to discover your conference style? Let's go!",
+  'step-1': "Remember — there's no wrong answer!",
+  'step-2': "Trust your instincts and choose what feels right.",
+  'step-3': "You're doing great! Keep being yourself.",
+  'step-4': "Almost there! One more moment to capture.",
+  'analyzing': "Hang tight while I analyze your unique style...",
+  'results': "Here's what I discovered about you!"
+}
+
+// LocalStorage key for caching state
+const ELEVATE_STATE_KEY = 'elevate-simulation-state'
+
+// Interface for cached state
+interface ElevateState {
+  screenState: ScreenState
+  sessionId: string
+  dbSessionId: string
+  currentStepNumber: number
+  currentStep: Step | null
+  previousResponses: string[]
+  backgroundImageUrl: string | null
+  archetype: string
+  explanation: string
+  timestamp: number
+}
+
 export default function ElevateSimulation() {
   // Screen state
   const [screenState, setScreenState] = useState<ScreenState>('welcome')
@@ -102,11 +131,106 @@ export default function ElevateSimulation() {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Initialize session
+  // Get current Blobbert tip
+  const getCurrentTip = (): string => {
+    if (screenState === 'welcome') return BLOBBERT_TIPS['welcome']
+    if (screenState === 'simulation' && currentStepNumber > 0) {
+      return BLOBBERT_TIPS[`step-${currentStepNumber}`] || ''
+    }
+    if (screenState === 'analyzing') return BLOBBERT_TIPS['analyzing']
+    if (screenState === 'results') return BLOBBERT_TIPS['results']
+    return ''
+  }
+
+  // Save state to localStorage
+  const saveState = useCallback(() => {
+    if (typeof window === 'undefined') return
+    
+    const stateToSave: ElevateState = {
+      screenState,
+      sessionId,
+      dbSessionId,
+      currentStepNumber,
+      currentStep,
+      previousResponses,
+      backgroundImageUrl,
+      archetype,
+      explanation,
+      timestamp: Date.now()
+    }
+    
+    try {
+      localStorage.setItem(ELEVATE_STATE_KEY, JSON.stringify(stateToSave))
+    } catch (error) {
+      console.error('Failed to save state to localStorage:', error)
+    }
+  }, [screenState, sessionId, dbSessionId, currentStepNumber, currentStep, previousResponses, backgroundImageUrl, archetype, explanation])
+
+  // Load state from localStorage
+  const loadState = (): ElevateState | null => {
+    if (typeof window === 'undefined') return null
+    
+    try {
+      const saved = localStorage.getItem(ELEVATE_STATE_KEY)
+      if (!saved) return null
+      
+      const parsed: ElevateState = JSON.parse(saved)
+      
+      // Check if state is not too old (e.g., 24 hours)
+      const MAX_AGE = 24 * 60 * 60 * 1000 // 24 hours
+      if (Date.now() - parsed.timestamp > MAX_AGE) {
+        localStorage.removeItem(ELEVATE_STATE_KEY)
+        return null
+      }
+      
+      return parsed
+    } catch (error) {
+      console.error('Failed to load state from localStorage:', error)
+      return null
+    }
+  }
+
+  // Clear saved state
+  const clearSavedState = () => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.removeItem(ELEVATE_STATE_KEY)
+    } catch (error) {
+      console.error('Failed to clear state from localStorage:', error)
+    }
+  }
+
+  // Initialize session and restore state
   useEffect(() => {
-    const sid = getOrCreateSessionId()
-    setSessionId(sid)
+    // Try to load saved state first
+    const savedState = loadState()
+    
+    if (savedState && savedState.screenState !== 'welcome') {
+      // Restore saved state
+      setScreenState(savedState.screenState)
+      setSessionId(savedState.sessionId)
+      setDbSessionId(savedState.dbSessionId)
+      setCurrentStepNumber(savedState.currentStepNumber)
+      setCurrentStep(savedState.currentStep)
+      setPreviousResponses(savedState.previousResponses)
+      setBackgroundImageUrl(savedState.backgroundImageUrl)
+      setArchetype(savedState.archetype)
+      setExplanation(savedState.explanation)
+      setStepStartTime(Date.now()) // Reset timer
+    } else {
+      // No saved state or back at welcome, initialize fresh session
+      const sid = getOrCreateSessionId()
+      setSessionId(sid)
+    }
   }, [])
+
+  // Save state whenever key variables change
+  useEffect(() => {
+    // Only save if we're not on the welcome screen
+    if (screenState !== 'welcome') {
+      saveState()
+    }
+  }, [screenState, currentStepNumber, currentStep, previousResponses, archetype, explanation, backgroundImageUrl, sessionId, dbSessionId, saveState])
 
   const startSimulation = async () => {
     setIsLoading(true)
@@ -168,6 +292,9 @@ export default function ElevateSimulation() {
   }
 
   const resetSimulation = () => {
+    // Clear saved state from localStorage
+    clearSavedState()
+    
     setScreenState('welcome')
     setCurrentStepNumber(0)
     setCurrentStep(null)
@@ -479,14 +606,21 @@ export default function ElevateSimulation() {
       case 'welcome':
         return (
           <div className={styles.welcomeContainer}>
+            <div className={styles.welcomeHeader}>
+              <h1 className={styles.welcomeTitle}> What Kind of Elevate Attendee Are You? </h1>
+              
+              {/* BlobbertTip positioned in flow */}
+              <div className={styles.blobbertInline}>
+                <BlobbertTip 
+                  tip={getCurrentTip()} 
+                  isVisible={true}
+                />
+              </div>
 
-<div className={styles.welcomeHeader}>
-                <h1 className={styles.welcomeTitle}> What Kind of Elevate Attendee Are You? </h1>
-
-                <button
+              <button
                 onClick={startSimulation}
                 disabled={isLoading}
-                className={styles.choiceButton}
+                className={styles.appButton}
               >
                 {isLoading ? (
                   <div className={styles.loadingSpinner}>     
@@ -502,9 +636,7 @@ export default function ElevateSimulation() {
                  
                 )}
               </button>
-              </div>
-              
-
+            </div>
           </div>
         )
 
@@ -521,6 +653,14 @@ export default function ElevateSimulation() {
                   <h2>{displayedQuestion}</h2>
                 </div>
               )}
+              
+              {/* BlobbertTip positioned in flow after topText content */}
+              <div className={styles.blobbertInline}>
+                <BlobbertTip 
+                  tip={getCurrentTip()} 
+                  isVisible={true}
+                />
+              </div>
             </div>
 
             <div className={styles.choicesContainer}>
@@ -528,7 +668,7 @@ export default function ElevateSimulation() {
                 <button
                   onClick={startAnalysis}
                   disabled={isLoading}
-                  className={styles.choiceButton}
+                  className={styles.appButton}
                 >
                   <span>Continue to Results →</span>
                 </button>
@@ -551,6 +691,7 @@ export default function ElevateSimulation() {
                         }}
                       >
                         <span>{choice.label}</span>
+                        <span className="material-symbols-rounded text-orange-500">arrow_forward</span>
                       </button>
                     )
                   })}
@@ -569,6 +710,7 @@ export default function ElevateSimulation() {
                       }}
                     >
                       <div className={styles.customInputWrapper}>
+                        <span className={styles.customInputIcon}>✍️ </span>
                         <input
                           ref={inputRef}
                           type="text"
@@ -579,7 +721,7 @@ export default function ElevateSimulation() {
                               handleChoiceSelect(customInput, true)
                             }
                           }}
-                          placeholder="Or write your own response..."
+                          placeholder="Custom response..."
                           disabled={isLoading || isStreaming || !visibleButtons.includes(currentStep.choices.length)}
                           className={styles.customInput}
                         />
@@ -611,19 +753,17 @@ export default function ElevateSimulation() {
       case 'analyzing':
         return (
           <div className={styles.textContainer}>
-            <div className={styles.topText}>
-              <div className={styles.stepText}>
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin mb-6"></div>
-                  <h2 className="text-2xl font-light text-gray-800 mb-2">
-                    Analyzing Your Journey...
-                  </h2>
-                  <p className="text-gray-600 font-light text-center max-w-md">
-                    We&apos;re reviewing your choices and discovering your conference archetype.
-                  </p>
+                <div className="flex flex-col h-full items-center justify-center py-12">
+                  <div 
+                    className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full z-100 animate-spin mb-6 cursor-pointer hover:scale-110 transition-transform"
+                    onClick={() => {
+                      clearSavedState()
+                      resetSimulation()
+                    }}
+                    title="Click to reset"
+                  ></div>
                 </div>
-              </div>
-            </div>
+  
           </div>
         )
 
@@ -644,15 +784,18 @@ export default function ElevateSimulation() {
                   </div>
                 </div>
               </div>
-              
-              <div className={styles.choicesContainer}>
-                <button
+
+              <div className={styles.welcomeHeader}>
+
+              <button
                   onClick={resetSimulation}
                   className={styles.choiceButton}
                 >
                   Try Again
                 </button>
               </div>
+              
+          
             </div>
           )
         }
@@ -661,10 +804,11 @@ export default function ElevateSimulation() {
 
         return (
           <div className={styles.textContainer}>
-            <div className={styles.topText} style={{ maxHeight: '70vh', overflowY: 'hidden' }}>
 
-              
-              <div className="text-center mb-10 mt-4">
+            <div className={styles.welcomeHeader}>
+
+              <div className="text-center mb-10 mt-10 px-8">
+                <div className={styles.resultCard}></div>
                 <div className="text-6xl mb-4">{archetypeInfo?.emoji || '✨'}</div>
                 <h1 className="text-2xl font-bold tracking-tight text-gray-800 mb-2">{archetype}</h1>
                 <p className="text-lg font-medium tracking-tight leading-5 text-black/40">
@@ -672,28 +816,27 @@ export default function ElevateSimulation() {
                 </p>
               </div>
 
-              <div className="bg-white/80 p-6 rounded-xl mb-6 h-full overflow-y-scroll">
-                <div className="text-sm font-normal tracking-tight text-gray-700 leading-5 whitespace-pre-line">
+                <div className="px-8">
+                  <p className="text-base font-medium tracking-tight text-gray-700 leading-[1.3] whitespace-pre-line">
                   {explanation}
+                  </p>
                 </div>
-              </div>
+   
 
-            </div>
-
-            <div className={styles.choicesContainer}>
               <button
                 onClick={resetSimulation}
-                className={styles.choiceButton}
+                className={styles.appButton}
               >
                 <span> Try Again </span>
               </button>
               <button
                 onClick={() => router.push('/')}
-                className={styles.choiceButton}
+                className={styles.textButton}
               >
                 <span> Back to Home </span>
               </button>
             </div>
+           
           </div>
         )
 
