@@ -204,7 +204,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     height: 100%;
     background-image: linear-gradient(to bottom, rgba(255,255,255, 0.8), rgba(255,255,255, 0.3));
     content: '';
-    border-radius: $border-radius-2xl;
+    border-radius: 36px;
     z-index: 1;
   }
 
@@ -532,14 +532,17 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     top: 0;
     left: 0;
     width: 100dvw;
-    height: 99.9dvh;
-    max-height: 99.9dvh;
+    height: 99.5dvh;
+    max-height: 100dvh;
     z-index: 10;
     border-radius: 0;
     border: none;
 
+    box-shadow: 0 0 24px 24px $primary-orange;
+
     &::after{
         border-radius: 0;
+        height: 120%;
     }
   }
 }
