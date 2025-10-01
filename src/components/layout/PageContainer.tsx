@@ -16,10 +16,9 @@ export default function PageContainer({
   allowScroll = false
 }: PageContainerProps) {
   return (
-    <div className="h-full flex items-center justify-center p-6 md:p-12">
+    <div className="h-full flex items-center justify-center">
       <main className={`
-        lifted bg-[#fdfbf7] max-w-[720px] w-full p-6 md:p-12 flex flex-col
-        h-[80vh] max-h-[80vh] overflow-y-auto
+        lifted overflow-y-auto
         ${className}
       `}>
         {children}
