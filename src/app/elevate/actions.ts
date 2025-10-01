@@ -222,14 +222,14 @@ User's last action: ${page1Input}
 Writing Instructions
 Write in second person ("you") - you're describing THEIR immediate experience.
 Keep it concise and impactful, like a narrative beat in a story.
-One sentence only.
+Two sentences max.
 If the user's input isn't suitable for a professional conference setting (e.g., gibberish, NSFW), elegantly pivot to a generic but still active conference-related action.
 The sentence must clearly set up the user's immediate intention, then lead directly into "you suddenly trip, dropping your bag and scattering its contents everywhere!"
 
 Format
 Generate a JSON response with:
 {
-  "text": "SENTENCE - A single sentence (~100-150 chars) describing their immediate action/thought that leads directly into them tripping and dropping their bag, scattering its contents everywhere"
+  "text": "SENTENCE - One or two sentences (~100-150 chars total) describing their immediate action/thought that leads directly into them tripping and dropping their bag and having their bag contents fall everywhere"
 }
 
 Write a single sentence describing the conference attendee's next moment, culminating in a dropped bag.`
@@ -242,10 +242,10 @@ Current Scenario Context
 You've just tripped at a tech conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}"
 
 Writing Instructions
-The "text" should be a single, vivid sentence acknowledging what fell out and setting a reflective or immediate action-oriented tone, keeping it grounded in the tech conference vibe. Naturally incorporate what fell out in a way that makes grammatical sense (e.g., if they said "my laptop," you would say "your laptop" when addressing them).
-The "question" must subtly probe the user's motivations, strategies, or primary focus for navigating this conference, using what fell out as context. It should be designed to differentiate between the provided archetypes.
-Each "choice" should be casual, authentic, and reflective of a real-world startup/tech conference attendee's mindset. Avoid overly formal or generic corporate language. They should align with the essence of a distinct archetype, offering a concise, relatable reflection of a mindset or approach.
-Ensure the question and choices are directly helpful in narrowing down the user's final archetype.
+The "text" should be two casual sentences acknowledging what the user stated fell out, and how the user ends up cleaning it up quickly. Naturally incorporate what fell out in a way that makes grammatical sense (e.g., if they said "my laptop," you would say "your laptop" when addressing them). The second sentence should be a beat change that leads into the question. Use proper punctuation.
+The "question" must be action oriented, while subtly probing the user's motivations, strategies, or primary focus for navigating this conference for the purposes of mapping them to an archetype. It should relate to the text above, primarily the second sentence.Decide based on the context so far what needs to be further differentiated (ex. if user did not mention anything relating to other people in previous inputs, maybe have someone help pick up the bag contents, etc.) Be creative with it.
+Each "choice" needs to be relevant in answering the question. It should be casual, authentic, and reflective of a real-world startup/tech conference attendee's mindset. Avoid overly formal or generic corporate language. This should be fun, and the choices should align with the essence of a distinct archetype, offering a concise, relatable reflection of a mindset or approach.
+Ensure the question and choices are directly helpful in narrowing down the user's final archetype. Choices should not have punctuation at the end.
 
 Archetypes (for reference to inform question/choices)
 • The Icebreaker → You thrive in groups and make others feel at ease.
@@ -288,20 +288,20 @@ The user initially said they wanted to: "${page1Input}"
 When asked what fell out of their bag, they said: "${page2Response}"
 
 Writing Instructions
-The first paragraph should provide a concise, validating statement, acknowledging their journey and the recent "bag mishap." When referencing what fell out, naturally rephrase it in second person (e.g., if they said "my laptop," you say "your laptop").
-The second paragraph should briefly set the stage for moving forward, connecting back to what they initially wanted to do.
-Keep the tone professional, conversational, and authentic to a tech/startup environment.
+The first paragraph should provide a concise, validating statement, acknowledging their journey so far in the day.
+The second paragraph should briefly set the stage for moving forward, and optimistically looking forward to the rest of the event. 
+Keep the tone fun yet professional, casual, and authentic to a tech/startup environment.
 The entire output should be short and punchy, as indicated by the character limits.
 
 Format
 Generate a JSON response with:
 {
-  "paragraph1": "A short, validating statement and recap (~75-100 chars)",
-  "paragraph2": "A short, forward-looking transition (~75-100 chars)"
+  "paragraph1": "A short, validating statement and recap (~100 chars)",
+  "paragraph2": "A short, forward-looking transition (~100 chars)"
 }
 
 IMPORTANT:
-• The total combined length of both paragraphs should be roughly 150-200 characters.
+• The total combined length of both paragraphs should be roughly 180-220 characters.
 • Naturally incorporate the context provided, adjusting pronouns appropriately for second-person address.
 • Maintain a casual, conversational, and authentic tone.
 
