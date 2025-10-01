@@ -222,10 +222,10 @@ The sentence must clearly set up the user's immediate intention, then lead direc
 Format
 Generate a JSON response with:
 {
-  "text": "SENTENCE - One or two sentences (~100-150 chars total) describing their immediate action/thought that leads directly into them tripping and dropping their bag and having their bag contents fall everywhere"
+  "text": "SENTENCE - Two sentences (~100-150 chars total) describing their immediate action/thought. Then how that leads directly into them tripping and dropping their bag and having their bag contents fall everywhere."
 }
 
-Write a single sentence describing the conference attendee's next moment, culminating in a dropped bag.`
+Write two sentences describing the conference attendee's next moment, culminating in a dropped bag.`
   } else if (stepNumber === 3) {
     // Generate Page 3 from Page 2
     const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
@@ -235,10 +235,20 @@ Current Scenario Context
 You've just tripped at a tech conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}"
 
 Writing Instructions
-The "text" should be two casual sentences acknowledging what the user stated fell out, and how the user ends up cleaning it up quickly. Naturally incorporate what fell out in a way that makes grammatical sense (e.g., if they said "my laptop," you would say "your laptop" when addressing them). The second sentence should be a beat change that leads into the question. Use proper punctuation.
-The "question" must be action oriented, while subtly probing the user's motivations, strategies, or primary focus for navigating this conference for the purposes of mapping them to an archetype. It should relate to the text above, primarily the second sentence.Decide based on the context so far what needs to be further differentiated (ex. if user did not mention anything relating to other people in previous inputs, maybe have someone help pick up the bag contents, etc.) Be creative with it.
-Each "choice" needs to be relevant in answering the question. It should be casual, authentic, and reflective of a real-world startup/tech conference attendee's mindset. Avoid overly formal or generic corporate language. This should be fun, and the choices should align with the essence of a distinct archetype, offering a concise, relatable reflection of a mindset or approach.
-Ensure the question and choices are directly helpful in narrowing down the user's final archetype. Choices should not have punctuation at the end.
+The "text" field should contain two casual sentences:
+Sentence 1 (Incident Resolution): Acknowledge what the user stated fell out and describe how they quickly and casually cleaned it up. Naturally incorporate what fell out in a way that makes grammatical sense (e.g., if they said "my laptop," you would say "your laptop" when addressing them). Focus on a swift, low-fuss recovery.
+Sentence 2 (Beat Change & Setup): Create a natural, seamless transition from the immediate incident to the broader conference experience. This sentence should set a slightly reflective or forward-looking tone, prompting the user to consider their next move or current mindset in response to the minor hiccup. It must directly lead into and justify the "question" that follows. Use proper punctuation for both sentences.
+The "question" field must be a short, immediate action-oriented query:
+It should subtly probe the user's motivations, strategies, or primary focus for navigating the rest of the conference following the minor disruption.
+The question must directly relate to and flow logically from the "beat change" in the second sentence of the "text".
+Ensure it's casual, concise (~100 chars), and designed to differentiate between archetypes by asking about their immediate priority or next strategic move.
+The "choices" field needs three options:
+Each choice must be highly relevant, casual, authentic, and reflective of a distinct, real-world startup/tech conference attendee's mindset.
+Each choice must DIRECTLY and LITERALLY answer the "question" posed - not related topics, but the exact thing being asked about. The choices should be specific responses to whatever is being asked, not tangential or generic options.
+Each choice should offer a clear, concise (~40 chars) action or mindset that aligns with a specific core archetype.
+Avoid overly formal or generic corporate language. This should be fun, relatable, and clearly reflect a distinct approach.
+Start each choice with a relevant emoji. Choices should not have punctuation at the end.
+Ensure the question and choices are directly helpful in narrowing down the user's final archetype.
 
 Archetypes (for reference to inform question/choices)
 • The Icebreaker → You thrive in groups and make others feel at ease.
@@ -254,7 +264,7 @@ Archetypes (for reference to inform question/choices)
 Format
 Generate a JSON response with:
 {
-  "text": "A short 1 sentence narrative (naturally incorporating what fell out, ~150 chars, casual tone)",
+  "text": "A short 1-2 sentence narrative (naturally incorporating what fell out, ~150 chars, casual tone)",
   "question": "A short sentence (designed to narrow archetype, ~100 chars, casual tone)",
   "choices": [
     "🎯 First choice option (~40 chars, starts with emoji, casual tone)",
@@ -274,29 +284,37 @@ Generate the next narrative step, question, and choices.`
     // Generate Page 4 - conclusion
     const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
     const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
-    return `You are a narrative expert, crafting a super concise and validating recap for the user's journey through the morning of Day 1 at a tech conference. This output acts as a brief, affirming bridge to the next phase.
+    return `You are writing about someone's actual day that happens to be taking place at a conference. Write like you're describing a real person's lived experience - what they actually see, feel, and think - not conference marketing copy.
 
 Contextual Information
 The user initially said they wanted to: "${page1Input}"
 When asked what fell out of their bag, they said: "${page2Response}"
 
 Writing Instructions
-The first paragraph should provide a concise, validating statement, acknowledging their journey so far in the day.
-The second paragraph should briefly set the stage for moving forward, and optimistically looking forward to the rest of the event. 
-Keep the tone fun yet professional, casual, and authentic to a tech/startup environment.
-The entire output should be short and punchy, as indicated by the character limits.
+
+Write like you're describing someone's real Tuesday morning that just happens to be at a conference venue:
+
+Paragraph 1: Describe what they've actually done so far today as a real human experience. Include their goals (${page1Input}) and the bag incident (${page2Response}) as things that actually happened to them, not achievement milestones.
+
+Paragraph 2: Describe what's literally coming up next in their day from their perspective. Talk about the actual physical space, what they can see around them, what they're thinking about - not conference opportunities or networking potential.
+
+Think like: someone's internal monologue about their morning, not an event coordinator describing activities.
+
+Avoid: Conference buzzwords (networking, keynotes, tech wave), corporate enthusiasm, exclamation points, motivational language, agenda-speak, any language that sounds like event marketing.
+
+Use: What people actually notice (the coffee line, where to sit, what time things start), internal thoughts, casual observations, the way someone actually experiences a day.
 
 Format
 Generate a JSON response with:
 {
-  "paragraph1": "A short, validating statement and recap (~100 chars)",
-  "paragraph2": "A short, forward-looking transition (~100 chars)"
+  "paragraph1": "What they've actually done this morning (~100 chars)",
+  "paragraph2": "What's literally happening next (~100 chars)"
 }
 
 IMPORTANT:
-• The total combined length of both paragraphs should be roughly 180-220 characters.
-• Naturally incorporate the context provided, adjusting pronouns appropriately for second-person address.
-• Maintain a casual, conversational, and authentic tone.
+The total combined length of both paragraphs should be roughly 180-220 characters.
+Write from their actual perspective as a human being, not as conference content.
+This is someone's real day, not a professional development experience.
 
 Generate the two-paragraph conclusion for the first half of Day 1.`
   }
