@@ -344,7 +344,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     justify-content: center;
     gap: 8px;
 
-    margin: auto;
+    margin: 12px auto;
   
     &:not(:disabled) {
       color: $gray-800;
@@ -362,6 +362,14 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
       line-height: 1.1 !important;
     }
   }
+
+.textButton{
+    font-weight: 600;
+    letter-spacing: -0.36px;
+    z-index: 10;
+    margin: 0;
+    padding: 0;
+}
 
 // Custom Input
 .customInputContainer {
@@ -486,7 +494,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .resultCard{
-    width: 400px;
+    width: 320px;
     max-width: calc(50vw * 0.5);
     aspect-ratio: 4/5.5;
     background-color: $gray-100;

@@ -809,8 +809,7 @@ export default function ElevateSimulation() {
 
               <div className="text-center mb-10 mt-10 px-8">
                 <div className={styles.resultCard}></div>
-                <div className="text-6xl mb-4">{archetypeInfo?.emoji || '✨'}</div>
-                <h1 className="text-2xl font-bold tracking-tight text-gray-800 mb-2">{archetype}</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-gray-800 mb-2 mt-8">{archetype}</h1>
                 <p className="text-lg font-medium tracking-tight leading-5 text-black/40">
                   {archetypeInfo?.tagline || ''}
                 </p>
@@ -827,13 +826,7 @@ export default function ElevateSimulation() {
                 onClick={resetSimulation}
                 className={styles.appButton}
               >
-                <span> Try Again </span>
-              </button>
-              <button
-                onClick={() => router.push('/')}
-                className={styles.textButton}
-              >
-                <span> Back to Home </span>
+                <span> Complete </span>
               </button>
             </div>
            
