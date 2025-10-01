@@ -1,6 +1,6 @@
 'use server'
 
-import Groq from 'groq-sdk'
+import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 
@@ -17,7 +17,7 @@ export async function generateWorkplaceScenario(
     data: { user }
   } = await supabase.auth.getUser()
 
-  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
   if (!formData.name || !formData.jobTitle || !formData.company) {
     return { error: 'Incomplete form data provided.' }
@@ -32,22 +32,20 @@ The scenario should be a single paragraph.
 Be insightful and creative.
 `
 
-    const chatCompletion = await groq.chat.completions.create({
+    const chatCompletion = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      system: systemPrompt,
       messages: [
-        {
-          role: 'system',
-          content: systemPrompt
-        },
         {
           role: 'user',
           content: `My name is ${formData.name}, I am a ${formData.jobTitle} at ${formData.company}. Please generate a scenario for me.`
         }
-      ],
-      model: 'openai/gpt-oss-20b'
+      ]
     })
 
     const initialScenario =
-      chatCompletion.choices[0]?.message?.content || 'Could not generate scenario.'
+      (chatCompletion.content[0] as { text: string })?.text || 'Could not generate scenario.'
 
     try {
       // Best-effort client IP and User-Agent for additional tracking context
@@ -145,22 +143,23 @@ export async function continueStory(sessionId: string, userInput: string) {
 
     const isComplete = (currentTurn + 1) >= 5;
 
-    // 3. Call Groq to get the next narrative
+    // 3. Call Claude to get the next narrative
     try {
-        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+        const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
         const systemPrompt = isComplete
             ? `You are a creative writer. Based on the story so far, write a concluding paragraph. The user's final action was: ${userInput}`
             : `You are a creative writer. Continue the story based on the user's last action. The user's action was: ${userInput}`;
         
-        const chatCompletion = await groq.chat.completions.create({
+        const chatCompletion = await anthropic.messages.create({
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 1024,
+            system: systemPrompt,
             messages: [
-                { role: 'system', content: systemPrompt },
                 { role: 'user', content: `Here is the story so far:\n${fullStory}` }
-            ],
-            model: 'openai/gpt-oss-20b'
+            ]
         });
 
-        const nextNarrative = chatCompletion.choices[0]?.message?.content || 'The story ends here.';
+        const nextNarrative = (chatCompletion.content[0] as { text: string })?.text || 'The story ends here.';
         
         const finalStoryChunks = [...updatedStoryChunks, { type: 'narrative', content: nextNarrative }];
         const updatedUserActions = [...userActions, { type: 'response', text: userInput.trim() }];
@@ -188,7 +187,7 @@ export async function continueStory(sessionId: string, userInput: string) {
         return { success: true, data: updatedData };
 
     } catch (error) {
-        console.error('Error with Groq API during story continuation:', error);
+        console.error('Error with Claude API during story continuation:', error);
         return { error: 'Failed to continue story due to a server error.' };
     }
 }
@@ -216,9 +215,9 @@ export async function analyzeBehavior(sessionId: string) {
   const { result } = sessionData;
   const { userActions } = result;
 
-  // 2. Call Groq to analyze the user's actions
+  // 2. Call Claude to analyze the user's actions
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     
     const analysisPrompt = `You are an honest but supportive behavioral analyst. Give accurate, realistic insights based on what the user actually did - don't force positive spins on negative responses.
 
@@ -261,13 +260,13 @@ Generate an honest behavioral analysis in JSON format:
 
 Return ONLY the JSON - no other text or formatting.`;
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: analysisPrompt }],
-      model: 'openai/gpt-oss-20b',
-      response_format: { type: 'json_object' }
+    const chatCompletion = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: analysisPrompt + '\n\nPlease respond with valid JSON only.' }]
     });
 
-    const rawAnalysis = chatCompletion.choices[0]?.message?.content || '{}';
+    const rawAnalysis = (chatCompletion.content[0] as { text: string })?.text || '{}';
     let analysisResult;
 
     try {
@@ -323,7 +322,7 @@ Return ONLY the JSON - no other text or formatting.`;
     return { success: true, analysis: analysisResult };
 
   } catch (error) {
-    console.error('Error with Groq API during analysis:', error);
+    console.error('Error with Claude API during analysis:', error);
     return { error: 'Failed to analyze behavior due to a server error.' };
   }
 }

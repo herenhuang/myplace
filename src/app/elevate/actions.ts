@@ -1,6 +1,6 @@
 'use server'
 
-import Groq from 'groq-sdk'
+import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -279,42 +279,55 @@ IMPORTANT:
 • Naturally incorporate what the user said fell out, adjusting the language for second-person address (their "my" becomes your "your").
 • Maintain a casual, conversational, and authentic tone throughout, reflective of a modern tech/startup environment.
 
+Before finalizing, reread your response. Does it flow naturally and sound like how a real person would experience this? Do all parts connect logically? Remove any corporate buzzwords, em dashes, phrases like "dive into" or "gear up," and anything that sounds like event marketing. Adjust anything that feels artificial or disconnected.
+
 Generate the next narrative step, question, and choices.`
   } else if (stepNumber === 4) {
     // Generate Page 4 - conclusion
     const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
     const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
-    return `You are writing about someone's actual day that happens to be taking place at a conference. Write like you're describing a real person's lived experience - what they actually see, feel, and think - not conference marketing copy.
+    return `You are a highly creative storyteller, tasked with narrating a brief, authentic moment in someone's day at a tech conference. Your writing should capture a real human experience – what they *actually* see, feel, and think – with a personal touch, *not* generic marketing or corporate event language.
 
-Contextual Information
+# Contextual Information
 The user initially said they wanted to: "${page1Input}"
 When asked what fell out of their bag, they said: "${page2Response}"
 
-Writing Instructions
+# Writing Instructions
 
-Write like you're describing someone's real Tuesday morning that just happens to be at a conference venue:
+Write a two-paragraph summary that concludes their morning, infused with a sense of personal observation and realistic reflection.
 
-Paragraph 1: Describe what they've actually done so far today as a real human experience. Include their goals (${page1Input}) and the bag incident (${page2Response}) as things that actually happened to them, not achievement milestones.
+Paragraph 1: Describe their morning so far, incorporating their initial goal (${page1Input}) and the dropped bag incident (${page2Response}). Focus on *how these felt to them* or *what they personally noticed*, rather than simply listing events. Show, don't just tell.
 
-Paragraph 2: Describe what's literally coming up next in their day from their perspective. Talk about the actual physical space, what they can see around them, what they're thinking about - not conference opportunities or networking potential.
+Paragraph 2: Transition to what's coming up next in their day. Describe the *immediate physical environment* and *their personal thoughts or small actions*, grounding it in their subjective experience. This paragraph should feel like a natural progression of their day, with a touch of character.
 
-Think like: someone's internal monologue about their morning, not an event coordinator describing activities.
+**Focus on:**
+-   **Authentic human observation:** The small details, personal reactions, a sense of their personality coming through.
+-   **Evocative, descriptive language:** Make it feel real, even if describing a common conference activity.
+-   **Relatability:** Sound like someone you know talking about their day.
+-   **A natural flow:** The sentences should connect smoothly, like a person thinking or speaking.
 
-Avoid: Conference buzzwords (networking, keynotes, tech wave), corporate enthusiasm, exclamation points, motivational language, agenda-speak, any language that sounds like event marketing.
+**Avoid (Specific to the "AI-generated" feel):**
+-   **Generic, clichéd phrases:** "Great start!", "on track," "nice hustle," "keep momentum," "unforgettable," "adventure," "make the most," "dive into," "gear up."
+-   **Overly enthusiastic or overtly promotional tone.**
+-   **Exclamation points** (unless used *very* sparingly and deliberately for a specific, authentic personal reaction, not generic excitement).
+-   **Language that sounds like an event agenda or marketing copy.**
+-   **Any phrasing that could be mistaken for AI trying to be "helpful."**
 
-Use: What people actually notice (the coffee line, where to sit, what time things start), internal thoughts, casual observations, the way someone actually experiences a day.
+# Example of Desired Output Style:
+"{'paragraph1': 'After that sudden bag tumble, gathering your ${page2Response} was a scramble, but you actually managed to get to the main hall, hoping to ${page1Input}.', 'paragraph2': 'Now, the main stage lights are warm, the coffee line is long, and you're just looking for an open spot near an outlet for the next session.'}"
 
-Format
+# Format
 Generate a JSON response with:
 {
-  "paragraph1": "What they've actually done this morning (~100 chars)",
-  "paragraph2": "What's literally happening next (~100 chars)"
+  "paragraph1": "Creative, authentic recap of the morning (~90-120 chars)",
+  "paragraph2": "Creative, authentic transition to what's next (~90-120 chars)"
 }
 
 IMPORTANT:
-The total combined length of both paragraphs should be roughly 180-220 characters.
-Write from their actual perspective as a human being, not as conference content.
-This is someone's real day, not a professional development experience.
+• The total combined length of both paragraphs should be roughly 180-240 characters.
+• Reference the specific items from ${page2Response} in paragraph1.
+• Reference ${page1Input} in paragraph2 (or paragraph1 if it flows better) to show continuity.
+• **Prioritize creative, authentic storytelling over generic positivity or formal reporting. Make it sound like a real person's day, not an event summary.**
 
 Generate the two-paragraph conclusion for the first half of Day 1.`
   }
@@ -330,12 +343,12 @@ export async function generateNextStep(
   const supabase = await createClient()
   
   // Validate required environment variables
-  if (!process.env.GROQ_API_KEY) {
-    console.error('❌ [STEP GEN] GROQ_API_KEY not found in environment variables')
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('❌ [STEP GEN] ANTHROPIC_API_KEY not found in environment variables')
     return { error: 'Service configuration error. Please try again.' }
   }
   
-  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
   try {
     // Get session data
@@ -356,26 +369,23 @@ export async function generateNextStep(
     const stepSpecificPrompt = getStepPrompt(currentStep, steps)
 
     const chatCompletion = await Promise.race([
-      groq.chat.completions.create({
+      anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1024,
+        system: BASE_SYSTEM_PROMPT,
         messages: [
           { 
-            role: 'system', 
-            content: BASE_SYSTEM_PROMPT
-          },
-          { 
             role: 'user', 
-            content: stepSpecificPrompt
+            content: stepSpecificPrompt + '\n\nPlease respond with valid JSON only.'
           }
-        ],
-        model: 'openai/gpt-oss-20b',
-        response_format: { type: 'json_object' }
+        ]
       }),
       new Promise<never>((_, reject) => 
         setTimeout(() => reject(new Error('API request timeout')), 30000)
       )
     ])
 
-    const response = chatCompletion.choices[0]?.message?.content || '{}'
+    const response = (chatCompletion.content[0] as { text: string })?.text || '{}'
     const stepContent = JSON.parse(response)
     
     console.log(`\n📋 [STEP GEN] Step ${currentStep} content generated:`)
@@ -453,12 +463,12 @@ export async function analyzeArchetype(sessionId: string) {
   const supabase = await createClient()
   
   // Validate required environment variables
-  if (!process.env.GROQ_API_KEY) {
-    console.error('❌ [ANALYSIS] GROQ_API_KEY not found in environment variables')
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('❌ [ANALYSIS] ANTHROPIC_API_KEY not found in environment variables')
     return { error: 'Service configuration error. Please try again.' }
   }
   
-  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
   try {
     // Get session data
@@ -516,17 +526,17 @@ Analyze their choices and response patterns. Return a JSON object with:
 Return ONLY the JSON - no other text.`
 
     const chatCompletion = await Promise.race([
-      groq.chat.completions.create({
-        messages: [{ role: 'user', content: analysisPrompt }],
-        model: 'openai/gpt-oss-20b',
-        response_format: { type: 'json_object' }
+      anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: analysisPrompt + '\n\nPlease respond with valid JSON only.' }]
       }),
       new Promise<never>((_, reject) => 
         setTimeout(() => reject(new Error('API request timeout')), 30000)
       )
     ])
 
-    const response = chatCompletion.choices[0]?.message?.content || '{}'
+    const response = (chatCompletion.content[0] as { text: string })?.text || '{}'
     const analysis = JSON.parse(response)
 
     // Save analysis to session

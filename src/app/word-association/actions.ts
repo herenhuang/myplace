@@ -1,6 +1,6 @@
 'use server';
 
-import Groq from 'groq-sdk';
+import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
 
@@ -26,7 +26,7 @@ export async function analyze(userResponses: string, clientSessionId?: string) {
 		data: { user }
 	} = await supabase.auth.getUser();
 
-	const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+	const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 	if (!userResponses) {
 		return { error: 'No responses provided.' };
@@ -58,21 +58,19 @@ Example output format:
 }
 `;
 
-		const chatCompletion = await groq.chat.completions.create({
+		const chatCompletion = await anthropic.messages.create({
+			model: 'claude-3-5-sonnet-20241022',
+			max_tokens: 1024,
+			system: systemPrompt,
 			messages: [
-				{
-					role: 'system',
-					content: systemPrompt
-				},
 				{
 					role: 'user',
 					content: `Here are the user's word association results: ${userResponses}`
 				}
-			],
-			model: 'openai/gpt-oss-20b'
+			]
 		});
 
-		const analysis = chatCompletion.choices[0]?.message?.content || 'Could not generate analysis.';
+		const analysis = (chatCompletion.content[0] as { text: string })?.text || 'Could not generate analysis.';
 
 		const parsedAnalysis = parseAnalysisJson(analysis);
 
@@ -113,7 +111,7 @@ Example output format:
 
 		return { success: true, analysis: parsedAnalysis };
 	} catch (error) {
-		console.error('Error with Groq API:', error);
+		console.error('Error with Claude API:', error);
 		return { error: 'Failed to generate analysis due to a server error.' };
 	}
 }
