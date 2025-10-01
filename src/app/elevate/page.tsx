@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
@@ -91,6 +92,11 @@ const BLOBBERT_TIPS: Record<string, string> = {
 
 // LocalStorage key for caching state
 const ELEVATE_STATE_KEY = 'elevate-simulation-state'
+
+// Helper function to format archetype name for icon file
+const formatArchetypeForIcon = (archetype: string): string => {
+  return `icon_${archetype.toLowerCase().replace(/[\s-]/g, '_').replace(/^the_/, '')}`
+}
 
 // Interface for cached state
 interface ElevateState {
@@ -805,12 +811,24 @@ export default function ElevateSimulation() {
 
             <div className={styles.welcomeHeader}>
 
-              <div className="text-center mb-10 mt-10 px-8 box-border">
-                <div className={styles.resultCard}></div>
-                <h1 className="text-2xl font-bold tracking-tight text-gray-800 mb-2 mt-8">{archetype}</h1>
-                <p className="text-lg font-medium tracking-tight leading-5 text-black/40">
-                  {archetypeInfo?.tagline || ''}
-                </p>
+              <div className="text-center mb-4 mt-10 px-8 box-border">
+                <div className={styles.resultCard}>
+                  <div className="flex flex-col justify-center w-full h-full items-center mb-4">
+                    <Image
+                      src={`/elevate/${formatArchetypeForIcon(archetype)}.png`}
+                      alt={`${archetype} icon`}
+                      width={200}
+                      height={200}
+                      className="rounded-lg"
+                      priority
+                    />
+                     <h1 className="text-2xl font-bold tracking-tight text-gray-800 mb-2 mt-6">{archetype}</h1>
+                      <p className="text-base font-medium tracking-tight leading-[1.1] text-black/40 w-[80%]">
+                        {archetypeInfo?.tagline || ''}
+                      </p>
+                  </div>
+                </div>
+               
               </div>
 
                 <div className="px-8">
