@@ -169,11 +169,11 @@ Style requirements:
       hasContent: !!response.candidates?.[0]?.content,
       hasParts: !!parts,
       partsLength: parts?.length,
-      partsTypes: parts?.map((p: any) => Object.keys(p)).join(', ')
+      partsTypes: parts?.map((p) => Object.keys(p as unknown as Record<string, unknown>)).join(', ')
     })
 
     // Search for the part containing inlineData (don't assume it's the first part)
-    const imagePart = parts?.find((p: any) => p.inlineData)
+    const imagePart = parts?.find((p) => 'inlineData' in (p as unknown as Record<string, unknown>))
     
     if (imagePart?.inlineData) {
       const { data: base64Data, mimeType } = imagePart.inlineData

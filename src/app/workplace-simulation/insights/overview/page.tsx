@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { getSession, analyzeBehavior } from '../../actions'
@@ -21,7 +21,7 @@ interface AnalysisData {
   developmentAreas: string[]
 }
 
-export default function InsightsOverview() {
+function InsightsOverviewContent() {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const router = useRouter()
@@ -103,7 +103,7 @@ export default function InsightsOverview() {
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-100">
               <h2 className="text-2xl font-light text-gray-800 mb-6">Your Workplace Personality</h2>
               <div className="text-lg text-gray-700 mb-4">
-                Based on how you handled this crisis, here's what stands out about your professional style:
+                Based on how you handled this crisis, here&apos;s what stands out about your professional style:
               </div>
               <div className="space-y-3">
                 {analysis.personalityHighlights.map((highlight, index) => (
@@ -134,5 +134,17 @@ export default function InsightsOverview() {
         </div>
       </div>
     </PageContainer>
+  )
+}
+
+export default function InsightsOverview() {
+  return (
+    <Suspense fallback={
+      <PageContainer>
+        <div className="text-center">Loading...</div>
+      </PageContainer>
+    }>
+      <InsightsOverviewContent />
+    </Suspense>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { getSession } from '../../actions'
@@ -27,7 +27,7 @@ interface SessionData {
   }
 }
 
-export default function DevelopmentRoadmap() {
+function DevelopmentRoadmapContent() {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -124,7 +124,7 @@ export default function DevelopmentRoadmap() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <h2 className="text-2xl font-light text-gray-800 mb-4">Your Workplace Journey</h2>
             <p className="text-gray-700 font-light leading-relaxed mb-6">
-              Based on this simulation, you've shown clear patterns in how you navigate workplace pressure. 
+              Based on this simulation, you&apos;ve shown clear patterns in how you navigate workplace pressure. 
               The insights above give you a roadmap for leveraging your strengths while growing in areas 
               that will make you even more effective.
             </p>
@@ -161,5 +161,17 @@ export default function DevelopmentRoadmap() {
         </div>
       </div>
     </PageContainer>
+  )
+}
+
+export default function DevelopmentRoadmap() {
+  return (
+    <Suspense fallback={
+      <PageContainer>
+        <div className="text-center">Loading...</div>
+      </PageContainer>
+    }>
+      <DevelopmentRoadmapContent />
+    </Suspense>
   )
 }

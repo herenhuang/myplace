@@ -66,7 +66,7 @@ export default function CrisisSimulationPage() {
           setIsComplete(true)
         }
       }
-    } catch (error) {
+    } catch {
       setErrorMessage('Network error. Please try again.')
     } finally {
       setIsLoading(false)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { getSession } from '../../actions'
@@ -27,7 +27,7 @@ interface SessionData {
   }
 }
 
-export default function StrengthsBlindSpots() {
+function StrengthsBlindSpotsContent() {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -165,5 +165,17 @@ export default function StrengthsBlindSpots() {
         </div>
       </div>
     </PageContainer>
+  )
+}
+
+export default function StrengthsBlindSpots() {
+  return (
+    <Suspense fallback={
+      <PageContainer>
+        <div className="text-center">Loading...</div>
+      </PageContainer>
+    }>
+      <StrengthsBlindSpotsContent />
+    </Suspense>
   )
 }

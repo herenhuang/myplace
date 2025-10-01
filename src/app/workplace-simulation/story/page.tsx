@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { getSession, continueStory } from '../actions'
@@ -20,7 +20,7 @@ interface SimulationData {
     };
 }
 
-export default function WorkplaceStory() {
+function WorkplaceStoryContent() {
   const [simulationData, setSimulationData] = useState<SimulationData | null>(null)
   const [userInput, setUserInput] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -156,7 +156,7 @@ export default function WorkplaceStory() {
               What happens next?
             </h3>
             <p className="text-gray-600 font-light mb-6">
-              Write down your train of thought, and ultimately what you'd do or what you'd say. There is no right answer. Share what you would actually think / do / say.
+              Write down your train of thought, and ultimately what you&apos;d do or what you&apos;d say. There is no right answer. Share what you would actually think / do / say.
             </p>
             
             <div className="space-y-4">
@@ -240,5 +240,17 @@ export default function WorkplaceStory() {
         )}
       </div>
     </PageContainer>
+  )
+}
+
+export default function WorkplaceStory() {
+  return (
+    <Suspense fallback={
+      <PageContainer>
+        <div className="text-center">Loading...</div>
+      </PageContainer>
+    }>
+      <WorkplaceStoryContent />
+    </Suspense>
   )
 }

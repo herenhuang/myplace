@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { getSession } from '../../actions'
@@ -28,7 +28,7 @@ interface SessionData {
   }
 }
 
-export default function ResponsePatterns() {
+function ResponsePatternsContent() {
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -119,7 +119,7 @@ export default function ResponsePatterns() {
                         {emoji} Turn {index + 1}: {action.type}
                       </div>
                       <div className="text-gray-800 font-light leading-relaxed mb-3">
-                        "{action.text}"
+                        &quot;{action.text}&quot;
                       </div>
                       <div className="text-sm text-gray-600 italic">
                         Your response reflects your approach to workplace challenges.
@@ -172,5 +172,17 @@ export default function ResponsePatterns() {
         </div>
       </div>
     </PageContainer>
+  )
+}
+
+export default function ResponsePatterns() {
+  return (
+    <Suspense fallback={
+      <PageContainer>
+        <div className="text-center">Loading...</div>
+      </PageContainer>
+    }>
+      <ResponsePatternsContent />
+    </Suspense>
   )
 }

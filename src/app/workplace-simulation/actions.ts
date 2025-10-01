@@ -131,7 +131,7 @@ export async function continueStory(sessionId: string, userInput: string) {
     }
 
     // 2. Prepare data for story continuation
-    const { result, data: initialData } = sessionData;
+    const { result } = sessionData;
     const { storyChunks, currentTurn, userActions } = result;
     
     const userAction = {
@@ -213,7 +213,7 @@ export async function analyzeBehavior(sessionId: string) {
     return { success: true, analysis: sessionData.result.analysis };
   }
 
-  const { result, data: initialData } = sessionData;
+  const { result } = sessionData;
   const { userActions } = result;
 
   // 2. Call Groq to analyze the user's actions
@@ -223,7 +223,7 @@ export async function analyzeBehavior(sessionId: string) {
     const analysisPrompt = `You are an honest but supportive behavioral analyst. Give accurate, realistic insights based on what the user actually did - don't force positive spins on negative responses.
 
 # User Actions During Crisis
-${userActions.map((action: any, i: number) => `Turn ${i+1}: "${action.text}"`).join('\n')}
+${userActions.map((action: { type: string; text: string }, i: number) => `Turn ${i+1}: "${action.text}"`).join('\n')}
 
 # Your Task
 Generate an honest behavioral analysis in JSON format:

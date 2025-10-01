@@ -71,7 +71,7 @@ export default function WorkplaceSimulation() {
                 placeholder="Your name"
                 className="border-b-4 border-orange-300 bg-transparent px-3 py-2 text-4xl font-normal focus:border-orange-400 focus:outline-none w-64 placeholder-gray-300 placeholder:text-4xl placeholder:font-extralight mx-1 text-left"
               />
-              <span>, and I'm a </span>
+              <span>, and I&apos;m a </span>
               <input
                 type="text"
                 value={formData.jobTitle}

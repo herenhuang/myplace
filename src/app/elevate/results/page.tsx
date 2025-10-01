@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { analyzeArchetype } from '../actions'
@@ -44,7 +44,7 @@ const ARCHETYPE_DESCRIPTIONS: Record<string, { tagline: string; emoji: string }>
   }
 }
 
-export default function ElevateResults() {
+function ElevateResultsContent() {
   const [isAnalyzing, setIsAnalyzing] = useState(true)
   const [archetype, setArchetype] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
@@ -99,7 +99,7 @@ export default function ElevateResults() {
             Analyzing Your Journey...
           </h2>
           <p className="text-gray-600 font-light text-center max-w-md">
-            We're reviewing your choices and discovering your conference archetype.
+            We&apos;re reviewing your choices and discovering your conference archetype.
           </p>
         </div>
       </PageContainer>
@@ -206,5 +206,19 @@ export default function ElevateResults() {
         </div>
       </div>
     </PageContainer>
+  )
+}
+
+export default function ElevateResults() {
+  return (
+    <Suspense fallback={
+      <PageContainer className="!max-w-none max-w-4xl">
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="text-center">Loading...</div>
+        </div>
+      </PageContainer>
+    }>
+      <ElevateResultsContent />
+    </Suspense>
   )
 }

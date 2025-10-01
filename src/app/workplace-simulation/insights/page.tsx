@@ -290,7 +290,7 @@ export default function WorkplaceInsights() {
                     {emoji} Turn {index + 1}: {action.type}
                   </div>
                   <div className="text-gray-800 font-light leading-relaxed">
-                    "{action.text}"
+                    &quot;{action.text}&quot;
                   </div>
                 </div>
               )
