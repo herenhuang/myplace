@@ -326,53 +326,30 @@ Before finalizing, reread your response. Does it flow naturally and sound like h
 
 Generate the next narrative step, question, and choices.`
   } else if (stepNumber === 4) {
-    // Generate Page 4 - conclusion
+    // Page 4 prompt (morning wrap) — concise, human, grounded
     const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
     const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
-    return `You are a highly creative storyteller, tasked with narrating a brief, authentic moment in someone's day at a tech conference. Your writing should capture a real human experience, validating their experience during the event without being too generic or corporate. 
+    return `You are writing a brief morning wrap that feels human and grounded.
 
-# Contextual Information
-The user initially said they wanted to: "${page1Input}"
-When asked what fell out of their bag, they said: "${page2Response}"
+Context
+- Step 1 intent: "${page1Input}"
+- Step 2 item(s): "${page2Response}"
 
-# Writing Instructions
+Write exactly two short paragraphs (one sentence each).
+- Paragraph 1: Acknowledge picking up the Step 2 item(s) as a small detail, then naturally reconnect to the Step 1 intent.
+- Paragraph 2: A simple forward glance toward the midday shift (no specifics or agenda).
 
-Write a two-paragraph summary that concludes their morning, infused with a sense of personal observation and realistic reflection.
+Tone and style rules
+- Keep it realistic and plain. Avoid poetic phrasing.
+- No em dashes, no exclamation points, no buzzwords.
+- 60–90 characters per paragraph. Keep it tight.
+- No invented specifics; reference only what the user provided.
 
-Paragraph 1: Describe their morning so far, incorporating their initial goal (${page1Input}) and the dropped bag incident (${page2Response}). Focus on *how these felt to them* or *what they personally noticed*, rather than simply listing events. Show, don't just tell.
-
-Paragraph 2: Transition to what's coming up next in their day. Describe the *immediate physical environment* and *their personal thoughts or small actions*, grounding it in their subjective experience. This paragraph should feel like a natural progression of their day, with a touch of character. The user should feel excited and optimistic for the rest of the day.
-
-**Focus on:**
--   **Authentic human observation:** The small details, personal reactions, a sense of their personality coming through.
--   **Evocative, descriptive language:** Make it feel real and overall optimistic.
--   **Relatability:** Sound like someone you know talking about their day.
--   **A natural flow:** The sentences should connect smoothly, like a person thinking or speaking.
-
-**Avoid (Specific to the "AI-generated" feel):**
--   **Generic, clichéd phrases:** "Great start!", "on track," "nice hustle," "keep momentum," "unforgettable," "adventure," "make the most," "dive into," "gear up."
--   **Overly enthusiastic or overtly promotional tone.**
--   **Exclamation points** (unless used *very* sparingly and deliberately for a specific, authentic personal reaction, not generic excitement).
--   **Language that sounds like an event agenda or marketing copy.**
--   **Any phrasing that could be mistaken for AI trying to be "helpful."**
-
-# Example of Desired Output Style:
-"{'paragraph1': 'After that sudden bag tumble, gathering your ${page2Response} was a scramble, but you actually managed to get to the main hall, hoping to ${page1Input}.', 'paragraph2': 'Now, the main stage lights are warm, the coffee line is long, and you're just looking for an open spot near an outlet for the next session.'}"
-
-# Format
-Generate a JSON response with:
+Format (JSON only)
 {
-  "paragraph1": "Creative, authentic recap of the morning (~90-120 chars)",
-  "paragraph2": "Creative, authentic transition to the remainder of the day (~90-120 chars)"
-}
-
-IMPORTANT:
-• The total combined length of both paragraphs should be roughly 180-240 characters.
-• Reference the specific items from ${page2Response} in paragraph1.
-• Reference ${page1Input} in paragraph2 (or paragraph1 if it flows better) to show continuity.
-• **Prioritize creative, authentic storytelling over generic positivity or formal reporting. Make it sound like a real person's day, not an event summary.**
-
-Generate the two-paragraph conclusion for the first half of Day 1.`
+  "paragraph1": "One short sentence",
+  "paragraph2": "One short sentence"
+}`
   } else if (stepNumber === 5) {
     // Page 5: Start lunch arc (text only; frontend provides question/choices)
     const page3Question = steps.find(s => s.stepNumber === 3)?.question || ''
@@ -455,29 +432,32 @@ JSON
   "choices": ["📝 option one", "👀 option two", "🤝 option three"]
 }`
   } else if (stepNumber === 9) {
-    // Page 9: Final conclusion of whole day (paragraphs)
+    // Page 9 prompt (day wind‑down) — concise, human, heading home
     const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
-    const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
     const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
     const page7Response = steps.find(s => s.stepNumber === 7)?.userResponse || ''
-    return `Write a brief, human-feeling two-paragraph conclusion summarizing the whole day.
+    return `Write a brief wind down as the user heads home after Day 1 of an art x tech conference.
 
-# Inputs to reference (naturally)
-- Morning goal: "${page1Input}"
-- Bag incident: "${page2Response}"
-- Lunch choice: "${page5Response}"
-- Helen talk focus: "${page7Response}"
+Inputs to weave in naturally (do not list):
+- Step 1 thread or early intent: "${page1Input}"
+- Lunch vibe: "${page5Response}"
+- Helen’s talk: keep wording as "Helen’s talk"
+- Capture style (Step 7/8): reference behavior (e.g., notes, ideas)
 
-# Writing
-- paragraph1: Reflect on the day with specific sensory or personal observations.
-- paragraph2: Close the arc with a grounded, hopeful tone.
-- Avoid corporate buzzwords and hype.
-- No exclamation spam; concise and evocative.
+Write exactly two short paragraphs (one sentence each).
+- Paragraph 1: Wind down leaving the venue, recalling small beats from the day.
+- Paragraph 2: On the way home, a calm look ahead, possibly to Day 2.
 
-# JSON
+Tone and style rules
+- Plain, human, grounded. No poetic flourishes.
+- No em dashes, no exclamation points, no buzzwords.
+- 80–120 characters per paragraph. Keep it tight.
+- Do not invent talk topics. "Notes from Helen’s talk" is fine.
+
+Format (JSON only)
 {
-  "paragraph1": "~100-130 chars",
-  "paragraph2": "~100-130 chars"
+  "paragraph1": "One short sentence",
+  "paragraph2": "One short sentence"
 }`
   }
   
