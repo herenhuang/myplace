@@ -82,9 +82,9 @@ const ARCHETYPE_DESCRIPTIONS: Record<string, { tagline: string; emoji: string }>
 // Blobbert tips for each screen
 const BLOBBERT_TIPS: Record<string, string> = {
   'welcome': "Ready to discover your conference style? Let's go!",
-  'step-1': "Remember — there's no wrong answer!",
-  'step-2': "Trust your instincts and choose what feels right.",
-  'step-3': "You're doing great! Keep being yourself.",
+  'step-1': "There are no wrong answers, so just go with your gut!!",
+  // 'step-2': "Trust your instincts and choose what feels right.",
+  // 'step-3': "You're doing great! Keep being yourself.",
   'step-4': "Almost there! One more moment to capture.",
   'analyzing': "Hang tight while I analyze your unique style...",
   'results': "Here's what I discovered about you!"

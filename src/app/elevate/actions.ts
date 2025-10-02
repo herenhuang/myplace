@@ -216,7 +216,8 @@ User's last action: ${page1Input}
 Writing Instructions
 Write in second person ("you") - you're describing THEIR immediate experience.
 Keep it concise and impactful, like a narrative beat in a story.
-Two sentences max.
+Do not make up user's feelings, keep it open and standard but written in an exciting way.
+Two sentences max, 100-150 characters total.
 If the user's input isn't suitable for a professional conference setting (e.g., gibberish, NSFW), elegantly pivot to a generic but still active conference-related action.
 The sentence must clearly set up the user's immediate intention, then lead directly into "you suddenly trip, dropping your bag and scattering its contents everywhere!"
 
@@ -287,7 +288,7 @@ Generate the next narrative step, question, and choices.`
     // Generate Page 4 - conclusion
     const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
     const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
-    return `You are a highly creative storyteller, tasked with narrating a brief, authentic moment in someone's day at a tech conference. Your writing should capture a real human experience – what they *actually* see, feel, and think – with a personal touch, *not* generic marketing or corporate event language.
+    return `You are a highly creative storyteller, tasked with narrating a brief, authentic moment in someone's day at a tech conference. Your writing should capture a real human experience, validating their experience during the event without being too generic or corporate. 
 
 # Contextual Information
 The user initially said they wanted to: "${page1Input}"
@@ -299,11 +300,11 @@ Write a two-paragraph summary that concludes their morning, infused with a sense
 
 Paragraph 1: Describe their morning so far, incorporating their initial goal (${page1Input}) and the dropped bag incident (${page2Response}). Focus on *how these felt to them* or *what they personally noticed*, rather than simply listing events. Show, don't just tell.
 
-Paragraph 2: Transition to what's coming up next in their day. Describe the *immediate physical environment* and *their personal thoughts or small actions*, grounding it in their subjective experience. This paragraph should feel like a natural progression of their day, with a touch of character.
+Paragraph 2: Transition to what's coming up next in their day. Describe the *immediate physical environment* and *their personal thoughts or small actions*, grounding it in their subjective experience. This paragraph should feel like a natural progression of their day, with a touch of character. The user should feel excited and optimistic for the rest of the day.
 
 **Focus on:**
 -   **Authentic human observation:** The small details, personal reactions, a sense of their personality coming through.
--   **Evocative, descriptive language:** Make it feel real, even if describing a common conference activity.
+-   **Evocative, descriptive language:** Make it feel real and overall optimistic.
 -   **Relatability:** Sound like someone you know talking about their day.
 -   **A natural flow:** The sentences should connect smoothly, like a person thinking or speaking.
 
@@ -321,7 +322,7 @@ Paragraph 2: Transition to what's coming up next in their day. Describe the *imm
 Generate a JSON response with:
 {
   "paragraph1": "Creative, authentic recap of the morning (~90-120 chars)",
-  "paragraph2": "Creative, authentic transition to what's next (~90-120 chars)"
+  "paragraph2": "Creative, authentic transition to the remainder of the day (~90-120 chars)"
 }
 
 IMPORTANT:
