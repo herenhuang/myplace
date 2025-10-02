@@ -155,15 +155,15 @@ async function appendDebugLog(sessionId: string, entry: DebugLogEntry) {
 }
 
 // Base system prompt applied to all AI generations
-const BASE_SYSTEM_PROMPT = `You are a narrative guide for the Elevate tech conference simulation.
+const BASE_SYSTEM_PROMPT = `You are a narrative guide for the Elevate art x tech conference simulation.
 
 Context and Guidelines:
-- The user is attending the Elevate tech conference, a professional startup/tech industry event
+- The user is attending the Elevate art x tech conference (creative technology context)
 - All generated scenarios must be concise, easy to read, and scannable
 - Always address the user in second person ("you")
 - This simulation walks users through realistic conference scenarios to analyze their actions and determine their personality archetype
 
-Your role is to create engaging, authentic conference experiences that feel true to a modern tech/startup event while gathering insights about the user's behavioral patterns and preferences, with the goal of mapping the user to an archetype.
+Your role is to create engaging, authentic conference experiences that feel true to a modern art x tech event while gathering insights about the user's behavioral patterns and preferences, with the goal of mapping the user to an archetype.
 
 Archetypes (for reference to inform question/choices)
 • The Icebreaker → You thrive in groups and make others feel at ease.
@@ -268,6 +268,7 @@ Keep it concise and impactful, like a narrative beat in a story.
 Do not make up user's feelings, keep it open and standard but written in an exciting way.
 Two sentences max, 80-120 characters total.
 If the user's input isn't suitable for a professional conference setting (e.g., gibberish, NSFW), elegantly pivot to a generic but still active conference-related action.
+Do NOT invent specific session names or topics (e.g., no "AI Ethics panel"), unless explicitly provided by the user.
 The sentence must clearly set up the user's immediate intention, then lead directly into "you suddenly trip, dropping your bag and scattering its contents everywhere!"
 
 Format
@@ -284,7 +285,7 @@ Write two sentences describing the conference attendee's next moment, culminatin
     return `You are a creative storyteller and an insightful guide, observing a chaotic moment unfold at a fast-paced tech conference. Following the dropped bag incident, craft a narrative that naturally leads the user to reflect on their approach to this specific environment and, by extension, their core archetype — while preserving continuity with what they said they were doing earlier.
 
 Current Scenario Context
-You've just tripped at a tech conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}". Earlier, they said they wanted to: "${page1Input}".
+You've just tripped at a conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}". Earlier, they said they wanted to: "${page1Input}".
 
 Writing Instructions
 The "text" field should contain two casual sentences:
@@ -301,7 +302,7 @@ Each choice should offer a clear, concise (~40 chars) action or mindset that ali
 Avoid overly formal or generic corporate language. This should be fun, relatable, and clearly reflect a distinct approach.
 Start each choice with a relevant emoji. Choices should not have punctuation at the end.
 Ensure the question and choices are directly helpful in narrowing down the user's final archetype.
-Maintain continuity with their earlier intent (e.g., if they were heading to a keynote, don't forget that context unless their new answer clearly pivots).
+Maintain continuity with their earlier intent (e.g., if they were heading to a session, mention continuing toward that original destination unless their new answer clearly pivots).
 
 Format
 Generate a JSON response with:
@@ -426,6 +427,7 @@ Context to incorporate naturally (do not list):
 Instructions
 - Second person ("you"). Avoid promotional/agenda tone.
 - Mention moving toward or arriving at Helen's session.
+- Use "Helen's talk" (not "keynote").
 - Avoid naming a last name or specific talk topics (e.g., do not assume AI ethics). Use non-specific phrasing like "Helen's talk" or "the session".
 - Do NOT include a direct question; the frontend will ask it.
 - 120–180 characters total.
@@ -517,7 +519,7 @@ export async function generateNextStep(
 
     const chatCompletion = await Promise.race([
       anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-7-sonnet-latest',
         max_tokens: 1024,
         system: BASE_SYSTEM_PROMPT,
         messages: [
@@ -712,7 +714,7 @@ Return ONLY the JSON - no other text.`
 
     const chatCompletion = await Promise.race([
       anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-7-sonnet-latest',
         max_tokens: 1024,
         messages: [{ role: 'user', content: analysisPrompt + '\n\nPlease respond with valid JSON only.' }]
       }),
