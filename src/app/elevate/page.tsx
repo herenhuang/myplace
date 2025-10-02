@@ -114,6 +114,7 @@ interface ElevateState {
   backgroundImageUrl: string | null
   archetype: string
   explanation: string
+  resultsPage: 'card' | 'explanation'
   timestamp: number
 }
 
@@ -138,6 +139,7 @@ export default function ElevateSimulation() {
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
   const [copyLogsStatus, setCopyLogsStatus] = useState<'idle' | 'copying' | 'done' | 'error'>('idle')
+  const [resultsPage, setResultsPage] = useState<'card' | 'explanation'>('card')
   
   const inputRef = useRef<HTMLInputElement>(null)
   const choicesContainerRef = useRef<HTMLDivElement>(null)
@@ -152,7 +154,10 @@ export default function ElevateSimulation() {
       return BLOBBERT_TIPS[`step-${currentStepNumber}`] || ''
     }
     if (screenState === 'analyzing') return BLOBBERT_TIPS['analyzing']
-    if (screenState === 'results') return BLOBBERT_TIPS['results']
+    if (screenState === 'results') {
+      if (resultsPage === 'card') return BLOBBERT_TIPS['results']
+      return '' // No tip on explanation page
+    }
     return ''
   }
 
@@ -161,7 +166,7 @@ export default function ElevateSimulation() {
     if (screenState === 'welcome') return true
     if (screenState === 'simulation' && currentStepNumber === 1) return true // First step
     if (screenState === 'simulation' && currentStepNumber === TOTAL_STEPS) return true // Last step
-    if (screenState === 'results') return true
+    if (screenState === 'results' && resultsPage === 'card') return true // Only on card page
     return false
   }
 
@@ -179,6 +184,7 @@ export default function ElevateSimulation() {
       backgroundImageUrl,
       archetype,
       explanation,
+      resultsPage,
       timestamp: Date.now()
     }
     
@@ -187,7 +193,7 @@ export default function ElevateSimulation() {
     } catch (error) {
       console.error('Failed to save state to localStorage:', error)
     }
-  }, [screenState, sessionId, dbSessionId, currentStepNumber, currentStep, previousResponses, backgroundImageUrl, archetype, explanation])
+  }, [screenState, sessionId, dbSessionId, currentStepNumber, currentStep, previousResponses, backgroundImageUrl, archetype, explanation, resultsPage])
 
   // Load state from localStorage
   const loadState = (): ElevateState | null => {
@@ -239,6 +245,7 @@ export default function ElevateSimulation() {
       setBackgroundImageUrl(savedState.backgroundImageUrl)
       setArchetype(savedState.archetype)
       setExplanation(savedState.explanation)
+      setResultsPage(savedState.resultsPage || 'card')
       setStepStartTime(Date.now()) // Reset timer
     } else {
       // No saved state or back at welcome, initialize fresh session
@@ -253,7 +260,7 @@ export default function ElevateSimulation() {
     if (screenState !== 'welcome') {
       saveState()
     }
-  }, [screenState, currentStepNumber, currentStep, previousResponses, archetype, explanation, backgroundImageUrl, sessionId, dbSessionId, saveState])
+  }, [screenState, currentStepNumber, currentStep, previousResponses, archetype, explanation, backgroundImageUrl, sessionId, dbSessionId, resultsPage, saveState])
 
   const startSimulation = async () => {
     setIsLoading(true)
@@ -327,6 +334,7 @@ export default function ElevateSimulation() {
     setArchetype('')
     setExplanation('')
     setAnalysisError('')
+    setResultsPage('card')
     const sid = getOrCreateSessionId()
     setSessionId(sid)
   }
@@ -1043,56 +1051,62 @@ export default function ElevateSimulation() {
 
         const archetypeInfo = ARCHETYPE_DESCRIPTIONS[archetype]
 
-        return (
-          <div className={styles.textContainer}>
-
-            <div className={styles.resultHeader}>
-
-              <div className="text-center mb-4 mt-10 px-8 box-border">
-                <div className={styles.resultCard}>
-                  <div className="flex flex-col justify-center w-full h-full items-center mb-4">
-                    <Image
-                      src={`/elevate/${formatArchetypeForIcon(archetype)}.png`}
-                      alt={`${archetype} icon`}
-                      width={200}
-                      height={200}
-                      className="rounded-lg"
-                      priority
-                    />
-                     <h1 className={styles.resultTitle}>{archetype}</h1>
+        // Results Page 1: Card Display
+        if (resultsPage === 'card') {
+          return (
+            <div className={styles.textContainer}>
+              <div className={styles.resultHeader}>
+                <div className="text-center mt-10 px-8 box-border">
+                  <div className={styles.resultCard}>
+                    <div className="flex flex-col justify-center w-full h-full items-center">
+                      <Image
+                        src={`/elevate/${formatArchetypeForIcon(archetype)}.png`}
+                        alt={`${archetype} icon`}
+                        width={200}
+                        height={200}
+                        className="rounded-lg"
+                        priority
+                      />
+                      <h1 className={styles.resultTitle}>{archetype}</h1>
                       <p className={styles.resultTagline}>
                         {archetypeInfo?.tagline || ''}
                       </p>
+                    </div>
                   </div>
                 </div>
-               
-              </div>
 
-                <div className="px-8">
-                  <p className="text-base font-medium tracking-tight text-gray-700 leading-[1.3] whitespace-pre-line">
+                <button
+                  onClick={() => setResultsPage('explanation')}
+                  className={styles.appButton}
+                >
+                  <span>Continue →</span>
+                </button>
+              </div>
+            </div>
+          )
+        }
+
+        // Results Page 2: Explanation
+        return (
+          <div className={styles.textContainer}>
+            <div className={styles.resultHeader}>
+              <div className="px-8 pt-10">
+                <h2 className={styles.resultTitle}>
+                  {archetype}
+                </h2>
+                <p className="text-base mt-8 font-medium tracking-tight text-gray-700 leading-[1.3] whitespace-pre-line">
                   {explanation}
-                  </p>
-                </div>
-   
+                </p>
+              </div>
 
               <button
                 onClick={resetSimulation}
                 className={styles.appButton}
               >
-                <span> Complete </span>
+                <span>Complete</span>
               </button>
-              
-              <div className="relative w-full">
-                <button
-                  onClick={copyDebugLogs}
-                  className="absolute bottom-2 right-3 text-[11px] text-gray-400 hover:text-gray-600 underline"
-                  title="Copy prompts and responses"
-                >
-                  {copyLogsStatus === 'copying' ? 'Copying…' : copyLogsStatus === 'done' ? 'Copied!' : copyLogsStatus === 'error' ? 'Failed' : 'Copy Debug Logs'}
-                </button>
-              </div>
+
             </div>
-           
           </div>
         )
 
