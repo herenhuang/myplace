@@ -116,6 +116,44 @@ export async function recordStep(
   }
 }
 
+interface DebugLogEntry {
+  type: 'step_gen' | 'analysis'
+  step?: number
+  prompt: string
+  rawResponse: string
+  parsedSummary?: {
+    text?: string
+    question?: string
+    choicesCount?: number
+  }
+  timestamp: string
+}
+
+async function appendDebugLog(sessionId: string, entry: DebugLogEntry) {
+  const supabase = await createClient()
+  const { data: sessionData, error: fetchError } = await supabase
+    .from('sessions')
+    .select('*')
+    .eq('id', sessionId)
+    .single()
+  if (fetchError || !sessionData) {
+    console.error('Error fetching session for debug log:', fetchError)
+    return
+  }
+  const prevDebug: DebugLogEntry[] = sessionData.data?.debugLogs || []
+  const updated = {
+    ...sessionData.data,
+    debugLogs: [...prevDebug, entry]
+  }
+  const { error: updateError } = await supabase
+    .from('sessions')
+    .update({ data: updated })
+    .eq('id', sessionId)
+  if (updateError) {
+    console.error('Error appending debug log:', updateError)
+  }
+}
+
 // Base system prompt applied to all AI generations
 const BASE_SYSTEM_PROMPT = `You are a narrative guide for the Elevate tech conference simulation.
 
@@ -241,11 +279,12 @@ Generate a JSON response with:
 Write two sentences describing the conference attendee's next moment, culminating in a dropped bag.`
   } else if (stepNumber === 3) {
     // Generate Page 3 from Page 2
+    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
     const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
-    return `You are a creative storyteller and an insightful guide, observing a chaotic moment unfold at a fast-paced tech conference. Following the dropped bag incident, craft a narrative that naturally leads the user to reflect on their approach to this specific environment and, by extension, their core archetype.
+    return `You are a creative storyteller and an insightful guide, observing a chaotic moment unfold at a fast-paced tech conference. Following the dropped bag incident, craft a narrative that naturally leads the user to reflect on their approach to this specific environment and, by extension, their core archetype — while preserving continuity with what they said they were doing earlier.
 
 Current Scenario Context
-You've just tripped at a tech conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}"
+You've just tripped at a tech conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}". Earlier, they said they wanted to: "${page1Input}".
 
 Writing Instructions
 The "text" field should contain two casual sentences:
@@ -262,6 +301,7 @@ Each choice should offer a clear, concise (~40 chars) action or mindset that ali
 Avoid overly formal or generic corporate language. This should be fun, relatable, and clearly reflect a distinct approach.
 Start each choice with a relevant emoji. Choices should not have punctuation at the end.
 Ensure the question and choices are directly helpful in narrowing down the user's final archetype.
+Maintain continuity with their earlier intent (e.g., if they were heading to a keynote, don't forget that context unless their new answer clearly pivots).
 
 Format
 Generate a JSON response with:
@@ -346,6 +386,7 @@ Instructions
 - Write in second person ("you").
 - Keep it grounded and human; avoid hype.
 - Mention heading to lunch or scoping lunch options.
+- Avoid introducing specific restaurants, brand names, or factual details not provided by the user.
 - Do NOT include a direct question; the frontend will ask it.
 - 120–180 characters total.
 
@@ -375,7 +416,7 @@ JSON
     const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
     const page6Question = steps.find(s => s.stepNumber === 6)?.question || ''
     const page6Response = steps.find(s => s.stepNumber === 6)?.userResponse || ''
-    return `Write 1-2 casual, grounded sentences that weave together the lunch moment and the immediate post-lunch choice, as you head toward Helen Huang's talk. It should feel like a natural progression, with human detail.
+    return `Write 1-2 casual, grounded sentences that weave together the lunch moment and the immediate post-lunch choice, as you head toward Helen's talk. It should feel like a natural progression, with human detail.
 
 Context to incorporate naturally (do not list):
 - Lunch choice: "${page5Response}"
@@ -384,7 +425,8 @@ Context to incorporate naturally (do not list):
 
 Instructions
 - Second person ("you"). Avoid promotional/agenda tone.
-- Mention moving toward or arriving at Helen Huang's session.
+- Mention moving toward or arriving at Helen's session.
+- Avoid naming a last name or specific talk topics (e.g., do not assume AI ethics). Use non-specific phrasing like "Helen's talk" or "the session".
 - Do NOT include a direct question; the frontend will ask it.
 - 120–180 characters total.
 
@@ -393,7 +435,7 @@ Return JSON only
   } else if (stepNumber === 8) {
     // Page 8: Follow-up built off the talk (full generation)
     const page7Response = steps.find(s => s.stepNumber === 7)?.userResponse || ''
-    return `Right after Helen Huang's talk begins, generate a short narrative, a targeted question, and three concise choices that probe engagement style.
+    return `Right after Helen's talk begins, generate a short narrative, a targeted question, and three concise choices that probe engagement style — without inventing specific talk topics.
 
 Context
 - Pre-talk focus: "${page7Response}"
@@ -402,6 +444,7 @@ Writing
 - text: 1-2 sentences capturing your in-room attention and behavior.
 - question: A short, specific probe about how you engage in the session.
 - choices: 3 options, each starting with an emoji, ~30–40 chars, no terminal punctuation, directly answering the question.
+- Avoid naming specific topics, products, or claims about the content of the talk unless provided by the user.
 
 JSON
 {
@@ -496,6 +539,20 @@ export async function generateNextStep(
     console.log(`   - Text: "${stepContent.text?.substring(0, 80)}..."`)
     console.log(`   - Question: "${stepContent.question}"`)
     console.log(`   - Choices count: ${stepContent.choices?.length || 0}`)
+
+    // Store debug log
+    appendDebugLog(sessionId, {
+      type: 'step_gen',
+      step: currentStep,
+      prompt: stepSpecificPrompt,
+      rawResponse: response,
+      parsedSummary: {
+        text: stepContent.text,
+        question: stepContent.question,
+        choicesCount: stepContent.choices?.length || 0
+      },
+      timestamp: new Date().toISOString()
+    }).catch(err => console.error('Debug log append error:', err))
 
     // Handle step-specific response formats
     let result
@@ -620,11 +677,35 @@ Based on the user's responses throughout their Elevate conference simulation, as
 # User's Journey:
 ${responseContext}
 
+# Behavioral Rubric (use these rules strictly)
+Signals and mappings (examples, not exhaustive):
+- Proactive social initiation (joins/initiates networking, chooses to meet new people, walks up to others) → Strongly favors Icebreaker; secondarily Action-Taker. DO NOT classify as Observer.
+- Skips lunch to network or optimizes for engagement → Action-Taker or Icebreaker depending on tone; prefer Icebreaker when it’s social initiation; Action-Taker when it’s decisiveness/efficiency-focused.
+- Detailed note-taking, front-row, structured capture → Note-Taker.
+- Observing room energy, quietly scanning, hanging back → Observer (unless overridden by proactive social initiation).
+- Snapping a photo to post later, crafting shareable moments → Poster.
+- Brainstorming/“ideas to discuss after,” connecting dots, future-leaning → Big-Idea Person.
+- Schedule adherence/efficiency (quick bite to stay on track) → Planner.
+- Wanders/explores spontaneously (e.g., food trucks, roaming) → Floater.
+- Repeatedly references existing friends/people orbiting them → Anchor.
+
+Precedence and tie-breaking:
+- If signals conflict, prioritize proactive social initiation over reflective/observational signals.
+- Use multiple signals; avoid letting a single reflective answer override earlier proactive actions.
+- Steps 1–9 have equal weight. Consider consistency across steps.
+
+Special interpretation:
+- Step 2 “bag contents” should be treated as what they brought and what that implies (preparedness, note-taking, distraction), not the fact of dropping them.
+
+Guardrails:
+- If the user initiates networking with new people, DO NOT assign Observer.
+- The explanation must cite specific steps and justify precedence when signals conflict.
+
 # Your Task:
-Analyze their choices and response patterns. Return a JSON object with:
+Analyze their choices and response patterns using the rubric above. Return a JSON object with:
 {
   "archetype": "The [Archetype Name]",
-  "explanation": "A warm, insightful 2-3 paragraph explanation of why this archetype fits them, referencing specific choices they made. Be encouraging and authentic."
+  "explanation": "A warm, insightful 2–3 paragraph explanation of why this archetype fits them, referencing specific choices across steps (e.g., 2, 5–8). Explain any conflicts using the precedence rules, noting why proactive social initiation outweighs reflective signals when both are present. Be encouraging and authentic."
 }
 
 Return ONLY the JSON - no other text.`
@@ -642,6 +723,14 @@ Return ONLY the JSON - no other text.`
 
     const response = (chatCompletion.content[0] as { text: string })?.text || '{}'
     const analysis = JSON.parse(response)
+
+    // Store debug log for analysis
+    appendDebugLog(sessionId, {
+      type: 'analysis',
+      prompt: analysisPrompt,
+      rawResponse: response,
+      timestamp: new Date().toISOString()
+    }).catch(err => console.error('Debug log append error (analysis):', err))
 
     // Save analysis to session
     const { error: updateError } = await supabase
@@ -667,5 +756,29 @@ Return ONLY the JSON - no other text.`
   } catch (error) {
     console.error('Error analyzing archetype:', error)
     return { error: 'Failed to analyze archetype.' }
+  }
+}
+
+export async function getDebugLogs(sessionId: string) {
+  try {
+    const supabase = await createClient()
+    const { data: sessionData, error } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single()
+    if (error || !sessionData) {
+      console.error('Error fetching session for logs:', error)
+      return { error: 'Could not fetch logs.' }
+    }
+    return {
+      success: true,
+      steps: sessionData.data?.steps || [],
+      debugLogs: sessionData.data?.debugLogs || [],
+      result: sessionData.result || null
+    }
+  } catch (e) {
+    console.error('Error in getDebugLogs:', e)
+    return { error: 'Failed to get logs.' }
   }
 }

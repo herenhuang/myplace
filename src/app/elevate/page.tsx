@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
-import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
+import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, getDebugLogs, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
 
@@ -32,8 +32,8 @@ const TOTAL_STEPS = 9 // Expanded to 9 steps for full-day arc
 const PREDEFINED_STEPS: Record<number, Step> = {
   1: {
     stepNumber: 1,
-    text: "Day 1 of Elevate has finally begun! You just got your badge and you're standing in the Great Hall.",
-    question: "What do you do next?",
+    text: "Day 1 of Elevate has finally begun! You just collected your badge and walked into the Great Hall.",
+    question: "What do you immediately do next?",
     choices: [],
     allowCustomInput: true,
     imageUrl: '/elevate/orange.png'
@@ -137,6 +137,7 @@ export default function ElevateSimulation() {
   const [archetype, setArchetype] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
+  const [copyLogsStatus, setCopyLogsStatus] = useState<'idle' | 'copying' | 'done' | 'error'>('idle')
   
   const inputRef = useRef<HTMLInputElement>(null)
   const choicesContainerRef = useRef<HTMLDivElement>(null)
@@ -328,6 +329,27 @@ export default function ElevateSimulation() {
     setAnalysisError('')
     const sid = getOrCreateSessionId()
     setSessionId(sid)
+  }
+
+  const copyDebugLogs = async () => {
+    if (!dbSessionId) return
+    try {
+      setCopyLogsStatus('copying')
+      const result = await getDebugLogs(dbSessionId)
+      const payload = {
+        sessionId: dbSessionId,
+        steps: result.steps || [],
+        debugLogs: result.debugLogs || [],
+        analysis: result.result || null
+      }
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+      setCopyLogsStatus('done')
+      setTimeout(() => setCopyLogsStatus('idle'), 1500)
+    } catch (e) {
+      console.error('Failed to copy debug logs:', e)
+      setCopyLogsStatus('error')
+      setTimeout(() => setCopyLogsStatus('idle'), 1500)
+    }
   }
 
   const handleChoiceSelect = async (choiceValue: string, isCustom: boolean = false) => {
@@ -1059,6 +1081,16 @@ export default function ElevateSimulation() {
               >
                 <span> Complete </span>
               </button>
+              
+              <div className="relative w-full">
+                <button
+                  onClick={copyDebugLogs}
+                  className="absolute bottom-2 right-3 text-[11px] text-gray-400 hover:text-gray-600 underline"
+                  title="Copy prompts and responses"
+                >
+                  {copyLogsStatus === 'copying' ? 'Copying…' : copyLogsStatus === 'done' ? 'Copied!' : copyLogsStatus === 'error' ? 'Failed' : 'Copy Debug Logs'}
+                </button>
+              </div>
             </div>
            
           </div>
