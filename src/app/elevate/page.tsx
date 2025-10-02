@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
+import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, getDebugLogs, type StepData } from './actions'
@@ -1094,9 +1095,11 @@ export default function ElevateSimulation() {
                 <h2 className={styles.resultTitle}>
                   {archetype}
                 </h2>
-                <p className="text-base mt-8 font-medium tracking-tight text-gray-700 leading-[1.3] whitespace-pre-line">
-                  {explanation}
-                </p>
+                <div className={styles.markdownContent}>
+                  <ReactMarkdown>
+                    {explanation}
+                  </ReactMarkdown>
+                </div>
               </div>
 
               <button

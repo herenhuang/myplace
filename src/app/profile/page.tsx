@@ -138,33 +138,10 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-			{/* Navigation Header */}
-			<header className="bg-white/80 backdrop-blur-lg border-b border-gray-200">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex justify-between items-center py-4">
-						<Link href="/" className="flex items-center hover:scale-105 transition-transform duration-200">
-							<Image 
-								src='/MyPlace2.png' 
-								alt='MyPlace Logo' 
-								width={500}
-								height={300}
-								className='w-32 h-auto object-contain'
-							/>
-						</Link>
-						<Link 
-							href="/" 
-							className="text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200"
-						>
-							← Back to Home
-						</Link>
-					</div>
-				</div>
-			</header>
-
+		<div className="min-h-screen">
 			{/* Profile Content */}
-			<main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-				<div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+			<main className="max-w-[1400px]mx-auto px-4 sm:px-6 lg:px-8 py-12">
+				<div className="bg-white rounded-2xl overflow-hidden">
 					{/* Profile Header */}
 					<div className="bg-gradient-to-r px-8 py-8">
 						<div className="flex items-center justify-between w-full space-x-6">
@@ -212,10 +189,10 @@ export default function ProfilePage() {
 					</div>
 
 					{/* Profile Information */}
-					<div className="px-8 py-8">
+					<div className="px-8 py-8 flex gap-12">
 
 						{/* Scrapbook Section */}
-						<div className="mb-12">
+						<div className="mb-12 flex-1">
 							<h2 className="text-2xl font-semibold text-gray-900 mb-6">Your Scrapbook</h2>
 							
 							{/* Elevate Simulation Result */}
@@ -304,7 +281,7 @@ export default function ProfilePage() {
 						</div>
 
 						{/* Game Sessions */}
-						<div className="col-span-1 md:col-span-2">
+						<div className="width-[240px]">
 							<h2 className="text-2xl font-semibold text-gray-900 mb-6">Your Game Sessions</h2>
 							{sessions.length > 0 ? (
 								<div className="grid grid-cols-1 gap-6">
@@ -322,7 +299,7 @@ export default function ProfilePage() {
 														day: 'numeric'
 													})}
 												</p>
-												<p className="text-gray-700">{session.result.summary}</p>
+												<p className="text-sm text-gray-700 tracking-tight leading-5">{session.result.summary}</p>
 											</div>
 										</div>
 									))}

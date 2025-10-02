@@ -478,5 +478,97 @@
     height: 120%;
   }
 }
+.markdownContent {
+  margin-top: 2rem;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgb(55, 65, 81);
+  line-height: 1.5;
+}
+.markdownContent h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  color: rgb(17, 24, 39);
+  font-family: var(--font-instrument-serif);
+}
+.markdownContent h1:first-child {
+  margin-top: 0;
+}
+.markdownContent h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+  color: rgb(17, 24, 39);
+  font-family: var(--font-instrument-serif);
+}
+.markdownContent h2:first-child {
+  margin-top: 0;
+}
+.markdownContent h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+  color: rgb(17, 24, 39);
+}
+.markdownContent p {
+  margin-bottom: 1rem;
+}
+.markdownContent p:last-child {
+  margin-bottom: 0;
+}
+.markdownContent strong {
+  font-weight: 700;
+  color: rgb(17, 24, 39);
+}
+.markdownContent em {
+  font-style: italic;
+}
+.markdownContent ul, .markdownContent ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+.markdownContent ul li, .markdownContent ol li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+.markdownContent ul li:last-child, .markdownContent ol li:last-child {
+  margin-bottom: 0;
+}
+.markdownContent ul {
+  list-style-type: disc;
+}
+.markdownContent ol {
+  list-style-type: decimal;
+}
+.markdownContent code {
+  background-color: rgb(243, 244, 246);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.markdownContent pre {
+  background-color: rgb(243, 244, 246);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+.markdownContent pre code {
+  background-color: transparent;
+  padding: 0;
+}
+.markdownContent blockquote {
+  border-left: 4px solid rgb(229, 231, 235);
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-bottom: 1rem;
+  color: rgb(107, 114, 128);
+  font-style: italic;
+}
 
 /*# sourceMappingURL=page.module.css.map */
