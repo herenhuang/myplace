@@ -1,21 +1,44 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Instrument_Serif, Lora, Newsreader } from "next/font/google";
 import "./globals.css";
+import 'material-symbols';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: '--font-sans',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const instrumentSerif = Instrument_Serif({
+  weight: ['400'],
+  style: ['normal', 'italic'],
   subsets: ["latin"],
+  variable: '--font-instrument-serif',
+});
+
+const lora = Lora({
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  subsets: ["latin"],
+  variable: '--font-lora',
+});
+
+const newsreader = Newsreader({
+  weight: ['200', '300', '400', '500', '600', '700', '800'],
+  style: ['normal', 'italic'],
+  subsets: ["latin"],
+  variable: '--font-newsreader',
 });
 
 export const metadata: Metadata = {
   title: "MyPlace - Personality quizzes you can play",
   description: "Play games, learn about yourself and show them off in your own digital space. Interactive personality quizzes and games to discover yourself.",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    interactiveWidget: "resizes-content",
+  },
 };
+
 
 export default function RootLayout({
   children,
@@ -25,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${instrumentSerif.variable} ${lora.variable} ${newsreader.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}

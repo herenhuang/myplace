@@ -6,12 +6,15 @@ import React, { useRef, forwardRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ImageMask from '@/components/ui/image-mask';
+import type { User } from '@supabase/supabase-js';
+import UserButton from './UserButton';
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
+  user: User | null;
 }
 
-const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
+const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = ({ scrollYProgress, user }) => {
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, -5]);
   return (
@@ -33,6 +36,9 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
           />
         </Link>
       </div>
+      <div className="absolute top-6 right-6 z-10">
+				<UserButton user={user} />
+			</div>
 
       <h1 className='2xl:text-8xl text-7xl px-8 font-semibold text-center tracking-tight leading-[120%] relative z-10'>
         Personality quizzes you can play <br /> <span className='text-6xl'>👇👇👇</span>
@@ -41,7 +47,7 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
   );
 };
 
-const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
+const Section2: React.FC<Omit<SectionProps, 'user'>> = ({ scrollYProgress }) => {
   const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
   const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
   
@@ -103,8 +109,15 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
 };
 
 
-const Component = forwardRef<HTMLElement>(() => {
+interface ComponentProps {
+    user: User | null;
+}
+
+const Component = forwardRef<HTMLElement, ComponentProps>(({ user }, ref) => {
   const container = useRef<HTMLDivElement>(null);
+  
+  React.useImperativeHandle(ref, () => container.current as HTMLElement);
+
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ['start start', 'end end'],
@@ -113,7 +126,7 @@ const Component = forwardRef<HTMLElement>(() => {
   return (
     <>
       <main ref={container} className='relative h-[200vh] bg-black'>
-        <Section1 scrollYProgress={scrollYProgress} />
+        <Section1 scrollYProgress={scrollYProgress} user={user} />
         <Section2 scrollYProgress={scrollYProgress} />
       </main>
     </>

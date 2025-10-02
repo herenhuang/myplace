@@ -251,7 +251,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </div>
         <div className='w-75 mx-auto transform -rotate-1'>
           <div className='wiggle'>
-            <a href="https://tryorange.vercel.app/word" target="_blank" rel="noopener noreferrer" className="block group">
+            <a href="/word-association" target="_blank" rel="noopener noreferrer" className="block group">
               <figure style={{ clipPath: 'url(#clip-pattern1)' }}>
                 <div className='transition-all duration-300 aspect-[3/4] min-h-full align-bottom bg-gradient-to-br from-purple-400 to-purple-600 group-hover:scale-110 w-full cursor-pointer' />
               </figure>
