@@ -516,7 +516,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     .resultTagline{
         font-size: 16px;
         font-weight: 500;
-        font-family: 'Lora', serif;
+        font-family: var(--font-lora);
         line-height: 1.1;
         letter-spacing: -0.025em;   
         width: 80%;
@@ -528,7 +528,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     font-size: 40px;
     font-weight: 600;
     line-height: 1.1;
-    font-family: 'Instrument Serif', serif;
+    font-family: var(--font-instrument-serif);
     letter-spacing: -0.1px;
     margin-bottom: 8px;
     color: rgb(130, 44, 44);

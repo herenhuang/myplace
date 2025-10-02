@@ -1,19 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap");
 .welcomeContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
+  padding: 24px;
   text-align: center;
+  box-sizing: border-box;
+  z-index: 10;
 }
 
 .welcomeHeader {
   margin-bottom: 2rem;
+  z-index: 10;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .welcomeTitle {
   font-size: 40px;
   font-weight: 600;
+  line-height: 1.1;
   color: black;
   letter-spacing: -0.03em;
   margin-bottom: 1rem;
@@ -78,6 +90,7 @@
 .progressContainer {
   margin-bottom: 24px;
   width: 50vh;
+  display: none;
 }
 
 .progressHeader {
@@ -121,12 +134,11 @@
   width: 50vh;
   max-height: 90vh;
   aspect-ratio: 4/7;
-  border-radius: 1.5rem;
-  border: 1px solid white;
+  border-radius: 36px;
   background-size: cover;
   background-position: center;
   position: relative;
-  box-shadow: -4px 24px 48px rgba(0, 0, 0, 0.25);
+  box-shadow: -12px 36px 48px rgba(0, 0, 0, 0.12);
   background-color: #f97316;
   transition: background-image 0.8s ease-in-out;
 }
@@ -138,7 +150,7 @@
   height: 100%;
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
   content: "";
-  border-radius: 1.5rem;
+  border-radius: 36px;
   z-index: 1;
 }
 .imageContainer[data-image-loading=true]::before {
@@ -165,8 +177,10 @@
 .topText {
   flex: 1;
   overflow-y: scroll;
-  padding: 24px 24px 0 24px;
+  padding: 28px 28px 0 28px;
   z-index: 3;
+  display: flex;
+  flex-direction: column;
 }
 
 .textContainer {
@@ -174,6 +188,7 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  overflow-y: scroll;
 }
 
 .stepText p {
@@ -185,7 +200,7 @@
 }
 
 .stepQuestion {
-  margin-bottom: 1.5rem;
+  margin: 16px 0;
 }
 .stepQuestion h2 {
   font-size: 18px;
@@ -204,19 +219,22 @@
 }
 
 .choiceButton {
-  width: -moz-fit-content;
   width: fit-content;
   text-align: left;
   padding: 12px 16px 12px 14px;
   border-radius: 22px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   transition: all 200ms ease-in-out;
   cursor: pointer;
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.2);
   line-height: 1.1 !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 .choiceButton:not(:disabled) {
   color: #1f2937;
@@ -224,12 +242,57 @@
 .choiceButton:not(:disabled):hover {
   background-color: rgba(255, 255, 255, 0.9);
   box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.3);
+  border-color: #f97316;
+}
+.choiceButton:focus {
+  border-color: #f97316;
 }
 .choiceButton span {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.36px;
   line-height: 1.1 !important;
+}
+
+.appButton {
+  width: 80%;
+  text-align: left;
+  padding: 12px 16px 12px 14px;
+  border-radius: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  transition: all 200ms ease-in-out;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  background-color: #f97316;
+  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.2);
+  line-height: 1.1 !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px auto;
+}
+.appButton:not(:disabled) {
+  color: #1f2937;
+}
+.appButton:not(:disabled):hover {
+  background-color: #ea580c;
+}
+.appButton span {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: -0.36px;
+  line-height: 1.1 !important;
+}
+
+.textButton {
+  font-weight: 600;
+  letter-spacing: -0.36px;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
 }
 
 .customInputContainer {
@@ -251,14 +314,10 @@
   color: #1f2937;
   padding: 0;
   margin: 0;
-  height: -moz-fit-content;
   height: fit-content;
 }
 .customInput:not(:disabled):focus {
   outline: none;
-}
-.customInput:not(:disabled)::-moz-placeholder {
-  color: #9ca3af;
 }
 .customInput:not(:disabled)::placeholder {
   color: #9ca3af;
@@ -273,8 +332,7 @@
   border: 1px solid;
   padding: 6px 6px 6px 16px;
   border: 2px solid rgba(255, 255, 255, 0.5);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.2);
 }
@@ -338,6 +396,64 @@
   animation: spin 1s linear infinite;
 }
 
+.resultCard {
+  width: 280px;
+  max-width: 80vw;
+  aspect-ratio: 4/5.5;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  margin: auto;
+  padding: 16px;
+  box-shadow: -4px 24px 48px rgba(0, 0, 0, 0.2);
+  margin-bottom: 16px;
+  background-image: url("/elevate/card.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: fadeUp 0.5s ease-in-out;
+}
+.resultCard .resultTagline {
+  font-size: 16px;
+  font-weight: 500;
+  font-family: var(--font-lora);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  width: 80%;
+  color: rgba(130, 44, 44, 0.6);
+}
+
+.resultTitle {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  font-family: var(--font-instrument-serif);
+  letter-spacing: -0.1px;
+  margin-bottom: 8px;
+  color: rgb(130, 44, 44);
+}
+
+.resultHeader {
+  margin-bottom: 2rem;
+  z-index: 10;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding-bottom: 180px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 @media screen and (max-width: 768px) {
   .stepContainer {
     flex-direction: column;
@@ -350,13 +466,17 @@
     top: 0;
     left: 0;
     width: 100dvw;
-    height: 100vh;
-    max-height: 100vh;
+    height: 99.5dvh;
+    max-height: 100dvh;
     z-index: 10;
     border-radius: 0;
     border: none;
+    box-shadow: 0 0 24px 24px #f97316;
   }
   .imageContainer::after {
     border-radius: 0;
+    height: 120%;
   }
-}/*# sourceMappingURL=page.module.css.map */
+}
+
+/*# sourceMappingURL=page.module.css.map */
