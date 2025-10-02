@@ -253,14 +253,22 @@ Style requirements:
   }
 }
 
+// Helper function to build comprehensive context from all previous steps
+function buildFullContext(steps: StepData[]): string {
+  if (steps.length === 0) return ''
+  
+  return steps
+    .map(step => `${step.question}\nUser chose: ${step.userResponse}`)
+    .join('\n\n')
+}
+
 function getStepPrompt(stepNumber: number, steps: StepData[]): string {
+  // Get full context of all previous steps
+  const fullContext = buildFullContext(steps)
+  const contextSection = fullContext ? `\n\nFull Journey So Far:\n${fullContext}\n` : ''
   if (stepNumber === 2) {
     // Generate Page 2 from Page 1
-    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
-    return `You're setting the scene for a conference attendee's next moment, which inevitably leads to a mishap. Write a single, engaging sentence that captures their immediate action or thought right before an unfortunate incident.
-
-Their Focus
-User's last action: ${page1Input}
+    return `You're setting the scene for a conference attendee's next moment, which inevitably leads to a mishap. Write a single, engaging sentence that captures their immediate action or thought right before an unfortunate incident.${contextSection}
 
 Writing Instructions
 Write in second person ("you") - you're describing THEIR immediate experience.
@@ -280,12 +288,7 @@ Generate a JSON response with:
 Write two sentences describing the conference attendee's next moment, culminating in a dropped bag.`
   } else if (stepNumber === 3) {
     // Generate Page 3 from Page 2
-    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
-    const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
-    return `You are a creative storyteller and an insightful guide, observing a chaotic moment unfold at a fast-paced tech conference. Following the dropped bag incident, craft a narrative that naturally leads the user to reflect on their approach to this specific environment and, by extension, their core archetype — while preserving continuity with what they said they were doing earlier.
-
-Current Scenario Context
-You've just tripped at a conference, scattering the contents of your bag. The user mentioned that what fell out was: "${page2Response}". Earlier, they said they wanted to: "${page1Input}".
+    return `You are a creative storyteller and an insightful guide, observing a chaotic moment unfold at a fast-paced tech conference. Following the dropped bag incident, craft a narrative that naturally leads the user to reflect on their approach to this specific environment and, by extension, their core archetype — while preserving continuity with their full journey so far.${contextSection}
 
 Writing Instructions
 The "text" field should contain two casual sentences:
@@ -326,35 +329,26 @@ Before finalizing, reread your response. Does it flow naturally and sound like h
 
 Generate the next narrative step, question, and choices.`
   } else if (stepNumber === 4) {
-    // Page 4 prompt (morning reset) — second person, plain, two sentences
-    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
-    return `Write a brief morning reset in second person. Use exactly two sentences.
+    // Page 4 prompt (morning reset) — second person, responds to their actual journey
+    return `Write a brief morning reset that reflects on their ACTUAL journey so far. Use exactly two sentences in second person.${contextSection}
 
-Context
-- Step 1 intent: "${page1Input}"
-
-Rules
-- Use second person only. Do not use "I".
-- Sentence 1: You re-center and return to your original plan (Step 1).
-- Sentence 2: You feel a simple, natural anticipation for what's next.
-- Keep it plain and human; avoid poetic phrasing.
+Instructions
+- Look at what they've ACTUALLY chosen and done - don't ignore their specific path
+- Sentence 1: Reflect on how their morning went based on their real choices (not a generic "return to plan")
+- Sentence 2: Show their mindset/feelings heading into the next part, based on how things actually unfolded for them
+- If they networked heavily, acknowledge that. If they stayed focused on sessions, reflect that.
+- If their original plan got completely derailed, don't pretend they're "returning" to it
+- Keep it authentic to THEIR experience, not a template
 - 70–110 characters per sentence.
-- Don't invent details.
 
 Format (JSON only)
 {
-  "paragraph1": "You ...",
-  "paragraph2": "You ..."
+  "paragraph1": "You [reflection based on their actual morning choices]",
+  "paragraph2": "You [mindset based on how their morning actually went]"
 }`
   } else if (stepNumber === 5) {
     // Page 5: Start lunch arc (text only; frontend provides question/choices)
-    const page3Question = steps.find(s => s.stepNumber === 3)?.question || ''
-    const page3Response = steps.find(s => s.stepNumber === 3)?.userResponse || ''
-    return `Write 1-2 casual sentences transitioning into lunch at a tech conference. It should feel like a beat change into a new arc.
-
-Context
-- The last reflective question was: "${page3Question}"
-- The user's answer: "${page3Response}"
+    return `Write 1-2 casual sentences transitioning into lunch at a tech conference. It should feel like a beat change into a new arc.${contextSection}
 
 Instructions
 - Write in second person ("you").
@@ -368,11 +362,7 @@ Format JSON
 {"text":"1-2 sentences setting up the lunch arc (no question)"}`
   } else if (stepNumber === 6) {
     // Page 6: Follow-up built off lunch (full generation)
-    const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
-    return `After lunch decisions, generate a short narrative, a targeted question, and three concise choices to further differentiate archetypes.
-
-Context
-- Lunch choice: "${page5Response}"
+    return `After lunch decisions, generate a short narrative, a targeted question, and three concise choices to further differentiate archetypes.${contextSection}
 
 Writing
 - text: 1-2 sentences reflecting on the lunch moment's vibe and how you proceed.
@@ -387,15 +377,7 @@ JSON
 }`
   } else if (stepNumber === 7) {
     // Page 7: Going to Helen Huang's talk (text only; frontend provides question/choices)
-    const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
-    const page6Question = steps.find(s => s.stepNumber === 6)?.question || ''
-    const page6Response = steps.find(s => s.stepNumber === 6)?.userResponse || ''
-    return `Write 1-2 casual, grounded sentences that weave together the lunch moment and the immediate post-lunch choice, as you head toward Helen's talk. It should feel like a natural progression, with human detail.
-
-Context to incorporate naturally (do not list):
-- Lunch choice: "${page5Response}"
-- Follow-up prompt: "${page6Question}"
-- Your answer: "${page6Response}"
+    return `Write 1-2 casual, grounded sentences that weave together the lunch moment and the immediate post-lunch choice, as you head toward Helen's talk. It should feel like a natural progression, with human detail.${contextSection}
 
 Instructions
 - Second person ("you"). Avoid promotional/agenda tone.
@@ -409,11 +391,7 @@ Return JSON only
 {"text":"1-2 sentences leading into Helen Huang's talk (no question)"}`
   } else if (stepNumber === 8) {
     // Page 8: Follow-up built off the talk (full generation)
-    const page7Response = steps.find(s => s.stepNumber === 7)?.userResponse || ''
-    return `Right after Helen's talk begins, generate a short narrative, a targeted question, and three concise choices that probe engagement style — without inventing specific talk topics.
-
-Context
-- Pre-talk focus: "${page7Response}"
+    return `Right after Helen's talk begins, generate a short narrative, a targeted question, and three concise choices that probe engagement style — without inventing specific talk topics.${contextSection}
 
 Writing
 - text: 1-2 sentences capturing your in-room attention and behavior.
@@ -428,32 +406,27 @@ JSON
   "choices": ["📝 option one", "👀 option two", "🤝 option three"]
 }`
   } else if (stepNumber === 9) {
-    // Page 9 prompt (day wind‑down) — concise, human, heading home
-    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
-    const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
-    const page7Response = steps.find(s => s.stepNumber === 7)?.userResponse || ''
-    return `Write a brief wind down as the user heads home after Day 1 of an art x tech conference.
+    // Page 9 prompt (day wind‑down) — responds to their actual full day experience
+    return `Write a brief wind down that reflects their ACTUAL day at the conference. Use exactly two sentences.${contextSection}
 
-Inputs to weave in naturally (do not list):
-- Step 1 thread or early intent: "${page1Input}"
-- Lunch vibe: "${page5Response}"
-- Helen’s talk: keep wording as "Helen’s talk"
-- Capture style (Step 7/8): reference behavior (e.g., notes, ideas)
-
-Write exactly two short paragraphs (one sentence each).
-- Paragraph 1: Wind down leaving the venue, recalling small beats from the day.
-- Paragraph 2: On the way home, a calm look ahead, possibly to Day 2.
+Instructions
+- This should feel like a genuine reflection of THEIR specific conference experience
+- Look at their actual choices throughout the day - how did they approach networking, sessions, lunch, Helen's talk?
+- Sentence 1: Reflect on leaving the venue, thinking about the specific way THEY moved through the day
+- Sentence 2: Their mindset heading home, based on what they actually accomplished or experienced
+- If they were social all day, reflect that. If they took tons of notes, mention that. If they went with the flow, capture that vibe.
+- Don't default to generic "conference day" - make it feel like THEIR day
+- Reference their actual behavior patterns without being too literal about specific choices
 
 Tone and style rules
 - Plain, human, grounded. No poetic flourishes.
-- No em dashes, no exclamation points, no buzzwords.
 - 80–120 characters per paragraph. Keep it tight.
-- Do not invent talk topics. "Notes from Helen’s talk" is fine.
+- Feel like a real person reflecting on their real day
 
 Format (JSON only)
 {
-  "paragraph1": "One short sentence",
-  "paragraph2": "One short sentence"
+  "paragraph1": "You [reflection of how they actually spent/ended their day]",
+  "paragraph2": "You [their actual mindset heading home based on their choices]"
 }`
   }
   
@@ -682,19 +655,38 @@ Guardrails:
 - Ignore hardcoded narrative elements like the bag drop - only analyze user choices.
 
 # Your Task:
-Analyze their choices and response patterns using the rubric above. Write the explanation in a warm, casual tone like a wise friend. Use this structure (200 words max total):
+Analyze their choices and response patterns using the rubric above. Write like you're a wise, observant friend who's been watching them at this conference. Be warm but not gushy, insightful but not clinical. Avoid corporate-speak, therapy jargon, and AI-sounding phrases. Use this structure (200 words max total):
 
 # [Archetype Name]
 
-**Here's what I noticed:** [One sentence summary of their main pattern]
+**Here's what I noticed:** [One natural sentence about their main pattern - use "you" like you're talking directly to them]
 
 ## Your Approach
-- [First choice they made] when others might have [alternative behavior]. This shows [insight about their preference].
-- [Second choice they made] while someone else might have [alternative behavior]. This tells me [insight about their values].
-- [Third choice they made] when others were [alternative behavior]. This suggests [insight about their style].
+- You [specific thing they chose] when others might have [different behavior]. [Natural insight in conversational language]
+- You [another choice] while someone else might have [alternative]. [Another insight, casual but meaningful]  
+- You [third choice] when others were [different approach]. [Final insight that feels like a friend's observation]
 
 ## What This Actually Means
-[2-3 sentences connecting their specific choices to deeper behavioral patterns, explaining why these choices matter and what they reveal about how the user approaches situations]
+[2-3 sentences that sound like an insightful friend explaining what these choices reveal. Use "you" throughout. Keep it grounded and real, not flowery or abstract. Connect their choices to who they are, not generic personality traits.]
+
+TONE GUIDELINES:
+- Write like you're chatting with a friend over coffee who just watched them at this conference
+- React to their choices with humor and understanding, not clinical analysis
+- If they say something funny like "free food" - acknowledge the humor! ("honestly, who doesn't love free food?")
+- Interpret the SPIRIT of their choices, not just the literal words
+- Use natural speech: "you went straight for..." "while others were stressing about..." "you figured..."
+- Be playful when appropriate: "because let's be real..." "which honestly makes sense..."
+- Sound like you GET them and their choices make perfect sense
+
+EXAMPLES OF GOOD TONE:
+- "You went for the food trucks because honestly, practical priorities win"
+- "While others were color-coding their schedules, you figured good conversations would find you"
+- "You chose to sit with strangers, which is either brave or you just really wanted to avoid small talk with people you already know"
+
+AVOID:
+- "This demonstrates your preference for..." 
+- "You prioritize X while others Y"
+- Any sentence that sounds like it came from a personality test
 
 Return a JSON object with:
 {
