@@ -658,11 +658,11 @@ ${responseContext}
 # Behavioral Rubric (use these rules strictly)
 Signals and mappings (examples, not exhaustive):
 - Proactive social initiation (joins/initiates networking, chooses to meet new people, walks up to others) → Strongly favors Icebreaker; secondarily Action-Taker. DO NOT classify as Observer.
-- Skips lunch to network or optimizes for engagement → Action-Taker or Icebreaker depending on tone; prefer Icebreaker when it’s social initiation; Action-Taker when it’s decisiveness/efficiency-focused.
+- Skips lunch to network or optimizes for engagement → Action-Taker or Icebreaker depending on tone; prefer Icebreaker when it's social initiation; Action-Taker when it's decisiveness/efficiency-focused.
 - Detailed note-taking, front-row, structured capture → Note-Taker.
 - Observing room energy, quietly scanning, hanging back → Observer (unless overridden by proactive social initiation).
 - Snapping a photo to post later, crafting shareable moments → Poster.
-- Brainstorming/“ideas to discuss after,” connecting dots, future-leaning → Big-Idea Person.
+- Brainstorming/"ideas to discuss after," connecting dots, future-leaning → Big-Idea Person.
 - Schedule adherence/efficiency (quick bite to stay on track) → Planner.
 - Wanders/explores spontaneously (e.g., food trucks, roaming) → Floater.
 - Repeatedly references existing friends/people orbiting them → Anchor.
@@ -673,17 +673,33 @@ Precedence and tie-breaking:
 - Steps 1–9 have equal weight. Consider consistency across steps.
 
 Special interpretation:
-- Step 2 “bag contents” should be treated as what they brought and what that implies (preparedness, note-taking, distraction), not the fact of dropping them.
+- Step 2 "bag contents" should be treated as what they brought and what that implies (preparedness, note-taking, distraction), not the fact of dropping them. The bag drop itself is part of the hardcoded narrative and should NOT be analyzed as user behavior.
 
 Guardrails:
 - If the user initiates networking with new people, DO NOT assign Observer.
-- The explanation must cite specific steps and justify precedence when signals conflict.
+- Do NOT reference specific step numbers in the explanation (avoid "Step 1", "Step 2", etc.).
+- Focus on behavioral patterns rather than individual actions.
+- Ignore hardcoded narrative elements like the bag drop - only analyze user choices.
 
 # Your Task:
-Analyze their choices and response patterns using the rubric above. Return a JSON object with:
+Analyze their choices and response patterns using the rubric above. Write the explanation in a warm, casual tone like a wise friend. Use this structure (200 words max total):
+
+# [Archetype Name]
+
+**Here's what I noticed:** [One sentence summary of their main pattern]
+
+## Your Approach
+- [First choice they made] when others might have [alternative behavior]. This shows [insight about their preference].
+- [Second choice they made] while someone else might have [alternative behavior]. This tells me [insight about their values].
+- [Third choice they made] when others were [alternative behavior]. This suggests [insight about their style].
+
+## What This Actually Means
+[2-3 sentences connecting their specific choices to deeper behavioral patterns, explaining why these choices matter and what they reveal about how the user approaches situations]
+
+Return a JSON object with:
 {
   "archetype": "The [Archetype Name]",
-  "explanation": "A warm, insightful 2–3 paragraph explanation of why this archetype fits them, referencing specific choices across steps (e.g., 2, 5–8). Explain any conflicts using the precedence rules, noting why proactive social initiation outweighs reflective signals when both are present. Be encouraging and authentic."
+  "explanation": "[The full formatted explanation following the structure above, using markdown headers and formatting]"
 }
 
 Return ONLY the JSON - no other text.`
