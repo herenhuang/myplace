@@ -139,6 +139,10 @@ export default function ElevateSimulation() {
   const [analysisError, setAnalysisError] = useState<string>('')
   
   const inputRef = useRef<HTMLInputElement>(null)
+  const choicesContainerRef = useRef<HTMLDivElement>(null)
+  
+  // Dynamic Blobbert positioning
+  const [blobbertBottomPosition, setBlobbertBottomPosition] = useState(120)
 
   // Get current Blobbert tip
   const getCurrentTip = (): string => {
@@ -149,6 +153,15 @@ export default function ElevateSimulation() {
     if (screenState === 'analyzing') return BLOBBERT_TIPS['analyzing']
     if (screenState === 'results') return BLOBBERT_TIPS['results']
     return ''
+  }
+
+  // Determine if speech bubble should show
+  const shouldShowSpeechBubble = (): boolean => {
+    if (screenState === 'welcome') return true
+    if (screenState === 'simulation' && currentStepNumber === 1) return true // First step
+    if (screenState === 'simulation' && currentStepNumber === TOTAL_STEPS) return true // Last step
+    if (screenState === 'results') return true
+    return false
   }
 
   // Save state to localStorage
@@ -763,6 +776,53 @@ export default function ElevateSimulation() {
     }
   }, [currentStep, screenState, isStreaming])
 
+  // Calculate Blobbert position dynamically based on choicesContainer height
+  useEffect(() => {
+    // For non-simulation screens, use fixed bottom-left position
+    if (screenState !== 'simulation') {
+      setBlobbertBottomPosition(20) // 20px from bottom for welcome, analyzing, results
+      return
+    }
+
+    // For simulation screens, calculate dynamic position
+    const calculateBlobbertPosition = () => {
+      if (choicesContainerRef.current) {
+        const imageContainer = choicesContainerRef.current.closest('[class*="imageContainer"]')
+        if (!imageContainer) return
+        
+        const imageContainerRect = imageContainer.getBoundingClientRect()
+        const choicesRect = choicesContainerRef.current.getBoundingClientRect()
+        
+        // Calculate distance from bottom of imageContainer to top of choicesContainer
+        const distanceFromBottom = imageContainerRect.bottom - choicesRect.top
+        
+        // Position Blobbert directly above the choicesContainer:
+        // distanceFromBottom gives us the space from container bottom to choices top
+        // Add small gap (12px) to sit just above the choices
+        const calculatedBottom = distanceFromBottom + 0
+        
+        setBlobbertBottomPosition(calculatedBottom)
+      }
+    }
+
+    // Calculate on mount and when dependencies change
+    calculateBlobbertPosition()
+
+    // Recalculate after a short delay to account for animations
+    const timer = setTimeout(calculateBlobbertPosition, 600)
+
+    // Add resize observer to handle dynamic changes
+    const resizeObserver = new ResizeObserver(calculateBlobbertPosition)
+    if (choicesContainerRef.current) {
+      resizeObserver.observe(choicesContainerRef.current)
+    }
+
+    return () => {
+      clearTimeout(timer)
+      resizeObserver.disconnect()
+    }
+  }, [currentStep, visibleButtons, screenState, isStreaming])
+
   // Render content based on screen state
   const renderContent = () => {
     switch (screenState) {
@@ -772,13 +832,6 @@ export default function ElevateSimulation() {
             <div className={styles.welcomeHeader}>
               <h1 className={styles.welcomeTitle}> What Kind of Elevate Attendee Are You? </h1>
               
-              {/* BlobbertTip positioned in flow */}
-              <div className={styles.blobbertInline}>
-                <BlobbertTip 
-                  tip={getCurrentTip()} 
-                  isVisible={true}
-                />
-              </div>
 
               <button
                 onClick={startSimulation}
@@ -817,16 +870,9 @@ export default function ElevateSimulation() {
                 </div>
               )}
               
-              {/* BlobbertTip positioned in flow after topText content */}
-              <div className={styles.blobbertInline}>
-                <BlobbertTip 
-                  tip={getCurrentTip()} 
-                  isVisible={true}
-                />
-              </div>
             </div>
 
-            <div className={styles.choicesContainer}>
+            <div ref={choicesContainerRef} className={styles.choicesContainer}>
               {currentStepNumber === TOTAL_STEPS ? (
                 <button
                   onClick={startAnalysis}
@@ -978,7 +1024,7 @@ export default function ElevateSimulation() {
         return (
           <div className={styles.textContainer}>
 
-            <div className={styles.welcomeHeader}>
+            <div className={styles.resultHeader}>
 
               <div className="text-center mb-4 mt-10 px-8 box-border">
                 <div className={styles.resultCard}>
@@ -1053,6 +1099,14 @@ export default function ElevateSimulation() {
               data-image-loading={isImageLoading}
             >
               {renderContent()}
+              
+              {/* Floating Blobbert Button - appears on all screens inside imageContainer */}
+              <BlobbertTip 
+                tip={getCurrentTip()} 
+                isVisible={true}
+                showSpeechBubble={shouldShowSpeechBubble()}
+                bottomPosition={blobbertBottomPosition}
+              />
             </div>
           </div>
         </div>
