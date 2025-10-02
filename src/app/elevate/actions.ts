@@ -326,29 +326,25 @@ Before finalizing, reread your response. Does it flow naturally and sound like h
 
 Generate the next narrative step, question, and choices.`
   } else if (stepNumber === 4) {
-    // Page 4 prompt (morning wrap) — concise, human, grounded
+    // Page 4 prompt (morning reset) — second person, plain, two sentences
     const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
-    const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
-    return `You are writing a brief morning wrap that feels human and grounded.
+    return `Write a brief morning reset in second person. Use exactly two sentences.
 
 Context
 - Step 1 intent: "${page1Input}"
-- Step 2 item(s): "${page2Response}"
 
-Write exactly two short paragraphs (one sentence each).
-- Paragraph 1: Acknowledge picking up the Step 2 item(s) as a small detail, then naturally reconnect to the Step 1 intent.
-- Paragraph 2: A simple forward glance toward the midday shift (no specifics or agenda).
-
-Tone and style rules
-- Keep it realistic and plain. Avoid poetic phrasing.
-- No em dashes, no exclamation points, no buzzwords.
-- 60–90 characters per paragraph. Keep it tight.
-- No invented specifics; reference only what the user provided.
+Rules
+- Use second person only. Do not use "I".
+- Sentence 1: You re-center and return to your original plan (Step 1).
+- Sentence 2: You feel a simple, natural anticipation for what's next.
+- Keep it plain and human; avoid poetic phrasing.
+- 70–110 characters per sentence.
+- Don't invent details.
 
 Format (JSON only)
 {
-  "paragraph1": "One short sentence",
-  "paragraph2": "One short sentence"
+  "paragraph1": "You ...",
+  "paragraph2": "You ..."
 }`
   } else if (stepNumber === 5) {
     // Page 5: Start lunch arc (text only; frontend provides question/choices)
@@ -704,7 +700,20 @@ Return ONLY the JSON - no other text.`
     ])
 
     const response = (chatCompletion.content[0] as { text: string })?.text || '{}'
-    const analysis = JSON.parse(response)
+    let analysis
+    try {
+      analysis = JSON.parse(response)
+    } catch (e) {
+      // Defensive: extract first JSON object from the text if the model wrapped it
+      const start = response.indexOf('{')
+      const end = response.lastIndexOf('}')
+      if (start !== -1 && end !== -1 && end > start) {
+        const maybeJson = response.slice(start, end + 1)
+        analysis = JSON.parse(maybeJson)
+      } else {
+        throw e
+      }
+    }
 
     // Store debug log for analysis
     appendDebugLog(sessionId, {
