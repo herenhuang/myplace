@@ -991,8 +991,8 @@ export default function ElevateSimulation() {
                       className="rounded-lg"
                       priority
                     />
-                     <h1 className="text-2xl font-bold tracking-tight text-gray-800 mb-2 mt-6">{archetype}</h1>
-                      <p className="text-base font-medium tracking-tight leading-[1.1] text-black/40 w-[80%]">
+                     <h1 className={styles.resultTitle}>{archetype}</h1>
+                      <p className={styles.resultTagline}>
                         {archetypeInfo?.tagline || ''}
                       </p>
                   </div>
