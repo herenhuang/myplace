@@ -422,6 +422,34 @@
   color: rgba(130, 44, 44, 0.6);
 }
 
+.markdownContent {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: black;
+}
+.markdownContent h1 {
+  font-size: 28px !important;
+}
+.markdownContent h2 {
+  font-size: 24px !important;
+}
+.markdownContent p {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: black;
+}
+.markdownContent ul li, .markdownContent ol li {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3 !important;
+  letter-spacing: -0.025em;
+  color: black;
+}
+
 .resultTitle {
   font-size: 40px;
   font-weight: 600;

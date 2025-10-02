@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
+import ElevateCard from '@/components/ElevateCard'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, getDebugLogs, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
@@ -98,11 +98,6 @@ const BLOBBERT_TIPS: Record<string, string> = {
 
 // LocalStorage key for caching state
 const ELEVATE_STATE_KEY = 'elevate-simulation-state'
-
-// Helper function to format archetype name for icon file
-const formatArchetypeForIcon = (archetype: string): string => {
-  return `icon_${archetype.toLowerCase().replace(/[\s-]/g, '_').replace(/^the_/, '')}`
-}
 
 // Interface for cached state
 interface ElevateState {
@@ -1059,20 +1054,12 @@ export default function ElevateSimulation() {
               <div className={styles.resultHeader}>
                 <div className="text-center mt-10 px-8 box-border">
                   <div className={styles.resultCard}>
-                    <div className="flex flex-col justify-center w-full h-full items-center">
-                      <Image
-                        src={`/elevate/${formatArchetypeForIcon(archetype)}.png`}
-                        alt={`${archetype} icon`}
-                        width={200}
-                        height={200}
-                        className="rounded-lg"
-                        priority
-                      />
-                      <h1 className={styles.resultTitle}>{archetype}</h1>
-                      <p className={styles.resultTagline}>
-                        {archetypeInfo?.tagline || ''}
-                      </p>
-                    </div>
+                    <ElevateCard
+                      archetype={archetype}
+                      tagline={archetypeInfo?.tagline || ''}
+                      size="large"
+                      className="mx-auto"
+                    />
                   </div>
                 </div>
 
