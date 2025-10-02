@@ -657,9 +657,9 @@ Guardrails:
 # Your Task:
 Analyze their choices and response patterns using the rubric above. Write like you're a wise, observant friend who's been watching them at this conference. Be warm but not gushy, insightful but not clinical. Avoid corporate-speak, therapy jargon, and AI-sounding phrases. Use this structure (250 words max total):
 
-# [Archetype Name]
+# Uniquely You
 
-**Here's what I noticed:** [One natural sentence about their main pattern - use "you" like you're talking directly to them]
+[One natural sentence about their main pattern - use "you" like you're talking directly to them]
 
 ## Your Approach
 - You [specific thing they chose] when others might have [different behavior]. [Natural insight in conversational language]
@@ -669,11 +669,11 @@ Analyze their choices and response patterns using the rubric above. Write like y
 ## What This Actually Means
 [2-3 sentences that sound like an insightful friend explaining what these choices reveal. Use "you" throughout. Keep it grounded and real, not flowery or abstract. Connect their choices to who they are, not generic personality traits.]
 
-## You Could Have Also Been...
+## You May Also Be
 **[Second archetype]** - [1 sentence about which of their choices pointed toward this archetype and what would have tipped them over]
 **[Third archetype]** - [1 sentence about another close call, if applicable]
 
-INSTRUCTIONS FOR "YOU COULD HAVE ALSO BEEN":
+INSTRUCTIONS FOR "YOU MAY ALSO BE":
 - Pick 1-2 other archetypes that had some evidence in their choices
 - Explain what they did that pointed toward that archetype
 - Mention what would have "tipped them over" into that category
