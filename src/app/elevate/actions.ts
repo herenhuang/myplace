@@ -125,7 +125,18 @@ Context and Guidelines:
 - Always address the user in second person ("you")
 - This simulation walks users through realistic conference scenarios to analyze their actions and determine their personality archetype
 
-Your role is to create engaging, authentic conference experiences that feel true to a modern tech/startup event while gathering insights about the user's behavioral patterns and preferences.`
+Your role is to create engaging, authentic conference experiences that feel true to a modern tech/startup event while gathering insights about the user's behavioral patterns and preferences, with the goal of mapping the user to an archetype.
+
+Archetypes (for reference to inform question/choices)
+• The Icebreaker → You thrive in groups and make others feel at ease.
+• The Planner → You prepare well and others can count on you.
+• The Floater → You embrace spontaneity and find unexpected gems.
+• The Note-Taker → You're detail-oriented and curious to understand fully
+• The Action-Taker → You move quickly from ideas to action and bring energy with you.
+• The Observer → You notice what others miss and reflect before acting.
+• The Poster → You capture the vibe and make it memorable for others.
+• The Big-Idea Person → You think in possibilities and spark expansive conversations.
+• The Anchor → You're steady, grounding, and people naturally orbit you.`
 
 async function generateStepImage(scenarioText: string, stepNumber: number): Promise<string | null> {
   console.log(`\n🎨 [IMAGE GEN] Starting image generation for Step ${stepNumber}`)
@@ -217,14 +228,14 @@ Writing Instructions
 Write in second person ("you") - you're describing THEIR immediate experience.
 Keep it concise and impactful, like a narrative beat in a story.
 Do not make up user's feelings, keep it open and standard but written in an exciting way.
-Two sentences max, 100-150 characters total.
+Two sentences max, 80-120 characters total.
 If the user's input isn't suitable for a professional conference setting (e.g., gibberish, NSFW), elegantly pivot to a generic but still active conference-related action.
 The sentence must clearly set up the user's immediate intention, then lead directly into "you suddenly trip, dropping your bag and scattering its contents everywhere!"
 
 Format
 Generate a JSON response with:
 {
-  "text": "SENTENCE - Two sentences (~100-150 chars total) describing their immediate action/thought. Then how that leads directly into them tripping and dropping their bag and having their bag contents fall everywhere."
+  "text": "SENTENCE - Two sentences (~80-120 chars total) describing their immediate action/thought. Then how that leads directly into them tripping and dropping their bag and having their bag contents fall everywhere."
 }
 
 Write two sentences describing the conference attendee's next moment, culminating in a dropped bag.`
@@ -252,26 +263,15 @@ Avoid overly formal or generic corporate language. This should be fun, relatable
 Start each choice with a relevant emoji. Choices should not have punctuation at the end.
 Ensure the question and choices are directly helpful in narrowing down the user's final archetype.
 
-Archetypes (for reference to inform question/choices)
-• The Icebreaker → You thrive in groups and make others feel at ease.
-• The Planner → You prepare well and others can count on you.
-• The Floater → You embrace spontaneity and find unexpected gems.
-• The Note-Taker → You're detail-oriented and curious to understand fully
-• The Action-Taker → You move quickly from ideas to action and bring energy with you.
-• The Observer → You notice what others miss and reflect before acting.
-• The Poster → You capture the vibe and make it memorable for others.
-• The Big-Idea Person → You think in possibilities and spark expansive conversations.
-• The Anchor → You're steady, grounding, and people naturally orbit you.
-
 Format
 Generate a JSON response with:
 {
-  "text": "A short 1-2 sentence narrative (naturally incorporating what fell out, ~150 chars, casual tone)",
-  "question": "A short sentence (designed to narrow archetype, ~100 chars, casual tone)",
+  "text": "A short 1-2 sentence narrative (naturally incorporating what fell out, ~120 chars, casual tone)",
+  "question": "A short sentence (designed to narrow archetype, ~80 chars, casual tone)",
   "choices": [
-    "🎯 First choice option (~40 chars, starts with emoji, casual tone)",
-    "💡 Second choice option (~40 chars, starts with emoji, casual tone)",
-    "✨ Third choice option (~40 chars, starts with emoji, casual tone)"
+    "🎯 First choice option (~30 chars, starts with emoji, casual tone)",
+    "💡 Second choice option (~30 chars, starts with emoji, casual tone)",
+    "✨ Third choice option (~30 chars, starts with emoji, casual tone)"
   ]
 }
 
@@ -332,6 +332,108 @@ IMPORTANT:
 • **Prioritize creative, authentic storytelling over generic positivity or formal reporting. Make it sound like a real person's day, not an event summary.**
 
 Generate the two-paragraph conclusion for the first half of Day 1.`
+  } else if (stepNumber === 5) {
+    // Page 5: Start lunch arc (text only; frontend provides question/choices)
+    const page3Question = steps.find(s => s.stepNumber === 3)?.question || ''
+    const page3Response = steps.find(s => s.stepNumber === 3)?.userResponse || ''
+    return `Write 1-2 casual sentences transitioning into lunch at a tech conference. It should feel like a beat change into a new arc.
+
+Context
+- The last reflective question was: "${page3Question}"
+- The user's answer: "${page3Response}"
+
+Instructions
+- Write in second person ("you").
+- Keep it grounded and human; avoid hype.
+- Mention heading to lunch or scoping lunch options.
+- Do NOT include a direct question; the frontend will ask it.
+- 120–180 characters total.
+
+Format JSON
+{"text":"1-2 sentences setting up the lunch arc (no question)"}`
+  } else if (stepNumber === 6) {
+    // Page 6: Follow-up built off lunch (full generation)
+    const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
+    return `After lunch decisions, generate a short narrative, a targeted question, and three concise choices to further differentiate archetypes.
+
+Context
+- Lunch choice: "${page5Response}"
+
+Writing
+- text: 1-2 sentences reflecting on the lunch moment's vibe and how you proceed.
+- question: A short, specific follow-up that directly builds on the lunch choice.
+- choices: 3 options that directly answer the question, each starting with an emoji, ~30–40 chars, no terminal punctuation.
+
+JSON
+{
+  "text": "1-2 sentence narrative (~120 chars)",
+  "question": "Short specific follow-up (~80 chars)",
+  "choices": ["🎯 option one", "💡 option two", "✨ option three"]
+}`
+  } else if (stepNumber === 7) {
+    // Page 7: Going to Helen Huang's talk (text only; frontend provides question/choices)
+    const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
+    const page6Question = steps.find(s => s.stepNumber === 6)?.question || ''
+    const page6Response = steps.find(s => s.stepNumber === 6)?.userResponse || ''
+    return `Write 1-2 casual, grounded sentences that weave together the lunch moment and the immediate post-lunch choice, as you head toward Helen Huang's talk. It should feel like a natural progression, with human detail.
+
+Context to incorporate naturally (do not list):
+- Lunch choice: "${page5Response}"
+- Follow-up prompt: "${page6Question}"
+- Your answer: "${page6Response}"
+
+Instructions
+- Second person ("you"). Avoid promotional/agenda tone.
+- Mention moving toward or arriving at Helen Huang's session.
+- Do NOT include a direct question; the frontend will ask it.
+- 120–180 characters total.
+
+Return JSON only
+{"text":"1-2 sentences leading into Helen Huang's talk (no question)"}`
+  } else if (stepNumber === 8) {
+    // Page 8: Follow-up built off the talk (full generation)
+    const page7Response = steps.find(s => s.stepNumber === 7)?.userResponse || ''
+    return `Right after Helen Huang's talk begins, generate a short narrative, a targeted question, and three concise choices that probe engagement style.
+
+Context
+- Pre-talk focus: "${page7Response}"
+
+Writing
+- text: 1-2 sentences capturing your in-room attention and behavior.
+- question: A short, specific probe about how you engage in the session.
+- choices: 3 options, each starting with an emoji, ~30–40 chars, no terminal punctuation, directly answering the question.
+
+JSON
+{
+  "text": "1-2 sentence narrative (~120 chars)",
+  "question": "Short probe (~80 chars)",
+  "choices": ["📝 option one", "👀 option two", "🤝 option three"]
+}`
+  } else if (stepNumber === 9) {
+    // Page 9: Final conclusion of whole day (paragraphs)
+    const page1Input = steps.find(s => s.stepNumber === 1)?.userResponse || ''
+    const page2Response = steps.find(s => s.stepNumber === 2)?.userResponse || ''
+    const page5Response = steps.find(s => s.stepNumber === 5)?.userResponse || ''
+    const page7Response = steps.find(s => s.stepNumber === 7)?.userResponse || ''
+    return `Write a brief, human-feeling two-paragraph conclusion summarizing the whole day.
+
+# Inputs to reference (naturally)
+- Morning goal: "${page1Input}"
+- Bag incident: "${page2Response}"
+- Lunch choice: "${page5Response}"
+- Helen talk focus: "${page7Response}"
+
+# Writing
+- paragraph1: Reflect on the day with specific sensory or personal observations.
+- paragraph2: Close the arc with a grounded, hopeful tone.
+- Avoid corporate buzzwords and hype.
+- No exclamation spam; concise and evocative.
+
+# JSON
+{
+  "paragraph1": "~100-130 chars",
+  "paragraph2": "~100-130 chars"
+}`
   }
   
   console.log('prompt failed, returning default prompt')
@@ -397,7 +499,7 @@ export async function generateNextStep(
 
     // Handle step-specific response formats
     let result
-    if (currentStep === 2) {
+    if (currentStep === 2 || currentStep === 5 || currentStep === 7) {
       // Page 2: AI generates only the text, question and choices are hard-coded
       result = { 
         success: true, 
@@ -405,7 +507,7 @@ export async function generateNextStep(
         question: '', // Will be set in frontend
         choices: [] // Will be set in frontend
       }
-    } else if (currentStep === 4) {
+    } else if (currentStep === 4 || currentStep === 9) {
       // Page 4: Conclusion format
       result = { 
         success: true, 

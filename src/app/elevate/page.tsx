@@ -26,7 +26,7 @@ type ScreenState = 'welcome' | 'simulation' | 'analyzing' | 'results'
 
 // Configuration
 const ENABLE_IMAGE_GENERATION = false // Toggle to enable/disable AI image generation
-const TOTAL_STEPS = 4 // New total: 4 steps instead of 10
+const TOTAL_STEPS = 9 // Expanded to 9 steps for full-day arc
 
 // Predefined step 1 only
 const PREDEFINED_STEPS: Record<number, Step> = {
@@ -85,7 +85,12 @@ const BLOBBERT_TIPS: Record<string, string> = {
   'step-1': "There are no wrong answers, so just go with your gut!!",
   // 'step-2': "Trust your instincts and choose what feels right.",
   // 'step-3': "You're doing great! Keep being yourself.",
-  'step-4': "Almost there! One more moment to capture.",
+  'step-4': "Keep the momentum—what catches your attention next?",
+  'step-5': "Lunch break—reset your energy for the next arc.",
+  'step-6': "Little choices add up—what’s your move now?",
+  'step-7': "Helen’s talk is starting—how do you show up?",
+  'step-8': "Follow the thread—what stands out to you most?",
+  'step-9': "Nice wrap—one last reflection for the day.",
   'analyzing': "Hang tight while I analyze your unique style...",
   'results': "Here's what I discovered about you!"
 }
@@ -376,7 +381,7 @@ export default function ElevateSimulation() {
             text: result.text || '',
             question: "What ends up falling out?",
             choices: [
-              { label: "🤷 Nothing really, I came empty-handed", value: "Nothing really, I came empty-handed" },
+              { label: "🤷 I came empty-handed", value: "I came empty-handed" },
               { label: "💻 My work laptop", value: "My work laptop" },
               { label: "📓 Notebook and some pens", value: "Notebook and some pens" }
             ],
@@ -408,7 +413,7 @@ export default function ElevateSimulation() {
         
         if (result.success) {
           if (nextStepNumber === 4) {
-            // Step 4 is conclusion - no question or choices
+            // Step 4 is morning conclusion - no question or choices
             nextStep = {
               stepNumber: nextStepNumber,
               text: result.text || '',
@@ -463,6 +468,160 @@ export default function ElevateSimulation() {
             setBackgroundImageUrl(null)
             setIsImageLoading(false)
           }
+        }
+      } else if (nextStepNumber === 5) {
+        // Step 5: Start lunch arc - AI generates text only; we add question/choices
+        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 5 (lunch arc)`)
+        const result = await generateNextStep(dbSessionId, nextStepNumber)
+        if ('error' in result) {
+          console.error('❌ [FRONTEND] Error from generateNextStep (5):', result.error)
+          setIsLoading(false)
+          return
+        }
+        if (result.success) {
+          nextStep = {
+            stepNumber: nextStepNumber,
+            text: result.text || '',
+            question: "Where are you headed for lunch?",
+            choices: [
+              { label: "🥗 Food trucks outside", value: "Food trucks outside" },
+              { label: "🍣 Quick bite nearby", value: "Quick bite nearby" },
+              { label: "👥 Join a table with new folks", value: "Join a table with new folks" }
+            ],
+            allowCustomInput: true,
+            imageUrl: '/elevate/marble.png'
+          }
+          setBackgroundImageUrl('/elevate/marble.png')
+          setIsImageLoading(false)
+        }
+      } else if (nextStepNumber === 6) {
+        // Step 6: Follow-up after lunch - full AI generation
+        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 6 (post-lunch follow-up)`)
+        const result = await generateNextStep(dbSessionId, nextStepNumber)
+        if ('error' in result) {
+          console.error('❌ [FRONTEND] Error from generateNextStep (6):', result.error)
+          setIsLoading(false)
+          return
+        }
+        if (result.success) {
+          nextStep = {
+            stepNumber: nextStepNumber,
+            text: result.text || '',
+            question: result.question || '',
+            choices: (result.choices || []).map((c: string) => ({ label: c, value: c })),
+            allowCustomInput: true
+          }
+          if (ENABLE_IMAGE_GENERATION) {
+            setBackgroundImageUrl(null)
+            setIsImageLoading(true)
+            const stepTextForImage = nextStep.text
+            generateStepImageForStep(nextStepNumber, stepTextForImage).then((imageResult) => {
+              if ('error' in imageResult) {
+                console.error('❌ [FRONTEND] Error generating image:', imageResult.error)
+                setIsImageLoading(false)
+              } else if (imageResult.success && imageResult.imageUrl) {
+                console.log('✅ [FRONTEND] Background image loaded successfully')
+                setBackgroundImageUrl(imageResult.imageUrl)
+                setIsImageLoading(false)
+              } else {
+                console.log('⚠️ [FRONTEND] No image generated')
+                setIsImageLoading(false)
+              }
+            }).catch((error) => {
+              console.error('❌ [FRONTEND] Error in background image generation:', error)
+              setIsImageLoading(false)
+            })
+          } else {
+            setBackgroundImageUrl(null)
+            setIsImageLoading(false)
+          }
+        }
+      } else if (nextStepNumber === 7) {
+        // Step 7: Helen Huang's talk - AI text only; we add question/choices
+        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 7 (Helen's talk)`)
+        const result = await generateNextStep(dbSessionId, nextStepNumber)
+        if ('error' in result) {
+          console.error('❌ [FRONTEND] Error from generateNextStep (7):', result.error)
+          setIsLoading(false)
+          return
+        }
+        if (result.success) {
+          nextStep = {
+            stepNumber: nextStepNumber,
+            text: result.text || '',
+            question: "What are you most focused on during Helen's talk?",
+            choices: [
+              { label: "📝 Taking detailed notes", value: "Taking detailed notes" },
+              { label: "👀 Observing the room energy", value: "Observing the room energy" },
+              { label: "💬 Ideas to discuss after", value: "Ideas to discuss after" }
+            ],
+            allowCustomInput: true,
+            imageUrl: '/elevate/marble-1.png'
+          }
+          setBackgroundImageUrl('/elevate/marble-1.png')
+          setIsImageLoading(false)
+        }
+      } else if (nextStepNumber === 8) {
+        // Step 8: Follow-up built off the talk - full AI generation
+        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 8 (post-talk follow-up)`)
+        const result = await generateNextStep(dbSessionId, nextStepNumber)
+        if ('error' in result) {
+          console.error('❌ [FRONTEND] Error from generateNextStep (8):', result.error)
+          setIsLoading(false)
+          return
+        }
+        if (result.success) {
+          nextStep = {
+            stepNumber: nextStepNumber,
+            text: result.text || '',
+            question: result.question || '',
+            choices: (result.choices || []).map((c: string) => ({ label: c, value: c })),
+            allowCustomInput: true
+          }
+          if (ENABLE_IMAGE_GENERATION) {
+            setBackgroundImageUrl(null)
+            setIsImageLoading(true)
+            const stepTextForImage = nextStep.text
+            generateStepImageForStep(nextStepNumber, stepTextForImage).then((imageResult) => {
+              if ('error' in imageResult) {
+                console.error('❌ [FRONTEND] Error generating image:', imageResult.error)
+                setIsImageLoading(false)
+              } else if (imageResult.success && imageResult.imageUrl) {
+                console.log('✅ [FRONTEND] Background image loaded successfully')
+                setBackgroundImageUrl(imageResult.imageUrl)
+                setIsImageLoading(false)
+              } else {
+                console.log('⚠️ [FRONTEND] No image generated')
+                setIsImageLoading(false)
+              }
+            }).catch((error) => {
+              console.error('❌ [FRONTEND] Error in background image generation:', error)
+              setIsImageLoading(false)
+            })
+          } else {
+            setBackgroundImageUrl(null)
+            setIsImageLoading(false)
+          }
+        }
+      } else if (nextStepNumber === 9) {
+        // Step 9: Final conclusion - no question or choices
+        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 9 (day conclusion)`)
+        const result = await generateNextStep(dbSessionId, nextStepNumber)
+        if ('error' in result) {
+          console.error('❌ [FRONTEND] Error from generateNextStep (9):', result.error)
+          setIsLoading(false)
+          return
+        }
+        if (result.success) {
+          nextStep = {
+            stepNumber: nextStepNumber,
+            text: result.text || '',
+            question: '',
+            choices: [],
+            allowCustomInput: false
+          }
+          setBackgroundImageUrl(null)
+          setIsImageLoading(false)
         }
       }
       
@@ -678,6 +837,16 @@ export default function ElevateSimulation() {
                 </button>
               ) : (
                 <>
+                  {currentStep.choices.length === 0 && !currentStep.allowCustomInput && (
+                    <button
+                      onClick={() => handleChoiceSelect('Continue')}
+                      disabled={isLoading || isStreaming}
+                      className={styles.appButton}
+                      style={{ opacity: 1, transition: 'opacity 0.2s ease-in-out' }}
+                    >
+                      <span>Continue →</span>
+                    </button>
+                  )}
                   {currentStep.choices.map((choice, index) => {
                     const isVisible = visibleButtons.includes(index)
                     return (
