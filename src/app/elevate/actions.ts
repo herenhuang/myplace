@@ -655,7 +655,7 @@ Guardrails:
 - Ignore hardcoded narrative elements like the bag drop - only analyze user choices.
 
 # Your Task:
-Analyze their choices and response patterns using the rubric above. Write like you're a wise, observant friend who's been watching them at this conference. Be warm but not gushy, insightful but not clinical. Avoid corporate-speak, therapy jargon, and AI-sounding phrases. Use this structure (200 words max total):
+Analyze their choices and response patterns using the rubric above. Write like you're a wise, observant friend who's been watching them at this conference. Be warm but not gushy, insightful but not clinical. Avoid corporate-speak, therapy jargon, and AI-sounding phrases. Use this structure (250 words max total):
 
 # [Archetype Name]
 
@@ -668,6 +668,17 @@ Analyze their choices and response patterns using the rubric above. Write like y
 
 ## What This Actually Means
 [2-3 sentences that sound like an insightful friend explaining what these choices reveal. Use "you" throughout. Keep it grounded and real, not flowery or abstract. Connect their choices to who they are, not generic personality traits.]
+
+## You Could Have Also Been...
+**[Second archetype]** - [1 sentence about which of their choices pointed toward this archetype and what would have tipped them over]
+**[Third archetype]** - [1 sentence about another close call, if applicable]
+
+INSTRUCTIONS FOR "YOU COULD HAVE ALSO BEEN":
+- Pick 1-2 other archetypes that had some evidence in their choices
+- Explain what they did that pointed toward that archetype
+- Mention what would have "tipped them over" into that category
+- Be specific about the gap: "Your LinkedIn mention showed Poster instincts, but you'd need more content creation moments"
+- Make it feel validating, not like they "failed" to get those archetypes
 
 TONE GUIDELINES:
 - Write like you're chatting with a friend over coffee who just watched them at this conference
