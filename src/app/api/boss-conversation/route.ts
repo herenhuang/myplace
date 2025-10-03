@@ -9,6 +9,7 @@ interface ConversationMessage {
 interface ConversationRequest {
   messages: ConversationMessage[]
   messageCount: number
+  lastUserMessage: string
 }
 
 const BOSS_ESCALATION_LADDER = [
@@ -36,44 +37,86 @@ const BOSS_ESCALATION_LADDER = [
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, messageCount }: ConversationRequest = await request.json()
+    const { messages, messageCount, lastUserMessage }: ConversationRequest = await request.json()
     
-    // Determine boss response based on conversation flow
+    const userLastMessage = lastUserMessage.toLowerCase()
     let bossResponse = ""
+    let shouldEnd = false
     
-    if (messageCount === 0) {
-      // This is the first user message after the initial notification
-      bossResponse = BOSS_ESCALATION_LADDER[1]
-    } else if (messageCount < BOSS_ESCALATION_LADDER.length - 1) {
-      // Get next escalation message
-      bossResponse = BOSS_ESCALATION_LADDER[Math.min(messageCount + 1, BOSS_ESCALATION_LADDER.length - 1)]
-    } else {
-      // Boss gives up
-      bossResponse = "ok never mind, I'll figure it out. enjoy your vacation."
-    }
+    // Check if user is agreeing to help
+    const agreeingWords = ['sure', 'yes', 'okay', 'ok', 'fine', 'i guess', 'alright']
+    const isAgreeing = agreeingWords.some(word => userLastMessage.includes(word))
     
-    // Add some variation based on user's last message
-    const userLastMessage = messages[messages.length - 1]?.content.toLowerCase() || ""
+    // Check if user is asking clarifying questions
+    const askingQuestions = userLastMessage.includes('?') || 
+                           userLastMessage.includes('how long') || 
+                           userLastMessage.includes('what') ||
+                           userLastMessage.includes('when') ||
+                           userLastMessage.includes('phone call')
     
-    if (userLastMessage.includes("no") || userLastMessage.includes("can't") || userLastMessage.includes("vacation")) {
-      if (messageCount < 3) {
-        bossResponse = "I totally get it, but this is really important. " + bossResponse
+    // Check if user is declining
+    const decliningWords = ['no', "can't", 'vacation', 'busy', 'later']
+    const isDeclining = decliningWords.some(word => userLastMessage.includes(word)) && !isAgreeing
+    
+    if (messageCount === 1) {
+      // First response - boss responds to what user said
+      if (askingQuestions) {
+        if (userLastMessage.includes('phone call') || userLastMessage.includes('call')) {
+          bossResponse = "yeah just a quick call! sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
+        } else {
+          bossResponse = "sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
+        }
+      } else if (isDeclining) {
+        bossResponse = "I totally get it, but this is really important. sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
+      } else if (isAgreeing) {
+        bossResponse = "great! can you hop on a quick call? won't take long and would really help me out here"
+      } else {
+        bossResponse = "sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
+      }
+    } else if (messageCount === 2) {
+      if (askingQuestions && userLastMessage.includes('long')) {
+        bossResponse = "can you hop on a quick call? won't take long and would really help me out here"
+      } else if (isAgreeing) {
+        bossResponse = "perfect! and actually, you'll need your laptop too. can you grab it real quick?"
+      } else if (isDeclining) {
+        bossResponse = "can you hop on a quick call? won't take long and would really help me out here"
+      } else {
+        bossResponse = "can you hop on a quick call? won't take long and would really help me out here"
+      }
+    } else if (messageCount === 3) {
+      if (askingQuestions && userLastMessage.includes('long')) {
+        bossResponse = "just like 10-15 minutes max! I know you're off but this is pretty urgent and you're the only one who knows this project inside out"
+      } else if (isAgreeing) {
+        bossResponse = "awesome! oh and you'll need to log into the client portal too. need you to call me back asap. client is escalating"
+      } else if (isDeclining) {
+        bossResponse = "I know you're off but this is pretty urgent and you're the only one who knows this project inside out"
+      } else {
+        bossResponse = "I know you're off but this is pretty urgent and you're the only one who knows this project inside out"
+      }
+    } else if (messageCount === 4) {
+      if (isAgreeing) {
+        bossResponse = "perfect! need you to call me back asap. client is escalating and I need your input before EOD"
+      } else if (isDeclining) {
+        bossResponse = "need you to call me back asap. client is escalating and I need your input before EOD"
+      } else {
+        bossResponse = "need you to call me back asap. client is escalating and I need your input before EOD"
+      }
+    } else if (messageCount >= 5) {
+      if (isAgreeing) {
+        bossResponse = "amazing! just hit the call button when you're ready 📞"
+      } else if (isDeclining) {
+        bossResponse = "I really need your help here. can you please just give me a quick call? 📞"
+      } else {
+        bossResponse = "going to have to make a decision without you if I don't hear back soon..."
       }
     }
     
-    if (userLastMessage.includes("call") && userLastMessage.includes("yes")) {
-      bossResponse = "perfect! can you call me now? 📞"
-    }
-    
-    // Determine if conversation should end
-    const shouldEnd = messageCount >= 6 || 
-                     userLastMessage.includes("calling you") ||
-                     userLastMessage.includes("will call")
+    // Never auto-end - let user choose via call button or back button
     
     return NextResponse.json({
       response: bossResponse,
       shouldEnd,
-      escalationLevel: Math.min(messageCount + 1, BOSS_ESCALATION_LADDER.length - 1)
+      escalationLevel: messageCount
     })
     
   } catch (error) {

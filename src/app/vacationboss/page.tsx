@@ -161,6 +161,8 @@ export default function ElevateSimulation() {
   const [messages, setMessages] = useState<Array<{role: 'boss' | 'user', content: string, timestamp: number}>>([])
   const [userMessageInput, setUserMessageInput] = useState('')
   const [isSendingMessage, setIsSendingMessage] = useState(false)
+  const [bossIsTyping, setBossIsTyping] = useState(false)
+  const [showBlobbertTip, setShowBlobbertTip] = useState(true)
   
   // Results state
   const [archetype, setArchetype] = useState<string>('')
@@ -379,6 +381,9 @@ export default function ElevateSimulation() {
       content: 'urgent! you got time for a quick convo?',
       timestamp: Date.now()
     }])
+    
+    // Reset Blobbert tip to show
+    setShowBlobbertTip(true)
   }
 
   const sendUserMessage = async () => {
@@ -407,52 +412,65 @@ export default function ElevateSimulation() {
     setConversationMetrics(newMetrics)
     
     try {
-      // Get boss response
-      const response = await fetch('/api/boss-conversation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: updatedMessages,
-          messageCount: newMetrics.messageCount
-        })
-      })
+      // Show typing indicator first
+      setBossIsTyping(true)
       
-      const result = await response.json()
+      // Simulate realistic typing delay (1-3 seconds)
+      const typingDelay = Math.random() * 2000 + 1000
       
-      if (result.response) {
-        // Add boss response
-        setTimeout(() => {
-          setMessages(prev => [...prev, {
-            role: 'boss',
-            content: result.response,
-            timestamp: Date.now()
-          }])
+      setTimeout(async () => {
+        try {
+          // Get boss response
+          const response = await fetch('/api/boss-conversation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              messages: updatedMessages,
+              messageCount: newMetrics.messageCount,
+              lastUserMessage: messageText
+            })
+          })
           
-          // Check if conversation should end
-          if (result.shouldEnd || newMetrics.messageCount >= 6) {
-            setTimeout(() => {
-              handleConversationEnd(newMetrics.messageCount)
-            }, 2000)
+          const result = await response.json()
+          
+          setBossIsTyping(false)
+          
+          if (result.response) {
+            // Add boss response
+            setMessages(prev => [...prev, {
+              role: 'boss',
+              content: result.response,
+              timestamp: Date.now()
+            }])
+            
+            // Don't auto-end conversation - only end on explicit user action (call button or back button)
           }
-        }, 1000) // Simulate typing delay
-      }
+          
+        } catch (error) {
+          console.error('Error getting boss response:', error)
+          setBossIsTyping(false)
+        }
+      }, typingDelay)
       
     } catch (error) {
       console.error('Error sending message:', error)
+      setBossIsTyping(false)
     } finally {
       setIsSendingMessage(false)
     }
   }
 
-  const handleConversationEnd = (finalMessageCount: number) => {
-    // Determine outcome based on conversation length and content
-    let outcome = ''
-    if (finalMessageCount <= 2) {
-      outcome = 'held_boundaries'
-    } else if (finalMessageCount >= 5) {
-      outcome = 'gave_in'
-    } else {
-      outcome = 'held_boundaries' // Default for middle range
+  const handleConversationEnd = (finalMessageCount: number, explicitOutcome?: string) => {
+    // Use explicit outcome if provided, otherwise determine based on conversation length
+    let outcome = explicitOutcome || ''
+    if (!outcome) {
+      if (finalMessageCount <= 2) {
+        outcome = 'held_boundaries'
+      } else if (finalMessageCount >= 5) {
+        outcome = 'gave_in'
+      } else {
+        outcome = 'held_boundaries' // Default for middle range
+      }
     }
     
     setConversationMetrics(prev => ({ ...prev, outcome }))
@@ -465,7 +483,27 @@ export default function ElevateSimulation() {
     let archetype = ''
     let explanation = ''
     
-    if (outcome === 'held_boundaries') {
+    if (outcome === 'exited_early') {
+      archetype = 'The Escape Artist'
+      explanation = `# The Escape Artist
+
+You started engaging but then decided to exit the conversation after ${messageCount} message${messageCount === 1 ? '' : 's'}. Smart move!
+
+## Your Approach
+
+Only **18%** of people have the self-awareness to recognize when a work conversation is spiraling and step away. You saw where this was heading and chose your peace of mind.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Trust your instincts** - You recognized the escalation pattern
+- **Value your boundaries** - You're willing to step away when needed
+- **Learn quickly** - You could see this wasn't going to be a "quick" anything
+
+## Your Mindset
+
+You understand that some conversations are designed to gradually pull you in. By stepping away, you maintained control over your vacation time and avoided the trap of endless "just one more thing" requests.`
+    } else if (outcome === 'held_boundaries') {
       archetype = 'The Boundary Keeper'
       explanation = `# The Boundary Keeper
 
@@ -1445,12 +1483,38 @@ This approach helps you return from vacation more refreshed and actually more pr
             </div>
             
             <div className={styles.iMessageHeader}>
-              <button className={styles.backButton}>‹ Back</button>
+              <button 
+                className={styles.backButton}
+                onClick={() => {
+                  setShowIMessage(false)
+                  setMessages([])
+                  setConversationMetrics({
+                    messageCount: 0,
+                    startTime: 0,
+                    outcome: 'exited_early',
+                    responseTimes: []
+                  })
+                  // Generate results for exiting early
+                  setTimeout(() => {
+                    handleConversationEnd(conversationMetrics.messageCount, 'exited_early')
+                  }, 500)
+                }}
+              >
+                ‹ Back
+              </button>
               <div className={styles.contactInfo}>
                 <div className={styles.contactName}>Heewon (Your Boss)</div>
                 <div className={styles.contactStatus}>Active now</div>
               </div>
-              <div className={styles.callButton}>📞</div>
+              <button 
+                className={styles.callButton}
+                onClick={() => {
+                  // User chose to make the call - they gave in
+                  handleConversationEnd(conversationMetrics.messageCount, 'gave_in')
+                }}
+              >
+                📞
+              </button>
             </div>
             
             <div className={styles.messagesContainer}>
@@ -1467,6 +1531,19 @@ This approach helps you return from vacation more refreshed and actually more pr
                   </div>
                 </div>
               ))}
+              
+              {/* Typing indicator */}
+              {bossIsTyping && (
+                <div className={`${styles.message} ${styles.received}`}>
+                  <div className={styles.typingIndicator}>
+                    <div className={styles.typingDots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className={styles.inputContainer}>
@@ -1493,6 +1570,24 @@ This approach helps you return from vacation more refreshed and actually more pr
                 </button>
               </div>
             </div>
+            
+            {/* Blobbert tip overlay for iMessage */}
+            {showBlobbertTip && (
+              <div className={styles.blobbertTipOverlay}>
+                <div className={styles.blobbertTipCard}>
+                  <button 
+                    className={styles.dismissButton}
+                    onClick={() => setShowBlobbertTip(false)}
+                  >
+                    ×
+                  </button>
+                  <div className={styles.blobbertAvatar}>🍊</div>
+                  <div className={styles.tipText}>
+                    Each response you send moves the conversation forward. Most people send 1-2 messages before either giving in or firmly declining.
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
