@@ -271,115 +271,114 @@ function getStepPrompt(stepNumber: number, steps: StepData[]): string {
   const contextSection = fullContext ? `\n\nUser's Journey So Far:\n${fullContext}\n` : ''
   
   if (stepNumber === 2) {
-    return `Based on the user's first answer, create a natural follow-up scenario that explores their personality further in the world of Teyvat.${contextSection}
+    return `Based on the user's first answer, create a natural follow-up scenario in Teyvat.${contextSection}
 
 Writing Instructions:
 - Write in second person ("you")
-- Create an immersive Genshin Impact scenario (2-3 sentences, 120-180 chars)
-- IMPORTANT: Reference or build upon their previous answer naturally in the scenario
-- Don't reference game mechanics, focus on personality and values
-- If the user's input is inappropriate or unclear, pivot to a generic Teyvat exploration scenario
-- Generate a question that reveals how they approach challenges or decisions
-- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
+- Create a CONCISE scenario (1-2 sentences, 80-120 chars total)
+- IMPORTANT: Reference their previous answer
+- Present a CONCRETE situation requiring immediate action
+- Question should ask "What do you DO?" not "What do you value?"
+- Focus on ACTIONS, not philosophy or intentions
+- Generate EXACTLY 3 choices, each ultra-short (~20-25 chars)
 
 Format:
 {
-  "text": "2-3 sentences setting up a Genshin-themed scenario that builds on their first answer",
-  "question": "A question about their approach or values (60-100 chars)",
+  "text": "1-2 sentences, specific situation (80-120 chars)",
+  "question": "ACTION-BASED question about what they DO (40-60 chars)",
   "choices": [
-    "🌟 First choice (~25-30 chars)",
-    "⚔️ Second choice (~25-30 chars)",
-    "🎭 Third choice (~25-30 chars)"
+    "🌟 Action #1 (~20-25 chars)",
+    "⚔️ Action #2 (~20-25 chars)",
+    "🎭 Action #3 (~20-25 chars)"
   ]
 }
 
-Generate the next scenario, question, and choices.`
+Generate the scenario, question, and choices.`
   } else if (stepNumber === 3) {
-    return `Create a scenario about handling conflict or adversity in Teyvat that naturally continues from their previous choices.${contextSection}
+    return `Create a conflict scenario in Teyvat that continues from their previous actions.${contextSection}
 
 Writing Instructions:
-- Present a challenge or difficult decision
-- 2-3 sentences describing the conflict
-- IMPORTANT: Acknowledge their previous choices/actions in the scenario setup
-- Question should explore their conflict resolution style or moral compass
-- Choices should reflect different approaches to handling adversity
-- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
+- CONCISE conflict setup (1-2 sentences, 80-120 chars)
+- IMPORTANT: Build on their previous actions
+- Present an IMMEDIATE threat or challenge
+- Question asks "What do you DO right now?" - not about values
+- Focus on CONCRETE ACTIONS in the moment
+- Generate EXACTLY 3 choices, each ultra-short (~20-25 chars)
 
 Format:
 {
-  "text": "2-3 sentence scenario about conflict or challenge (~150 chars)",
-  "question": "Question about their approach to conflict/adversity (60-100 chars)",
+  "text": "1-2 sentences, immediate conflict (80-120 chars)",
+  "question": "What do you DO? (40-60 chars)",
   "choices": [
-    "⚔️ Direct/confrontational (~25-30 chars)",
-    "🕊️ Peaceful/diplomatic (~25-30 chars)",
-    "🧠 Strategic/thoughtful (~25-30 chars)"
+    "⚔️ Direct action (~20-25 chars)",
+    "🕊️ Diplomatic action (~20-25 chars)",
+    "🧠 Strategic action (~20-25 chars)"
   ]
 }
 
 Generate the scenario, question, and choices.`
   } else if (stepNumber === 4) {
-    return `Create a scenario about goals, ambitions, or life philosophy in Teyvat that reflects their journey so far.${contextSection}
+    return `Create a scenario about choosing a path or making a decision in Teyvat.${contextSection}
 
 Writing Instructions:
-- Explore what drives them and their long-term outlook
-- 2-3 sentences about aspirations or purpose
-- IMPORTANT: Reference their previous journey/choices to make this feel personalized
-- Question should reveal their priorities and values
-- Choices should reflect different life philosophies
-- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
+- CONCISE setup (1-2 sentences, 80-120 chars)
+- IMPORTANT: Reference their previous actions
+- Present a CHOICE or CROSSROADS situation
+- Question asks "Which path do you take?" or "What do you pursue?"
+- Focus on CHOOSING ACTIONS, not describing values
+- Generate EXACTLY 3 choices, each ultra-short (~20-25 chars)
 
 Format:
 {
-  "text": "2-3 sentence scenario about ambitions/purpose (~150 chars)",
-  "question": "Question about their goals or philosophy (60-100 chars)",
+  "text": "1-2 sentences, decision point (80-120 chars)",
+  "question": "Which path/what do you pursue? (40-60 chars)",
   "choices": [
-    "🌟 Idealistic/aspirational (~25-30 chars)",
-    "💼 Practical/pragmatic (~25-30 chars)",
-    "🎨 Creative/expressive (~25-30 chars)"
+    "🌟 Path/action #1 (~20-25 chars)",
+    "💼 Path/action #2 (~20-25 chars)",
+    "🎨 Path/action #3 (~20-25 chars)"
   ]
 }
 
 Generate the scenario, question, and choices.`
   } else if (stepNumber === 5) {
-    return `Create the final question that solidifies their nation alignment, building on their entire journey.${contextSection}
+    return `Create the final decisive moment that solidifies their nation alignment.${contextSection}
 
 Writing Instructions:
-- This is the final question - make it count
-- 2-3 sentences presenting a defining moment or choice
-- CRITICAL: Explicitly reference their journey and previous choices to create a sense of culmination
-- Question should explore their core identity or deepest values
-- Choices should clearly differentiate between the seven nations' philosophies
-- Build on ALL their previous answers for maximum personalization
-- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
+- This is the FINAL question - make it climactic
+- CONCISE setup (1-2 sentences, 80-120 chars)
+- CRITICAL: Reference their specific journey/actions
+- Present a DEFINING MOMENT requiring immediate choice
+- Question asks "What do you DO in this moment?"
+- Choices should be ACTIONS that reflect different nations
+- Generate EXACTLY 3 choices, each ultra-short (~20-25 chars)
 
 Format:
 {
-  "text": "2-3 sentence final scenario that feels climactic and personal (~150 chars)",
-  "question": "Final question about core values/identity (60-100 chars)",
+  "text": "1-2 sentences, climactic moment (80-120 chars)",
+  "question": "What do you DO? (40-60 chars)",
   "choices": [
-    "✨ First defining choice (~25-30 chars)",
-    "⚡ Second defining choice (~25-30 chars)",
-    "🌊 Third defining choice (~25-30 chars)"
+    "✨ Defining action #1 (~20-25 chars)",
+    "⚡ Defining action #2 (~20-25 chars)",
+    "🌊 Defining action #3 (~20-25 chars)"
   ]
 }
 
 Generate the final scenario, question, and choices.`
   } else if (stepNumber === 6) {
-    return `Write a brief, reflective conclusion to their journey through Teyvat. This wraps up their experience before revealing their home nation.${contextSection}
+    return `Write a BRIEF conclusion to their Teyvat journey.${contextSection}
 
 Writing Instructions:
-- Write 2-3 sentences in second person
-- CRITICAL: Acknowledge their specific journey and key choices they made
-- Reflect on their overall journey and how their choices revealed their character
-- Create a sense of completion and anticipation
-- Don't reveal their nation - that comes next
-- Make it feel deeply personal based on their actual choices
+- CONCISE: 1-2 sentences max (80-120 chars)
+- CRITICAL: Reference specific actions they took
+- Focus on WHAT THEY DID, not what they value
+- Create anticipation for the reveal
+- Don't reveal their nation yet
 - DO NOT include a question
 - This is JUST a narrative conclusion
 
 Format (JSON only):
 {
-  "text": "2-3 reflective sentences wrapping up their journey, referencing their actual choices (~150-200 chars)"
+  "text": "1-2 sentences referencing their specific actions (80-120 chars)"
 }
 
 IMPORTANT: Return ONLY the text field. No question field. No choices field. Just text.`
