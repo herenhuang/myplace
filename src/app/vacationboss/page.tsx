@@ -150,6 +150,18 @@ export default function ElevateSimulation() {
   // User choice tracking
   const [userChoice, setUserChoice] = useState<string>('')
   
+  // iMessage conversation state
+  const [showIMessage, setShowIMessage] = useState(false)
+  const [conversationMetrics, setConversationMetrics] = useState({
+    messageCount: 0,
+    startTime: 0,
+    outcome: '', // 'gave_in', 'held_boundaries', 'exited_early'
+    responseTimes: [] as number[]
+  })
+  const [messages, setMessages] = useState<Array<{role: 'boss' | 'user', content: string, timestamp: number}>>([])
+  const [userMessageInput, setUserMessageInput] = useState('')
+  const [isSendingMessage, setIsSendingMessage] = useState(false)
+  
   // Results state
   const [archetype, setArchetype] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
@@ -167,6 +179,9 @@ export default function ElevateSimulation() {
   const getCurrentTip = (): string => {
     if (screenState === 'welcome') return BLOBBERT_TIPS['welcome']
     if (screenState === 'simulation' && currentStepNumber > 0) {
+      if (showIMessage) {
+        return "Each response you send moves the conversation forward. Most people send 1-2 messages before either giving in or firmly declining."
+      }
       return BLOBBERT_TIPS[`step-${currentStepNumber}`] || ''
     }
     if (screenState === 'analyzing') return BLOBBERT_TIPS['analyzing']
@@ -181,6 +196,7 @@ export default function ElevateSimulation() {
   const shouldShowSpeechBubble = (): boolean => {
     if (screenState === 'welcome') return true
     if (screenState === 'simulation' && currentStepNumber === 1) return true // First step
+    if (screenState === 'simulation' && showIMessage) return true // Show guidance during iMessage conversation
     if (screenState === 'simulation' && currentStepNumber === TOTAL_STEPS) return true // Last step
     if (screenState === 'results' && resultsPage === 'card') return true // Only on card page
     return false
@@ -188,7 +204,8 @@ export default function ElevateSimulation() {
 
   // Determine if Blobbert should be visible at all
   const shouldShowBlobbert = (): boolean => {
-    if (screenState === 'simulation' && currentStepNumber === 2) return false // Hide on iOS interface
+    if (screenState === 'simulation' && currentStepNumber === 2 && !showIMessage) return false // Hide on iOS home screen
+    if (screenState === 'simulation' && showIMessage) return false // Hide when iMessage overlay is showing
     return true
   }
 
@@ -343,6 +360,157 @@ export default function ElevateSimulation() {
       setAnalysisError('An unexpected error occurred.')
       setScreenState('results')
     }
+  }
+
+  const handleReplyChoice = () => {
+    // Track the user's choice and start iMessage conversation
+    setUserChoice('Reply')
+    setShowIMessage(true)
+    setConversationMetrics({
+      messageCount: 0,
+      startTime: Date.now(),
+      outcome: '',
+      responseTimes: []
+    })
+    
+    // Initialize conversation with boss's first message
+    setMessages([{
+      role: 'boss',
+      content: 'urgent! you got time for a quick convo?',
+      timestamp: Date.now()
+    }])
+  }
+
+  const sendUserMessage = async () => {
+    if (!userMessageInput.trim() || isSendingMessage) return
+    
+    setIsSendingMessage(true)
+    const messageText = userMessageInput.trim()
+    setUserMessageInput('')
+    
+    // Add user message
+    const userMessage = {
+      role: 'user' as const,
+      content: messageText,
+      timestamp: Date.now()
+    }
+    
+    const updatedMessages = [...messages, userMessage]
+    setMessages(updatedMessages)
+    
+    // Update metrics
+    const newMetrics = {
+      ...conversationMetrics,
+      messageCount: conversationMetrics.messageCount + 1,
+      responseTimes: [...conversationMetrics.responseTimes, Date.now() - conversationMetrics.startTime]
+    }
+    setConversationMetrics(newMetrics)
+    
+    try {
+      // Get boss response
+      const response = await fetch('/api/boss-conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: updatedMessages,
+          messageCount: newMetrics.messageCount
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (result.response) {
+        // Add boss response
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            role: 'boss',
+            content: result.response,
+            timestamp: Date.now()
+          }])
+          
+          // Check if conversation should end
+          if (result.shouldEnd || newMetrics.messageCount >= 6) {
+            setTimeout(() => {
+              handleConversationEnd(newMetrics.messageCount)
+            }, 2000)
+          }
+        }, 1000) // Simulate typing delay
+      }
+      
+    } catch (error) {
+      console.error('Error sending message:', error)
+    } finally {
+      setIsSendingMessage(false)
+    }
+  }
+
+  const handleConversationEnd = (finalMessageCount: number) => {
+    // Determine outcome based on conversation length and content
+    let outcome = ''
+    if (finalMessageCount <= 2) {
+      outcome = 'held_boundaries'
+    } else if (finalMessageCount >= 5) {
+      outcome = 'gave_in'
+    } else {
+      outcome = 'held_boundaries' // Default for middle range
+    }
+    
+    setConversationMetrics(prev => ({ ...prev, outcome }))
+    
+    // Create results based on engagement level
+    generateConversationResults(finalMessageCount, outcome)
+  }
+
+  const generateConversationResults = (messageCount: number, outcome: string) => {
+    let archetype = ''
+    let explanation = ''
+    
+    if (outcome === 'held_boundaries') {
+      archetype = 'The Boundary Keeper'
+      explanation = `# The Boundary Keeper
+
+You handled this boss conversation with clear boundaries. You exchanged ${messageCount} message${messageCount === 1 ? '' : 's'} before standing firm.
+
+## Your Approach
+
+Research shows that **${messageCount <= 1 ? '72%' : '45%'}** of people would have responded similarly in this situation. ${messageCount <= 1 ? 'You kept it brief and direct.' : 'You engaged thoughtfully but maintained your limits.'}
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Respect your time off** - You understand vacation is for recharging
+- **Communicate clearly** - You don't leave people hanging, but you're direct
+- **Trust your judgment** - You can distinguish between true emergencies and manufactured urgency
+
+## Your Mindset
+
+While some people feel guilty about not being available 24/7, you understand that boundaries actually make you more effective when you are working. This approach helps you return refreshed and prevents burnout.`
+    } else {
+      archetype = 'The Helper'
+      explanation = `# The Helper
+
+You found yourself drawn into a work conversation during vacation. You sent ${messageCount} messages, showing your willingness to help even during time off.
+
+## Your Approach
+
+About **${messageCount >= 5 ? '23%' : '31%'}** of people would have engaged this deeply. You're someone who values being helpful and responsive to your team.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Care about your work** - You want to ensure things run smoothly
+- **Value relationships** - You don't want to let your boss down
+- **Feel responsibility** - You take ownership even during vacation
+
+## Your Mindset
+
+You likely feel a strong sense of duty to your work and teammates. While this dedication is valuable, it's worth considering whether some boundaries might help you recharge more effectively during time off.`
+    }
+    
+    setArchetype(archetype)
+    setExplanation(explanation)
+    setScreenState('results')
+    setResultsPage('card')
   }
 
   const handleDeleteChoice = () => {
@@ -844,6 +1012,12 @@ This approach helps you return from vacation more refreshed and actually more pr
       return
     }
 
+    // For iMessage mode, position above the input area
+    if (showIMessage) {
+      setBlobbertBottomPosition(120) // Above the iMessage input container
+      return
+    }
+
     // For simulation screens, calculate dynamic position
     const calculateBlobbertPosition = () => {
       if (choicesContainerRef.current) {
@@ -881,7 +1055,7 @@ This approach helps you return from vacation more refreshed and actually more pr
       clearTimeout(timer)
       resizeObserver.disconnect()
     }
-  }, [currentStep, visibleButtons, screenState, isStreaming])
+  }, [currentStep, visibleButtons, screenState, isStreaming, showIMessage])
 
   // Render content based on screen state
   const renderContent = () => {
@@ -920,7 +1094,7 @@ This approach helps you return from vacation more refreshed and actually more pr
         return currentStep ? (
           <div className={`${styles.textContainer} ${currentStepNumber === 2 ? styles.iosContainer : ''}`}>
             {/* Special iOS interface background for step 2 */}
-            {currentStepNumber === 2 ? (
+            {currentStepNumber === 2 && !showIMessage ? (
               <div className={styles.iosInterface}>
                 <div className={styles.iosStatusBar}>
                   <span className={styles.iosTime}>9:41</span>
@@ -1216,8 +1390,8 @@ This approach helps you return from vacation more refreshed and actually more pr
         </div>
       </div>
 
-      {/* Notification Overlay for step 2 */}
-      {screenState === 'simulation' && currentStepNumber === 2 && (
+      {/* Notification Overlay for step 2 - only show when not in iMessage mode */}
+      {screenState === 'simulation' && currentStepNumber === 2 && !showIMessage && (
         <div className={styles.notificationOverlay}>
           <div className={styles.iosNotification}>
             <div className={styles.notificationHeader}>
@@ -1234,7 +1408,7 @@ This approach helps you return from vacation more refreshed and actually more pr
                   e.preventDefault();
                   e.stopPropagation();
                   console.log('Reply button clicked');
-                  handleChoiceSelect('Reply to the message');
+                  handleReplyChoice();
                 }}
                 className={styles.notificationButton}
                 disabled={isLoading}
@@ -1257,6 +1431,72 @@ This approach helps you return from vacation more refreshed and actually more pr
           </div>
         </div>
       )}
+
+      {/* iMessage Interface Overlay - positioned on top */}
+      {showIMessage && (
+        <div className={styles.iMessageOverlay}>
+          <div className={styles.iMessageInterface}>
+            <div className={styles.iosStatusBar}>
+              <span className={styles.iosTime}>9:41</span>
+              <div className={styles.iosSignals}>
+                <span className={styles.iosSignal}>●●●</span>
+                <span className={styles.iosBattery}>🔋</span>
+              </div>
+            </div>
+            
+            <div className={styles.iMessageHeader}>
+              <button className={styles.backButton}>‹ Back</button>
+              <div className={styles.contactInfo}>
+                <div className={styles.contactName}>Heewon (Your Boss)</div>
+                <div className={styles.contactStatus}>Active now</div>
+              </div>
+              <div className={styles.callButton}>📞</div>
+            </div>
+            
+            <div className={styles.messagesContainer}>
+              {messages.map((message, index) => (
+                <div 
+                  key={index}
+                  className={`${styles.message} ${message.role === 'boss' ? styles.received : styles.sent}`}
+                >
+                  <div className={styles.messageText}>
+                    {message.content}
+                  </div>
+                  <div className={styles.messageTime}>
+                    {new Date(message.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className={styles.inputContainer}>
+              <div className={styles.messageInput}>
+                <input 
+                  type="text" 
+                  value={userMessageInput}
+                  onChange={(e) => setUserMessageInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !isSendingMessage) {
+                      sendUserMessage()
+                    }
+                  }}
+                  placeholder="Text Message"
+                  className={styles.textInput}
+                  disabled={isSendingMessage}
+                />
+                <button 
+                  className={styles.sendButton}
+                  onClick={sendUserMessage}
+                  disabled={!userMessageInput.trim() || isSendingMessage}
+                >
+                  {isSendingMessage ? '...' : '↑'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </PageContainer>
   )
 }
