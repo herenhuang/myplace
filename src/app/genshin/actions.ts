@@ -280,9 +280,9 @@ Format:
   "text": "2-3 sentences setting up a Genshin-themed scenario that builds on their first answer",
   "question": "A question about their approach or values (60-100 chars)",
   "choices": [
-    "🌟 First choice (~40 chars)",
-    "⚔️ Second choice (~40 chars)",
-    "🎭 Third choice (~40 chars)"
+    "🌟 First choice (~25 chars)",
+    "⚔️ Second choice (~25 chars)",
+    "🎭 Third choice (~25 chars)"
   ]
 }
 
@@ -301,9 +301,9 @@ Format:
   "text": "2-3 sentence scenario about conflict or challenge (~150 chars)",
   "question": "Question about their approach to conflict/adversity (60-100 chars)",
   "choices": [
-    "⚔️ Direct/confrontational choice (~40 chars)",
-    "🕊️ Peaceful/diplomatic choice (~40 chars)",
-    "🧠 Strategic/thoughtful choice (~40 chars)"
+    "⚔️ Direct/confrontational choice (~25 chars)",
+    "🕊️ Peaceful/diplomatic choice (~25 chars)",
+    "🧠 Strategic/thoughtful choice (~25 chars)"
   ]
 }
 
@@ -322,9 +322,9 @@ Format:
   "text": "2-3 sentence scenario about ambitions/purpose (~150 chars)",
   "question": "Question about their goals or philosophy (60-100 chars)",
   "choices": [
-    "🌟 Idealistic/aspirational choice (~40 chars)",
-    "💼 Practical/pragmatic choice (~40 chars)",
-    "🎨 Creative/expressive choice (~40 chars)"
+    "🌟 Idealistic/aspirational choice (~25 chars)",
+    "💼 Practical/pragmatic choice (~25 chars)",
+    "🎨 Creative/expressive choice (~25 chars)"
   ]
 }
 
@@ -344,9 +344,9 @@ Format:
   "text": "2-3 sentence final scenario that feels climactic (~150 chars)",
   "question": "Final question about core values/identity (60-100 chars)",
   "choices": [
-    "✨ First defining choice (~40 chars)",
-    "⚡ Second defining choice (~40 chars)",
-    "🌊 Third defining choice (~40 chars)"
+    "✨ First defining choice (~25 chars)",
+    "⚡ Second defining choice (~25 chars)",
+    "🌊 Third defining choice (~25 chars)"
   ]
 }
 

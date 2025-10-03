@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
@@ -96,6 +97,20 @@ const BLOBBERT_TIPS: Record<string, string> = {
   'results': "Here's your Genshin home nation!"
 }
 
+// Contextual click messages for tiny Blobbert
+const CONTEXTUAL_MESSAGES: Record<number, string[]> = {
+  1: ["Follow your gut!", "What's your first instinct?", "No wrong answers!"],
+  2: ["Trust yourself", "First reaction?", "What feels right?"],
+  3: ["Be authentic", "Your move", "Honest response?"],
+  4: ["Your values", "What matters?", "Think deep"],
+  5: ["Final choice!", "Trust yourself", "Your truth?"]
+}
+
+const getContextualMessage = (stepNumber: number): string => {
+  const messages = CONTEXTUAL_MESSAGES[stepNumber] || ["Write what you feel!"]
+  return messages[Math.floor(Math.random() * messages.length)]
+}
+
 // LocalStorage key for caching state
 const GENSHIN_STATE_KEY = 'genshin-quiz-state'
 
@@ -140,9 +155,25 @@ export default function GenshinQuiz() {
   const inputRef = useRef<HTMLInputElement>(null)
   const choicesContainerRef = useRef<HTMLDivElement>(null)
   
-  // Dynamic Blobbert positioning
-  const [blobbertBottomPosition, setBlobbertBottomPosition] = useState(120)
 
+  // Blobbert click message state
+  const [blobbertClickMessage, setBlobbertClickMessage] = useState<string>("")
+  const [showClickMessage, setShowClickMessage] = useState(false)
+
+
+  // Blobbert click handler
+  const handleBlobbertClick = () => {
+    if (screenState === 'simulation' && currentStepNumber >= 1 && currentStepNumber <= 5) {
+      const message = getContextualMessage(currentStepNumber)
+      setBlobbertClickMessage(message)
+      setShowClickMessage(true)
+      
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        setShowClickMessage(false)
+      }, 3000)
+    }
+  }
   // Get current Blobbert tip
   const getCurrentTip = (): string => {
     if (screenState === 'welcome') return BLOBBERT_TIPS['welcome']
@@ -419,7 +450,7 @@ export default function GenshinQuiz() {
             stepNumber: nextStepNumber,
             text: result.text || '',
             question: result.question || '',
-            choices: (result.choices || []).map((c: string) => ({ label: c, value: c })),
+            choices: (result.choices || []).slice(0, 3).map((c: string) => ({ label: c, value: c })),
             allowCustomInput: true,
             imageUrl: getRandomBackground() // Random background for each step
           }
@@ -440,11 +471,11 @@ export default function GenshinQuiz() {
         }
         
         if (result.success) {
-          nextStep = {
-            stepNumber: nextStepNumber,
-            text: result.text || '',
-            question: '',
-            choices: [],
+            nextStep = {
+              stepNumber: nextStepNumber,
+              text: result.text || '',
+              question: '',
+              choices: [],
             allowCustomInput: false,
             imageUrl: getRandomBackground() // Random background for conclusion too
           }
@@ -592,52 +623,6 @@ export default function GenshinQuiz() {
     }
   }, [currentStep, screenState, isStreaming])
 
-  // Calculate Blobbert position dynamically based on choicesContainer height
-  useEffect(() => {
-    // For non-simulation screens, use fixed bottom-left position
-    if (screenState !== 'simulation') {
-      setBlobbertBottomPosition(20) // 20px from bottom for welcome, analyzing, results
-      return
-    }
-
-    // For simulation screens, calculate dynamic position
-    const calculateBlobbertPosition = () => {
-      if (choicesContainerRef.current) {
-        const imageContainer = choicesContainerRef.current.closest('[class*="imageContainer"]')
-        if (!imageContainer) return
-        
-        const imageContainerRect = imageContainer.getBoundingClientRect()
-        const choicesRect = choicesContainerRef.current.getBoundingClientRect()
-        
-        // Calculate distance from bottom of imageContainer to top of choicesContainer
-        const distanceFromBottom = imageContainerRect.bottom - choicesRect.top
-        
-        // Position Blobbert directly above the choicesContainer:
-        // distanceFromBottom gives us the space from container bottom to choices top
-        // Add small gap (12px) to sit just above the choices
-        const calculatedBottom = distanceFromBottom + 0
-        
-        setBlobbertBottomPosition(calculatedBottom)
-      }
-    }
-
-    // Calculate on mount and when dependencies change
-    calculateBlobbertPosition()
-
-    // Recalculate after a short delay to account for animations
-    const timer = setTimeout(calculateBlobbertPosition, 600)
-
-    // Add resize observer to handle dynamic changes
-    const resizeObserver = new ResizeObserver(calculateBlobbertPosition)
-    if (choicesContainerRef.current) {
-      resizeObserver.observe(choicesContainerRef.current)
-    }
-
-    return () => {
-      clearTimeout(timer)
-      resizeObserver.disconnect()
-    }
-  }, [currentStep, visibleButtons, screenState, isStreaming])
 
   // Render content based on screen state
   const renderContent = () => {
@@ -646,7 +631,7 @@ export default function GenshinQuiz() {
         return (
           <div className={styles.welcomeContainer}>
             <div className={styles.welcomeHeader}>
-              <h1 className={styles.welcomeTitle}> What's Your Genshin Impact Home Nation? </h1>
+              <h1 className={styles.welcomeTitle}> What&apos;s Your Genshin Impact Home Nation? </h1>
               
 
               <button
@@ -732,6 +717,70 @@ export default function GenshinQuiz() {
                   })}
 
                   {currentStep.allowCustomInput && (
+                    <>
+                    {/* Blobbert positioned above custom input */}
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'flex-end',
+                      gap: '8px',
+                      marginBottom: '8px',
+                      position: 'relative'
+                    }}>
+                      {/* Speech bubble */}
+                      {(shouldShowSpeechBubble() || showClickMessage) && (
+                        <div style={{
+                          position: 'relative',
+                          backgroundColor: 'white',
+                          borderRadius: '16px',
+                          padding: '8px 12px',
+                          maxWidth: '200px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          marginRight: '4px'
+                        }}>
+                          <div style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: '#666',
+                            marginBottom: '2px'
+                          }}>Blobbert</div>
+                          <p style={{
+                            fontSize: '13px',
+                            margin: 0,
+                            color: '#333',
+                            lineHeight: 1.3
+                          }}>
+                            {shouldShowSpeechBubble() ? getCurrentTip() : blobbertClickMessage}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Clickable Blobbert */}
+                      <div 
+                        onClick={handleBlobbertClick}
+                        style={{
+                          width: shouldShowSpeechBubble() ? '60px' : '40px',
+                          height: shouldShowSpeechBubble() ? '60px' : '40px',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}
+                        title="Click for encouragement!"
+                      >
+                        <Image 
+                          src="/elevate/blobbert.png" 
+                          alt="Blobbert" 
+                          width={shouldShowSpeechBubble() ? 60 : 40}
+                          height={shouldShowSpeechBubble() ? 60 : 40}
+                          style={{ transform: 'scaleX(-1)' }}
+                        />
+                      </div>
+                    </div>
+
                     <div 
                       className={styles.customInputContainer}
                       style={{ 
@@ -778,6 +827,7 @@ export default function GenshinQuiz() {
                         </button>
                       </div>
                     </div>
+                    </>
                   )}
                 </>
               )}
@@ -929,13 +979,15 @@ export default function GenshinQuiz() {
             >
               {renderContent()}
               
-              {/* Floating Blobbert Button - appears on all screens inside imageContainer */}
-              <BlobbertTip 
-                tip={getCurrentTip()} 
-                isVisible={true}
-                showSpeechBubble={shouldShowSpeechBubble()}
-                bottomPosition={blobbertBottomPosition}
-              />
+              {/* Floating Blobbert - appears on welcome and results screens */}
+              {(screenState === 'welcome' || screenState === 'results') && (
+                <BlobbertTip 
+                  tip={getCurrentTip()} 
+                  isVisible={true}
+                  showSpeechBubble={screenState === 'welcome'}
+                  bottomPosition={20}
+                />
+              )}
             </div>
           </div>
         </div>
