@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, getDebugLogs, type StepData } from './actions'
+import { saveOutcome, getOutcomePercentage } from './analytics'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
 
@@ -33,7 +34,7 @@ const TOTAL_STEPS = 9 // Expanded to 9 steps for full-day arc
 const PREDEFINED_STEPS: Record<number, Step> = {
   1: {
     stepNumber: 1,
-    text: "Your boss is the type who says \"no rush\" but really means \"now.\" They cushion every request with emojis — nice, but never optional.\n\nYou're on day 2 of vacation, when your phone buzzes…",
+    text: "The past few months have been extremely tough, especially with your new manager that always seems to ask for too much. You're finally relaxing by the pool, 3 days into your vacation, when your phone buzzes...",
     question: "",
     choices: [],
     allowCustomInput: false,
@@ -155,8 +156,9 @@ export default function ElevateSimulation() {
   const [conversationMetrics, setConversationMetrics] = useState({
     messageCount: 0,
     startTime: 0,
-    outcome: '', // 'gave_in', 'held_boundaries', 'exited_early'
-    responseTimes: [] as number[]
+    outcome: '', // 'gave_in', 'held_boundaries', 'exited_early', 'ignored', 'quick_peeker'
+    responseTimes: [] as number[],
+    hasSeenBossResponse: false // Track if user waited to see boss's reply before exiting
   })
   const [messages, setMessages] = useState<Array<{role: 'boss' | 'user', content: string, timestamp: number}>>([])
   const [userMessageInput, setUserMessageInput] = useState('')
@@ -168,6 +170,8 @@ export default function ElevateSimulation() {
   const [archetype, setArchetype] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
+  const [realPercentage, setRealPercentage] = useState<number | null>(null)
+  const [totalPlays, setTotalPlays] = useState<number | null>(null)
   const [copyLogsStatus, setCopyLogsStatus] = useState<'idle' | 'copying' | 'done' | 'error'>('idle')
   const [resultsPage, setResultsPage] = useState<'card' | 'explanation'>('card')
   
@@ -372,7 +376,8 @@ export default function ElevateSimulation() {
       messageCount: 0,
       startTime: Date.now(),
       outcome: '',
-      responseTimes: []
+      responseTimes: [],
+      hasSeenBossResponse: false
     })
     
     // Initialize conversation with boss's first message
@@ -431,19 +436,63 @@ export default function ElevateSimulation() {
             })
           })
           
-          const result = await response.json()
+          if (!response.ok) {
+            console.error('API request failed:', response.status, response.statusText)
+            setBossIsTyping(false)
+            
+            // Add fallback boss message on error
+            setMessages(prev => [...prev, {
+              role: 'boss',
+              content: "hey, you still there? 👀",
+              timestamp: Date.now()
+            }])
+            return
+          }
+          
+          let result
+          try {
+            result = await response.json()
+          } catch (parseError) {
+            console.error('Failed to parse JSON response:', parseError)
+            setBossIsTyping(false)
+            
+            // Add fallback boss message on parse error
+            setMessages(prev => [...prev, {
+              role: 'boss',
+              content: "sorry, lost connection for a sec. can you help me out?",
+              timestamp: Date.now()
+            }])
+            return
+          }
           
           setBossIsTyping(false)
           
-          if (result.response) {
-            // Add boss response
+          if (result.responses && result.responses.length > 0) {
+            // Handle multiple messages with slight delay between them
+            for (let i = 0; i < result.responses.length; i++) {
+              await new Promise(resolve => setTimeout(resolve, i * 800)) // 800ms delay between messages
+              
+              setMessages(prev => [...prev, {
+                role: 'boss',
+                content: result.responses[i],
+                timestamp: Date.now()
+              }])
+            }
+            
+            // Mark that user has seen boss response
+            setConversationMetrics(prev => ({ ...prev, hasSeenBossResponse: true }))
+            
+            // Don't auto-end conversation - only end on explicit user action (call button or back button)
+          } else if (result.response) {
+            // Backwards compatibility: handle old single-response format
             setMessages(prev => [...prev, {
               role: 'boss',
               content: result.response,
               timestamp: Date.now()
             }])
             
-            // Don't auto-end conversation - only end on explicit user action (call button or back button)
+            // Mark that user has seen boss response
+            setConversationMetrics(prev => ({ ...prev, hasSeenBossResponse: true }))
           }
           
         } catch (error) {
@@ -460,78 +509,314 @@ export default function ElevateSimulation() {
     }
   }
 
-  const handleConversationEnd = (finalMessageCount: number, explicitOutcome?: string) => {
+  const handleConversationEnd = async (finalMessageCount: number, explicitOutcome?: string) => {
     // Use explicit outcome if provided, otherwise determine based on conversation length
     let outcome = explicitOutcome || ''
     if (!outcome) {
-      if (finalMessageCount <= 2) {
-        outcome = 'held_boundaries'
-      } else if (finalMessageCount >= 5) {
-        outcome = 'gave_in'
+      if (finalMessageCount === 0) {
+        outcome = 'ignored' // Never replied at all
+      } else if (finalMessageCount === 1 && conversationMetrics.hasSeenBossResponse) {
+        outcome = 'quick_peeker' // Replied once, saw response, then immediately left
+      } else if (finalMessageCount >= 2 && finalMessageCount <= 3) {
+        outcome = 'exited_early' // Engaged for 2-3 messages then actively backed out
+      } else if (finalMessageCount >= 4 && finalMessageCount <= 6) {
+        outcome = 'held_boundaries' // Engaged for several messages but held firm
+      } else if (finalMessageCount >= 7) {
+        outcome = 'gave_in' // Deep engagement
       } else {
-        outcome = 'held_boundaries' // Default for middle range
+        outcome = 'held_boundaries' // Default
       }
     }
     
     setConversationMetrics(prev => ({ ...prev, outcome }))
     
     // Create results based on engagement level
-    generateConversationResults(finalMessageCount, outcome)
+    await generateConversationResults(finalMessageCount, outcome)
   }
 
-  const generateConversationResults = (messageCount: number, outcome: string) => {
+  const generateConversationResults = async (messageCount: number, outcome: string) => {
     let archetype = ''
     let explanation = ''
     
-    if (outcome === 'exited_early') {
-      archetype = 'The Escape Artist'
-      explanation = `# The Escape Artist
+    if (outcome === 'ignored') {
+      archetype = 'The Boundary Protector'
+      explanation = `# The Boundary Protector
 
-You started engaging but then decided to exit the conversation after ${messageCount} message${messageCount === 1 ? '' : 's'}. Smart move!
+You saw the notification and chose not to engage. You trust your judgment about when to disconnect.
 
 ## Your Approach
 
-Only **18%** of people have the self-awareness to recognize when a work conversation is spiraling and step away. You saw where this was heading and chose your peace of mind.
+Only **12%** of people have the clarity to completely step away from a boss's message on vacation. You made a decisive choice.
 
 ## What This Reveals
 
 Your response pattern shows you:
-- **Trust your instincts** - You recognized the escalation pattern
-- **Value your boundaries** - You're willing to step away when needed
-- **Learn quickly** - You could see this wasn't going to be a "quick" anything
+- **Clear priorities** - You know what matters to you and honor it
+- **Confident decision-making** - You don't second-guess yourself
+- **Self-trust** - You believe that if it were truly urgent, they'd find another way
 
 ## Your Mindset
 
-You understand that some conversations are designed to gradually pull you in. By stepping away, you maintained control over your vacation time and avoided the trap of endless "just one more thing" requests.`
-    } else if (outcome === 'held_boundaries') {
-      archetype = 'The Boundary Keeper'
-      explanation = `# The Boundary Keeper
+You understand that rest requires full disconnection. This isn't avoidance—it's intentional protection of your recharge time. You know that returning refreshed makes you more valuable than being constantly available but depleted.`
+    } else if (outcome === 'quick_peeker' || outcome === 'quick_peeker_curious' || outcome === 'quick_peeker_boundary') {
+      if (outcome === 'quick_peeker_curious') {
+        archetype = 'The Wise Assessor'
+        explanation = `# The Wise Assessor
 
-You handled this boss conversation with clear boundaries. You exchanged ${messageCount} message${messageCount === 1 ? '' : 's'} before standing firm.
+You replied once to understand the situation, then chose to exit. Smart assessment!
 
 ## Your Approach
 
-Research shows that **${messageCount <= 1 ? '72%' : '45%'}** of people would have responded similarly in this situation. ${messageCount <= 1 ? 'You kept it brief and direct.' : 'You engaged thoughtfully but maintained your limits.'}
+About **19%** of people have this level of discernment—engaging just enough to understand, then making a conscious choice. You gathered information without getting trapped.
 
 ## What This Reveals
 
 Your response pattern shows you:
-- **Respect your time off** - You understand vacation is for recharging
-- **Communicate clearly** - You don't leave people hanging, but you're direct
-- **Trust your judgment** - You can distinguish between true emergencies and manufactured urgency
+- **Strategic thinking** - You assess before committing
+- **Information-driven** - You wanted context before deciding
+- **Confident exits** - Once you understood, you didn't hesitate to leave
 
 ## Your Mindset
 
-While some people feel guilty about not being available 24/7, you understand that boundaries actually make you more effective when you are working. This approach helps you return refreshed and prevents burnout.`
+You're not avoiding—you're being intentional. You checked if it was truly urgent, determined it wasn't, and protected your time. This is mature boundary-setting.`
+      } else if (outcome === 'quick_peeker_boundary') {
+        archetype = 'The Boundary Expert'
+        explanation = `# The Boundary Expert
+
+You replied once trying to set a boundary, saw the response, then immediately exited. You recognized the pattern early.
+
+## Your Approach
+
+Only **17%** of people can spot boundary-testing this quickly. You said what you needed to say, then left before being drawn into negotiation.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Pattern recognition** - You've learned to spot these situations
+- **No negotiation** - You stated your position and didn't debate it
+- **Self-protective** - You exited before emotional exhaustion could set in
+
+## Your Mindset
+
+You understand that boundaries work best when they're non-negotiable. By exiting quickly, you avoided the trap of justifying yourself repeatedly. This is advanced boundary-setting.`
+      } else {
+        archetype = 'The Quick Decider'
+        explanation = `# The Quick Decider
+
+You replied once, saw the response, and immediately chose to exit. You made a fast decision.
+
+## Your Approach
+
+About **22%** of people engage briefly and then step away. You satisfied your initial response instinct without getting pulled further in.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Efficient assessment** - You don't need prolonged deliberation
+- **Trust yourself** - You make decisions and move on
+- **Time-protective** - You recognized this would consume more time than you wanted to give
+
+## Your Mindset
+
+You engage enough to feel responsive, but you're also willing to disengage when your gut tells you this isn't worth your vacation time.`
+      }
+    } else if (outcome === 'exited_early' || outcome === 'exited_boundary_aware') {
+      if (outcome === 'exited_boundary_aware') {
+        archetype = 'The Self-Advocate'
+        explanation = `# The Self-Advocate
+
+You tried to set boundaries across ${messageCount} message${messageCount === 1 ? '' : 's'}, then chose to exit rather than continue defending yourself. Wise choice!
+
+## Your Approach
+
+Only **16%** of people recognize when a conversation becomes an exhausting loop and choose to exit instead of continuing to explain. You valued your energy over winning the argument.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Energy-aware** - You noticed the conversation draining you
+- **Strategic exits** - You chose to leave rather than be worn down
+- **Self-respect** - You don't need to justify your boundaries endlessly
+
+## Your Mindset
+
+You understand that not every "no" needs endless explanation. When you saw the pattern of persistent pressure, you chose to exit with your boundary intact rather than risk eroding it through fatigue.`
+      } else {
+        archetype = 'The Pattern Spotter'
+        explanation = `# The Pattern Spotter
+
+You engaged for ${messageCount} message${messageCount === 1 ? '' : 's'}, then recognized where this was heading and exited. Smart move!
+
+## Your Approach
+
+About **18%** of people can spot when a work conversation is spiraling and step away mid-conversation. You saw the pattern early and chose your peace of mind.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Pattern recognition** - You've learned to spot these situations
+- **Decisive action** - You don't wait until you're exhausted to act
+- **Self-trust** - You trust your judgment about what's worth your time
+
+## Your Mindset
+
+You understand that some conversations are designed to gradually pull you in. By stepping away mid-conversation, you maintained control over your vacation time and avoided the trap of endless "just one more thing" requests.`
+      }
+    } else if (outcome === 'held_boundaries' || outcome === 'held_boundaries_strong') {
+      if (outcome === 'held_boundaries_strong') {
+        archetype = 'The Boundary Champion'
+        explanation = `# The Boundary Champion
+
+You engaged for ${messageCount} messages while consistently setting and maintaining boundaries. You didn't give in.
+
+## Your Approach
+
+Only **21%** of people can maintain clear boundaries through extended pressure. You kept saying what you needed to say without wavering.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Unwavering clarity** - You knew what you wanted and didn't compromise
+- **Resilient communication** - Pressure didn't change your position
+- **Self-respect** - You value your rest as much as your work
+
+## Your Mindset
+
+You understand that clear, consistent boundaries are the foundation of sustainable work relationships. By holding firm even through extended conversation, you're teaching others to respect your time off from the start.`
+      } else {
+        archetype = 'The Steady Communicator'
+        explanation = `# The Steady Communicator
+
+You engaged for ${messageCount} message${messageCount === 1 ? '' : 's'}, navigating the conversation while maintaining your position.
+
+## Your Approach
+
+About **28%** of people would engage this much while still holding their ground. You stayed present in the conversation without losing sight of your boundaries.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Balanced engagement** - You communicate without over-committing
+- **Calm under pressure** - You don't get flustered by persistence
+- **Clear sense of self** - You know what you're willing and unwilling to do
+
+## Your Mindset
+
+You believe in staying responsive while still protecting your time. This balance helps you maintain relationships without sacrificing your wellbeing. You understand that you can be both helpful and boundaried.`
+      }
+    } else if (outcome === 'willing_helper') {
+      // User was eager/willing to help from the start
+      if (messageCount === 0) {
+        archetype = 'The Instant Helper'
+        explanation = `# The Instant Helper
+
+You called immediately without even texting back. You're highly responsive and ready to help!
+
+## Your Approach
+
+Only **8%** of people would call their boss instantly during vacation. You prioritize being there for your team.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Highly responsive** - You react quickly to work requests
+- **Team-oriented** - You value being available for your colleagues
+- **Action-focused** - You prefer to jump in and solve problems
+
+## Your Mindset
+
+You're someone who finds satisfaction in helping others. While this responsiveness is admirable, make sure you're also protecting time to recharge. The best helpers know when to step back too.`
+      } else {
+        archetype = 'The Team Player'
+        explanation = `# The Team Player
+
+After ${messageCount} message${messageCount === 1 ? '' : 's'}, you agreed to call. Your tone showed you were willing and happy to help.
+
+## Your Approach
+
+About **24%** of people would engage and agree to help without resistance. You're someone who values team cohesion and being reliable.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Collaborative spirit** - You genuinely want to help your team succeed
+- **Positive attitude** - You approached this willingly, not grudgingly
+- **Reliable** - Your team knows they can count on you
+
+## Your Mindset
+
+You believe in supporting your team even during personal time. This is admirable, but make sure this pattern doesn't lead to burnout. The best team players also model healthy boundaries.`
+      }
+    } else if (outcome === 'reluctant_but_kind') {
+      archetype = 'The Accommodating Helper'
+      explanation = `# The Accommodating Helper
+
+After ${messageCount === 0 ? 'seeing the notification' : messageCount + ' message' + (messageCount === 1 ? '' : 's')}, you agreed to call. You showed some hesitation but ultimately chose to help.
+
+## Your Approach
+
+About **31%** of people would respond this way - slightly reluctant but ultimately accommodating. You balance helpfulness with some self-protection.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Considerate** - You weigh both sides before deciding
+- **Flexible** - You're willing to adjust your plans when needed
+- **Empathetic** - You understand others' needs even during your time off
+
+## Your Mindset
+
+You try to find a middle ground between being helpful and protecting your boundaries. This can be healthy, but watch for patterns where you consistently prioritize others over yourself.`
+    } else if (outcome === 'boundary_setter_failed') {
+      archetype = 'The Worn Down Caver'
+      explanation = `# The Worn Down Caver
+
+You tried to set boundaries across ${messageCount} message${messageCount === 1 ? '' : 's'}, but eventually agreed to call. You knew what you wanted, but struggled to hold firm.
+
+## Your Approach
+
+About **18%** of people set boundaries initially but give in under pressure. You have the right instincts but need support in maintaining them.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Boundary awareness** - You know what you want and need
+- **Struggle with persistence** - Continued pressure eventually works on you
+- **Guilt susceptible** - You may feel bad saying no repeatedly
+
+## Your Mindset
+
+You understand the importance of time off, but when someone keeps pushing, it feels harder to keep saying no. This teaches others that your boundaries are negotiable. Consider: a firm "no" once is kinder than multiple nos followed by a yes.`
+    } else if (outcome === 'worn_down') {
+      archetype = 'The Exhausted Caver'
+      explanation = `# The Exhausted Caver
+
+After ${messageCount} messages where you clearly tried to say no, you finally agreed to call. You were worn down, not convinced.
+
+## Your Approach
+
+Only **12%** of people hold boundaries this long before giving in. You showed real resistance, but the persistence eventually broke you down.
+
+## What This Reveals
+
+Your response pattern shows you:
+- **Strong initial boundaries** - You were clear about wanting time off
+- **Exhausted into compliance** - You gave in from fatigue, not genuine agreement
+- **Difficulty ending conversations** - Once engaged, you struggled to exit
+
+## Your Mindset
+
+You know you shouldn't be working on vacation, but after all that back-and-forth, agreeing to the call felt easier than continuing to fight. This is emotional exhaustion at work. The irony? All that texting probably took longer than the call would have, but now you're doing both.`
     } else {
+      // Fallback
       archetype = 'The Helper'
       explanation = `# The Helper
 
-You found yourself drawn into a work conversation during vacation. You sent ${messageCount} messages, showing your willingness to help even during time off.
+You engaged with your boss during vacation and ultimately agreed to help.
 
 ## Your Approach
 
-About **${messageCount >= 5 ? '23%' : '31%'}** of people would have engaged this deeply. You're someone who values being helpful and responsive to your team.
+You're someone who values being helpful and responsive to your team.
 
 ## What This Reveals
 
@@ -545,44 +830,46 @@ Your response pattern shows you:
 You likely feel a strong sense of duty to your work and teammates. While this dedication is valuable, it's worth considering whether some boundaries might help you recharge more effectively during time off.`
     }
     
+    // Save outcome and get real statistics FIRST
+    let realStats = null
+    try {
+      await saveOutcome({
+        archetype,
+        outcome,
+        messageCount,
+        sessionId: sessionId || 'anonymous'
+      })
+      
+      realStats = await getOutcomePercentage(outcome, archetype)
+      if (realStats) {
+        setRealPercentage(realStats.percentage)
+        setTotalPlays(realStats.totalPlays)
+        
+        // Replace placeholder percentage with real data
+        // Format: "Only **X%**" or "About **X%**"
+        explanation = explanation.replace(
+          /(Only|About) \*\*\d+%\*\*/,
+          `$1 **${realStats.percentage}%**`
+        )
+      }
+    } catch (error) {
+      console.error('Error saving/fetching stats:', error)
+    }
+    
     setArchetype(archetype)
     setExplanation(explanation)
     setScreenState('results')
     setResultsPage('card')
   }
 
-  const handleDeleteChoice = () => {
+  const handleDeleteChoice = async () => {
     // Track the user's choice
     setUserChoice('Delete')
     
-    // Skip directly to results with The Poster archetype
-    setArchetype('The Poster')
-    
-    // Create custom explanation for Delete choice
-    const deleteExplanation = `# The Poster
-
-You deleted the message without reading or responding. This shows you prioritize your personal time and set clear boundaries with work.
-
-## Your Choice
-
-Research shows that only **38%** of people would delete a work message during vacation without responding. You're part of a group that values work-life balance and isn't afraid to protect their time off.
-
-## What This Reveals
-
-Your quick decision to delete shows you:
-- **Protect your boundaries** - You don't let work intrude on personal time
-- **Trust your instincts** - You made a decisive choice without overthinking
-- **Value presence** - You prioritize being fully present during your vacation
-
-## Your Mindset
-
-While others might feel guilty or anxious about ignoring work messages, you understand that true rest requires disconnecting. You've learned that urgent rarely means emergency, and most work "crises" resolve themselves.
-
-This approach helps you return from vacation more refreshed and actually more productive in the long run.`
-
-    setExplanation(deleteExplanation)
-    setScreenState('results')
-    setResultsPage('card')
+    // Analyze why they deleted - confident boundary or avoidance?
+    // Since there are no messages yet, we'll determine based on speed/decisiveness
+    // For now, treat as confident boundary setting
+    handleConversationEnd(0, 'ignored')
   }
 
   const resetSimulation = () => {
@@ -1339,6 +1626,23 @@ This approach helps you return from vacation more refreshed and actually more pr
                       </p>
                     </div>
                   </div>
+                  
+                  {/* Real Stats Display */}
+                  {realPercentage !== null && totalPlays !== null && (
+                    <div className="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 font-light mb-1">
+                          Your response is unique
+                        </p>
+                        <p className="text-3xl font-bold text-orange-600 mb-1">
+                          {realPercentage}%
+                        </p>
+                        <p className="text-xs text-gray-500 font-light">
+                          of {totalPlays.toLocaleString()} people responded like you
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button
@@ -1485,18 +1789,81 @@ This approach helps you return from vacation more refreshed and actually more pr
             <div className={styles.iMessageHeader}>
               <button 
                 className={styles.backButton}
-                onClick={() => {
+                onClick={async () => {
+                  const currentMessageCount = conversationMetrics.messageCount
+                  const hasSeenResponse = conversationMetrics.hasSeenBossResponse
+                  
+                  // Analyze sentiment before determining outcome
+                  let outcome = ''
+                  
+                  if (currentMessageCount === 0) {
+                    outcome = 'ignored' // Never replied
+                  } else {
+                    // User engaged, analyze their messages to understand their exit
+                    try {
+                      const response = await fetch('/api/analyze-conversation', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          messages: messages,
+                          messageCount: currentMessageCount
+                        })
+                      })
+                      
+                      const result = await response.json()
+                      const sentiment = result.sentiment || 'reluctant_but_kind'
+                      
+                      console.log('📊 Back button - Conversation sentiment:', sentiment)
+                      
+                      // Map sentiment to exit behavior
+                      if (currentMessageCount === 1 && hasSeenResponse) {
+                        // Quick peek behavior
+                        if (sentiment === 'willing_helper') {
+                          outcome = 'quick_peeker_curious' // Curious but decided not worth it
+                        } else if (sentiment === 'boundary_setter_failed' || sentiment === 'worn_down') {
+                          outcome = 'quick_peeker_boundary' // Assessed and set boundary
+                        } else {
+                          outcome = 'quick_peeker' // Default
+                        }
+                      } else if (currentMessageCount >= 2 && currentMessageCount <= 3) {
+                        // Exited early
+                        if (sentiment === 'boundary_setter_failed' || sentiment === 'worn_down') {
+                          outcome = 'exited_boundary_aware' // Left after trying to set boundaries
+                        } else {
+                          outcome = 'exited_early' // Left for other reasons
+                        }
+                      } else {
+                        // Held boundaries (4+ messages)
+                        if (sentiment === 'boundary_setter_failed' || sentiment === 'worn_down') {
+                          outcome = 'held_boundaries_strong' // Consistently said no
+                        } else {
+                          outcome = 'held_boundaries' // Engaged but didn't give in
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error analyzing back button conversation:', error)
+                      // Fallback to simple logic
+                      if (currentMessageCount === 1 && hasSeenResponse) {
+                        outcome = 'quick_peeker'
+                      } else {
+                        outcome = 'exited_early'
+                      }
+                    }
+                  }
+                  
                   setShowIMessage(false)
                   setMessages([])
                   setConversationMetrics({
                     messageCount: 0,
                     startTime: 0,
-                    outcome: 'exited_early',
-                    responseTimes: []
+                    outcome: outcome,
+                    responseTimes: [],
+                    hasSeenBossResponse: false
                   })
-                  // Generate results for exiting early
+                  
+                  // Generate results
                   setTimeout(() => {
-                    handleConversationEnd(conversationMetrics.messageCount, 'exited_early')
+                    handleConversationEnd(currentMessageCount, outcome)
                   }, 500)
                 }}
               >
@@ -1508,9 +1875,54 @@ This approach helps you return from vacation more refreshed and actually more pr
               </div>
               <button 
                 className={styles.callButton}
-                onClick={() => {
-                  // User chose to make the call - they gave in
-                  handleConversationEnd(conversationMetrics.messageCount, 'gave_in')
+                onClick={async () => {
+                  // User chose to make the call - analyze their sentiment first
+                  const finalMessageCount = conversationMetrics.messageCount
+                  
+                  try {
+                    // Analyze conversation sentiment
+                    const response = await fetch('/api/analyze-conversation', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        messages: messages,
+                        messageCount: finalMessageCount
+                      })
+                    })
+                    
+                    const result = await response.json()
+                    const sentiment = result.sentiment || 'reluctant_but_kind'
+                    
+                    console.log('📊 Conversation sentiment:', sentiment)
+                    
+                    // Close iMessage interface
+                    setShowIMessage(false)
+                    setMessages([])
+                    
+                    setConversationMetrics({
+                      messageCount: 0,
+                      startTime: 0,
+                      outcome: sentiment, // Use sentiment instead of 'gave_in'
+                      responseTimes: [],
+                      hasSeenBossResponse: false
+                    })
+                    
+                    // Generate results based on sentiment
+                    handleConversationEnd(finalMessageCount, sentiment)
+                  } catch (error) {
+                    console.error('Error analyzing conversation:', error)
+                    // Fallback to old behavior
+                    setShowIMessage(false)
+                    setMessages([])
+                    setConversationMetrics({
+                      messageCount: 0,
+                      startTime: 0,
+                      outcome: 'reluctant_but_kind',
+                      responseTimes: [],
+                      hasSeenBossResponse: false
+                    })
+                    handleConversationEnd(finalMessageCount, 'reluctant_but_kind')
+                  }
                 }}
               >
                 📞
