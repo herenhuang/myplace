@@ -127,6 +127,7 @@ interface ElevateState {
   archetype: string
   explanation: string
   resultsPage: 'card' | 'explanation'
+  userChoice: string
   timestamp: number
 }
 
@@ -145,6 +146,9 @@ export default function ElevateSimulation() {
   const [previousResponses, setPreviousResponses] = useState<string[]>([])
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null)
   const [isImageLoading, setIsImageLoading] = useState(false)
+  
+  // User choice tracking
+  const [userChoice, setUserChoice] = useState<string>('')
   
   // Results state
   const [archetype, setArchetype] = useState<string>('')
@@ -203,6 +207,7 @@ export default function ElevateSimulation() {
       archetype,
       explanation,
       resultsPage,
+      userChoice,
       timestamp: Date.now()
     }
     
@@ -264,6 +269,7 @@ export default function ElevateSimulation() {
       setArchetype(savedState.archetype)
       setExplanation(savedState.explanation)
       setResultsPage(savedState.resultsPage || 'card')
+      setUserChoice(savedState.userChoice || '')
       setStepStartTime(Date.now()) // Reset timer
     } else {
       // No saved state or back at welcome, initialize fresh session
@@ -278,7 +284,7 @@ export default function ElevateSimulation() {
     if (screenState !== 'welcome') {
       saveState()
     }
-  }, [screenState, currentStepNumber, currentStep, previousResponses, archetype, explanation, backgroundImageUrl, sessionId, dbSessionId, resultsPage, saveState])
+  }, [screenState, currentStepNumber, currentStep, previousResponses, archetype, explanation, backgroundImageUrl, sessionId, dbSessionId, resultsPage, userChoice, saveState])
 
   const startSimulation = async () => {
     setIsLoading(true)
@@ -339,6 +345,40 @@ export default function ElevateSimulation() {
     }
   }
 
+  const handleDeleteChoice = () => {
+    // Track the user's choice
+    setUserChoice('Delete')
+    
+    // Skip directly to results with The Poster archetype
+    setArchetype('The Poster')
+    
+    // Create custom explanation for Delete choice
+    const deleteExplanation = `# The Poster
+
+You deleted the message without reading or responding. This shows you prioritize your personal time and set clear boundaries with work.
+
+## Your Choice
+
+Research shows that only **38%** of people would delete a work message during vacation without responding. You're part of a group that values work-life balance and isn't afraid to protect their time off.
+
+## What This Reveals
+
+Your quick decision to delete shows you:
+- **Protect your boundaries** - You don't let work intrude on personal time
+- **Trust your instincts** - You made a decisive choice without overthinking
+- **Value presence** - You prioritize being fully present during your vacation
+
+## Your Mindset
+
+While others might feel guilty or anxious about ignoring work messages, you understand that true rest requires disconnecting. You've learned that urgent rarely means emergency, and most work "crises" resolve themselves.
+
+This approach helps you return from vacation more refreshed and actually more productive in the long run.`
+
+    setExplanation(deleteExplanation)
+    setScreenState('results')
+    setResultsPage('card')
+  }
+
   const resetSimulation = () => {
     // Clear saved state from localStorage
     clearSavedState()
@@ -353,6 +393,7 @@ export default function ElevateSimulation() {
     setExplanation('')
     setAnalysisError('')
     setResultsPage('card')
+    setUserChoice('')
     const sid = getOrCreateSessionId()
     setSessionId(sid)
   }
@@ -1205,7 +1246,7 @@ export default function ElevateSimulation() {
                   e.preventDefault();
                   e.stopPropagation();
                   console.log('Delete button clicked');
-                  handleChoiceSelect('Delete the notification');
+                  handleDeleteChoice();
                 }}
                 className={styles.notificationButton}
                 disabled={isLoading}
