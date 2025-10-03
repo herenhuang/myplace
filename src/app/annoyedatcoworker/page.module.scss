@@ -511,7 +511,11 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
     animation: fadeUp 0.5s ease-in-out;
 
-    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
 
     .resultTagline{
         font-size: 16px;
@@ -522,6 +526,39 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         width: 80%;
         color: rgba(130, 44, 44, .6);
     }
+}
+
+.modelImage {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    animation: fadeUp 0.6s ease-in-out 0.1s both;
+}
+
+.modelName {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: var(--font-instrument-serif);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: rgb(130, 44, 44);
+    text-align: center;
+    animation: fadeUp 0.6s ease-in-out 0.2s both;
+}
+
+.modelTagline {
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--font-lora);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: rgba(130, 44, 44, .7);
+    text-align: center;
+    animation: fadeUp 0.6s ease-in-out 0.3s both;
 }
 
 .markdownContent{

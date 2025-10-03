@@ -93,6 +93,119 @@ export async function recordStep(
   }
 }
 
+async function generateQuizImage(prompt: string): Promise<string | null> {
+  try {
+    console.log('[SERVER] 🎨 generateQuizImage called with prompt:', prompt.substring(0, 60) + '...')
+    
+    if (!process.env.GOOGLE_API_KEY) {
+      console.error('[SERVER] ❌ [IMAGE] Google API key not found')
+      return null
+    }
+    
+    console.log('[SERVER] ✅ Google API key found, initializing...')
+    const { GoogleGenerativeAI } = await import('@google/generative-ai')
+    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY)
+    // Use the image generation preview model (same as Elevate)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-image-preview' })
+    console.log('[SERVER] 🤖 Model initialized: gemini-2.5-flash-image-preview')
+
+    const imagePrompt = `Create a vibrant, abstract 3D illustration: ${prompt}
+
+Style:
+- Warm orange/coral gradient tones
+- Minimalist geometric shapes
+- Clean, modern, tech aesthetic
+- Soft lighting, depth
+- Professional but playful`
+
+    console.log('[SERVER] 📤 Sending request to Gemini...')
+    const result = await model.generateContent([imagePrompt])
+    console.log('[SERVER] 📥 Response received from Gemini')
+    
+    const response = result.response
+    const parts = response.candidates?.[0]?.content?.parts
+    
+    console.log('[SERVER] 🔍 Parts count:', parts?.length || 0)
+    const imagePart = parts?.find((p) => 'inlineData' in (p as any))
+    
+    if (imagePart?.inlineData) {
+      const { data: base64Data, mimeType } = imagePart.inlineData
+      console.log('[SERVER] ✅ Image data found! Size:', base64Data.length, 'Type:', mimeType)
+      return `data:${mimeType || 'image/png'};base64,${base64Data}`
+    }
+
+    console.log('[SERVER] ⚠️ No inlineData found in response')
+    return null
+  } catch (error) {
+    console.error('[SERVER] ❌ [IMAGE] Error:', error)
+    return null
+  }
+}
+
+export async function generateBackgroundImage(stepNumber: number) {
+  try {
+    console.log(`[SERVER] 🎨 Generating background for step ${stepNumber}`)
+    const prompts: Record<number, string> = {
+      1: "A person made of flowing digital particles standing at a crossroads between different glowing paths, representing choice and personality discovery",
+      3: "Abstract split personality visualization - one side organized patterns, other side chaotic creativity, blending in the middle with warm gradients",
+      5: "A figure surrounded by floating question marks transforming into lightbulbs, representing self-discovery and insight",
+      7: "Multiple abstract personas or masks floating and merging together, representing the final stages of personality analysis"
+    }
+
+    const prompt = prompts[stepNumber]
+    if (!prompt) {
+      console.log(`[SERVER] ⚠️ No prompt for step ${stepNumber}`)
+      return { success: true, imageUrl: null }
+    }
+
+    console.log(`[SERVER] 📝 Prompt: "${prompt}"`)
+    const imageUrl = await generateQuizImage(prompt)
+    console.log(`[SERVER] ${imageUrl ? '✅' : '❌'} Image generated: ${imageUrl ? 'Yes' : 'No'}`)
+    return { success: true, imageUrl }
+  } catch (error) {
+    console.error('[SERVER] ❌ Error generating background:', error)
+    return { success: true, imageUrl: null }
+  }
+}
+
+export async function generateModelImage(modelName: string) {
+  try {
+    // Create highly specific prompts based on each model's known characteristics
+    const modelLower = modelName.toLowerCase()
+    
+    let specificPrompt = ''
+    
+    if (modelLower.includes('gpt') || modelLower.includes('chatgpt')) {
+      specificPrompt = "A wise, friendly glowing orb with rainbow sparkles and speech bubbles, representing versatile communication and helpful problem-solving"
+    } else if (modelLower.includes('claude')) {
+      specificPrompt = "A thoughtful, analytical figure made of flowing text and structured diagrams, representing careful reasoning and detailed explanations"
+    } else if (modelLower.includes('gemini')) {
+      specificPrompt = "A multifaceted crystalline structure with multiple perspectives and colors, representing multimodal thinking and creative flexibility"
+    } else if (modelLower.includes('llama')) {
+      specificPrompt = "A warm, approachable llama silhouette made of open-source code patterns and community connections, representing grassroots power"
+    } else if (modelLower.includes('mistral')) {
+      specificPrompt = "A swift, elegant wind pattern flowing through efficient geometric shapes, representing speed and European sophistication"
+    } else if (modelLower.includes('perplexity')) {
+      specificPrompt = "A magnifying glass merging with search beams and fact-checking symbols, representing research and truth-seeking"
+    } else if (modelLower.includes('dall-e') || modelLower.includes('dalle')) {
+      specificPrompt = "A surreal artist's palette exploding with impossible dreamlike imagery and creative chaos"
+    } else if (modelLower.includes('stable diffusion')) {
+      specificPrompt = "A community of artists collaborating with flowing paint and pixels, representing open creative power"
+    } else if (modelLower.includes('midjourney')) {
+      specificPrompt = "A mystical portal to fantastical artistic realms with ethereal beauty and creative mastery"
+    } else {
+      // Generic fallback - but try to capture the essence
+      specificPrompt = `An abstract representation of ${modelName}'s unique personality - whether it's creative chaos, methodical precision, friendly helpfulness, or analytical depth`
+    }
+
+    const imageUrl = await generateQuizImage(specificPrompt)
+    return { success: true, imageUrl }
+  } catch (error) {
+    console.error('Error generating model image:', error)
+    return { success: true, imageUrl: null }
+  }
+}
+
 export async function analyzeModel(sessionId: string) {
   const supabase = await createClient()
   

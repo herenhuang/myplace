@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
-import { startSession, recordStep, analyzeModel, type StepData } from './actions'
+import { startSession, recordStep, analyzeModel, generateBackgroundImage, generateModelImage, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
 
@@ -135,8 +135,10 @@ interface QuizState {
   currentStepNumber: number
   currentStep: Step | null
   previousResponses: string[]
+  backgroundImageUrl: string | null
   aiModel: string
   explanation: string
+  modelImageUrl: string | null
   timestamp: number
 }
 
@@ -157,6 +159,12 @@ export default function AIModelQuiz() {
   const [aiModel, setAiModel] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
+  
+  // Image state
+  const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null)
+  const [modelImageUrl, setModelImageUrl] = useState<string | null>(null)
+  const [isImageLoading, setIsImageLoading] = useState(false)
+  const [resultsPage, setResultsPage] = useState<'card' | 'explanation'>('card')
   
   const choicesContainerRef = useRef<HTMLDivElement>(null)
   
@@ -187,8 +195,10 @@ export default function AIModelQuiz() {
       currentStepNumber,
       currentStep,
       previousResponses,
+      backgroundImageUrl,
       aiModel,
       explanation,
+      modelImageUrl,
       timestamp: Date.now()
     }
     
@@ -197,7 +207,7 @@ export default function AIModelQuiz() {
     } catch (error) {
       console.error('Failed to save state to localStorage:', error)
     }
-  }, [screenState, sessionId, dbSessionId, currentStepNumber, currentStep, previousResponses, aiModel, explanation])
+  }, [screenState, sessionId, dbSessionId, currentStepNumber, currentStep, previousResponses, backgroundImageUrl, aiModel, explanation, modelImageUrl])
 
   // Load state from localStorage
   const loadState = (): QuizState | null => {
@@ -246,8 +256,10 @@ export default function AIModelQuiz() {
       setCurrentStepNumber(savedState.currentStepNumber)
       setCurrentStep(savedState.currentStep)
       setPreviousResponses(savedState.previousResponses)
+      setBackgroundImageUrl(savedState.backgroundImageUrl)
       setAiModel(savedState.aiModel)
       setExplanation(savedState.explanation)
+      setModelImageUrl(savedState.modelImageUrl)
       setStepStartTime(Date.now()) // Reset timer
     } else {
       // No saved state or back at welcome, initialize fresh session
@@ -262,13 +274,21 @@ export default function AIModelQuiz() {
     if (screenState !== 'welcome') {
       saveState()
     }
-  }, [screenState, currentStepNumber, currentStep, previousResponses, aiModel, explanation, sessionId, dbSessionId, saveState])
+  }, [screenState, currentStepNumber, currentStep, previousResponses, backgroundImageUrl, aiModel, explanation, modelImageUrl, sessionId, dbSessionId, saveState])
+
+  // Debug: Log when background image URL changes
+  useEffect(() => {
+    console.log('🖼️ Background image URL changed:', backgroundImageUrl ? 'Has image' : 'No image')
+  }, [backgroundImageUrl])
 
   const startQuiz = async () => {
+    console.log('▶️ START QUIZ CLICKED!')
     setIsLoading(true)
     
     try {
+      console.log('📡 Calling startSession...')
       const result = await startSession(sessionId, 'ai-model-quiz')
+      console.log('📡 Session result:', result)
       
       if (result.error) {
         console.error(result.error)
@@ -277,6 +297,7 @@ export default function AIModelQuiz() {
       }
       
       if (result.success && result.sessionId) {
+        console.log('✅ Session created successfully!')
         setDbSessionId(result.sessionId)
         const firstStep = PREDEFINED_STEPS[1]
         setCurrentStepNumber(1)
@@ -284,7 +305,27 @@ export default function AIModelQuiz() {
         setStepStartTime(Date.now())
         
         // Move to quiz screen
+        console.log('🎬 Setting screen state to quiz')
         setScreenState('quiz')
+        
+        // Generate first background image
+        setIsImageLoading(true)
+        console.log('🎨 About to call generateBackgroundImage(1)...')
+        generateBackgroundImage(1).then((imgResult) => {
+          console.log('🎨 generateBackgroundImage promise resolved!')
+          console.log('🎨 imgResult:', imgResult)
+          console.log('🎨 Background result:', { success: imgResult.success, hasUrl: !!imgResult.imageUrl })
+          if (imgResult.success && imgResult.imageUrl) {
+            console.log('✅ Setting background image URL')
+            setBackgroundImageUrl(imgResult.imageUrl)
+          } else {
+            console.log('⚠️ No background image generated')
+          }
+          setIsImageLoading(false)
+        }).catch((err) => {
+          console.error('❌ Background generation error:', err)
+          setIsImageLoading(false)
+        })
       }
     } catch (error) {
       console.error('Error starting quiz:', error)
@@ -306,9 +347,26 @@ export default function AIModelQuiz() {
       }
       
       if (result.success) {
-        setAiModel(result.model || '')
+        const modelName = result.model || ''
+        setAiModel(modelName)
         setExplanation(result.explanation || '')
-        setScreenState('results')
+        
+        // Generate model-specific image for the card
+        if (modelName) {
+          setIsImageLoading(true)
+          generateModelImage(modelName).then((imgResult) => {
+            if (imgResult.success && imgResult.imageUrl) {
+              setModelImageUrl(imgResult.imageUrl)
+            }
+            setIsImageLoading(false)
+            setScreenState('results')
+          }).catch(() => {
+            setIsImageLoading(false)
+            setScreenState('results')
+          })
+        } else {
+          setScreenState('results')
+        }
       }
     } catch (err) {
       console.error('Error analyzing model:', err)
@@ -325,6 +383,9 @@ export default function AIModelQuiz() {
     setCurrentStepNumber(0)
     setCurrentStep(null)
     setPreviousResponses([])
+    setBackgroundImageUrl(null)
+    setModelImageUrl(null)
+    setResultsPage('card')
     setAiModel('')
     setExplanation('')
     setAnalysisError('')
@@ -370,6 +431,25 @@ export default function AIModelQuiz() {
         setCurrentStepNumber(nextStepNumber)
         setStepStartTime(Date.now())
         window.scrollTo({ top: 0, behavior: 'smooth' })
+        
+        // Generate new background image at steps 3, 5, 7
+        if ([3, 5, 7].includes(nextStepNumber)) {
+          setIsImageLoading(true)
+          console.log(`🎨 Generating background for step ${nextStepNumber}...`)
+          generateBackgroundImage(nextStepNumber).then((imgResult) => {
+            console.log(`🎨 Background result for step ${nextStepNumber}:`, { success: imgResult.success, hasUrl: !!imgResult.imageUrl })
+            if (imgResult.success && imgResult.imageUrl) {
+              console.log(`✅ Setting background image URL for step ${nextStepNumber}`)
+              setBackgroundImageUrl(imgResult.imageUrl)
+            } else {
+              console.log(`⚠️ No background image generated for step ${nextStepNumber}`)
+            }
+            setIsImageLoading(false)
+          }).catch((err) => {
+            console.error(`❌ Background generation error for step ${nextStepNumber}:`, err)
+            setIsImageLoading(false)
+          })
+        }
       }
     } catch (error) {
       console.error('Error processing choice:', error)
@@ -568,6 +648,40 @@ export default function AIModelQuiz() {
           )
         }
 
+        // Results Page 1: Card Display
+        if (resultsPage === 'card') {
+          return (
+            <div className={styles.textContainer}>
+              <div className={styles.resultHeader}>
+                <div className="text-center mt-10 px-8 box-border">
+                  <div className={styles.resultCard}>
+                    {modelImageUrl && (
+                      <div 
+                        className={styles.modelImage}
+                        style={{ backgroundImage: `url(${modelImageUrl})` }}
+                      />
+                    )}
+                    <div className={styles.modelName}>
+                      {aiModel}
+                    </div>
+                    <div className={styles.modelTagline}>
+                      Your AI personality match
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setResultsPage('explanation')}
+                  className={styles.appButton}
+                >
+                  <span>See Why →</span>
+                </button>
+              </div>
+            </div>
+          )
+        }
+
+        // Results Page 2: Explanation
         return (
           <div className={styles.textContainer}>
             <div className={styles.resultHeader}>
@@ -618,10 +732,13 @@ export default function AIModelQuiz() {
             <div 
               className={styles.imageContainer} 
               style={{ 
-                backgroundImage: screenState === 'welcome' || screenState === 'quiz'
+                backgroundImage: screenState === 'quiz'
+                  ? `url(${backgroundImageUrl || '/elevate/orange.png'})`
+                  : screenState === 'welcome'
                   ? `url(/elevate/orange.png)`
                   : 'none'
               }}
+              data-image-loading={isImageLoading}
             >
               {renderContent()}
               
