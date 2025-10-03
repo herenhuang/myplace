@@ -208,7 +208,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </div>
         <div className={`${styles.gameCard} transform rotate-2`}>
           <div className={styles.wiggle}>
-            <a href="https://work-sim.netlify.app/remix-simulation/intro" target="_blank" rel="noopener noreferrer" className="block group">
+            <a href="/remix-simulation/intro" target="_blank" rel="noopener noreferrer" className="block group">
               <div className={styles.gameCardInner}>
                 <figure style={{ clipPath: 'url(#clip-pattern)' }}>
                   <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-blue-400 to-blue-600 group-hover:scale-110 w-full cursor-pointer' />
@@ -310,7 +310,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </div>
         <div className={`${styles.gameCard} transform -rotate-2`}>
           <div className={styles.wiggle}>
-            <a href="https://work-sim.netlify.app/workplace-simulation" target="_blank" rel="noopener noreferrer" className="block group">
+            <a href="/workplace-simulation" target="_blank" rel="noopener noreferrer" className="block group">
               <div className={styles.gameCardInner}>
                 <figure style={{ clipPath: 'url(#clip-pattern7)' }}>
                   <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-red-400 to-red-600 group-hover:scale-110 w-full cursor-pointer' />
