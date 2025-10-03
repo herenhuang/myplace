@@ -1,0 +1,160 @@
+@keyframes wiggle {
+  0% { transform: rotate(0deg); }
+  15% { transform: rotate(5deg); }
+  30% { transform: rotate(-5deg); }
+  45% { transform: rotate(3deg); }
+  60% { transform: rotate(-3deg); }
+  75% { transform: rotate(1deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.wiggle:hover {
+  animation: wiggle 0.4s ease-out;
+}
+
+.accentsGroup svg .accents {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.accentsGroup:hover svg .accents,
+.accentsGroup:active svg .accents {
+  opacity: 1;
+}
+
+.gameCard {
+  width: 120px;
+  height: fit-content;
+  margin: 0 auto;
+  position: relative;
+  filter: drop-shadow(-4px 12px 16px rgba(0, 0, 0, 0.2));
+  
+  figure {
+    position: relative;
+  }
+
+  @media (min-width: 768px) {
+    width: 200px;
+  }
+}
+
+.gameCardInner {
+  position: relative;
+}
+
+.gameContent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gameTitle {
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: #111827;
+  margin-bottom: 0.25rem;
+  text-align: center;
+
+  @media (min-width: 768px) {
+    font-size: 1.25rem;
+  }
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  background-color: white;
+  color: black;
+  padding: 3px 8px;
+  border-radius: 24px;   
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: -0.25px;
+  text-transform: uppercase;
+  border: 1px solid black;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (min-width: 768px) {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+.newBadge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.375rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @media (min-width: 768px) {
+    top: -0.5rem;
+    right: -0.5rem;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+.voteButton {
+  width: fit-content;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+  display: none;
+  
+  &.voted {
+    background-color: #dcfce7;
+    color: #15803d;
+    cursor: not-allowed;
+  }
+  
+  &.default {
+    background-color: #f3f4f6;
+    color: #374151;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: #e5e7eb;
+    }
+  }
+  
+  &.loading {
+    background-color: #fafafa;
+    cursor: not-allowed;
+  }
+}
+
+.voteButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+
