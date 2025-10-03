@@ -1057,7 +1057,7 @@ export default function ElevateSimulation() {
                     <ElevateCard
                       archetype={archetype}
                       tagline={archetypeInfo?.tagline || ''}
-                      size="large"
+                      dimension={280}
                       className="mx-auto"
                     />
                   </div>
