@@ -51,20 +51,19 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
 				<UserButton user={user} />
 			</div>
 
-      <div className='flex flex-col items-center justify-start gap-12 md:flex-row md:justify-center w-full pb-8 md:pb-0'>
+      <div className='flex flex-col items-center justify-start gap-12 md:flex-row md:justify-center w-full pb-8 md:pb-0 mx-auto'>
 
-
-        <div className='flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-12 md:pb-0 gap-12 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)]'>
-          <h1 className='text-5xl font-bold text-center tracking-tight leading-[90%] w-[360px]'>
-            Personality quizzes you can play
+        <div className='flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-12 md:pb-0 gap-4 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)]'>
+          <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={500} height={300} className='w-40 h-auto object-contain' />
+          <h1 className='text-5xl font-bold text-center tracking-tight leading-[90%] w-[360px] mb-8'>
+            Real, Interactive Simulations.
           </h1>
           <div className="">
             <UserButton user={user} />
           </div>
         </div>
        
-
-        <div className='mt-5 md:mt-10 flex-1 w-full'>
+        <div className='mt-5 md:mt-10 w-fit'>
             <GamesSection />
         </div>
       </div>
