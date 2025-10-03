@@ -28,7 +28,7 @@ type ScreenState = 'welcome' | 'simulation' | 'analyzing' | 'results'
 
 // Configuration
 const ENABLE_IMAGE_GENERATION = false // Toggle to enable/disable AI image generation
-const TOTAL_STEPS = 5 // 5 steps for Genshin quiz (step 6 will be conclusion)
+const TOTAL_STEPS = 6 // 5 question steps + 1 conclusion step
 
 // Random backgrounds for quiz steps
 const RANDOM_BACKGROUNDS = [
@@ -718,44 +718,17 @@ export default function GenshinQuiz() {
 
                   {currentStep.allowCustomInput && (
                     <>
-                    {/* Blobbert positioned above custom input */}
+                    {/* Blobbert positioned on LEFT, above custom input */}
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'flex-end',
+                      justifyContent: 'flex-start',
                       gap: '8px',
-                      marginBottom: '8px',
-                      position: 'relative'
+                      marginBottom: '4px',
+                      position: 'relative',
+                      paddingLeft: '24px'
                     }}>
-                      {/* Speech bubble */}
-                      {(shouldShowSpeechBubble() || showClickMessage) && (
-                        <div style={{
-                          position: 'relative',
-                          backgroundColor: 'white',
-                          borderRadius: '16px',
-                          padding: '8px 12px',
-                          maxWidth: '200px',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          marginRight: '4px'
-                        }}>
-                          <div style={{
-                            fontSize: '11px',
-                            fontWeight: 600,
-                            color: '#666',
-                            marginBottom: '2px'
-                          }}>Blobbert</div>
-                          <p style={{
-                            fontSize: '13px',
-                            margin: 0,
-                            color: '#333',
-                            lineHeight: 1.3
-                          }}>
-                            {shouldShowSpeechBubble() ? getCurrentTip() : blobbertClickMessage}
-                          </p>
-                        </div>
-                      )}
-                      
-                      {/* Clickable Blobbert */}
+                      {/* Clickable Blobbert - LEFT side */}
                       <div 
                         onClick={handleBlobbertClick}
                         style={{
@@ -779,6 +752,34 @@ export default function GenshinQuiz() {
                           style={{ transform: 'scaleX(-1)' }}
                         />
                       </div>
+                      
+                      {/* Speech bubble - to the right of Blobbert */}
+                      {(shouldShowSpeechBubble() || showClickMessage) && (
+                        <div style={{
+                          position: 'relative',
+                          backgroundColor: 'white',
+                          borderRadius: '16px',
+                          padding: '8px 12px',
+                          maxWidth: '200px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          marginLeft: '4px'
+                        }}>
+                          <div style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: '#666',
+                            marginBottom: '2px'
+                          }}>Blobbert</div>
+                          <p style={{
+                            fontSize: '13px',
+                            margin: 0,
+                            color: '#333',
+                            lineHeight: 1.3
+                          }}>
+                            {shouldShowSpeechBubble() ? getCurrentTip() : blobbertClickMessage}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div 

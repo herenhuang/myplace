@@ -80,6 +80,11 @@ export async function recordStep(
       console.error('❌ [RECORD] Step data is required')
       return { error: 'Invalid step data. Please try again.' }
     }
+    
+    console.log(`\n📝 [USER INPUT] Step ${stepData.stepNumber}:`)
+    console.log(`   Question: "${stepData.question}"`)
+    console.log(`   User Response: "${stepData.userResponse}"`)
+    
     // Get current session
     const { data: sessionData, error: fetchError } = await supabase
       .from('sessions')
@@ -271,82 +276,90 @@ function getStepPrompt(stepNumber: number, steps: StepData[]): string {
 Writing Instructions:
 - Write in second person ("you")
 - Create an immersive Genshin Impact scenario (2-3 sentences, 120-180 chars)
+- IMPORTANT: Reference or build upon their previous answer naturally in the scenario
 - Don't reference game mechanics, focus on personality and values
 - If the user's input is inappropriate or unclear, pivot to a generic Teyvat exploration scenario
 - Generate a question that reveals how they approach challenges or decisions
+- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
 
 Format:
 {
   "text": "2-3 sentences setting up a Genshin-themed scenario that builds on their first answer",
   "question": "A question about their approach or values (60-100 chars)",
   "choices": [
-    "🌟 First choice (~25 chars)",
-    "⚔️ Second choice (~25 chars)",
-    "🎭 Third choice (~25 chars)"
+    "🌟 First choice (~25-30 chars)",
+    "⚔️ Second choice (~25-30 chars)",
+    "🎭 Third choice (~25-30 chars)"
   ]
 }
 
 Generate the next scenario, question, and choices.`
   } else if (stepNumber === 3) {
-    return `Create a scenario about handling conflict or adversity in Teyvat.${contextSection}
+    return `Create a scenario about handling conflict or adversity in Teyvat that naturally continues from their previous choices.${contextSection}
 
 Writing Instructions:
 - Present a challenge or difficult decision
 - 2-3 sentences describing the conflict
+- IMPORTANT: Acknowledge their previous choices/actions in the scenario setup
 - Question should explore their conflict resolution style or moral compass
 - Choices should reflect different approaches to handling adversity
+- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
 
 Format:
 {
   "text": "2-3 sentence scenario about conflict or challenge (~150 chars)",
   "question": "Question about their approach to conflict/adversity (60-100 chars)",
   "choices": [
-    "⚔️ Direct/confrontational choice (~25 chars)",
-    "🕊️ Peaceful/diplomatic choice (~25 chars)",
-    "🧠 Strategic/thoughtful choice (~25 chars)"
+    "⚔️ Direct/confrontational (~25-30 chars)",
+    "🕊️ Peaceful/diplomatic (~25-30 chars)",
+    "🧠 Strategic/thoughtful (~25-30 chars)"
   ]
 }
 
 Generate the scenario, question, and choices.`
   } else if (stepNumber === 4) {
-    return `Create a scenario about goals, ambitions, or life philosophy in Teyvat.${contextSection}
+    return `Create a scenario about goals, ambitions, or life philosophy in Teyvat that reflects their journey so far.${contextSection}
 
 Writing Instructions:
 - Explore what drives them and their long-term outlook
 - 2-3 sentences about aspirations or purpose
+- IMPORTANT: Reference their previous journey/choices to make this feel personalized
 - Question should reveal their priorities and values
 - Choices should reflect different life philosophies
+- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
 
 Format:
 {
   "text": "2-3 sentence scenario about ambitions/purpose (~150 chars)",
   "question": "Question about their goals or philosophy (60-100 chars)",
   "choices": [
-    "🌟 Idealistic/aspirational choice (~25 chars)",
-    "💼 Practical/pragmatic choice (~25 chars)",
-    "🎨 Creative/expressive choice (~25 chars)"
+    "🌟 Idealistic/aspirational (~25-30 chars)",
+    "💼 Practical/pragmatic (~25-30 chars)",
+    "🎨 Creative/expressive (~25-30 chars)"
   ]
 }
 
 Generate the scenario, question, and choices.`
   } else if (stepNumber === 5) {
-    return `Create the final question that solidifies their nation alignment.${contextSection}
+    return `Create the final question that solidifies their nation alignment, building on their entire journey.${contextSection}
 
 Writing Instructions:
 - This is the final question - make it count
 - 2-3 sentences presenting a defining moment or choice
+- CRITICAL: Explicitly reference their journey and previous choices to create a sense of culmination
 - Question should explore their core identity or deepest values
 - Choices should clearly differentiate between the seven nations' philosophies
 - Build on ALL their previous answers for maximum personalization
+- Generate EXACTLY 3 choices, each ultra-short (~25-30 chars)
 
 Format:
 {
-  "text": "2-3 sentence final scenario that feels climactic (~150 chars)",
+  "text": "2-3 sentence final scenario that feels climactic and personal (~150 chars)",
   "question": "Final question about core values/identity (60-100 chars)",
   "choices": [
-    "✨ First defining choice (~25 chars)",
-    "⚡ Second defining choice (~25 chars)",
-    "🌊 Third defining choice (~25 chars)"
+    "✨ First defining choice (~25-30 chars)",
+    "⚡ Second defining choice (~25-30 chars)",
+    "🌊 Third defining choice (~25-30 chars)"
   ]
 }
 
@@ -356,16 +369,17 @@ Generate the final scenario, question, and choices.`
 
 Writing Instructions:
 - Write 2-3 sentences in second person
-- Reflect on their overall journey and choices
+- CRITICAL: Acknowledge their specific journey and key choices they made
+- Reflect on their overall journey and how their choices revealed their character
 - Create a sense of completion and anticipation
 - Don't reveal their nation - that comes next
-- Make it feel personal based on their actual choices
+- Make it feel deeply personal based on their actual choices
 - DO NOT include a question
 - This is JUST a narrative conclusion
 
 Format (JSON only):
 {
-  "text": "2-3 reflective sentences wrapping up their journey (~150-200 chars)"
+  "text": "2-3 reflective sentences wrapping up their journey, referencing their actual choices (~150-200 chars)"
 }
 
 IMPORTANT: Return ONLY the text field. No question field. No choices field. Just text.`
@@ -404,6 +418,15 @@ export async function generateNextStep(
 
     const steps = sessionData.data?.steps || []
     
+    console.log(`\n🎯 [STEP GEN START] Generating Step ${currentStep}`)
+    console.log(`   Previous steps count: ${steps.length}`)
+    if (steps.length > 0) {
+      console.log(`   Previous user responses:`)
+      steps.forEach((step: StepData, idx: number) => {
+        console.log(`     ${idx + 1}. Q: "${step.question}" → A: "${step.userResponse}"`)
+      })
+    }
+    
     // Get step-specific prompt and combine with base system prompt
     const stepSpecificPrompt = getStepPrompt(currentStep, steps)
 
@@ -424,13 +447,30 @@ export async function generateNextStep(
       )
     ])
 
-    const response = (chatCompletion.content[0] as { text: string })?.text || '{}'
+    let response = (chatCompletion.content[0] as { text: string })?.text || '{}'
+    
+    // Strip markdown code blocks if present (AI sometimes wraps JSON in ```json ... ```)
+    response = response.trim()
+    if (response.startsWith('```json')) {
+      response = response.replace(/^```json\s*/, '').replace(/\s*```$/, '')
+    } else if (response.startsWith('```')) {
+      response = response.replace(/^```\s*/, '').replace(/\s*```$/, '')
+    }
+    response = response.trim()
+    
+    console.log(`\n🔍 [RAW AI RESPONSE] Step ${currentStep}:`)
+    console.log(response.substring(0, 200) + (response.length > 200 ? '...' : ''))
+    
     const stepContent = JSON.parse(response)
     
-    console.log(`\n📋 [STEP GEN] Step ${currentStep} content generated:`)
-    console.log(`   - Text: "${stepContent.text?.substring(0, 80)}..."`)
-    console.log(`   - Question: "${stepContent.question}"`)
-    console.log(`   - Choices count: ${stepContent.choices?.length || 0}`)
+    console.log(`\n${'='.repeat(80)}`)
+    console.log(`📋 [AI RESPONSE] Step ${currentStep} Generated Content:`)
+    console.log(`${'='.repeat(80)}`)
+    console.log(`Text: "${stepContent.text}"`)
+    console.log(`Question: "${stepContent.question || '(none)'}"`)
+    console.log(`Choices: ${JSON.stringify(stepContent.choices || [])}`)
+    console.log(`Choices count: ${stepContent.choices?.length || 0}`)
+    console.log(`${'='.repeat(80)}\n`)
 
     // Store debug log
     appendDebugLog(sessionId, {
@@ -446,20 +486,33 @@ export async function generateNextStep(
       timestamp: new Date().toISOString()
     }).catch(err => console.error('Debug log append error:', err))
 
-    // Handle step-specific response formats - all steps generate full content for Genshin quiz
-    const result = { 
-        success: true, 
-        text: stepContent.text || '',
-        question: stepContent.question || '',
-        choices: stepContent.choices || []
-    }
+    // Handle step-specific response formats
+    // Step 6 is conclusion only (no question/choices)
+    const result = currentStep === 6
+      ? {
+          success: true,
+          text: stepContent.text || '',
+          question: '', // Explicitly empty for step 6
+          choices: [] // No choices for step 6
+        }
+      : {
+          success: true,
+          text: stepContent.text || '',
+          question: stepContent.question || '',
+          choices: stepContent.choices || []
+        }
     
-    console.log(`\n✅ [STEP GEN] Returning result for step ${currentStep}:`, {
-      success: result.success,
-      hasText: !!result.text,
-      hasQuestion: !!result.question,
-      choicesCount: result.choices.length
-    })
+    console.log(`\n✅ [RETURN TO FRONTEND] Step ${currentStep}:`)
+    console.log(`   - success: ${result.success}`)
+    console.log(`   - text: "${result.text}"`)
+    console.log(`   - question: "${result.question}"`)
+    console.log(`   - choices: ${JSON.stringify(result.choices)}`)
+    console.log(`   - choicesCount: ${result.choices.length}`)
+    if (currentStep === 6) {
+      console.log(`\n⚠️  STEP 6 CHECK:`)
+      console.log(`   - Question should be empty: ${result.question === '' ? '✅ YES' : '❌ NO'}`)
+      console.log(`   - Choices should be empty: ${result.choices.length === 0 ? '✅ YES' : '❌ NO'}`)
+    }
 
     return result
   } catch (error) {
