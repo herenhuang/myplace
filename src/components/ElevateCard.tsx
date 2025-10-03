@@ -7,6 +7,7 @@ interface ElevateCardProps {
   tagline: string;
   dimension?: number; // Width dimension - height calculated from 4:5.5 ratio
   className?: string;
+  imagePath?: string; // Base path for images (e.g., '/genshin' or '/elevate')
 }
 
 // Helper function to format archetype name for icon file
@@ -18,7 +19,8 @@ export default function ElevateCard({
   archetype, 
   tagline, 
   dimension = 200,
-  className = ''
+  className = '',
+  imagePath = '/elevate' // Default to elevate for backwards compatibility
 }: ElevateCardProps) {
   // Calculate height based on 4:5.5 aspect ratio
   const width = dimension;
@@ -37,7 +39,7 @@ export default function ElevateCard({
         width: `${width}px`,
         height: `${height}px`,
         aspectRatio: '4 / 5.5',
-        backgroundImage: 'url(/elevate/card.png)',
+        backgroundImage: `url(${imagePath}/card.png)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
@@ -48,7 +50,7 @@ export default function ElevateCard({
         style={{ padding: `${padding}px` }}
       >
         <Image
-          src={`/elevate/${formatArchetypeForIcon(archetype)}.png`}
+          src={`${imagePath}/${formatArchetypeForIcon(archetype)}.svg`}
           alt={`${archetype} icon`}
           width={iconSize}
           height={iconSize}
