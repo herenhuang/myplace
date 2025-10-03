@@ -1438,7 +1438,7 @@ This approach helps you return from vacation more refreshed and actually more pr
               <span className={styles.notificationTime}>now</span>
             </div>
             <div className={styles.notificationContent}>
-              urgent! you got time fo...
+              urgent! you got time for a quick call? should only be...
             </div>
             <div className={styles.notificationActions}>
               <button 
