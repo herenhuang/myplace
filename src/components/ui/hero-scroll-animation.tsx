@@ -6,6 +6,7 @@ import React, { useRef, forwardRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ImageMask from '@/components/ui/image-mask';
+import GamesSection from '@/components/ui/games-section';
 import type { User } from '@supabase/supabase-js';
 import UserButton from './UserButton';
 
@@ -15,12 +16,22 @@ interface SectionProps {
 }
 
 const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = ({ scrollYProgress, user }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, -5]);
+  
   return (
     <motion.section
-      style={{ scale, rotate }}
-      className='sticky font-semibold top-0 h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-center text-gray-900'
+      style={isMobile ? {} : { scale, rotate }}
+      className='md:sticky font-semibold md:top-0 min-h-screen h-auto md:h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-start md:justify-center text-gray-900 rounded-xl'
     >
       <div className='absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle,#e2e8f0_1px,transparent_1px)] bg-[size:20px_20px]'></div>
       
@@ -40,57 +51,81 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
 				<UserButton user={user} />
 			</div>
 
-      <h1 className='2xl:text-8xl text-5xl px-8 font-bold text-center tracking-tight leading-[120%] relative z-10'>
-        Personality quizzes you can play
-      </h1>
+      <div className='flex flex-col items-center justify-start gap-12 md:flex-row md:justify-center w-full pb-8 md:pb-0'>
+
+
+        <div className='flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-12 md:pb-0 gap-12 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)]'>
+          <h1 className='text-5xl font-bold text-center tracking-tight leading-[90%] w-[360px]'>
+            Personality quizzes you can play
+          </h1>
+          <div className="">
+            <UserButton user={user} />
+          </div>
+        </div>
+       
+
+        <div className='mt-5 md:mt-10 flex-1 w-full'>
+            <GamesSection />
+        </div>
+      </div>
+        
+
     </motion.section>
   );
 };
 
 const Section2: React.FC<Omit<SectionProps, 'user'>> = ({ scrollYProgress }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
   const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
   
 
   return (
     <motion.section
-      style={{ scale, rotate }}
-      className='relative min-h-screen bg-gradient-to-t to-[#1a1919] from-[#06060e] text-white '
+      style={isMobile ? {} : { scale, rotate }}
+      className='relative min-h-screen bg-gradient-to-t to-[#1a1919] from-[#06060e] text-white rounded-xl'
     >
-      <div className='absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]'></div>
+
+      <div className='absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle,#505050,transparent_1px)] bg-[size:20px_20px]'></div>
+
       <article className='container mx-auto relative z-10 pb-12 px-4 md:px-6 lg:px-8'>
-        <h1 className='text-4xl md:text-6xl leading-[110%] pt-20 pb-16 md:pb-20 font-semibold tracking-tight max-w-5xl'>
-          <span className="block sm:inline">Play games, discover your traits</span>
-          <span className="block sm:inline"> and show them off in </span>
-          <Link 
-            href="/welcome" 
-            className="inline-block hover:scale-105 transition-transform duration-200"
-          >
-            <Image 
-              src="/LogoWhite.png" 
-              alt="myPlace Logo" 
-              width={400}
-              height={100}
-              className="inline-block w-48 md:w-72 lg:w-96 h-auto object-contain"
-            />
-          </Link>
-        </h1>
         
-        {/* Image Mask Section */}
-        <div className='mt-20'>
-          <ImageMask />
+        
+      <div className='flex-1 container mx-auto relative z-10 px-4 md:px-6 lg:px-8 pt-32 pb-16'>
+        <div className='max-w-4xl mx-auto'>
+          <div className='text-white text-2xl font-medium leading-8 space-y-12'>
+            <p>We were built for 🎲 play. It&apos;s how kids learn, how friends bond, how we reveal ourselves without even trying.</p>
+            
+            <p>Somewhere along the way, many of us were told to grow up: fill out forms, take tests, polish résumés 📝.</p>
+            <p>But that doesn&apos;t capture who we are. Interviews, personality tests, even social media reflect what we say, not how we act. None of them hold the living record of how we actually show up: in the small choices, under real pressure, over ⏳ time.</p>
+            
+            <p>Now that AI can mimic our words and even fake our work, the one thing it can&apos;t copy is our judgment, our character, the way we move through the world. That&apos;s ours 🧩 to keep. And it&apos;s worth sharing with each other, and with the tools we rely on.</p>
+            <p>A living record of our human edge.</p>
+            
+            <p>If any of that resonates, there&apos;s a place for you here.</p>
+          </div>
         </div>
+      </div>
+
         
         {/* Footer content integrated into games section */}
         <div className='mt-20 text-center border-t border-gray-700 pt-12'>
-          <h1 className='text-3xl md:text-5xl text-white font-semibold mb-8 w-full'>
+          <h1 className='text-4xl tracking-tight text-white font-semibold mb-8 w-full'>
             Let us know what you like by clicking to vote!
           </h1>
-          <p className='text-white text-base mb-8'>
-            <a href="https://tally.so/r/mR91yP" target="_blank" rel="noopener noreferrer" className="hover:underline">
-              contact here
-            </a>
-          </p>
+          <a href="https://tally.so/r/mR91yP" target="_blank" rel="noopener noreferrer" className="hover:underline mx-auto w-fit block">
+            <p className='text-white mb-8 bg-white/10 rounded-full w-fit text-base font-semibold tracking-tight px-5 py-3'>
+                Contact
+            </p>
+          </a>
           <div className='mt-12 mb-8'>
             <Link href="/" className="block hover:scale-105 transition-transform duration-200">
               <Image 
@@ -125,7 +160,7 @@ const Component = forwardRef<HTMLElement, ComponentProps>(({ user }, ref) => {
 
   return (
     <>
-      <main ref={container} className='relative h-[200vh] bg-black'>
+      <main ref={container} className='relative md:h-[200vh] bg-black'>
         <Section1 scrollYProgress={scrollYProgress} user={user} />
         <Section2 scrollYProgress={scrollYProgress} />
       </main>
