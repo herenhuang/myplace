@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { HandleTurnRequest, HandleTurnResponse } from '@/lib/types';
-import { GUARD_RAIL_PROMPT as CRISIS_GUARD_RAIL, ENGINE_PROMPT as CRISIS_ENGINE, QUESTIONS as CRISIS_QUESTIONS } from '@/lib/scenarios/crisis';
-import { GUARD_RAIL_PROMPT as REMIX_GUARD_RAIL, STORY_PROMPT_TURN_1, STORY_PROMPT_TURN_2, STORY_PROMPT_TURN_3, STORY_PROMPT_TURN_4, INTENT_CLASSIFIER_PROMPT as REMIX_CLASSIFICATION, QUESTIONS as REMIX_QUESTIONS } from '@/lib/scenarios/remix';
+import { QUESTIONS as CRISIS_QUESTIONS, GUARD_RAIL_PROMPT as CRISIS_GUARD_RAIL, ENGINE_PROMPT as CRISIS_ENGINE } from '@/lib/scenarios/crisis';
+import { STORY_PROMPT_TURN_1, STORY_PROMPT_TURN_2, STORY_PROMPT_TURN_3, STORY_PROMPT_TURN_4, QUESTIONS as REMIX_QUESTIONS, GUARD_RAIL_PROMPT as REMIX_GUARD_RAIL, INTENT_CLASSIFIER_PROMPT as REMIX_CLASSIFICATION } from '@/lib/scenarios/remix';
 
 export async function POST(request: NextRequest): Promise<NextResponse<HandleTurnResponse>> {
   try {
@@ -26,17 +26,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<HandleTur
       return turn > 0 && turn <= questions.length ? questions[turn - 1] : null; // turn-1 because they're responding to the previous question
     };
 
-    const currentQuestion = getCurrentQuestion(scenarioType, currentTurn);
-
-    // Get the appropriate scenario prompts
     const getScenarioPrompts = (type: string) => {
-      switch (type) {
-        case 'crisis':
-          return { guardRail: CRISIS_GUARD_RAIL, engine: CRISIS_ENGINE };
-        case 'remix':
-          return { guardRail: REMIX_GUARD_RAIL, classification: REMIX_CLASSIFICATION };
-        default:
-          throw new Error(`Unknown scenario type: ${type}`);
+      if (type === 'crisis') {
+        return {
+          guardRail: CRISIS_GUARD_RAIL,
+          engine: CRISIS_ENGINE
+        };
+      } else { // 'remix'
+        return {
+          guardRail: REMIX_GUARD_RAIL,
+          classification: REMIX_CLASSIFICATION
+        };
       }
     };
 
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<HandleTur
     // Handle different prompt structures
     if (scenarioType === 'remix') {
       // Step 1: Classification first
-      const classificationPrompt = (scenarioPrompts as any).classification(userInput);
+      const classificationPrompt = (scenarioPrompts as { classification: (userInput: string) => string; }).classification(userInput);
       
       const classificationResponse = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<HandleTur
       
     } else {
       // Single-step process for crisis (existing logic)
-      const enginePrompt = (scenarioPrompts as any).engine(userInput, trimmedStorySoFar, getCurrentQuestion(scenarioType, currentTurn));
+      const enginePrompt = (scenarioPrompts as { engine: (userInput: string, storySoFar: string, question: string | null) => string; }).engine(userInput, trimmedStorySoFar, getCurrentQuestion(scenarioType, currentTurn));
 
       const engineResponse = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<HandleTur
       let parsedResult;
       try {
         parsedResult = JSON.parse(engineResult);
-      } catch (error) {
+      } catch {
         throw new Error('Failed to parse AI response as JSON');
       }
 
@@ -190,8 +190,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<HandleTur
 
   } catch (error) {
     console.error('=== HANDLE TURN ERROR ===');
-    console.error('Error type:', error?.constructor?.name);
-    console.error('Error message:', (error as any)?.message || 'No message available');
+    console.error('Error type:', (error as Error)?.constructor?.name);
+    console.error('Error message:', (error as Error)?.message || 'No message available');
     console.error('Full error:', error);
     console.error('=== END HANDLE TURN ERROR ===');
     

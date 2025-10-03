@@ -49,7 +49,7 @@ export default function FullscreenInstagram({ senderName, messages, onSendMessag
     messages.forEach((_, index) => {
       showMessage(index)
     })
-  }, [messages.length])
+  }, [messages])
 
   // Countdown timer effect
   useEffect(() => {

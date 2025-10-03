@@ -22,19 +22,6 @@ const SUBTRAIT_DEFINITIONS = {
   Diligence: "The Diligence scale assesses a tendency to work hard. Low scorers have little self-discipline and are not strongly motivated to achieve, whereas high scorers have a strong 'work ethic' and are willing to exert themselves."
 }
 
-const NORMATIVE_DATA = {
-  Organization: { mean: 5.0, sd: 2.0 },
-  Perfectionism: { mean: 5.0, sd: 2.0 },
-  Prudence: { mean: 5.0, sd: 2.0 },
-  Diligence: { mean: 5.0, sd: 2.0 }
-}
-
-const CONTEXT_DESCRIPTIONS = {
-  2: "User is responding to a viral remix situation where their track has gained unexpected attention and recognition.",
-  3: "User is deciding how to respond to a record label (APEX Records) offering to sign their remix but requiring permission from the original artist within 24 hours.",
-  4: "User is crafting their final response/strategy after learning more about the situation and considering their next steps."
-}
-
 function buildPerfectionismPrompt(userResponse: string): string {
   return `You are **Dr. Kibeom Lee**, co-author of the HEXACO-PI-R, with 20+ years of experience in personality assessment. You are scoring responses for the **Perfectionism** facet of Conscientiousness.
 
@@ -404,13 +391,13 @@ Based on the prudence definition, scenario context, and examples above, assign a
 \`\`\``
 }
 
-function buildOrganizationPrompt(userResponse: string): string {
+function buildOrganizationPrompt(): string {
   // Organization is scored from Turn 1 choices, not text responses
   // This function exists for completeness but shouldn't be called
   throw new Error('Organization is scored from Turn 1 choices, not text responses')
 }
 
-function buildScoringPrompt(subtrait: keyof typeof SUBTRAIT_DEFINITIONS, userResponse: string, turn: number): string {
+function buildScoringPrompt(subtrait: keyof typeof SUBTRAIT_DEFINITIONS, userResponse: string): string {
   switch (subtrait) {
     case 'Perfectionism':
       return buildPerfectionismPrompt(userResponse)
@@ -419,7 +406,7 @@ function buildScoringPrompt(subtrait: keyof typeof SUBTRAIT_DEFINITIONS, userRes
     case 'Prudence':
       return buildPrudencePrompt(userResponse)
     case 'Organization':
-      return buildOrganizationPrompt(userResponse)
+      return buildOrganizationPrompt()
     default:
       throw new Error(`Unknown subtrait: ${subtrait}`)
   }
@@ -446,7 +433,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build the scoring prompt
-    const prompt = buildScoringPrompt(subtrait, userResponse, turn)
+    const prompt = buildScoringPrompt(subtrait, userResponse)
 
     // Call Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {

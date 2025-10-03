@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { SOCIAL_INITIAL_PROMPT } from '@/lib/social-prompts'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   console.log('\n=== SOCIAL SIMULATION INITIALIZE ===')
   
   try {

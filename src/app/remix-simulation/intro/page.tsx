@@ -48,18 +48,18 @@ export default function RemixSimulationIntro() {
           
           <div className="space-y-4">
             <p className="text-lg font-light text-gray-800 leading-relaxed">
-              You are about to enter a simulation that we like to call The Remix Controversy. The results you'll get are a direct reflection of your choices. For true insight, don't do what you should do. Do what you would do.
+              You are about to enter a simulation that we like to call The Remix Controversy. The results you&apos;ll get are a direct reflection of your choices. For true insight, don&apos;t do what you should do. Do what you would do.
             </p>
             
             <p className="text-lg font-light text-gray-800 leading-relaxed">
-              This isn't a game to be solved. It's a spotlight and mirror on you.
+              This isn&apos;t a game to be solved. It&apos;s a spotlight and mirror on you.
             </p>
           </div>
           
           <div className="space-y-4 mt-8">
             <div>
               <label htmlFor="userName" className="block text-lg font-light text-gray-800 mb-2">
-                What's your name?
+                What&apos;s your name?
               </label>
               <input
                 id="userName"
@@ -78,7 +78,7 @@ export default function RemixSimulationIntro() {
             
             <div>
               <label htmlFor="artistName" className="block text-lg font-light text-gray-800 mb-2">
-                What's your favorite artist called?
+                What&apos;s your favorite artist called?
               </label>
               <input
                 id="artistName"

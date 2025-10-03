@@ -106,7 +106,7 @@ CRITICAL FORMATTING: Break your response into short paragraphs separated by blan
 Return ONLY the story continuation with proper paragraph breaks - no explanations.
 `;
 
-export const WORKPLACE_THINK_PROMPT = (userThoughts: string, fullStory: string, turnNumber: number) => `
+export const WORKPLACE_THINK_PROMPT = (userThoughts: string, fullStory: string) => `
 You are handling a "Think" action in a workplace crisis simulation where the user wants to redirect the narrative.
 
 # Current Story Context

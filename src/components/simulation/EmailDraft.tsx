@@ -13,9 +13,8 @@ interface EmailDraftProps {
   isLoading?: boolean
 }
 
-export default function EmailDraft({ recipientName, recipientEmail, subject, context, onSendEmail, isLoading = false }: EmailDraftProps) {
+export default function EmailDraft({ recipientName, subject, onSendEmail, isLoading = false }: EmailDraftProps) {
   const [message, setMessage] = useState('')
-  const [showInterface, setShowInterface] = useState(true)
 
   useEffect(() => {
     // Animation handled by motion.div, no need for separate state

@@ -101,7 +101,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeBe
     try {
       // First try parsing the entire response as JSON
       analysis = JSON.parse(rawAnalysis)
-    } catch (firstError) {
+    } catch {
       try {
         // If that fails, try to extract JSON from markdown code blocks
         const codeBlockMatch = rawAnalysis.match(/```json\s*(\{[\s\S]*?\})\s*```/)

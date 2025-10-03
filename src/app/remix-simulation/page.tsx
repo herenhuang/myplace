@@ -1,20 +1,19 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { SimulationState, HandleTurnResponse, UserChoice, ConscientiousnessScores } from '@/lib/types'
+import Image from 'next/image'
+import { SimulationState, HandleTurnResponse, UserChoice, ConversationMessage } from '@/lib/types'
 import { INITIAL_SCENE } from '@/lib/scenarios/remix'
 import IMessageChat from '@/components/simulation/iMessageChat'
-import InstagramDM from '@/components/simulation/InstagramDM'
 import EmailDraft from '@/components/simulation/EmailDraft'
 import ChoiceSelector from '@/components/simulation/ChoiceSelector'
-import FullscreenIMessage from '@/components/simulation/FullscreenIMessage'
 import ConversationalIMessage from '@/components/simulation/ConversationalIMessage'
 import ConversationalInstagramDM from '@/components/simulation/ConversationalInstagramDM'
 import FullscreenInstagram from '@/components/simulation/FullscreenInstagram'
 import EmailInbox from '@/components/simulation/EmailInbox'
-import { PageContainer, ContentSection, NavigationSection } from '@/components/simulation/layout'
+import { PageContainer } from '@/components/simulation/layout'
 import { ArrowRight } from 'lucide-react'
 import ContinueButton from '@/components/simulation/ContinueButton'
 
@@ -51,7 +50,7 @@ function ViewCounter({ onComplete }: { onComplete: () => void }) {
     }, 500) // Short delay after "views" appears
 
     return () => clearTimeout(initialDelay)
-  }, [])
+  }, [onComplete])
 
   const formatViews = (num: number) => {
     // Always show full numbers with commas
@@ -92,7 +91,6 @@ export default function RemixSimulationPage() {
   const [textComplete, setTextComplete] = useState(false)
   
   const [isGeneratingConclusion, setIsGeneratingConclusion] = useState(false)
-  const [conclusionReady, setConclusionReady] = useState(false)
   const [userName, setUserName] = useState('')
   const [artistName, setArtistName] = useState('')
   
@@ -181,12 +179,94 @@ export default function RemixSimulationPage() {
     localStorage.setItem('remix-simulation-state', JSON.stringify(stateWithUI))
   }, [simulationState, currentTurn, currentPage])
 
+  const generateTurn5Question = useCallback(async () => {
+    try {
+      console.log('=== GENERATING TURN 5 QUESTION ===')
+      
+      const response = await fetch('/api/generateFinalTurn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userResponses: simulationState.userResponses || [],
+          storySoFar: simulationState.storySoFar || '',
+          artistName: artistName,
+          userName: userName,
+          conversationHistory: simulationState.conversationHistory || [],
+          instagramConversationHistory: simulationState.instagramConversationHistory || [],
+          userChoices: simulationState.userChoices || [],
+          conscientiousnessScores: simulationState.conscientiousnessScores || {}
+        })
+      })
+
+      const result = await response.json()
+      console.log('Turn 5 generation result:', result)
+
+      if (result.success && result.scenario && result.question && result.choices) {
+        setTurn5Question({
+          scenario: result.scenario,
+          question: result.question,
+          choices: result.choices
+        })
+        console.log('Turn 5 question generated successfully')
+      } else {
+        console.error('Turn 5 generation failed:', result)
+        // Fallback to a default question
+        setTurn5Question({
+          scenario: "The remix has opened many doors. As you reflect on this journey, you realize what matters most to you.",
+          question: "What drives you forward?",
+          choices: [
+            {
+              id: "idea_focus",
+              text: "The creative possibilities - exploring new sonic territories and pushing musical boundaries",
+              focusType: "idea"
+            },
+            {
+              id: "process_focus",
+              text: "The collaborative connections - building relationships and bringing people together through music",
+              focusType: "process"
+            },
+            {
+              id: "outcome_focus",
+              text: "The tangible success - achieving concrete results and turning musical vision into reality",
+              focusType: "outcome"
+            }
+          ]
+        })
+      }
+      console.log('=== END TURN 5 GENERATION ===')
+    } catch (error) {
+      console.error('Error generating Turn 5 question:', error)
+      // Use fallback
+      setTurn5Question({
+        scenario: "The remix has opened many doors. As you reflect on this journey, you realize what matters most to you.",
+        question: "What drives you forward?",
+        choices: [
+          {
+            id: "idea_focus",
+            text: "The creative possibilities - exploring new sonic territories and pushing musical boundaries",
+            focusType: "idea"
+          },
+          {
+            id: "process_focus",
+            text: "The collaborative connections - building relationships and bringing people together through music",
+            focusType: "process"
+          },
+          {
+            id: "outcome_focus",
+            text: "The tangible success - achieving concrete results and turning musical vision into reality",
+            focusType: "outcome"
+          }
+        ]
+      })
+    }
+  }, [artistName, userName, simulationState.userResponses, simulationState.storySoFar, simulationState.conversationHistory, simulationState.instagramConversationHistory, simulationState.userChoices, simulationState.conscientiousnessScores]);
+
   // Generate Turn 5 question when reaching Turn 5 Page 1
   useEffect(() => {
     if (currentTurn === 5 && currentPage === 1 && !turn5Question && userName && artistName) {
       generateTurn5Question()
     }
-  }, [currentTurn, currentPage, turn5Question, userName, artistName])
+  }, [currentTurn, currentPage, turn5Question, userName, artistName, generateTurn5Question])
 
   // Page identification with descriptive names
   const getCurrentPageName = () => {
@@ -373,7 +453,6 @@ Notifications keep flooding in — only now, they carry a different weight.`
         setIsGeneratingConclusion(true)
         generateConclusion(simulationState).then(() => {
           setIsGeneratingConclusion(false)
-          setConclusionReady(true)
           setCurrentPage(2)
         })
       } else {
@@ -729,88 +808,6 @@ Notifications keep flooding in — only now, they carry a different weight.`
     }
   }
 
-  const generateTurn5Question = async () => {
-    try {
-      console.log('=== GENERATING TURN 5 QUESTION ===')
-      
-      const response = await fetch('/api/generateFinalTurn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userResponses: simulationState.userResponses || [],
-          storySoFar: simulationState.storySoFar || '',
-          artistName: artistName,
-          userName: userName,
-          conversationHistory: simulationState.conversationHistory || [],
-          instagramConversationHistory: simulationState.instagramConversationHistory || [],
-          userChoices: simulationState.userChoices || [],
-          conscientiousnessScores: simulationState.conscientiousnessScores || {}
-        })
-      })
-
-      const result = await response.json()
-      console.log('Turn 5 generation result:', result)
-
-      if (result.success && result.scenario && result.question && result.choices) {
-        setTurn5Question({
-          scenario: result.scenario,
-          question: result.question,
-          choices: result.choices
-        })
-        console.log('Turn 5 question generated successfully')
-      } else {
-        console.error('Turn 5 generation failed:', result)
-        // Fallback to a default question
-        setTurn5Question({
-          scenario: "The remix has opened many doors. As you reflect on this journey, you realize what matters most to you.",
-          question: "What drives you forward?",
-          choices: [
-            {
-              id: "idea_focus",
-              text: "The creative possibilities - exploring new sonic territories and pushing musical boundaries",
-              focusType: "idea"
-            },
-            {
-              id: "process_focus",
-              text: "The collaborative connections - building relationships and bringing people together through music",
-              focusType: "process"
-            },
-            {
-              id: "outcome_focus",
-              text: "The tangible success - achieving concrete results and turning musical vision into reality",
-              focusType: "outcome"
-            }
-          ]
-        })
-      }
-      console.log('=== END TURN 5 GENERATION ===')
-    } catch (error) {
-      console.error('Error generating Turn 5 question:', error)
-      // Use fallback
-      setTurn5Question({
-        scenario: "The remix has opened many doors. As you reflect on this journey, you realize what matters most to you.",
-        question: "What drives you forward?",
-        choices: [
-          {
-            id: "idea_focus",
-            text: "The creative possibilities - exploring new sonic territories and pushing musical boundaries",
-            focusType: "idea"
-          },
-          {
-            id: "process_focus",
-            text: "The collaborative connections - building relationships and bringing people together through music",
-            focusType: "process"
-          },
-          {
-            id: "outcome_focus",
-            text: "The tangible success - achieving concrete results and turning musical vision into reality",
-            focusType: "outcome"
-          }
-        ]
-      })
-    }
-  }
-
   const handleTurn5Choice = (focusType: 'idea' | 'process' | 'outcome') => {
     setTurn5Choice(focusType)
     console.log('User selected focus type:', focusType)
@@ -831,7 +828,7 @@ Notifications keep flooding in — only now, they carry a different weight.`
     }, 300) // Small delay to show selection
   }
 
-  const handleConversationComplete = (score: number, reasoning: string, conversationHistory: any[]) => {
+  const handleConversationComplete = (score: number, reasoning: string, conversationHistory: ConversationMessage[]) => {
     console.log('🎯 CONVERSATION COMPLETE')
     console.log('📊 Perfectionism score:', score, '/9')
     console.log('🧠 AI Reasoning:', reasoning)
@@ -875,7 +872,7 @@ Notifications keep flooding in — only now, they carry a different weight.`
     setCurrentPage(2)
   }
 
-  const handleInstagramConversationComplete = async (score: number, reasoning: string, conversationHistory: any[]) => {
+  const handleInstagramConversationComplete = async (score: number, reasoning: string, conversationHistory: ConversationMessage[]) => {
     console.log('🎯 INSTAGRAM CONVERSATION COMPLETE')
     console.log('📊 Diligence score:', score, '/9')
     console.log('🧠 AI Reasoning:', reasoning)
@@ -1167,7 +1164,7 @@ Notifications keep flooding in — only now, they carry a different weight.`
     <div className="h-full flex flex-col" style={{ backgroundColor: '#FDF6F1' }}>
       <ProgressBar currentPage={getCurrentPageNumber()} textProgress={textProgress} />
       
-      <PageContainer maxWidth="media" className="flex-1">
+      <PageContainer className="flex-1">
           {isChoicePage() ? (
             // Choice page with animated text and delayed choices
             <>
@@ -1187,17 +1184,17 @@ Notifications keep flooding in — only now, they carry a different weight.`
                       {
                         id: 'read_immediately',
                         text: 'Open it immediately',
-                        description: 'You can\'t wait to see what they have to say.'
+                        description: 'You can&apos;t wait to see what they have to say.'
                       },
                       {
                         id: 'skim_preview',
-                        text: 'Skim the preview, but don\'t open',
-                        description: 'You\'re curious but want to stay focused on the comments.'
+                        text: 'Skim the preview, but don&apos;t open',
+                        description: 'You&apos;re curious but want to stay focused on the comments.'
                       },
                       {
                         id: 'ignore_text',
-                        text: 'Ignore it, you\'re preoccupied right now',
-                        description: 'You\'re too caught up in your viral moment to be distracted.'
+                        text: 'Ignore it, you&apos;re preoccupied right now',
+                        description: 'You&apos;re too caught up in your viral moment to be distracted.'
                       }
                     ]}
                     onChoiceSelect={handleChoiceSelect}
@@ -1225,12 +1222,12 @@ Notifications keep flooding in — only now, they carry a different weight.`
                       {
                         id: 'skim_respond',
                         text: 'Open and respond',
-                        description: 'You want to see what they\'re saying.'
+                        description: 'You want to see what they&apos;re saying.'
                       },
                       {
                         id: 'skim_ignore',
-                        text: 'Don\'t respond',
-                        description: 'You\'ll deal with it later.'
+                        text: 'Don&apos;t respond',
+                        description: 'You&apos;ll deal with it later.'
                       }
                     ]}
                     onChoiceSelect={handleChoiceSelect}
@@ -1327,7 +1324,7 @@ Notifications keep flooding in — only now, they carry a different weight.`
                           } else {
                             setErrorMessage('Invalid response from server. Please try again.')
                           }
-                        } catch (error) {
+                        } catch {
                           setErrorMessage('Network error. Please try again.')
                         } finally {
                           setIsLoading(false)
@@ -1351,7 +1348,7 @@ Notifications keep flooding in — only now, they carry a different weight.`
                   >
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium text-gray-900">
-                        Respond to your friend's text about copyright concerns:
+                        Respond to your friend&apos;s text about copyright concerns:
                       </h3>
                       <textarea
                         value={userInput}
@@ -1530,9 +1527,11 @@ Notifications keep flooding in — only now, they carry a different weight.`
                           }}
                           transition={{ duration: 0.3 }}
                         >
-                          <img 
+                          <Image
                             src={`/music-archetype-${simulationState.archetypeResult?.archetype}.png`} 
                             alt={`${simulationState.archetypeResult?.archetypeName} archetype`}
+                            width={500}
+                            height={700}
                             className="w-full max-w-sm rounded-2xl shadow-2xl"
                             style={{
                               filter: 'drop-shadow(0 25px 25px rgba(0, 0, 0, 0.25))',
@@ -1589,9 +1588,11 @@ Notifications keep flooding in — only now, they carry a different weight.`
                         <div className="flex flex-col md:flex-row items-start gap-6 justify-center">
                           {/* Archetype Card */}
                           <div className="flex-shrink-0 w-full md:w-1/2">
-                            <img 
+                            <Image
                               src={`/music-archetype-${simulationState.archetypeResult?.archetype}.png`} 
                               alt={`${simulationState.archetypeResult?.archetypeName} archetype`}
+                              width={500}
+                              height={700}
                               className="w-full max-w-sm mx-auto md:max-w-none rounded-xl shadow-lg"
                             />
                           </div>
@@ -1799,7 +1800,6 @@ function ProgressBar({ currentPage, textProgress = 1 }: { currentPage: number, t
         {Array.from({ length: totalPages }, (_, index) => {
           const isCompleted = index < currentPage - 1
           const isCurrentPage = index === currentPage - 1
-          const isFuture = index > currentPage - 1
           
           let fillPercentage = 0
           if (isCompleted) {
@@ -1830,13 +1830,11 @@ function ProgressBar({ currentPage, textProgress = 1 }: { currentPage: number, t
 function AnimatedText({ text, onComplete, onProgressUpdate }: { text: string, onComplete: () => void, onProgressUpdate?: (progress: number) => void }) {
   const [displayedText, setDisplayedText] = useState('')
   const [currentCharIndex, setCurrentCharIndex] = useState(0)
-  const [showCounter, setShowCounter] = useState(false)
 
   useEffect(() => {
     // Reset animation when text changes
     setDisplayedText('')
     setCurrentCharIndex(0)
-    setShowCounter(false)
   }, [text])
 
   useEffect(() => {
@@ -1849,11 +1847,6 @@ function AnimatedText({ text, onComplete, onProgressUpdate }: { text: string, on
         // Update progress for progress bar sync
         const progress = (currentCharIndex + 1) / text.length
         onProgressUpdate?.(progress)
-        
-        // Check if we've revealed "20,000 views" 
-        if (newText.includes('20,000 views')) {
-          setShowCounter(true)
-        }
       } else {
         clearInterval(timer)
         onProgressUpdate?.(1) // Ensure 100% completion

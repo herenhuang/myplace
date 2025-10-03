@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import ElevateCard from '@/components/ElevateCard'
-import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, getDebugLogs, type StepData } from './actions'
+import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
 
@@ -134,7 +134,6 @@ export default function ElevateSimulation() {
   const [archetype, setArchetype] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
-  const [copyLogsStatus, setCopyLogsStatus] = useState<'idle' | 'copying' | 'done' | 'error'>('idle')
   const [resultsPage, setResultsPage] = useState<'card' | 'explanation'>('card')
   
   const inputRef = useRef<HTMLInputElement>(null)
@@ -333,27 +332,6 @@ export default function ElevateSimulation() {
     setResultsPage('card')
     const sid = getOrCreateSessionId()
     setSessionId(sid)
-  }
-
-  const copyDebugLogs = async () => {
-    if (!dbSessionId) return
-    try {
-      setCopyLogsStatus('copying')
-      const result = await getDebugLogs(dbSessionId)
-      const payload = {
-        sessionId: dbSessionId,
-        steps: result.steps || [],
-        debugLogs: result.debugLogs || [],
-        analysis: result.result || null
-      }
-      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
-      setCopyLogsStatus('done')
-      setTimeout(() => setCopyLogsStatus('idle'), 1500)
-    } catch (e) {
-      console.error('Failed to copy debug logs:', e)
-      setCopyLogsStatus('error')
-      setTimeout(() => setCopyLogsStatus('idle'), 1500)
-    }
   }
 
   const handleChoiceSelect = async (choiceValue: string, isCustom: boolean = false) => {

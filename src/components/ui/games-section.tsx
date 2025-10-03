@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import styles from './games-section.module.scss';
 
 type ComponentProps = React.HTMLAttributes<HTMLDivElement>;

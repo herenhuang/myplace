@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send } from 'lucide-react'
 
@@ -60,117 +60,7 @@ export default function ConversationalInstagramDM({
     return () => clearInterval(timeInterval)
   }, [])
 
-  useEffect(() => {
-    // Prevent double initialization
-    if (conversationHistory.length > 0) {
-      console.log('🔄 [Turn 3] Already initialized, skipping...')
-      return
-    }
-    
-    // Show initial messages with staggered timing
-    console.log('🔵 [Turn 3] Initializing Instagram DM')
-    console.log('Sender name:', senderName)
-    console.log('Artist name:', artistName)
-    console.log('Initial messages (first 3):', initialMessages.slice(0, 3))
-    
-    // Show messages one by one with slower delays
-    const delays = [1000, 3000, 5000] // 1s, 3s, 5s
-    const messagesToShow = initialMessages.slice(0, 3) // Only first 3 messages
-    
-    delays.forEach((delay, index) => {
-      setTimeout(() => {
-        setVisibleMessages(index + 1)
-        
-        // After last message, initialize conversation and show input
-        if (index === delays.length - 1) {
-          const initialConversation: ConversationMessage[] = messagesToShow.map((msg, msgIndex) => ({
-            sender: 'apex' as const,
-            message: msg,
-            timestamp: Date.now() + msgIndex
-          }))
-          setConversationHistory(initialConversation)
-          setInputEnabled(true)
-          console.log('✅ [Turn 3] Initial 3 messages displayed and input enabled')
-        }
-      }, delay)
-    })
-  }, [])
-
-  useEffect(() => {
-    // Auto-scroll to bottom when new messages appear
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [conversationHistory, isTyping])
-
-  useEffect(() => {
-    // Monitor typing activity - pause/resume timer based on input state
-    // Only start timer after user has sent at least one message
-    if (userMessagesSent > 0 && !conversationComplete && !isLoading) {
-      if (message.trim()) {
-        // User is typing - pause timer
-        if (responseTimer) {
-          console.log('⏸️ [Turn 3] User typing - pausing timer')
-          clearTimeout(responseTimer)
-          setResponseTimer(null)
-        }
-      } else {
-        // Input is empty - start 8-second timer (slower than before)
-        if (!responseTimer && conversationHistory.length > 3) { // Only after initial 3 messages
-          console.log('⏲️ [Turn 3] Starting 8-second response timer')
-          const timer = setTimeout(() => {
-            console.log('⏰ [Turn 3] Timer fired - generating AI response')
-            handleAIResponse(conversationHistory)
-          }, 8000) // Increased from 4 seconds to 8 seconds
-          setResponseTimer(timer)
-        }
-      }
-    }
-  }, [message, userMessagesSent, conversationComplete, isLoading, responseTimer, conversationHistory])
-
-  useEffect(() => {
-    // Cleanup timers on unmount
-    return () => {
-      if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer)
-      if (responseTimer) clearTimeout(responseTimer)
-    }
-  }, [autoAdvanceTimer, responseTimer])
-
-  const startResponseTimer = (history: ConversationMessage[]) => {
-    // Only start timer if input is empty (not typing)
-    if (!message.trim()) {
-      const timer = setTimeout(() => {
-        handleAIResponse(history)
-      }, 4000)
-      setResponseTimer(timer)
-    }
-  }
-
-  const handleSend = async () => {
-    if (message.trim() && !isLoading && !conversationComplete) {
-      const userMessage = message.trim()
-      
-      // Clear any existing response timer
-      if (responseTimer) {
-        clearTimeout(responseTimer)
-        setResponseTimer(null)
-      }
-      
-      // Add user's message to conversation
-      const newHistory = [
-        ...conversationHistory,
-        { sender: 'user' as const, message: userMessage, timestamp: Date.now() }
-      ]
-      setConversationHistory(newHistory)
-      setMessage('')
-      setUserMessagesSent(prev => prev + 1)
-
-      // Start timer after clearing input
-      setTimeout(() => {
-        startResponseTimer(newHistory)
-      }, 100) // Small delay to ensure message state is cleared
-    }
-  }
-
-  const handleAIResponse = async (currentHistory: ConversationMessage[]) => {
+  const handleAIResponse = useCallback(async (currentHistory: ConversationMessage[]) => {
     setIsLoading(true)
     setIsTyping(true)
 
@@ -258,6 +148,116 @@ export default function ConversationalInstagramDM({
     } finally {
       setIsLoading(false)
     }
+  }, [artistName, initialMessages.length, onConversationComplete, userName])
+
+  useEffect(() => {
+    // Prevent double initialization
+    if (conversationHistory.length > 0) {
+      console.log('🔄 [Turn 3] Already initialized, skipping...')
+      return
+    }
+    
+    // Show initial messages with staggered timing
+    console.log('🔵 [Turn 3] Initializing Instagram DM')
+    console.log('Sender name:', senderName)
+    console.log('Artist name:', artistName)
+    console.log('Initial messages (first 3):', initialMessages.slice(0, 3))
+    
+    // Show messages one by one with slower delays
+    const delays = [1000, 3000, 5000] // 1s, 3s, 5s
+    const messagesToShow = initialMessages.slice(0, 3) // Only first 3 messages
+    
+    delays.forEach((delay, index) => {
+      setTimeout(() => {
+        setVisibleMessages(index + 1)
+        
+        // After last message, initialize conversation and show input
+        if (index === delays.length - 1) {
+          const initialConversation: ConversationMessage[] = messagesToShow.map((msg, msgIndex) => ({
+            sender: 'apex' as const,
+            message: msg,
+            timestamp: Date.now() + msgIndex
+          }))
+          setConversationHistory(initialConversation)
+          setInputEnabled(true)
+          console.log('✅ [Turn 3] Initial 3 messages displayed and input enabled')
+        }
+      }, delay)
+    })
+  }, [artistName, conversationHistory.length, initialMessages, senderName])
+
+  useEffect(() => {
+    // Auto-scroll to bottom when new messages appear
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [conversationHistory, isTyping])
+
+  useEffect(() => {
+    // Monitor typing activity - pause/resume timer based on input state
+    // Only start timer after user has sent at least one message
+    if (userMessagesSent > 0 && !conversationComplete && !isLoading) {
+      if (message.trim()) {
+        // User is typing - pause timer
+        if (responseTimer) {
+          console.log('⏸️ [Turn 3] User typing - pausing timer')
+          clearTimeout(responseTimer)
+          setResponseTimer(null)
+        }
+      } else {
+        // Input is empty - start 8-second timer (slower than before)
+        if (!responseTimer && conversationHistory.length > 3) { // Only after initial 3 messages
+          console.log('⏲️ [Turn 3] Starting 8-second response timer')
+          const timer = setTimeout(() => {
+            console.log('⏰ [Turn 3] Timer fired - generating AI response')
+            handleAIResponse(conversationHistory)
+          }, 8000) // Increased from 4 seconds to 8 seconds
+          setResponseTimer(timer)
+        }
+      }
+    }
+  }, [message, userMessagesSent, conversationComplete, isLoading, responseTimer, conversationHistory, handleAIResponse])
+
+  useEffect(() => {
+    // Cleanup timers on unmount
+    return () => {
+      if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer)
+      if (responseTimer) clearTimeout(responseTimer)
+    }
+  }, [autoAdvanceTimer, responseTimer])
+
+  const startResponseTimer = (history: ConversationMessage[]) => {
+    // Only start timer if input is empty (not typing)
+    if (!message.trim()) {
+      const timer = setTimeout(() => {
+        handleAIResponse(history)
+      }, 4000)
+      setResponseTimer(timer)
+    }
+  }
+
+  const handleSend = async () => {
+    if (message.trim() && !isLoading && !conversationComplete) {
+      const userMessage = message.trim()
+      
+      // Clear any existing response timer
+      if (responseTimer) {
+        clearTimeout(responseTimer)
+        setResponseTimer(null)
+      }
+      
+      // Add user's message to conversation
+      const newHistory = [
+        ...conversationHistory,
+        { sender: 'user' as const, message: userMessage, timestamp: Date.now() }
+      ]
+      setConversationHistory(newHistory)
+      setMessage('')
+      setUserMessagesSent(prev => prev + 1)
+
+      // Start timer after clearing input
+      setTimeout(() => {
+        startResponseTimer(newHistory)
+      }, 100) // Small delay to ensure message state is cleared
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -265,10 +265,6 @@ export default function ConversationalInstagramDM({
       e.preventDefault()
       handleSend()
     }
-  }
-
-  const formatTime = (timestamp: number) => {
-    return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
   }
 
   return (

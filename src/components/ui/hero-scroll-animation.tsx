@@ -5,7 +5,6 @@ import { useScroll, useTransform, motion, MotionValue } from 'motion/react';
 import React, { useRef, forwardRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import ImageMask from '@/components/ui/image-mask';
 import GamesSection from '@/components/ui/games-section';
 import type { User } from '@supabase/supabase-js';
 import UserButton from './UserButton';

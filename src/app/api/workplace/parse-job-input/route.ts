@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { JOB_PARSING_PROMPT, COWORKER_EXTRACTION_PROMPT, GENERATE_COWORKER_NAMES } from '@/lib/workplace-prompts'
+import { JOB_PARSING_PROMPT, GENERATE_COWORKER_NAMES } from '@/lib/workplace-prompts'
 
 interface ParseJobInputRequest {
   userInput: string

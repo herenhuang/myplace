@@ -51,7 +51,7 @@ export default function RemixSimulationSetup() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="userName" className="block text-lg font-light text-gray-800 mb-2">
-                  What's your name?
+                  What&apos;s your name?
                 </label>
                 <input
                   id="userName"
@@ -70,7 +70,7 @@ export default function RemixSimulationSetup() {
               
               <div>
                 <label htmlFor="artistName" className="block text-lg font-light text-gray-800 mb-2">
-                  What's your favorite artist called?
+                  What&apos;s your favorite artist called?
                 </label>
                 <input
                   id="artistName"

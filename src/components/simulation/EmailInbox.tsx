@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Star, Archive, Delete, MoreVertical, Reply, Forward, Printer } from 'lucide-react'
 
@@ -73,7 +73,7 @@ export default function EmailInbox({ userName, artistName, onSendReply, isLoadin
         {/* Email Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-normal text-gray-900 mb-4">
-            Let's Collaborate – Studio Re-Release Opportunity
+            Let&apos;s Collaborate – Studio Re-Release Opportunity
           </h1>
           
           <div className="flex items-start justify-between mb-4">
@@ -104,7 +104,7 @@ export default function EmailInbox({ userName, artistName, onSendReply, isLoadin
             
             <p>We saw your remix and absolutely loved it — the energy, the direction, everything. {artistName} would love to re-record it with you properly in-studio and release it together.</p>
             
-            <p>We'd need about two weeks to pull it off the right way. Let me know if you're interested — we can make something great here.</p>
+            <p>We&apos;d need about two weeks to pull it off the right way. Let me know if you&apos;re interested — we can make something great here.</p>
             
             <p>Best,<br />Sarah<br />Manager, {artistName}</p>
           </div>

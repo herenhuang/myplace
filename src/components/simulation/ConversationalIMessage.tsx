@@ -62,7 +62,7 @@ export default function ConversationalIMessage({
       console.log('✅ [Turn 2] Initial message displayed')
     }, 800)
     return () => clearTimeout(timer)
-  }, [initialFriendMessage])
+  }, [initialFriendMessage, friendName])
 
   useEffect(() => {
     // Auto-scroll to bottom when new messages appear
@@ -122,7 +122,7 @@ export default function ConversationalIMessage({
             setConversationHistory(result.conversationHistory)
 
             // Count user messages
-            const userMessageCount = result.conversationHistory.filter((msg: any) => msg.sender === 'user').length
+            const userMessageCount = result.conversationHistory.filter((msg: ConversationMessage) => msg.sender === 'user').length
             console.log('📊 [Turn 2] User message count:', userMessageCount)
             console.log('API status:', result.status)
             console.log('Conscientiousness score:', result.conscientiousnessScore)

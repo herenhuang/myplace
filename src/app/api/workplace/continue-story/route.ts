@@ -23,9 +23,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ContinueS
       actionType, 
       userAction, 
       fullStory, 
-      turnNumber,
-      jobTitle,
-      coworker1
+      turnNumber
     }: ContinueStoryRequest = await request.json()
     
     console.log(`🎯 Turn ${turnNumber}: ${actionType} - "${userAction}"`)
@@ -50,7 +48,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ContinueS
       console.log('🏁 Generating conclusion...')
     } else if (actionType === 'think') {
       // Use special think prompt for narrative redirection
-      prompt = WORKPLACE_THINK_PROMPT(userAction, fullStory, turnNumber)
+      prompt = WORKPLACE_THINK_PROMPT(userAction, fullStory)
       console.log(`🧠 Generating turn ${turnNumber} narrative redirection...`)
     } else {
       // Use continuation prompt for ongoing turns

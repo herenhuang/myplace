@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { userResponses, requestType = 'fullAnalysis' }: AnalyzeRequest = await request.json()
     
     console.log(`🧠 Analyzing ${userResponses.length} social responses (${requestType})`)
-    userResponses.forEach((resp, i) => {
+    userResponses.forEach((resp) => {
       console.log(`   Turn ${resp.turn}: "${resp.response.substring(0, 50)}..." ${resp.choice ? `[Choice: ${resp.choice}]` : ''}`)
     })
     
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.error('Failed to parse action insights JSON:', error)
         // Fallback for action insights
-        actionInsights = userResponses.map((resp, i) => 
+        actionInsights = userResponses.map((resp) => 
           `Turn ${resp.turn} shows individual social response patterns.`
         )
         return NextResponse.json({
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     let analysis
     try {
       analysis = JSON.parse(rawAnalysis)
-    } catch (firstError) {
+    } catch {
       try {
         // Try to extract JSON from markdown code blocks
         const codeBlockMatch = rawAnalysis.match(/```json\s*(\{[\s\S]*?\})\s*```/)

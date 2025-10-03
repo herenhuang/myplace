@@ -9,12 +9,6 @@ interface ArchetypeRequest {
   }
 }
 
-interface ArchetypeResponse {
-  archetype: number
-  archetypeName: string
-  rationale: string
-}
-
 const ARCHETYPE_NAMES = {
   9: "Record Player",
   8: "Gaming Headset", 

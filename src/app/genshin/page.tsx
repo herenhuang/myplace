@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import ElevateCard from '@/components/ElevateCard'
-import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, getDebugLogs, type StepData } from './actions'
+import { startSession, recordStep, generateNextStep, analyzeArchetype, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
 
@@ -27,7 +27,6 @@ interface Step {
 type ScreenState = 'welcome' | 'simulation' | 'analyzing' | 'results'
 
 // Configuration
-const ENABLE_IMAGE_GENERATION = false // Toggle to enable/disable AI image generation
 const TOTAL_STEPS = 6 // 5 question steps + 1 conclusion step
 
 // Random backgrounds for quiz steps
@@ -149,7 +148,6 @@ export default function GenshinQuiz() {
   const [archetype, setArchetype] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
-  const [copyLogsStatus, setCopyLogsStatus] = useState<'idle' | 'copying' | 'done' | 'error'>('idle')
   const [resultsPage, setResultsPage] = useState<'card' | 'explanation'>('card')
   
   const inputRef = useRef<HTMLInputElement>(null)
@@ -170,7 +168,7 @@ export default function GenshinQuiz() {
 
 
   // Blobbert click handler
-  const handleBlobbertClick = (e: React.MouseEvent) => {
+  const handleBlobbertClick = () => {
     // Don't show message if dragging
     if (isDraggingBlobbert) return
     
@@ -221,7 +219,7 @@ export default function GenshinQuiz() {
       
       setBlobbertPosition({ x: newX, y: newY })
     }
-  }, [isDraggingBlobbert, dragOffset, styles.imageContainer])
+  }, [isDraggingBlobbert, dragOffset])
   
   const handleBlobbertMouseUp = () => {
     setIsDraggingBlobbert(false)
@@ -429,27 +427,6 @@ export default function GenshinQuiz() {
     setResultsPage('card')
     const sid = getOrCreateSessionId()
     setSessionId(sid)
-  }
-
-  const copyDebugLogs = async () => {
-    if (!dbSessionId) return
-    try {
-      setCopyLogsStatus('copying')
-      const result = await getDebugLogs(dbSessionId)
-      const payload = {
-        sessionId: dbSessionId,
-        steps: result.steps || [],
-        debugLogs: result.debugLogs || [],
-        analysis: result.result || null
-      }
-      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
-      setCopyLogsStatus('done')
-      setTimeout(() => setCopyLogsStatus('idle'), 1500)
-    } catch (e) {
-      console.error('Failed to copy debug logs:', e)
-      setCopyLogsStatus('error')
-      setTimeout(() => setCopyLogsStatus('idle'), 1500)
-    }
   }
 
   const handleChoiceSelect = async (choiceValue: string, isCustom: boolean = false) => {
