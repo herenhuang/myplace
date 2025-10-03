@@ -378,7 +378,7 @@ export default function ElevateSimulation() {
     // Initialize conversation with boss's first message
     setMessages([{
       role: 'boss',
-      content: 'urgent! you got time for a quick convo?',
+      content: 'urgent! you got time for a quick convo? should only be 20 minutes',
       timestamp: Date.now()
     }])
     

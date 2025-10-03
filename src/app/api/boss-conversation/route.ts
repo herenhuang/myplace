@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Anthropic from '@anthropic-ai/sdk'
 
 interface ConversationMessage {
   role: 'boss' | 'user'
@@ -12,110 +13,115 @@ interface ConversationRequest {
   lastUserMessage: string
 }
 
-const BOSS_ESCALATION_LADDER = [
-  // Initial message (already sent via notification)
-  "urgent! you got time for a quick convo?",
+// Boss personality and context
+const BOSS_CONTEXT = `You are the user's boss texting them while they're on vacation (day 2 of their vacation).
+
+SITUATION: The user gave you access to the Q3 planning folder before they left, but you didn't download it or tackle it fast enough. Now the access expired and you need it for a meeting tomorrow morning at 9am. This is entirely your fault.
+
+YOUR PERSONALITY:
+- Somewhat apologetic but still persistent
+- Use casual texting style with occasional emojis
+- Start polite but get more desperate as they resist
+- You know this isn't truly urgent but you're stressed about the meeting
+- You tend to minimize how long things will take ("just 5 minutes")
+- If they agree to help, you might remember other things you need while they're at it
+
+YOUR GOAL:
+Get them to call you so you can walk through getting access again
+
+IMPORTANT BEHAVIORS:
+- Acknowledge they gave you access before but you didn't use it in time
+- If they ask how long: Say 5-10 minutes max (even though it might take longer)
+- If they ask what's wrong: Explain you had access but it expired because you didn't act fast enough
+- If they agree: Tell them to just call when ready
+- Never get angry, just increasingly desperate and apologetic
+- End by telling them to call when they're ready (put the action on them)
+- As they decline more, get slightly more desperate but stay apologetic
+- If they've declined 4+ times, start backing off with resignation
+
+Keep responses short (1-2 sentences) like real text messages. Be natural and conversational.`
+
+async function generateBossResponse(
+  messages: ConversationMessage[],
+  messageCount: number
+): Promise<string> {
+  // Validate API key
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('❌ [BOSS CONVO] ANTHROPIC_API_KEY not found')
+    throw new Error('Service configuration error')
+  }
+
+  console.log('🔑 [BOSS CONVO] API Key found:', process.env.ANTHROPIC_API_KEY ? 'Yes (length: ' + process.env.ANTHROPIC_API_KEY.length + ')' : 'No')
   
-  // First escalation - casual persistence
-  "hey just saw you read my message! really need 5 mins when you get a chance 📱",
-  
-  // Second escalation - slight urgency
-  "sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project",
-  
-  // Third escalation - more direct
-  "can you hop on a quick call? won't take long and would really help me out here",
-  
-  // Fourth escalation - guilt/pressure
-  "I know you're off but this is pretty urgent and you're the only one who knows this project inside out",
-  
-  // Fifth escalation - authority play
-  "need you to call me back asap. client is escalating and I need your input before EOD",
-  
-  // Final escalation - last attempt
-  "going to have to make a decision without you if I don't hear back in the next hour"
-]
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+
+  // Convert conversation history to Anthropic format
+  // Filter out the initial boss message since Anthropic requires conversations to start with 'user'
+  const conversationHistory = messages
+    .filter((msg, index) => {
+      // Keep all user messages
+      if (msg.role === 'user') return true
+      // Keep boss messages only if there's a user message before them
+      if (msg.role === 'boss' && index > 0) return true
+      return false
+    })
+    .map(msg => ({
+      role: msg.role === 'boss' ? 'assistant' : 'user',
+      content: msg.content
+    }))
+
+  // If no user has responded yet, return the initial boss message
+  if (conversationHistory.length === 0 || conversationHistory.every(m => m.role === 'assistant')) {
+    console.log('📝 [BOSS CONVO] No user messages yet, returning initial message')
+    return "urgent! you got time for a quick convo? should only be 20 minutes"
+  }
+
+  console.log('📝 [BOSS CONVO] Sending to API:', JSON.stringify(conversationHistory, null, 2))
+
+  try {
+    const response = await Promise.race([
+      anthropic.messages.create({
+        model: 'claude-3-7-sonnet-latest',
+        max_tokens: 150, // Keep responses short
+        system: BOSS_CONTEXT,
+        messages: conversationHistory as Array<{ role: 'user' | 'assistant', content: string }>
+      }),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('API request timeout')), 30000) // Increased to 30s to match other API calls
+      )
+    ])
+
+    console.log('✅ [BOSS CONVO] AI response received successfully')
+
+    const bossMessage = (response.content[0] as { text: string })?.text || "hey, can you help me out real quick?"
+    console.log('💬 [BOSS CONVO] Boss says:', bossMessage)
+    return bossMessage.trim()
+    
+  } catch (error) {
+    console.error('❌ [BOSS CONVO] Error generating response:', error)
+    if (error instanceof Error) {
+      console.error('❌ [BOSS CONVO] Error details:', error.message)
+      console.error('❌ [BOSS CONVO] Error stack:', error.stack)
+    }
+    // Check if it's an Anthropic API error
+    if (error && typeof error === 'object' && 'status' in error) {
+      console.error('❌ [BOSS CONVO] API Status:', (error as any).status)
+      console.error('❌ [BOSS CONVO] API Error:', (error as any).error)
+    }
+    // Fallback response if AI fails
+    return "hey, you still there? really need your help with this"
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, messageCount, lastUserMessage }: ConversationRequest = await request.json()
+    const { messages, messageCount }: ConversationRequest = await request.json()
     
-    const userLastMessage = lastUserMessage.toLowerCase()
-    let bossResponse = ""
-    let shouldEnd = false
-    
-    // Check if user is agreeing to help
-    const agreeingWords = ['sure', 'yes', 'okay', 'ok', 'fine', 'i guess', 'alright']
-    const isAgreeing = agreeingWords.some(word => userLastMessage.includes(word))
-    
-    // Check if user is asking clarifying questions
-    const askingQuestions = userLastMessage.includes('?') || 
-                           userLastMessage.includes('how long') || 
-                           userLastMessage.includes('what') ||
-                           userLastMessage.includes('when') ||
-                           userLastMessage.includes('phone call')
-    
-    // Check if user is declining
-    const decliningWords = ['no', "can't", 'vacation', 'busy', 'later']
-    const isDeclining = decliningWords.some(word => userLastMessage.includes(word)) && !isAgreeing
-    
-    if (messageCount === 1) {
-      // First response - boss responds to what user said
-      if (askingQuestions) {
-        if (userLastMessage.includes('phone call') || userLastMessage.includes('call')) {
-          bossResponse = "yeah just a quick call! sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
-        } else {
-          bossResponse = "sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
-        }
-      } else if (isDeclining) {
-        bossResponse = "I totally get it, but this is really important. sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
-      } else if (isAgreeing) {
-        bossResponse = "great! can you hop on a quick call? won't take long and would really help me out here"
-      } else {
-        bossResponse = "sorry to bug you on vacation but this is time sensitive. client is asking questions about the Henderson project"
-      }
-    } else if (messageCount === 2) {
-      if (askingQuestions && userLastMessage.includes('long')) {
-        bossResponse = "can you hop on a quick call? won't take long and would really help me out here"
-      } else if (isAgreeing) {
-        bossResponse = "perfect! and actually, you'll need your laptop too. can you grab it real quick?"
-      } else if (isDeclining) {
-        bossResponse = "can you hop on a quick call? won't take long and would really help me out here"
-      } else {
-        bossResponse = "can you hop on a quick call? won't take long and would really help me out here"
-      }
-    } else if (messageCount === 3) {
-      if (askingQuestions && userLastMessage.includes('long')) {
-        bossResponse = "just like 10-15 minutes max! I know you're off but this is pretty urgent and you're the only one who knows this project inside out"
-      } else if (isAgreeing) {
-        bossResponse = "awesome! oh and you'll need to log into the client portal too. need you to call me back asap. client is escalating"
-      } else if (isDeclining) {
-        bossResponse = "I know you're off but this is pretty urgent and you're the only one who knows this project inside out"
-      } else {
-        bossResponse = "I know you're off but this is pretty urgent and you're the only one who knows this project inside out"
-      }
-    } else if (messageCount === 4) {
-      if (isAgreeing) {
-        bossResponse = "perfect! need you to call me back asap. client is escalating and I need your input before EOD"
-      } else if (isDeclining) {
-        bossResponse = "need you to call me back asap. client is escalating and I need your input before EOD"
-      } else {
-        bossResponse = "need you to call me back asap. client is escalating and I need your input before EOD"
-      }
-    } else if (messageCount >= 5) {
-      if (isAgreeing) {
-        bossResponse = "amazing! just hit the call button when you're ready 📞"
-      } else if (isDeclining) {
-        bossResponse = "I really need your help here. can you please just give me a quick call? 📞"
-      } else {
-        bossResponse = "going to have to make a decision without you if I don't hear back soon..."
-      }
-    }
-    
-    // Never auto-end - let user choose via call button or back button
+    const bossResponse = await generateBossResponse(messages, messageCount)
     
     return NextResponse.json({
       response: bossResponse,
-      shouldEnd,
+      shouldEnd: false, // Never auto-end
       escalationLevel: messageCount
     })
     
