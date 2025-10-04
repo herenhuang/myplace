@@ -77,17 +77,22 @@ BEHAVIOR: ${getShareableContext()}
 
 PATTERN: ${patternContext}
 
-Write exactly 2 SHORT paragraphs (2-3 sentences each) in THIRD PERSON. Make it SHAREABLE - something they'd screenshot and send to friends.
+Write EXACTLY 2 SHORT paragraphs in THIRD PERSON. NO TITLES. NO HEADINGS. Make it SHAREABLE.
 
-Paragraph 1: A SPECIFIC, FUNNY observation about what THIS EXACT behavior reveals. Reference the actual numbers (${gameData.bubblesPopped} bubbles, ${formatTime(gameData.timeElapsed)}) naturally. ${randomTone}
+Paragraph 1: 2-3 sentences MAX. A SPECIFIC, FUNNY observation using the numbers (${gameData.bubblesPopped} bubbles, ${formatTime(gameData.timeElapsed)}). ${randomTone}
 
-Paragraph 2: Connect this to a broader personality trait or life approach. Make it feel true and a bit exposing in a fun way. ${randomStyle}
+Paragraph 2: 2-3 sentences MAX. Connect to personality/life approach. ${randomStyle}
 
-IMPORTANT: Make each analysis feel completely unique. Don't reuse phrases. Don't follow a template. Be memorable and shareable.`;
+STRICT RULES:
+- NO titles or headings
+- Each paragraph = 2-3 sentences ONLY
+- Start directly with observation
+- Be punchy and memorable
+- Make each one completely unique`;
 
     const shareableCompletion = await anthropic.messages.create({
       model: 'claude-3-7-sonnet-latest',
-      max_tokens: 512,
+      max_tokens: 300,
       system: shareablePrompt,
       messages: [
         {
@@ -142,17 +147,22 @@ WHAT HAPPENED: ${getPersonalContext()}
 
 THEIR STYLE: ${patternContext}
 
-Write 2 paragraphs (3-4 sentences each) in SECOND PERSON ("you") that make them feel SEEN. 
+Write EXACTLY 2 SHORT paragraphs in SECOND PERSON ("you"). NO TITLES. NO HEADINGS. Just the paragraphs.
 
-Paragraph 1: Call out EXACTLY what their behavior reveals using the specific numbers (${gameData.bubblesPopped} bubbles, ${formatTime(gameData.timeElapsed)}). ${randomApproach}
+Paragraph 1: 2-3 sentences MAX. Call out what their behavior reveals using the numbers (${gameData.bubblesPopped} bubbles, ${formatTime(gameData.timeElapsed)}). ${randomApproach}
 
-Paragraph 2: Connect this to how they probably are in real life. ${randomQuestion} Make them laugh and nod along. Be insightful but playful.
+Paragraph 2: 2-3 sentences MAX. Connect to real life. ${randomQuestion} Make them laugh and nod.
 
-CRITICAL: Every single assessment must feel COMPLETELY DIFFERENT. Use different sentence structures, different angles, different observations. Don't repeat phrases or follow patterns. Make it fresh every time.`;
+STRICT RULES:
+- NO titles like "The Speed Demon" or "## Anything"
+- Each paragraph = 2-3 sentences ONLY
+- Start directly with the analysis
+- Be concise and punchy
+- Make it completely different each time`;
 
     const personalCompletion = await anthropic.messages.create({
       model: 'claude-3-7-sonnet-latest',
-      max_tokens: 512,
+      max_tokens: 300,
       system: personalPrompt,
       messages: [
         {

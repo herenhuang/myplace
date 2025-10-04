@@ -9,9 +9,9 @@ $primary-color-dark: #2563eb;
 $primary-color-darker: #1d4ed8;
 $primary-color-light: #60a5fa;
 
-$bubble-color: #a78bfa;
-$bubble-color-light: #c4b5fd;
-$bubble-color-dark: #8b5cf6;
+$bubble-color: rgba(173, 216, 230, 0.85);
+$bubble-color-light: rgba(200, 230, 240, 0.95);
+$bubble-color-dark: rgba(135, 206, 235, 0.9);
 
 $gray-50: #f9fafb;
 $gray-100: #f3f4f6;
@@ -54,7 +54,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   max-height: 90vh;
   aspect-ratio: 4/7;
   border-radius: 36px;
-  background: #fafaf9;
+  background: linear-gradient(to bottom, #e8f4f8, #f0f8fb);
   position: relative;
   box-shadow: -12px 36px 48px rgba(0, 0, 0, 0.12);
   overflow: hidden;
@@ -65,7 +65,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(to bottom, rgba(250, 250, 249, 0.3), rgba(245, 245, 244, 0.5));
+    background-image: linear-gradient(to bottom, rgba(173, 216, 230, 0.15), rgba(135, 206, 235, 0.2));
     content: '';
     border-radius: 36px;
     z-index: 1;
@@ -236,15 +236,21 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   position: relative;
   @include transition-all(150ms);
   background: linear-gradient(135deg, $bubble-color-light 0%, $bubble-color 50%, $bubble-color-dark 100%);
+  border: 1px solid rgba(135, 206, 235, 0.15);
   box-shadow: 
-    0 1px 4px rgba(139, 92, 246, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    0 2px 4px rgba(100, 149, 237, 0.25),
+    0 1px 2px rgba(173, 216, 230, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(100, 149, 237, 0.15);
 
   &:hover:not(:disabled) {
     transform: scale(1.05);
+    border-color: rgba(135, 206, 235, 0.25);
     box-shadow: 
-      0 2px 6px rgba(139, 92, 246, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      0 3px 6px rgba(100, 149, 237, 0.3),
+      0 1px 3px rgba(173, 216, 230, 0.4),
+      inset 0 2px 4px rgba(255, 255, 255, 0.9),
+      inset 0 -1px 2px rgba(100, 149, 237, 0.2);
   }
 
   &:active:not(:disabled) {
@@ -253,6 +259,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
   &.popped {
     background: transparent;
+    border: none;
     box-shadow: none;
     cursor: default;
     animation: popAnimation 0.3s ease-out;
@@ -357,7 +364,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .oneLiner {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.5;
   color: $gray-900;

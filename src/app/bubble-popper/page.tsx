@@ -40,6 +40,7 @@ export default function BubblePopperPage() {
   const [gameStats, setGameStats] = useState<GameStats>({ totalPlays: 0, averageCompletion: 0, averageTime: 0 })
   const [user, setUser] = useState<User | null>(null)
   const [sessionId, setSessionId] = useState<string>('')
+  const [personalStats, setPersonalStats] = useState<{ totalRounds: number; totalBubbles: number }>({ totalRounds: 0, totalBubbles: 0 })
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Initialize user, session, and stats
@@ -68,6 +69,12 @@ export default function BubblePopperPage() {
       // Load global stats
       const stats = await getGlobalStats()
       setGameStats(stats)
+      
+      // Load personal stats from localStorage
+      const savedStats = localStorage.getItem('bubblePersonalStats')
+      if (savedStats) {
+        setPersonalStats(JSON.parse(savedStats))
+      }
     }
     
     initialize()
@@ -202,6 +209,14 @@ export default function BubblePopperPage() {
     playHistory.push({ bubbles: data.bubblesPopped, time: data.timeElapsed, completed: data.completed })
     if (playHistory.length > 10) playHistory.shift() // Keep only last 10
     localStorage.setItem('bubblePlayHistory', JSON.stringify(playHistory))
+    
+    // Update personal stats
+    const newPersonalStats = {
+      totalRounds: personalStats.totalRounds + 1,
+      totalBubbles: personalStats.totalBubbles + data.bubblesPopped
+    }
+    setPersonalStats(newPersonalStats)
+    localStorage.setItem('bubblePersonalStats', JSON.stringify(newPersonalStats))
     
     const playCount = playHistory.length
     
@@ -444,6 +459,16 @@ export default function BubblePopperPage() {
                 </div>
               ) : (
                 <p>No analysis available.</p>
+              )}
+
+              {personalStats.totalRounds > 0 && (
+                <>
+                  <h2>Your Stats</h2>
+                  <ul>
+                    <li><strong>Total Rounds Played:</strong> {personalStats.totalRounds}</li>
+                    <li><strong>Total Bubbles Popped:</strong> {personalStats.totalBubbles}</li>
+                  </ul>
+                </>
               )}
 
               {gameStats.totalPlays > 1 && (
