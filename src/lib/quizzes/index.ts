@@ -9,12 +9,18 @@ import { QuizConfig } from './types'
 import { aiModelQuiz } from './ai-model-quiz'
 import { vacationStyleQuiz } from './vacation-style-quiz'
 import { managerStyleQuiz } from './manager-style-quiz'
+import { crushQuiz } from './crush-quiz'
+import { flirtingStyleQuiz } from './flirting-style-quiz'
+import { howDoYouFallQuiz } from './how-do-you-fall-quiz'
 
 // Registry of all available quizzes
 export const quizRegistry: Record<string, QuizConfig> = {
   'ai-model': aiModelQuiz,
   'vacation-style': vacationStyleQuiz,
-  'manager-style': managerStyleQuiz
+  'manager-style': managerStyleQuiz,
+  'crush-quiz': crushQuiz,
+  'flirting-style': flirtingStyleQuiz,
+  'how-do-you-fall': howDoYouFallQuiz
   // Add new quizzes here:
   // Use the personalization template for narrative quizzes!
 }

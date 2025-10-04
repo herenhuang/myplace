@@ -215,6 +215,16 @@
   }
 }
 
+.timeMarker {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--quiz-primary-color, #ff6b35);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
 // Choices Container
 .choicesContainer {
   display: flex;
