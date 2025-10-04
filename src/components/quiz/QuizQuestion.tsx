@@ -29,6 +29,8 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     setShowComparison(false)
     setCustomInput('')
     setIsCustomSelected(false)
+    setStats(null) // Reset stats to prevent showing old question's data
+    setAnimateStats(false) // Reset animation state
 
     const timeouts: NodeJS.Timeout[] = []
     const optionCount = question.options.length
@@ -58,7 +60,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     // Then proceed to next question after delay
     setTimeout(() => {
       onSelect(value, label, isCustom)
-    }, 2500) // Give time to see comparison
+    }, 3200) // Give time to see tooltip + animation (500ms stats load + 1000ms animation + 1700ms to appreciate)
   }
 
   const handleCustomSubmit = () => {
@@ -71,6 +73,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
 
   // Fetch stats after selection
   const [stats, setStats] = useState<Array<{value: string, percentage: number}> | null>(null)
+  const [animateStats, setAnimateStats] = useState(false) // Control animation trigger
 
   useEffect(() => {
     if (showComparison) {
@@ -83,6 +86,8 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
 
           if (data.success && data.questionStats) {
             setStats(data.questionStats.options)
+            // Trigger animation after stats are set
+            setTimeout(() => setAnimateStats(true), 50)
           }
         } catch (error) {
           console.error('Error fetching stats:', error)
@@ -141,11 +146,11 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
               }}
               title={option.hint}
             >
-              {/* Background fill showing percentage */}
+              {/* Background fill showing percentage - animates from 0 to percentage */}
               {showStats && (
                 <div 
                   className={`${styles.optionButtonFill} ${isSelected ? styles.optionButtonFillUser : ''}`}
-                  style={{ width: `${percentage}%` }}
+                  style={{ width: animateStats ? `${percentage}%` : '0%' }}
                 />
               )}
               

@@ -325,7 +325,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 4px; // Reduced gap to prevent text wrapping
   overflow: hidden;
   box-sizing: border-box !important; // Ensure padding is included in height
 
@@ -360,11 +360,13 @@
 
   .optionArrow {
     color: var(--quiz-primary-color, #ff6b35);
-    font-size: 18px;
+    font-size: 16px; // Slightly smaller to match percentage
     position: relative;
     z-index: 2;
-    min-width: 24px; // Ensure consistent width
+    min-width: 36px; // Match percentage width
     text-align: right;
+    flex-shrink: 0; // Don't allow it to shrink
+    padding-left: 4px; // Match percentage padding
   }
 }
 
@@ -393,13 +395,15 @@
 }
 
 .optionPercentage {
-  font-size: 14px;
+  font-size: 12px; // Smaller size
   font-weight: 700;
   color: #374151;
   position: relative;
   z-index: 2;
-  min-width: 40px; // Match arrow width for consistency
+  min-width: 36px; // Smaller width
   text-align: right;
+  flex-shrink: 0; // Don't allow it to shrink
+  padding-left: 4px; // Small left padding instead of large gap
 }
 
 .youBadgeInline {
