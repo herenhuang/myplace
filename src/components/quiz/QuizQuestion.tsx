@@ -114,16 +114,12 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
           <h2>{question.text}</h2>
         </div>
         
-        {/* Insight message - always rendered to reserve space, prevents layout shift */}
-        <div className={styles.questionInsight} style={{ 
-          opacity: (showComparison && stats && moreUniqueThan > 0) ? 1 : 0,
-          visibility: (showComparison && stats && moreUniqueThan > 0) ? 'visible' : 'hidden'
-        }}>
-          {showComparison && stats && moreUniqueThan > 0 
-            ? `✨ Your choice is more unique than ${moreUniqueThan}% of responses!`
-            : '\u00A0' /* Non-breaking space to maintain height */
-          }
-        </div>
+        {/* Small tooltip about uniqueness - only renders when there's something to show */}
+        {showComparison && stats && moreUniqueThan > 0 && (
+          <div className={styles.questionInsight}>
+            ✨ Your choice is more unique than {moreUniqueThan}% of responses!
+          </div>
+        )}
       </div>
       <div className={styles.choicesContainer}>
         {question.options.map((option, index) => {
@@ -156,14 +152,9 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
               
               <span className={styles.optionLabel}>{option.label}</span>
               
-              {showStats ? (
-                <span className={styles.optionPercentage}>
-                  {percentage}%
-                  {isSelected && <span className={styles.youBadgeInline}>You</span>}
-                </span>
-              ) : (
-                <span className={styles.optionArrow}>→</span>
-              )}
+              <span className={showStats ? styles.optionPercentage : styles.optionArrow}>
+                {showStats ? `${percentage}%` : '→'}
+              </span>
             </button>
           )
         })}
