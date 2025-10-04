@@ -31,7 +31,8 @@ export default function BubblePopperPage() {
   const [timeElapsed, setTimeElapsed] = useState(0)
   const [isGameActive, setIsGameActive] = useState(false)
   const [gameData, setGameData] = useState<GameData | null>(null)
-  const [assessment, setAssessment] = useState<string>('')
+  const [assessment, setAssessment] = useState<string>('') // Third person for card
+  const [personalAssessment, setPersonalAssessment] = useState<string>('') // Second person for full page
   const [oneLiner, setOneLiner] = useState<string>('')
   const [isAnalyzing, startAnalysis] = useTransition()
   const [isEnding, setIsEnding] = useState(false)
@@ -179,13 +180,15 @@ export default function BubblePopperPage() {
     startAnalysis(async () => {
       const result = await saveAndAnalyze(data, sessionId)
       if (result.success && result.analysis) {
-        setAssessment(result.analysis)
+        setAssessment(result.analysis) // Third person for card
+        setPersonalAssessment(result.personalAnalysis || result.analysis) // Second person for full page
         // Refresh global stats
         const newStats = await getGlobalStats()
         setGameStats(newStats)
       } else if (result.error) {
         console.error('Analysis error:', result.error)
         setAssessment('Unable to generate analysis at this time.')
+        setPersonalAssessment('Unable to generate analysis at this time.')
       }
     })
     
@@ -201,50 +204,59 @@ export default function BubblePopperPage() {
     localStorage.setItem('bubblePlayHistory', JSON.stringify(playHistory))
     
     const playCount = playHistory.length
-    const patternText = data.poppingPattern === 'sequential' ? 'methodically, one by one' : 
-                       data.poppingPattern === 'strategic' ? 'in a clear pattern' : 
-                       'all over the place'
     
     if (data.completed && data.timeElapsed < 60) {
       const variations = [
-        `Speed demon. Popped all 100 ${patternText} in under a minute.`,
-        `Speedrunner energy. ${formatTime(data.timeElapsed)} for 100 bubbles. Impressive.`,
-        `Blitzed through it. ${formatTime(data.timeElapsed)} total. You don't mess around.`
+        `Speedran it. This person doesn't mess around with anything.`,
+        `Under a minute. Efficiency levels: dangerously high.`,
+        `Blitzed through without hesitation. The type who eats vegetables first.`,
+        `Treated this like a competitive sport. Somehow made bubble-popping intense.`,
+        `Full completion, minimal time. They definitely have a color-coded calendar.`
       ]
       setOneLiner(variations[playCount % variations.length])
     } else if (data.completed) {
       const variations = [
-        `Finished the whole thing ${patternText}. That's commitment.`,
-        `All 100 bubbles in ${formatTime(data.timeElapsed)}. You actually did it.`,
-        `Completed. ${formatTime(data.timeElapsed)} of your life you'll never get back. Worth it?`
+        `Actually finished every single one. Rare breed of completionist.`,
+        `Went all the way. They're thorough, borderline obsessive.`,
+        `100% completion. Definitely the type who reads terms and conditions.`,
+        `Couldn't leave it unfinished. That must be exhausting.`,
+        `Saw it through to the end. Commitment issues? Not here.`
       ]
       setOneLiner(variations[playCount % variations.length])
     } else if (data.bubblesPopped >= 75) {
       const variations = [
-        `Got to ${data.bubblesPopped}, popping ${patternText}, then said "I'm good."`,
-        `${data.bubblesPopped} bubbles. Close enough to 100. Smart.`,
-        `Stopped at ${data.bubblesPopped}. Diminishing returns, right?`
+        `Close enough is good enough for this one.`,
+        `Almost there, then bailed. Smart enough to know when it's pointless.`,
+        `Got the idea, called it quits. Pragmatist energy.`,
+        `Three quarters done and walked away. They understand diminishing returns.`,
+        `Nearly finished, then stopped. Probably leaves 5% battery too.`
       ]
       setOneLiner(variations[playCount % variations.length])
     } else if (data.bubblesPopped >= 40) {
       const variations = [
-        `Popped ${data.bubblesPopped} bubbles ${patternText} before questioning life choices.`,
-        `${data.bubblesPopped} bubbles and out. You saw where this was going.`,
-        `Made it to ${data.bubblesPopped}. That's ${playCount > 1 ? 'still' : ''} more patient than most.`
+        `Made it halfway-ish then bounced. They've got places to be.`,
+        `Gave it a solid attempt before realizing life is short.`,
+        `Got the general vibe and peaced out. This person values their time.`,
+        `Reasonable effort, then quit. The type who DNFs books guilt-free.`,
+        `Sampled enough to understand, then left. Efficient decision-maker.`
       ]
       setOneLiner(variations[playCount % variations.length])
     } else if (data.bubblesPopped >= 10) {
       const variations = [
-        `${data.bubblesPopped} bubbles was enough to get the point.`,
-        `Tried ${data.bubblesPopped}, decided it wasn't worth it. Fair.`,
-        `${data.bubblesPopped} bubbles. ${playCount > 2 ? "Third time and still not buying it?" : "Not impressed, huh?"}`
+        `A handful was enough to get the gist. Quick learner.`,
+        `Brief engagement, swift exit. The type who skips to the end.`,
+        `Popped a few and noped out. ${playCount > 2 ? "Somehow keeps coming back though." : "Not impressed."}`,
+        `Gave it exactly as much time as it deserved. Respect.`,
+        `Sampled the experience, found it lacking. Fair assessment.`
       ]
       setOneLiner(variations[playCount % variations.length])
     } else {
       const variations = [
-        `Nope. Not doing this. Ended it immediately.`,
-        `${data.bubblesPopped} bubbles and OUT. ${playCount > 1 ? "Again?! You really hate this." : "Respect the instant quit."}`,
-        `Literally ${data.bubblesPopped} bubbles. ${playCount > 2 ? "Why do you keep coming back?" : "You saw through it instantly."}`
+        `Instant quit. ${playCount > 1 ? "Somehow keeps trying this game." : "Saw through it immediately."}`,
+        `Noped out almost instantly. Commitment-phobe or genius? Probably genius.`,
+        `${playCount > 2 ? "Third try, still hates it." : "Has zero patience for pointless tasks."}`,
+        `Took one look and said no. That's a vibe.`,
+        `Barely started before quitting. Impressive BS detector.`
       ]
       setOneLiner(variations[playCount % variations.length])
     }
@@ -337,17 +349,45 @@ export default function BubblePopperPage() {
   const renderArchetype = () => {
     if (!gameData) return null
 
+    // Show loading state while analyzing
+    if (isAnalyzing) {
+      return (
+        <div className={styles.textContainer}>
+          <div className={styles.resultHeader}>
+            <div className={styles.loadingContent}>
+              <div className={styles.spinner}></div>
+              <span>Analyzing your gameplay...</span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // Get first 2 sentences of assessment for the card
+    const getShortAssessment = () => {
+      if (!assessment) return ''
+      const firstParagraph = assessment.split('\n\n').filter(p => p.trim())[0] || ''
+      const sentences = firstParagraph.match(/[^.!?]+[.!?]+/g) || []
+      return sentences.slice(0, 2).join(' ').trim()
+    }
+    
+    const shortAssessment = getShortAssessment()
+
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultHeader}>
           <div className={styles.resultCard}>
+            <h3 className={styles.cardTitle}>Bubble Popper</h3>
             {oneLiner && (
               <p className={styles.oneLiner}>{oneLiner}</p>
             )}
+            {shortAssessment && (
+              <p className={styles.cardAnalysis}>{shortAssessment}</p>
+            )}
             <div className={styles.resultStats}>
               <div className={styles.resultStat}>
-                <span className={styles.resultStatValue}>{gameData.bubblesPopped}%</span>
-                <span className={styles.resultStatLabel}>bubbles popped</span>
+                <span className={styles.resultStatValue}>{gameData.bubblesPopped}</span>
+                <span className={styles.resultStatLabel}>bubbles</span>
               </div>
               <div className={styles.resultStat}>
                 <span className={styles.resultStatValue}>{formatTime(gameData.timeElapsed)}</span>
@@ -370,6 +410,7 @@ export default function BubblePopperPage() {
               setPoppingSequence([])
               setGameData(null)
               setAssessment('')
+              setPersonalAssessment('')
               setOneLiner('')
             }}
           >
@@ -395,23 +436,15 @@ export default function BubblePopperPage() {
             </div>
           ) : (
             <div className={styles.markdownContent}>
-              {assessment ? (
+              {personalAssessment ? (
                 <div>
-                  {assessment.split('\n\n').filter(p => p.trim()).map((paragraph, idx) => (
+                  {personalAssessment.split('\n\n').filter(p => p.trim()).map((paragraph, idx) => (
                     <p key={idx}>{paragraph.trim()}</p>
                   ))}
                 </div>
               ) : (
                 <p>No analysis available.</p>
               )}
-              
-              <h2>Your Stats</h2>
-              <ul>
-                <li><strong>Bubbles Popped:</strong> {gameData.bubblesPopped} / 100</li>
-                <li><strong>Time Elapsed:</strong> {formatTime(gameData.timeElapsed)}</li>
-                <li><strong>Completion:</strong> {gameData.completed ? 'Completed all bubbles' : 'Ended early'}</li>
-                <li><strong>Popping Pattern:</strong> {gameData.poppingPattern.charAt(0).toUpperCase() + gameData.poppingPattern.slice(1)} {gameData.poppingPattern === 'sequential' ? '(one by one)' : gameData.poppingPattern === 'strategic' ? '(rows/columns)' : '(all over the place)'}</li>
-              </ul>
 
               {gameStats.totalPlays > 1 && (
                 <>
@@ -421,7 +454,6 @@ export default function BubblePopperPage() {
                     <li><strong>Your Completion:</strong> {gameData.bubblesPopped} bubbles — You're in the {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)} percentile</li>
                     <li><strong>Your Speed:</strong> {formatTime(gameData.timeElapsed)} — You're in the {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)} percentile (faster is better)</li>
                     <li><strong>Global Average:</strong> {Math.round(gameStats.averageCompletion)} bubbles in {formatTime(Math.round(gameStats.averageTime))}</li>
-                    {gameData.bubblesPopped > gameStats.averageCompletion && <li>🎉 <strong>Above average!</strong> You popped {Math.round(gameData.bubblesPopped - gameStats.averageCompletion)} more bubbles than most people</li>}
                     {gameData.completed && <li>⭐ <strong>Completionist!</strong> You're one of the few who finished all 100 bubbles</li>}
                   </ul>
                 </>
@@ -439,6 +471,7 @@ export default function BubblePopperPage() {
                 setPoppingSequence([])
                 setGameData(null)
                 setAssessment('')
+                setPersonalAssessment('')
                 setOneLiner('')
               }}
             >
