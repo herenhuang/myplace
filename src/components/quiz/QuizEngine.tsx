@@ -380,7 +380,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
           // Format alternatives for the prompt
           const alternativesText = alternatives && alternatives.length > 0
-            ? alternatives.map((alt: any) => `- **${alt.fullArchetype}**: ${alt.reason}`).join('\n')
+            ? alternatives.map((alt: { fullArchetype: string; reason: string }) => `- **${alt.fullArchetype}**: ${alt.reason}`).join('\n')
             : 'No strong alternatives - this is clearly your style!'
 
           // Generate AI explanation

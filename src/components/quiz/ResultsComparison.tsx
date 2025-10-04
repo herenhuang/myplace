@@ -53,7 +53,7 @@ export default function ResultsComparison({ config, userPersonalityId }: Results
 
   // Get personality name
   const getPersonalityName = (id: string) => {
-    const personality = config.personalities.find(p => p.id === id)
+    const personality = config.personalities?.find(p => p.id === id)
     return personality?.name || id
   }
 
@@ -92,9 +92,9 @@ export default function ResultsComparison({ config, userPersonalityId }: Results
           {userStat.percentage <= 20 ? (
             <>🌟 Your result is rare! Only {userStat.percentage}% of people match your style.</>
           ) : userStat.percentage >= 40 ? (
-            <>You're in good company! {userStat.percentage}% of people share your result.</>
+            <>You&apos;re in good company! {userStat.percentage}% of people share your result.</>
           ) : (
-            <>You're more unique than {moreUniqueThan}% of quiz takers!</>
+            <>You&apos;re more unique than {moreUniqueThan}% of quiz takers!</>
           )}
         </div>
       )}

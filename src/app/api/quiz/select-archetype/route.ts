@@ -7,7 +7,7 @@ const anthropic = new Anthropic({
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId, quizId, responses, wordMatrix } = await request.json()
+    const { sessionId: _sessionId, quizId, responses, wordMatrix } = await request.json()
 
     if (!quizId || !responses || !wordMatrix) {
       return NextResponse.json(
@@ -18,11 +18,11 @@ export async function POST(request: NextRequest) {
 
     // Format responses for the prompt
     const answersText = responses
-      .map((r: any, i: number) => `Q${i + 1}: ${r.question}\nA: ${r.selectedOption}`)
+      .map((r: { question: string; selectedOption: string }, i: number) => `Q${i + 1}: ${r.question}\nA: ${r.selectedOption}`)
       .join('\n\n')
 
     // Replace placeholders in selection prompt
-    let prompt = wordMatrix.selectionPrompt
+    const prompt = wordMatrix.selectionPrompt
       .replace('{{firstWords}}', wordMatrix.firstWords.join(', '))
       .replace('{{secondWords}}', wordMatrix.secondWords.join(', '))
       .replace('{{answers}}', answersText)
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       } else {
         throw new Error('No JSON found in response')
       }
-    } catch (parseError) {
+    } catch (_parseError) {
       console.error('Failed to parse AI response:', responseText)
       return NextResponse.json(
         { error: 'Failed to parse AI response' },
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Format alternatives if they exist
-    const alternatives = archetype.alternatives?.map((alt: any) => ({
+    const alternatives = archetype.alternatives?.map((alt: { firstWord: string; secondWord: string; reason?: string }) => ({
       firstWord: alt.firstWord,
       secondWord: alt.secondWord,
       fullArchetype: `${alt.firstWord} ${alt.secondWord}`,

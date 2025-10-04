@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Format responses for prompt
     const answersText = responses
-      .map((r: any) => `Q: ${r.question}\nA: ${r.selectedOption}`)
+      .map((r: { question: string; selectedOption: string }) => `Q: ${r.question}\nA: ${r.selectedOption}`)
       .join('\n\n')
 
     // Use custom prompt template or default

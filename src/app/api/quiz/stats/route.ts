@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
       sessions.forEach(session => {
         const responses = session.data?.responses || []
-        const response = responses.find((r: any) => r.questionIndex === qIndex)
+        const response = responses.find((r: { questionIndex: number; selectedValue?: string }) => r.questionIndex === qIndex)
         
         if (response?.selectedValue) {
           optionCounts[response.selectedValue] = (optionCounts[response.selectedValue] || 0) + 1

@@ -126,7 +126,7 @@ Style:
     const parts = response.candidates?.[0]?.content?.parts
     
     console.log('[SERVER] 🔍 Parts count:', parts?.length || 0)
-    const imagePart = parts?.find((p) => 'inlineData' in (p as any))
+    const imagePart = parts?.find((p) => 'inlineData' in (p as { inlineData?: { data: string; mimeType?: string } }))
     
     if (imagePart?.inlineData) {
       const { data: base64Data, mimeType } = imagePart.inlineData
