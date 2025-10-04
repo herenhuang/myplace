@@ -31,6 +31,11 @@ Ask yourself:
 
 ### Step 3: Design 8-10 Strategic Questions
 
+⚠️ **MANDATORY FORMAT:**
+- **EXACTLY 3 options per question** (no more, no less)
+- **ALWAYS set `allowCustomInput: true`** on every question
+- **8-10 total questions** (not more, not less)
+
 Each question must:
 1. **Map to specific dimensions** of your word matrix
 2. **Present a concrete scenario** showing what someone DOES

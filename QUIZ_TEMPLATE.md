@@ -17,6 +17,12 @@ When a user says "Create a [TOPIC] quiz":
 6. **Register the quiz** in `/src/lib/quizzes/index.ts`
 7. **Test the quiz** at `/quiz/[quiz-id]`
 
+### ⚠️ CRITICAL RULES FOR STORY-MATRIX QUIZZES:
+- **EXACTLY 3 options per question** (no more, no less)
+- **ALWAYS set `allowCustomInput: true`** on every single question
+- **8-10 total questions** (not more, not less)
+- **Scenario-based questions** that show what someone DOES (not preference questions)
+
 ---
 
 ## 📁 File Structure
@@ -546,16 +552,17 @@ export const yourStoryQuiz: QuizConfig = {
   
   // CRITICAL: Design 8-10 questions that map to your word matrix dimensions
   // Each question must be SCENARIO-BASED showing what someone DOES (not preferences)
+  // MANDATORY: EXACTLY 3 options + allowCustomInput: true on EVERY question
   questions: [
     {
       id: 'q1',  // ← All questions need IDs for story-matrix
       text: 'You just booked a trip departing in 3 months. What happens next?',  // ← SCENARIO, not "How do you..."
-      options: [
+      options: [  // ← EXACTLY 3 OPTIONS (not 2, not 4, EXACTLY 3)
         { label: 'Start a detailed spreadsheet with plans', value: 'structured_planner' },  // ← ACTION they take
         { label: 'Book the flight and wing the rest', value: 'spontaneous_free' },  // ← What they DO
         { label: 'Browse blogs but keep it loose', value: 'flexible_balance' }  // ← Observable behavior
       ],
-      allowCustomInput: true  // ← ALWAYS enable custom answers
+      allowCustomInput: true  // ← MANDATORY: Must be true on ALL questions
     },
     {
       id: 'q2',
@@ -626,6 +633,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
+  "tagline": "A punchy, evocative subtitle that makes them feel SEEN (e.g., 'You've got 3 backup plans for your backup plans' or 'Everyone knows you before they ask')",
   "reasoning": "2-3 sentence explanation. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason"},
@@ -640,12 +648,12 @@ IMPORTANT: Do NOT make up names like "Natural Explorer". Only use exact words fr
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: \`You're a [topic] expert analyzing someone's [topic] style. They are a "{{archetype}}".
+    promptTemplate: \`You're a [topic] expert analyzing someone's [topic] style. They are a "{{archetype}}" - {{tagline}}.
 
 Write a warm, engaging explanation with these sections:
 
 ## Your [Topic] DNA
-Start with "As {{archetype}}, you..." and write 2-3 sentences about their core approach. Reference their actual quiz answers.
+Start with "As {{archetype}}, you..." and write 2-3 sentences about their core approach. Make sure the description aligns with their tagline: "{{tagline}}". Reference their actual quiz answers.
 
 ## What I Noticed
 Highlight 2-3 specific patterns from their actual answers that show they're {{archetype}}:

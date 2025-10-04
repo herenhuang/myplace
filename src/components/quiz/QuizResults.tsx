@@ -18,7 +18,7 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
   // Get display name - either from personality or word matrix
   const displayName = result.personality?.name || result.wordMatrixResult?.fullArchetype || 'Your Result'
   const displayImage = result.personality?.image
-  const displayTagline = result.personality?.tagline
+  const displayTagline = result.personality?.tagline || result.wordMatrixResult?.tagline
 
   if (!showExplanation) {
     // Card view
@@ -72,6 +72,9 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
         <h1 className={styles.resultTitle}>{displayName}</h1>
+        {displayTagline && (
+          <p className={styles.resultTagline}>{displayTagline}</p>
+        )}
         <div className={styles.markdownContent}>
           <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
         </div>

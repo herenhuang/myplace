@@ -375,7 +375,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             throw new Error('Failed to select archetype')
           }
 
-          const { firstWord, secondWord, reasoning, alternatives } = selectData.archetype
+          const { firstWord, secondWord, tagline, reasoning, alternatives } = selectData.archetype
           const fullArchetype = `${firstWord} ${secondWord}`
 
           // Format alternatives for the prompt
@@ -388,9 +388,11 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
           if (config.aiExplanation?.enabled) {
             try {
-              // Replace {{alternatives}} in the prompt
+              // Replace placeholders in the prompt
               let promptWithAlternatives = config.aiExplanation.promptTemplate || ''
-              promptWithAlternatives = promptWithAlternatives.replace('{{alternatives}}', alternativesText)
+              promptWithAlternatives = promptWithAlternatives
+                .replace('{{alternatives}}', alternativesText)
+                .replace('{{tagline}}', tagline || '')
 
               const aiResponse = await fetch('/api/quiz/explain', {
                 method: 'POST',
@@ -398,6 +400,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                 body: JSON.stringify({
                   sessionId: dbSessionId,
                   archetype: fullArchetype,
+                  tagline: tagline,
                   responses: quizResponses,
                   config: {
                     model: config.aiExplanation.model,
@@ -420,6 +423,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
               firstWord,
               secondWord,
               fullArchetype,
+              tagline,
               alternatives: alternatives || []
             },
             responses: quizResponses,

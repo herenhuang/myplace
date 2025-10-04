@@ -129,6 +129,7 @@ export interface QuizResult {
     firstWord: string
     secondWord: string
     fullArchetype: string // "FirstWord SecondWord"
+    tagline?: string // Evocative subtitle like "You've got 3 backup plans for your backup plans"
     alternatives?: Array<{
       firstWord: string
       secondWord: string

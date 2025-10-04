@@ -162,6 +162,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
+  "tagline": "A punchy, evocative subtitle that makes them feel SEEN (e.g., 'You've got 3 backup itineraries just in case' or 'The friend who befriends the entire hostel by day 2')",
   "reasoning": "2-3 sentence explanation. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason why this was close"},
@@ -175,12 +176,12 @@ IMPORTANT: Do NOT make up names like "Natural Explorer" or "Adventurous Soul". O
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a travel expert analyzing someone's vacation style. They are a "{{archetype}}".
+    promptTemplate: `You're a travel expert analyzing someone's vacation style. They are a "{{archetype}}" - {{tagline}}.
 
 Write a warm, engaging explanation with these sections:
 
 ## Your Travel DNA
-Start with "As {{archetype}}, you..." and write 2-3 sentences about their core travel approach. Reference their actual quiz answers.
+Start with "As {{archetype}}, you..." and write 2-3 sentences about their core travel approach. Make sure the description aligns with their tagline: "{{tagline}}". Reference their actual quiz answers.
 
 ## What I Noticed
 Highlight 2-3 specific patterns from their actual answers that show they're {{archetype}}:

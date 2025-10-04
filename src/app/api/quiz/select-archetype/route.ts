@@ -78,6 +78,7 @@ export async function POST(request: NextRequest) {
       archetype: {
         firstWord: archetype.firstWord,
         secondWord: archetype.secondWord,
+        tagline: archetype.tagline || '',
         reasoning: archetype.reasoning || '',
         alternatives
       }
