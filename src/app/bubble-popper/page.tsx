@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getOrCreateSessionId } from '@/lib/session'
 import { saveAndAnalyze, getGlobalStats } from './actions'
-import type { User } from '@supabase/supabase-js'
 import PageContainer from '@/components/layout/PageContainer'
 import styles from './page.module.scss'
 
@@ -31,14 +30,12 @@ export default function BubblePopperPage() {
   const [timeElapsed, setTimeElapsed] = useState(0)
   const [isGameActive, setIsGameActive] = useState(false)
   const [gameData, setGameData] = useState<GameData | null>(null)
-  const [assessment, setAssessment] = useState<string>('') // Third person for card
   const [personalAssessment, setPersonalAssessment] = useState<string>('') // Second person for full page
   const [oneLiner, setOneLiner] = useState<string>('')
   const [isAnalyzing, startAnalysis] = useTransition()
   const [isEnding, setIsEnding] = useState(false)
   const [poppingSequence, setPoppingSequence] = useState<number[]>([])
   const [gameStats, setGameStats] = useState<GameStats>({ totalPlays: 0, averageCompletion: 0, averageTime: 0 })
-  const [user, setUser] = useState<User | null>(null)
   const [sessionId, setSessionId] = useState<string>('')
   const [personalStats, setPersonalStats] = useState<{ totalRounds: number; totalBubbles: number }>({ totalRounds: 0, totalBubbles: 0 })
   const cardRef = useRef<HTMLDivElement>(null)
@@ -49,15 +46,7 @@ export default function BubblePopperPage() {
     const supabase = createClient()
     
     const initialize = async () => {
-      // Get or create user
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      
-      // Get or create session
-      const sid = getOrCreateSessionId()
-      setSessionId(sid)
-      
-      // Sign in anonymously if needed
+      // Get or create user and sign in anonymously if needed
       try {
         const { data } = await supabase.auth.getSession()
         if (!data.session) {
@@ -66,6 +55,10 @@ export default function BubblePopperPage() {
       } catch {
         // non-fatal
       }
+      
+      // Get or create session
+      const sid = getOrCreateSessionId()
+      setSessionId(sid)
       
       // Load global stats
       const stats = await getGlobalStats()
@@ -188,14 +181,13 @@ export default function BubblePopperPage() {
     startAnalysis(async () => {
       const result = await saveAndAnalyze(data, sessionId)
       if (result.success && result.analysis) {
-        setAssessment(result.analysis) // Third person for card
-        setPersonalAssessment(result.personalAnalysis || result.analysis) // Second person for full page
+        // Only use personalAnalysis for the full assessment page
+        setPersonalAssessment(result.personalAnalysis || result.analysis)
         // Refresh global stats
         const newStats = await getGlobalStats()
         setGameStats(newStats)
       } else if (result.error) {
         console.error('Analysis error:', result.error)
-        setAssessment('Unable to generate analysis at this time.')
         setPersonalAssessment('Unable to generate analysis at this time.')
       }
     })
@@ -303,8 +295,8 @@ export default function BubblePopperPage() {
           try {
             await navigator.share({
               files: [file],
-              title: 'My Patience Test Results',
-              text: 'Check out my results from this patience test!'
+              title: 'Bubble Popping',
+              text: 'Check out my bubble popping results!'
             })
           } catch (err) {
             // User cancelled or error - fall through to download
@@ -357,7 +349,7 @@ export default function BubblePopperPage() {
     <div className={styles.welcomeContainer}>
       <div className={styles.welcomeHeader}>
         <h1 className={styles.welcomeTitle}>Bubble Popper Game</h1>
-        <p className={styles.welcomeSubtitle}>Just pop the bubbles, you don't need to know anything else.</p>
+        <p className={styles.welcomeSubtitle}>Just pop the bubbles, you don&apos;t need to know anything else.</p>
       </div>
       <button className={styles.startButton} onClick={handleStartGame}>
         <span>Start Popping</span>
@@ -435,7 +427,7 @@ export default function BubblePopperPage() {
       <div className={styles.textContainer}>
         <div className={styles.resultHeader}>
           <div className={styles.resultCard} ref={cardRef}>
-            <h3 className={styles.cardTitle}>PATIENCE TEST</h3>
+            <h3 className={styles.cardTitle}>BUBBLE POPPER</h3>
             {oneLiner && (
               <p className={styles.oneLiner}>{oneLiner}</p>
             )}
@@ -486,7 +478,6 @@ export default function BubblePopperPage() {
                 setTimeElapsed(0)
                 setPoppingSequence([])
                 setGameData(null)
-                setAssessment('')
                 setPersonalAssessment('')
                 setOneLiner('')
               }}
@@ -539,10 +530,10 @@ export default function BubblePopperPage() {
                   <h2>Compared to All Players</h2>
                   <ul>
                     <li><strong>Total Plays Worldwide:</strong> {gameStats.totalPlays} games played</li>
-                    <li><strong>Your Completion:</strong> {gameData.bubblesPopped} bubbles — You're in the {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)} percentile</li>
-                    <li><strong>Your Speed:</strong> {formatTime(gameData.timeElapsed)} — You're in the {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)} percentile (faster is better)</li>
+                    <li><strong>Your Completion:</strong> {gameData.bubblesPopped} bubbles — You&apos;re in the {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)} percentile</li>
+                    <li><strong>Your Speed:</strong> {formatTime(gameData.timeElapsed)} — You&apos;re in the {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)} percentile (faster is better)</li>
                     <li><strong>Global Average:</strong> {Math.round(gameStats.averageCompletion)} bubbles in {formatTime(Math.round(gameStats.averageTime))}</li>
-                    {gameData.completed && <li>⭐ <strong>Completionist!</strong> You're one of the few who finished all 100 bubbles</li>}
+                    {gameData.completed && <li>⭐ <strong>Completionist!</strong> You&apos;re one of the few who finished all 100 bubbles</li>}
                   </ul>
                 </>
               )}
@@ -564,7 +555,6 @@ export default function BubblePopperPage() {
                 setTimeElapsed(0)
                 setPoppingSequence([])
                 setGameData(null)
-                setAssessment('')
                 setPersonalAssessment('')
                 setOneLiner('')
               }}
