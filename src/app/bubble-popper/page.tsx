@@ -41,6 +41,7 @@ export default function BubblePopperPage() {
   const [user, setUser] = useState<User | null>(null)
   const [sessionId, setSessionId] = useState<string>('')
   const [personalStats, setPersonalStats] = useState<{ totalRounds: number; totalBubbles: number }>({ totalRounds: 0, totalBubbles: 0 })
+  const cardRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Initialize user, session, and stats
@@ -277,6 +278,58 @@ export default function BubblePopperPage() {
     }
   }
 
+  const handleShare = async () => {
+    if (!cardRef.current) return
+
+    try {
+      // Dynamically import html2canvas
+      const html2canvas = (await import('html2canvas')).default
+      
+      // Capture the card as canvas
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: '#e8f4f8',
+        scale: 2,
+        logging: false
+      })
+
+      // Convert to blob
+      canvas.toBlob(async (blob) => {
+        if (!blob) return
+
+        const file = new File([blob], 'patience-test-results.png', { type: 'image/png' })
+
+        // Try Web Share API (mobile)
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'My Patience Test Results',
+              text: 'Check out my results from this patience test!'
+            })
+          } catch (err) {
+            // User cancelled or error - fall through to download
+            if ((err as Error).name !== 'AbortError') {
+              downloadImage(canvas)
+            }
+          }
+        } else {
+          // Fallback to download
+          downloadImage(canvas)
+        }
+      }, 'image/png')
+    } catch (error) {
+      console.error('Share failed:', error)
+      alert('Unable to share. Please try again.')
+    }
+  }
+
+  const downloadImage = (canvas: HTMLCanvasElement) => {
+    const link = document.createElement('a')
+    link.download = 'patience-test-results.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -381,7 +434,7 @@ export default function BubblePopperPage() {
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultHeader}>
-          <div className={styles.resultCard}>
+          <div className={styles.resultCard} ref={cardRef}>
             <h3 className={styles.cardTitle}>PATIENCE TEST</h3>
             {oneLiner && (
               <p className={styles.oneLiner}>{oneLiner}</p>
@@ -411,27 +464,36 @@ export default function BubblePopperPage() {
               </div>
             )}
           </div>
-          <button 
-            className={styles.appButton}
-            onClick={() => setScreenState('assessment')}
-          >
-            <span>See Full Analysis →</span>
-          </button>
-          <button 
-            className={styles.textButton}
-            onClick={() => {
-              setScreenState('welcome')
-              setBubbles(Array(100).fill(false))
-              setTimeElapsed(0)
-              setPoppingSequence([])
-              setGameData(null)
-              setAssessment('')
-              setPersonalAssessment('')
-              setOneLiner('')
-            }}
-          >
-            Play Again
-          </button>
+          
+          <div className={styles.buttonGroup}>
+            <button 
+              className={styles.appButton}
+              onClick={handleShare}
+            >
+              <span>Share Results</span>
+            </button>
+            <button 
+              className={styles.textButton}
+              onClick={() => setScreenState('assessment')}
+            >
+              See Full Analysis →
+            </button>
+            <button 
+              className={styles.textButton}
+              onClick={() => {
+                setScreenState('welcome')
+                setBubbles(Array(100).fill(false))
+                setTimeElapsed(0)
+                setPoppingSequence([])
+                setGameData(null)
+                setAssessment('')
+                setPersonalAssessment('')
+                setOneLiner('')
+              }}
+            >
+              Play Again
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -490,6 +552,12 @@ export default function BubblePopperPage() {
           <div className={styles.assessmentActions}>
             <button 
               className={styles.appButton}
+              onClick={handleShare}
+            >
+              <span>Share Results</span>
+            </button>
+            <button 
+              className={styles.textButton}
               onClick={() => {
                 setScreenState('welcome')
                 setBubbles(Array(100).fill(false))
@@ -501,13 +569,7 @@ export default function BubblePopperPage() {
                 setOneLiner('')
               }}
             >
-              <span>Play Again</span>
-            </button>
-            <button 
-              className={styles.textButton}
-              onClick={() => setScreenState('archetype')}
-            >
-              Back to Stats
+              Play Again
             </button>
           </div>
         </div>
