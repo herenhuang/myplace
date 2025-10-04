@@ -1,6 +1,6 @@
 # Quiz Type Selector - Which Should I Use?
 
-Quick guide to help you choose between **Archetype Quiz** and **Story-Matrix Quiz**.
+Quick guide to help you choose between **Archetype**, **Story-Matrix**, and **Narrative** quizzes.
 
 ---
 
@@ -11,52 +11,65 @@ Quick guide to help you choose between **Archetype Quiz** and **Story-Matrix Qui
 - ✅ Matching to **established types** (e.g., "Which Hogwarts house?")
 - ✅ You have **4-8 distinct, pre-defined personas**
 - ✅ Results should be **instantly recognizable** (e.g., Myers-Briggs types)
-- ✅ You want **simple scoring** (point-based system)
 
 ### Characteristics:
 - **Outcomes**: 4-8 fixed results
-- **Questions**: 6-10 questions, 4 options each
+- **Questions**: 6-10, can be preferences or scenarios
+- **Story Arc**: None - questions are independent
 - **Scoring**: Manual point assignment per answer
-- **AI Role**: Optional, only for explanation text
-- **Custom Input**: Not typically used
-- **Branching**: Not typically used
+- **AI Role**: Optional explanation only
+- **Setup Time**: ⭐⭐ 30-60 minutes
 
 ### Examples:
-- "Which AI Model Are You?" → Claude, GPT-4, Gemini, etc.
-- "Which Disney Princess Are You?" → Ariel, Belle, Mulan, etc.
-- "What's Your Leadership Style?" → Visionary, Coach, Democrat, Pacesetter
-
-### Setup Complexity: ⭐⭐ (Medium)
-- Need to manually design scoring rules for each question
+- "Which AI Model Are You?" → Claude, GPT-4, Gemini
+- "Which Disney Princess?" → Ariel, Belle, Mulan
+- "Which Hogwarts House?" → Gryffindor, Slytherin, etc.
 
 ---
 
-## 🌟 Story-Matrix Quiz (Dynamic Combinations)
+## 🌟 Story-Matrix Quiz (Disconnected Scenarios)
 
 ### Use When:
-- ✅ Exploring **open-ended personality traits** (e.g., "What's your travel style?")
+- ✅ Exploring **open-ended traits** (e.g., "What's your travel style?")
 - ✅ You want **100+ unique outcomes** (10×10 matrix)
 - ✅ Results should be **personalized combinations** (e.g., "Bold Foodie")
 - ✅ Users should feel **uniquely seen** (not bucketed)
-- ✅ You want **AI-driven results** (Claude selects best match)
 
 ### Characteristics:
-- **Outcomes**: 100 possible combinations (10 first words × 10 second words)
-- **Questions**: 8+ questions, 3 options + custom input each
-- **Scoring**: AI analyzes all answers to select best combination
-- **AI Role**: Critical - selects archetype AND writes explanation
-- **Custom Input**: Yes, on every question
-- **Branching**: Optional, for deeper personalization
+- **Outcomes**: 100 combinations (10 first × 10 second words)
+- **Questions**: 8+, each is independent scenario
+- **Story Arc**: None - each question standalone
+- **Scoring**: AI analyzes all answers
+- **AI Role**: Critical - selects result AND writes explanation
+- **Setup Time**: ⭐⭐⭐ 1-2 hours
 
 ### Examples:
-- "What's Your Vacation Style?" → Spontaneous Foodie, Structured Nature Lover, etc.
-- "What's Your Learning Style?" → Visual Practitioner, Auditory Theorist, etc.
-- "What's Your Conflict Style?" → Direct Harmony Keeper, Diplomatic Truth Seeker, etc.
+- "What's Your Vacation Style?" → Spontaneous Foodie, Structured Planner
+- "What's Your Learning Style?" → Visual Practitioner, Auditory Theorist
 
-### Setup Complexity: ⭐⭐⭐⭐ (High)
-- Need to create distinct 10×10 word matrix
-- Questions must map to specific dimensions
-- Requires careful AI prompt engineering
+---
+
+## 🎬 Narrative Quiz (Continuous Story)
+
+### Use When:
+- ✅ You want users to **LIVE THROUGH a story**
+- ✅ Natural **timeline exists** (days, weeks, phases)
+- ✅ **Recurring characters** add depth
+- ✅ Context builds over time (management, relationships, crises)
+- ✅ Choices should feel **consequential** within a journey
+
+### Characteristics:
+- **Outcomes**: 100 combinations (same as story-matrix)
+- **Questions**: 10 sequential scenes in ONE story
+- **Story Arc**: Full narrative arc with beginning/middle/end
+- **Scoring**: AI analyzes journey through specific story
+- **AI Role**: Adapts each scene based on previous choices
+- **Setup Time**: ⭐⭐⭐⭐ 2-3 hours
+
+### Examples:
+- "Your First 2 Weeks as Manager" → Story adapts to your choices
+- "7 Days Solo in Tokyo" → Trip unfolds based on decisions
+- "First Month Dating" → Relationship evolves with your actions
 
 ---
 
@@ -65,20 +78,20 @@ Quick guide to help you choose between **Archetype Quiz** and **Story-Matrix Qui
 ```
 START: What kind of quiz do I want?
 
-Q1: Are the possible results pre-defined characters or types?
+Q1: Are the results pre-defined characters/types (e.g., Harry Potter houses)?
 ├─ YES → Archetype Quiz
 └─ NO → Continue to Q2
 
-Q2: Do I want 100+ unique, personalized combinations?
-├─ YES → Story-Matrix Quiz
-└─ NO → Continue to Q3
+Q2: Do I want users to experience a continuous story with recurring characters?
+├─ YES → Continue to Q3
+└─ NO → Continue to Q4
 
-Q3: Should every user get a truly unique result?
-├─ YES → Story-Matrix Quiz
-└─ NO → Archetype Quiz
+Q3: Is there a natural timeline (days/weeks/phases)?
+├─ YES → Narrative Quiz
+└─ NO → Story-Matrix Quiz (disconnected scenarios work better)
 
-Q4: Am I comfortable with AI selecting the final result?
-├─ YES → Either works! (lean Story-Matrix for variety)
+Q4: Do I want 100+ unique, personalized combinations?
+├─ YES → Story-Matrix Quiz
 └─ NO → Archetype Quiz
 ```
 
@@ -86,105 +99,156 @@ Q4: Am I comfortable with AI selecting the final result?
 
 ## 📊 Feature Comparison
 
-| Feature | Archetype | Story-Matrix |
-|---------|-----------|--------------|
-| **Total Outcomes** | 4-8 | 100 |
-| **Personalization** | Medium | Very High |
-| **AI Dependency** | Optional | Required |
-| **Setup Time** | ~30 min | ~1-2 hours |
-| **Question Count** | 6-10 | 8+ |
-| **Options per Q** | 4 | 3 + custom |
-| **Custom Input** | Rare | Every question |
-| **Branching Logic** | Rare | Common |
-| **Scoring** | Manual rules | AI-driven |
-| **Result Variety** | Low | Very High |
+| Feature | Archetype | Story-Matrix | Narrative |
+|---------|-----------|--------------|-----------|
+| **Outcomes** | 4-8 | 100 | 100 |
+| **Personalization** | Medium | Very High | **Extremely High** |
+| **Story Arc** | None | None | **Full narrative** |
+| **Scene Adaptation** | No | No | **Yes - AI adapts** |
+| **Continuity** | None | None | **Recurring characters** |
+| **AI During Quiz** | No | No | **Yes - 9 calls** |
+| **AI at End** | Optional | Required | Required |
+| **Setup Time** | 30-60 min | 1-2 hours | 2-3 hours |
+| **Immersion Level** | Low | Medium | **Very High** |
+| **Question Type** | Any | Scenarios | **Sequential scenes** |
 
 ---
 
 ## 💡 Real-World Scenarios
 
-### Scenario 1: "Create a Pokémon type quiz"
-**Choose**: Archetype Quiz
-**Why**: There are 18 Pokémon types - perfect for fixed personalities. Users expect to get "Fire" or "Water", not "Energetic Fire Lover"
+### Scenario 1: "Which Pokémon type are you?"
+**Choose**: Archetype
+**Why**: 18 pre-defined types. Users expect "Fire" not "Energetic Fire Lover"
 
-### Scenario 2: "Create a career path quiz"
-**Choose**: Story-Matrix Quiz
-**Why**: Careers are nuanced. "Strategic Analyst" vs "Creative Problem Solver" vs "Social Connector" - 100 combinations better capture real career styles
+### Scenario 2: "What's your vacation style?"
+**Choose**: Story-Matrix
+**Why**: Travel is nuanced. "Spontaneous Foodie" vs "Structured Nature Lover" - but no natural single narrative
 
-### Scenario 3: "Which Marvel superhero are you?"
-**Choose**: Archetype Quiz
-**Why**: Users want to BE Iron Man or Captain America, not "Bold Tech Enthusiast"
+### Scenario 3: "Your first week managing a team"
+**Choose**: Narrative
+**Why**: Perfect timeline (7 days), recurring team members, decisions build on each other
 
-### Scenario 4: "What's your communication style?"
-**Choose**: Story-Matrix Quiz
-**Why**: Communication is multi-dimensional. "Direct Truth Seeker" vs "Diplomatic Harmony Keeper" - combinations reveal nuance
+### Scenario 4: "Which Marvel superhero are you?"
+**Choose**: Archetype  
+**Why**: Users want to BE Iron Man, not "Bold Tech Enthusiast"
 
-### Scenario 5: "Which Friends character are you?"
-**Choose**: Archetype Quiz
-**Why**: 6 pre-defined characters (Ross, Rachel, Monica, Chandler, Joey, Phoebe)
+### Scenario 5: "What's your communication style?"
+**Choose**: Story-Matrix
+**Why**: Multi-dimensional but no single story - "Direct Truth Seeker" from various scenarios
 
-### Scenario 6: "What's your creative process?"
-**Choose**: Story-Matrix Quiz
-**Why**: Creativity is personal. "Methodical Perfectionist" vs "Chaotic Innovator" - unique combinations feel more authentic
+### Scenario 6: "48 hours handling a crisis"
+**Choose**: Narrative
+**Why**: Clear timeline, building stakes, your choices affect next moments
+
+### Scenario 7: "What's your creative process?"
+**Choose**: Story-Matrix
+**Why**: Creative process is situational, doesn't need one continuous story
+
+### Scenario 8: "Your first month dating someone new"
+**Choose**: Narrative
+**Why**: Clear progression (first date → texting → meeting friends), recurring person
 
 ---
 
-## 🎨 Quick Creation Guide
+## 🎨 Quick Start Guide by Type
 
-### For Archetype Quiz:
-1. List your 4-8 personalities/characters
-2. Find/create images for each
-3. Write 6-10 questions with 4 options each
-4. Design scoring rules (which answer → which personality)
-5. Test to ensure all personalities are reachable
-
+### Archetype Quiz:
+1. List 4-8 personalities
+2. Create/find images
+3. Write 6-10 questions (4 options each)
+4. Design scoring rules
 **Time**: 30-60 minutes
 
-**Theme**: Start with neutral colors (`#8b7355`, `#c9b8a3`, `#fafafa`, `#2c2c2c`)
-
-### For Story-Matrix Quiz:
-1. Identify core dimensions of your topic
-2. Create 10 distinct "first words" (approaches)
-3. Create 10 distinct "second words" (priorities)
-4. Design 8 questions that map to these dimensions
-5. Write selection prompt with strict rules
-6. Write explanation prompt with ⚠️ warnings
-7. Test to ensure variety and accuracy
-
+### Story-Matrix Quiz:
+1. Identify core dimensions
+2. Create 10 first words (approaches)
+3. Create 10 second words (priorities)  
+4. Write 8 disconnected scenarios
+5. Craft AI prompts
 **Time**: 1-2 hours
 
-**Theme**: Start with neutral colors (`#8b7355`, `#c9b8a3`, `#fafafa`, `#2c2c2c`)
+### Narrative Quiz:
+1. **READ NARRATIVE_QUIZ_TEMPLATE.md**
+2. Design your story arc
+3. Create 3-5 recurring characters
+4. Write story setup (premise, stakes)
+5. Write 10 base scenarios (chronological)
+6. Create word matrix
+7. Craft AI prompts for adaptation + results
+**Time**: 2-3 hours
 
 ---
 
-## 🚨 Common Mistakes
+## 🎯 When to Choose Narrative Over Story-Matrix
 
-### Archetype Quiz Mistakes:
-- ❌ Too many personalities (10+) → hard to differentiate
-- ❌ Biased scoring → everyone gets same result
-- ❌ Abstract questions → unclear which answer maps to who
-- ❌ No AI explanation → results feel flat
+Both give 100 combinations, so how to choose?
 
-### Story-Matrix Quiz Mistakes:
-- ❌ Similar words in matrix → "Explorer" and "Adventurer"
-- ❌ Questions don't map to dimensions → AI guesses randomly
-- ❌ Weak AI prompts → makes up names like "Natural Explorer"
-- ❌ Too few questions → not enough data for 100 combinations
+### Choose Story-Matrix If:
+- ❌ No natural timeline (e.g., "creative style" has no chronology)
+- ❌ Questions are naturally independent
+- ❌ No recurring characters make sense
+- ❌ You want simpler implementation
+- ❌ Faster quiz (no AI calls during)
+
+### Choose Narrative If:
+- ✅ Clear timeline (days, weeks, phases)
+- ✅ Recurring characters add depth
+- ✅ Context builds meaningfully
+- ✅ Decisions should feel connected
+- ✅ You want maximum immersion
+- ✅ Story enriches the insights
+
+**Example**: 
+- "What's your work style?" → **Story-Matrix** (no single story needed)
+- "Your first 90 days at a new job" → **Narrative** (perfect timeline)
+
+---
+
+## 🚨 Common Mistakes by Type
+
+### Archetype Mistakes:
+- ❌ Too many personalities (10+)
+- ❌ Biased scoring (everyone gets same result)
+- ❌ No variety in results
+
+### Story-Matrix Mistakes:
+- ❌ Words too similar ("Explorer" and "Adventurer")
+- ❌ Questions don't map to dimensions
+- ❌ Too few questions for 100 combinations
+
+### Narrative Mistakes:
+- ❌ Vague scenes without immersion
+- ❌ Timeline doesn't make sense
+- ❌ Characters inconsistent or forgettable
+- ❌ No story arc (just 10 random scenes)
+- ❌ Base scenarios not adaptable
 
 ---
 
 ## 🎯 Final Recommendation
 
 **Start with Archetype** if:
-- This is your first quiz
-- You have clear, pre-defined results in mind
-- You want something simple and fast
+- First quiz ever
+- Clear pre-defined results
+- Want something simple
 
-**Start with Story-Matrix** if:
-- You want to push boundaries
-- You're exploring personality/behavior
-- You want users to feel uniquely understood
-- You have time to craft a nuanced experience
+**Use Story-Matrix** when:
+- Exploring personality/behavior
+- Want 100+ outcomes
+- Scenarios are naturally independent
 
-**Both are great!** Choose based on your topic, goals, and available time. 🚀
+**Use Narrative** when:
+- Natural timeline exists
+- Story enhances the experience
+- Ready for advanced immersion
+- Worth the extra effort
 
+All three are powerful! Choose based on your topic and how much time you have. 🚀
+
+---
+
+## 📚 Next Steps
+
+1. **Archetype**: Read main QUIZ_TEMPLATE.md
+2. **Story-Matrix**: Read QUIZ_TEMPLATE.md + QUIZ_GENERATOR_PROMPT.md
+3. **Narrative**: Read **NARRATIVE_QUIZ_TEMPLATE.md** (full guide)

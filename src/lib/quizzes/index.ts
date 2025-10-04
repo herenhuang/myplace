@@ -8,11 +8,13 @@
 import { QuizConfig } from './types'
 import { aiModelQuiz } from './ai-model-quiz'
 import { vacationStyleQuiz } from './vacation-style-quiz'
+import { managerStyleQuiz } from './manager-style-quiz'
 
 // Registry of all available quizzes
 export const quizRegistry: Record<string, QuizConfig> = {
   'ai-model': aiModelQuiz,
-  'vacation-style': vacationStyleQuiz
+  'vacation-style': vacationStyleQuiz,
+  'manager-style': managerStyleQuiz
   // Add new quizzes here:
   // 'naruto-character': narutoCharacterQuiz,
 }
