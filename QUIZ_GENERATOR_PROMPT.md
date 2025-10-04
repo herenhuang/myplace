@@ -29,25 +29,60 @@ Ask yourself:
 - Should cover diverse interests
 - Test: "Are these meaningfully different?" If not, refine
 
-### Step 3: Design 8 Strategic Questions
+### Step 3: Design 8-10 Strategic Questions
 
-Each question must map to specific dimensions:
+Each question must:
+1. **Map to specific dimensions** of your word matrix
+2. **Present a concrete scenario** showing what someone DOES
+3. **Reveal patterns through actions**, not self-assessment
+
+**Example Question Structure:**
 
 **Q1**: Primary approach/style (maps to 3-4 first words)
-**Q2**: Core value/priority (maps to 3-4 second words)
-**Q3**: Social dimension (maps to social/independent spectrum)
-**Q4**: Energy/pace dimension (maps to energetic/relaxed spectrum)
-**Q5**: Resource allocation (maps to budget/comfort/etc)
-**Q6**: Risk tolerance (maps to bold/cautious spectrum)
-**Q7**: Adaptability (maps to structured/flexible spectrum)
-**Q8**: Success definition (maps to outcome priorities)
+- ❌ "How do you approach planning?"
+- ✅ "You just got invited to a destination wedding in 3 months. What happens next?"
 
-**Question Format:**
-- Action-oriented, not hypothetical
-- 3 distinct options (not 4!)
-- Options should be equally appealing
-- Enable custom input on ALL questions
-- Use storytelling: "You're in [situation]..."
+**Q2**: Core value/priority (maps to 3-4 second words)
+- ❌ "What matters most to you?"
+- ✅ "It's day 2 of your trip. Where do we find you at 2pm?"
+
+**Q3**: Social dimension (maps to social/independent spectrum)
+- ❌ "Are you social or independent?"
+- ✅ "You're at a hostel common area. Someone's making dinner. What do you do?"
+
+**Q4**: Energy/pace dimension (maps to energetic/relaxed spectrum)
+- ❌ "What's your ideal pace?"
+- ✅ "It's 7am on vacation day 3. Your alarm goes off. What happens?"
+
+**Q5**: Resource allocation (maps to budget/comfort/etc)
+- ❌ "How do you spend money?"
+- ✅ "You see a $200/night boutique hotel and a $40 hostel. Which do you book?"
+
+**Q6**: Risk tolerance (maps to bold/cautious spectrum)
+- ❌ "Are you adventurous?"
+- ✅ "A local offers to take you to their 'secret spot' off the tourist map. Your response?"
+
+**Q7**: Adaptability (maps to structured/flexible spectrum)
+- ❌ "How do you handle changes?"
+- ✅ "Your flight gets cancelled. You're now stuck in this city for 2 extra days. First reaction?"
+
+**Q8**: Success definition (maps to outcome priorities)
+- ❌ "What makes a trip successful?"
+- ✅ "Last day of the trip. What would make you say 'that was perfect'?"
+
+**The pattern: SITUATION → WHAT DO YOU DO → reveals who they are**
+
+**Question Format - CRITICAL:**
+- **SCENARIO-BASED**: Put them in a SPECIFIC SITUATION showing what they actually DO
+  - ❌ BAD: "What's your approach to decisions?" (vague preference)
+  - ✅ GOOD: "Your team missed a deadline. You walk into the office Monday morning. What do you do first?"
+- **ACTION-ORIENTED**: Focus on observable ACTIONS, not self-reported preferences
+  - ❌ BAD: "I prefer to plan ahead" (what they think they do)
+  - ✅ GOOD: "Pull up my detailed calendar and reschedule everything" (what they actually do)
+- **EXACTLY 3 options** (not 4!) - each showing a distinct behavior pattern
+- **Enable custom input on ALL questions** - `allowCustomInput: true`
+- **Use storytelling**: "You're at [place]. [Event happens]. What do you do?"
+- **Make it REAL**: Use concrete, relatable workplace/life situations people can actually picture
 
 ### Step 4: Write the AI Prompts
 
@@ -132,13 +167,14 @@ Their answers:
 ### Step 6: Generate Complete Config File
 
 Output the complete TypeScript config file with:
-- ✅ All 8 questions with IDs
-- ✅ 3 options per question + allowCustomInput
-- ✅ 10 distinct first words
-- ✅ 10 distinct second words
+- ✅ All 8-10 questions with unique IDs (q1, q2, q3, etc.)
+- ✅ EXACTLY 3 options per question (not 4!) + allowCustomInput: true on every question
+- ✅ Each question is a concrete SCENARIO with ACTION-based options
+- ✅ 10 distinct first words (approaches)
+- ✅ 10 distinct second words (priorities)
 - ✅ Selection prompt with exact structure
 - ✅ Explanation prompt with ⚠️ warnings
-- ✅ Theme colors
+- ✅ Theme colors (default to neutral: #8b7355, #c9b8a3, #fafafa, #2c2c2c)
 - ✅ `type: 'story-matrix'`
 
 ---
@@ -150,13 +186,16 @@ Before finalizing, verify:
 - [ ] All 10 first words are OBVIOUSLY different
 - [ ] All 10 second words are OBVIOUSLY different
 - [ ] Each question targets a different dimension
-- [ ] All questions have exactly 3 options
+- [ ] All questions have EXACTLY 3 options (not 4!)
 - [ ] All questions have `allowCustomInput: true`
-- [ ] All questions have unique `id` values
+- [ ] All questions have unique `id` values (q1, q2, q3, etc.)
+- [ ] **All questions are SCENARIO-BASED** (concrete situations, not vague preferences)
+- [ ] **All options show ACTIONS** (what they DO, not what they think/prefer)
+- [ ] Questions feel REAL and relatable to the topic
 - [ ] Selection prompt includes "do NOT make up names"
 - [ ] Explanation prompt includes ⚠️ warnings
 - [ ] Explanation prompt has all 5 sections
-- [ ] Theme colors are appropriate for topic
+- [ ] Theme colors are appropriate for topic (default to neutral)
 - [ ] Quiz ID is lowercase with hyphens
 
 ---
@@ -193,12 +232,15 @@ Before finalizing, verify:
 
 ❌ **"Explorer" and "Adventurer" in same list** → Too similar
 ❌ **"Planner" and "Organizer" in same list** → Too similar
-❌ **Only 5 questions** → Not enough data
-❌ **4 options per question** → Should be 3 + custom input
+❌ **Only 5 questions** → Not enough data (need 8-10)
+❌ **4 options per question** → Should be EXACTLY 3 + custom input
 ❌ **No warnings in explanation prompt** → AI will make up names
 ❌ **Questions don't map to dimensions** → Results won't be accurate
 ❌ **Branching on every question** → Too complex
 ❌ **No custom input** → Misses nuance
+❌ **Vague preference questions** → "How do you work?" instead of "It's Monday 9am, your inbox has 47 emails. What do you do first?"
+❌ **Self-assessment options** → "I'm very organized" instead of "Color-code my calendar by project"
+❌ **Hypothetical scenarios** → "What would you do if..." instead of "You're in [situation]. What happens?"
 
 ---
 
