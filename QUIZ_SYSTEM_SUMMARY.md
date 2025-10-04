@@ -7,7 +7,9 @@ A complete, reusable quiz template system that allows you to create personality 
 ## 📂 Files Created
 
 ### Documentation
-- ✅ `QUIZ_TEMPLATE.md` - Complete guide for creating quizzes (AI-readable)
+- ✅ `QUIZ_TEMPLATE.md` - Complete guide for both quiz types (AI-readable)
+- ✅ `QUIZ_GENERATOR_PROMPT.md` - Step-by-step generator for Story-Matrix quizzes
+- ✅ `QUIZ_TYPE_SELECTOR.md` - Decision guide: which quiz type to use
 - ✅ `QUIZ_SYSTEM_SUMMARY.md` - This file (implementation summary)
 
 ### Core System Files
@@ -24,6 +26,9 @@ A complete, reusable quiz template system that allows you to create personality 
 - ✅ `/src/app/api/quiz/start/route.ts` - Start session API
 - ✅ `/src/app/api/quiz/record/route.ts` - Record responses API
 - ✅ `/src/app/api/quiz/explain/route.ts` - Generate AI explanation API
+- ✅ `/src/app/api/quiz/stats/route.ts` - Social comparison stats API
+- ✅ `/src/app/api/quiz/analyze-custom-input/route.ts` - AI custom input analysis
+- ✅ `/src/app/api/quiz/select-archetype/route.ts` - AI word matrix selection
 
 ### Example Quizzes
 - ✅ `/src/lib/quizzes/ai-model-quiz.ts` - "Which AI Model Are You?"
@@ -52,20 +57,37 @@ A complete, reusable quiz template system that allows you to create personality 
 
 ## 🎨 Key Features
 
+### ✅ Two Quiz Types
+- **Archetype Quiz**: Fixed personalities (4-8 results) with rule-based scoring
+- **Story-Matrix Quiz**: Dynamic combinations (100 results) with AI selection
+
 ### ✅ Fully Themeable
 - Custom colors per quiz
 - Custom background images
 - Custom CSS variables
 
-### ✅ Rule-Based Matching
-- No more AI bias in personality matching
-- Deterministic results (same answers = same result)
-- Easy to debug and adjust scoring
+### ✅ Smart Personality Matching
+- **Archetype**: Rule-based scoring (deterministic, no AI bias)
+- **Story-Matrix**: AI analyzes 10×10 word matrix for best combination
+- Alternatives shown ("You were also close to...")
+
+### ✅ Social Comparison
+- See % of people who picked each answer
+- Live stats during quiz
+- Uniqueness insights ("Only 12% chose this!")
+- Animated stat bars on answer buttons
 
 ### ✅ Optional AI Explanations
-- Generate personalized results with Claude/GPT
-- Custom prompt templates
+- Generate personalized results with Claude
+- Custom prompt templates with strict naming rules
+- Markdown-formatted sections
 - Falls back to static descriptions
+
+### ✅ Advanced Question Features
+- Custom text input on any question
+- Branching logic based on previous answers
+- AI analysis of custom responses
+- Action-oriented storytelling questions
 
 ### ✅ Smart State Management
 - Auto-saves progress to localStorage
@@ -74,32 +96,43 @@ A complete, reusable quiz template system that allows you to create personality 
 
 ### ✅ Database Integration
 - All responses saved to Supabase
+- Real-time stats aggregation
 - Analytics ready
 - User tracking (if authenticated)
 
 ### ✅ Beautiful Animations
 - Smooth transitions
+- Animated stat bars filling from 0%
 - Staggered button animations
 - Progress bar
+- Fade-in uniqueness tooltips
 
 ---
 
 ## 🤖 AI-Assisted Quiz Creation
 
-The `QUIZ_TEMPLATE.md` file is designed to be read by AI systems. You can now say:
+The documentation is designed to be read by AI systems. You can now say:
 
-**"Create a Harry Potter house quiz"**
+**"Create a Harry Potter house quiz"** (Archetype type)
 
 And the AI will:
-1. Read the template guide
-2. Generate a complete quiz config
-3. Create appropriate scoring rules
+1. Read `QUIZ_TYPE_SELECTOR.md` → Choose Archetype
+2. Read `QUIZ_TEMPLATE.md` → Follow archetype section
+3. Generate complete quiz config with scoring rules
 4. Suggest image generation prompts
 5. Register the quiz
 
-**"Create a Naruto character quiz"**
+**"Create a communication style quiz"** (Story-Matrix type)
 
-Same process - the system knows exactly what to do!
+And the AI will:
+1. Read `QUIZ_TYPE_SELECTOR.md` → Choose Story-Matrix
+2. Read `QUIZ_GENERATOR_PROMPT.md` → Follow generation steps
+3. Create 10×10 word matrix with distinct dimensions
+4. Design 8 questions mapping to dimensions
+5. Write strict AI prompts (no name-making!)
+6. Generate complete config with branching logic
+
+Same process - the system knows exactly what to do for both types!
 
 ---
 
@@ -198,52 +231,76 @@ User can see explanation or restart quiz
 
 ---
 
-## 💡 Example: Creating a New Quiz
+## 💡 Examples: Creating New Quizzes
 
-**Step 1**: Create config file
+### Example 1: Archetype Quiz (Hogwarts Houses)
+
+Perfect for matching to predefined characters/types!
 
 ```typescript
 // /src/lib/quizzes/hogwarts-house-quiz.ts
-import { QuizConfig } from './types'
-
 export const hogwartsHouseQuiz: QuizConfig = {
   id: 'hogwarts-house',
+  type: 'archetype',  // ← Fixed personalities
   title: 'Which Hogwarts House Are You?',
-  theme: {
-    primaryColor: '#740001',  // Gryffindor red
-    secondaryColor: '#eeba30',  // Hufflepuff yellow
-    backgroundColor: '#1a1a1a',
-    textColor: '#ffffff',
-    backgroundImage: '/quiz/hogwarts-house/background.png'
-  },
-  questions: [ /* 8 questions here */ ],
+  theme: { /* colors */ },
+  questions: [ /* 6-10 questions with 4 options each */ ],
   personalities: [
-    { id: 'gryffindor', name: 'Gryffindor', tagline: 'Brave and Daring', image: '/quiz/hogwarts-house/gryffindor.png' },
-    { id: 'hufflepuff', name: 'Hufflepuff', tagline: 'Loyal and Kind', image: '/quiz/hogwarts-house/hufflepuff.png' },
-    { id: 'ravenclaw', name: 'Ravenclaw', tagline: 'Wise and Witty', image: '/quiz/hogwarts-house/ravenclaw.png' },
-    { id: 'slytherin', name: 'Slytherin', tagline: 'Cunning and Ambitious', image: '/quiz/hogwarts-house/slytherin.png' }
+    { id: 'gryffindor', name: 'Gryffindor', ... },
+    { id: 'hufflepuff', name: 'Hufflepuff', ... },
+    { id: 'ravenclaw', name: 'Ravenclaw', ... },
+    { id: 'slytherin', name: 'Slytherin', ... }
   ],
-  scoring: { /* scoring rules */ },
-  aiExplanation: { enabled: true }
+  scoring: { /* point-based rules */ }
 }
 ```
 
-**Step 2**: Register quiz
+### Example 2: Story-Matrix Quiz (Communication Style)
+
+Perfect for open-ended personality exploration!
+
+```typescript
+// /src/lib/quizzes/communication-style-quiz.ts
+export const communicationStyleQuiz: QuizConfig = {
+  id: 'communication-style',
+  type: 'story-matrix',  // ← Dynamic combinations
+  title: 'What\'s Your Communication Style?',
+  theme: { /* colors */ },
+  questions: [
+    {
+      id: 'q1',
+      text: 'In a heated discussion, you...',
+      options: [
+        { label: 'Address it directly', value: 'direct' },
+        { label: 'Find diplomatic middle ground', value: 'diplomatic' },
+        { label: 'Step back to cool down', value: 'avoidant' }
+      ],
+      allowCustomInput: true  // ← Enable custom answers
+    }
+    // ... 7 more questions
+  ],
+  wordMatrix: {
+    firstWords: ['Direct', 'Diplomatic', 'Analytical', 'Emotional', ...],
+    secondWords: ['Truth Seeker', 'Harmony Keeper', 'Problem Solver', ...],
+    selectionPrompt: `/* AI prompt with strict rules */`
+  },
+  aiExplanation: {
+    promptTemplate: `/* Explanation with ⚠️ warnings */`
+  }
+}
+```
+
+**Then register either quiz:**
 
 ```typescript
 // /src/lib/quizzes/index.ts
-import { hogwartsHouseQuiz } from './hogwarts-house-quiz'
-
 export const quizRegistry = {
   'ai-model': aiModelQuiz,
   'vacation-style': vacationStyleQuiz,
-  'hogwarts-house': hogwartsHouseQuiz  // Add this
+  'hogwarts-house': hogwartsHouseQuiz,  // Add archetype
+  'communication-style': communicationStyleQuiz  // Add story-matrix
 }
 ```
-
-**Step 3**: Add images to `/public/quiz/hogwarts-house/`
-
-**Step 4**: Visit `/quiz/hogwarts-house`
 
 Done! 🎉
 
@@ -251,9 +308,21 @@ Done! 🎉
 
 ## 🎓 Resources
 
-- **Main Guide**: `QUIZ_TEMPLATE.md` (read this for detailed instructions)
-- **Type Definitions**: `/src/lib/quizzes/types.ts` (all TypeScript interfaces)
-- **Example Quizzes**: Study `ai-model-quiz.ts` and `vacation-style-quiz.ts`
+### Documentation (Start Here!)
+- **`QUIZ_TYPE_SELECTOR.md`** - Which quiz type should you use?
+- **`QUIZ_TEMPLATE.md`** - Complete guide for both quiz types
+- **`QUIZ_GENERATOR_PROMPT.md`** - Story-Matrix generation walkthrough
+
+### Code References
+- **`/src/lib/quizzes/types.ts`** - All TypeScript interfaces
+- **`/src/lib/quizzes/ai-model-quiz.ts`** - Example Archetype quiz
+- **`/src/lib/quizzes/vacation-style-quiz.ts`** - Example Story-Matrix quiz
+
+### Reading Order for AI Systems:
+1. `QUIZ_TYPE_SELECTOR.md` → Decide type
+2. `QUIZ_TEMPLATE.md` → Learn structure
+3. `QUIZ_GENERATOR_PROMPT.md` → Generate (Story-Matrix only)
+4. Study relevant example quiz
 
 ---
 
@@ -270,6 +339,11 @@ To add a new quiz:
 ---
 
 **Built on**: October 4, 2025
-**Branch**: `quiz-template-system`
-**Status**: ✅ Complete and ready for testing
+**Branch**: `annoyedatcoworker`
+**Status**: ✅ Complete system with two quiz types
+- ✅ Archetype Quiz: Rule-based matching
+- ✅ Story-Matrix Quiz: AI-driven 10×10 combinations
+- ✅ Social comparison & live stats
+- ✅ Branching logic & custom input
+- ✅ Comprehensive documentation for AI generation
 

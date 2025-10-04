@@ -15,178 +15,128 @@ export const vacationStyleQuiz: QuizConfig = {
   },
   
   questions: [
-    // Question 1 - Opening (no branching)
+    // Question 1 - Planning style (Planner vs Free Spirit)
     {
       id: 'q1',
-      text: 'You just booked a spontaneous weekend trip. First thing you do?',
+      text: 'You just booked a trip. What does your prep look like?',
       options: [
-        { label: 'Start making a list of must-dos', value: 'plan' },
-        { label: 'Text everyone "who wants to join?"', value: 'social' },
-        { label: 'Research hidden local spots', value: 'research' }
+        { label: 'Detailed itinerary with backups', value: 'structured_planner' },
+        { label: 'Book flights, figure out the rest there', value: 'spontaneous_free' },
+        { label: 'Research but stay flexible', value: 'flexible_general' }
       ],
       allowCustomInput: true
     },
     
-    // BRANCHING TRIO 1: Questions 2-4 (Planning → Adaptation → Execution)
-    // Question 2 - Branches based on Q1
+    // Question 2 - What you prioritize (Foodie, Culture, Nature, Photography, Comfort)
     {
-      id: 'q2-plan',
-      text: 'Your list is getting long. How do you decide what makes the cut?',
+      id: 'q2',
+      text: 'What is the highlight of any trip for you?',
       options: [
-        { label: 'Prioritize top-rated attractions', value: 'popular', nextQuestionId: 'q3-structured' },
-        { label: 'Whatever fits the schedule', value: 'efficient', nextQuestionId: 'q3-structured' },
-        { label: 'Keep it flexible, see how you feel', value: 'flexible', nextQuestionId: 'q3-adaptive' }
-      ],
-      allowCustomInput: true
-    },
-    {
-      id: 'q2-social',
-      text: 'A friend says yes! How do you coordinate?',
-      options: [
-        { label: 'Create a shared doc with options', value: 'organized', nextQuestionId: 'q3-structured' },
-        { label: 'Send a quick poll for activities', value: 'collaborative', nextQuestionId: 'q3-adaptive' },
-        { label: '"Let\'s figure it out when we get there"', value: 'spontaneous', nextQuestionId: 'q3-adaptive' }
-      ],
-      allowCustomInput: true
-    },
-    {
-      id: 'q2-research',
-      text: 'You find an incredible local blog. What catches your eye?',
-      options: [
-        { label: 'Secret spots locals love', value: 'authentic', nextQuestionId: 'q3-adaptive' },
-        { label: 'Most photogenic locations', value: 'aesthetic', nextQuestionId: 'q3-structured' },
-        { label: 'Best value recommendations', value: 'practical', nextQuestionId: 'q3-structured' }
+        { label: 'Finding the best local food spots', value: 'foodie' },
+        { label: 'Hiking trails or beaches', value: 'nature' },
+        { label: 'Museums, history, and architecture', value: 'culture' }
       ],
       allowCustomInput: true
     },
     
-    // Question 3 - Two variants based on Q2
+    // Question 3 - Social vs Independent
     {
-      id: 'q3-structured',
-      text: 'Day 1: Your top restaurant is fully booked. What happens?',
+      id: 'q3',
+      text: 'You are at a hostel common area. What is your move?',
       options: [
-        { label: 'Find the next best backup option', value: 'pivot', nextQuestionId: 'q4-recovery' },
-        { label: 'Check if they have bar seating or waitlist', value: 'persist', nextQuestionId: 'q4-recovery' },
-        { label: 'Wander until something looks good', value: 'explore', nextQuestionId: 'q4-discovery' }
-      ],
-      allowCustomInput: true
-    },
-    {
-      id: 'q3-adaptive',
-      text: 'Day 1: You stumble on a street festival. Your move?',
-      options: [
-        { label: 'Jump right in, this is perfect', value: 'embrace', nextQuestionId: 'q4-discovery' },
-        { label: 'Check out for 20min then move on', value: 'sample', nextQuestionId: 'q4-discovery' },
-        { label: 'Snap a photo but stick to the plan', value: 'focused', nextQuestionId: 'q4-recovery' }
+        { label: 'Start chatting with everyone', value: 'social_connector' },
+        { label: 'Smile but keep to myself', value: 'independent_soloist' },
+        { label: 'Join if someone talks to me first', value: 'flexible_social' }
       ],
       allowCustomInput: true
     },
     
-    // Question 4 - Converges back
+    // Question 4 - Energy level (Energetic vs Relaxed)
     {
-      id: 'q4-recovery',
-      text: 'Your travel buddy wants to skip tomorrow\'s main activity. You...',
+      id: 'q4',
+      text: 'Your ideal vacation day looks like...',
       options: [
-        { label: 'Need a good reason—you planned this', value: 'committed' },
-        { label: 'Hear them out and find a compromise', value: 'diplomatic' },
-        { label: 'Sure, let\'s do what feels right', value: 'easygoing' }
-      ],
-      allowCustomInput: true
-    },
-    {
-      id: 'q4-discovery',
-      text: 'A local invites you to a neighborhood hangout tomorrow night. You...',
-      options: [
-        { label: 'Absolutely yes—this is what travel is about', value: 'open' },
-        { label: 'Ask what to expect first', value: 'curious' },
-        { label: 'Politely decline, you have other plans', value: 'selective' }
+        { label: 'Packed schedule, see everything possible', value: 'energetic_goer' },
+        { label: 'Chill morning, one activity, then relax', value: 'relaxed_chill' },
+        { label: 'Mix of both depending on mood', value: 'flexible_energy' }
       ],
       allowCustomInput: true
     },
     
-    // Question 5 - Reset, new topic
+    // Question 5 - Budget consciousness (Budgeteer)
     {
       id: 'q5',
-      text: 'Packing your suitcase the night before. How\'s it going?',
+      text: 'When it comes to spending on vacation...',
       options: [
-        { label: 'Already done—packed days ago with a checklist', value: 'prepared' },
-        { label: 'Throwing in essentials and winging it', value: 'minimal' },
-        { label: 'Overpacking "just in case"', value: 'cautious' }
+        { label: 'I splurge—treat yourself', value: 'comfort_spender' },
+        { label: 'Budget smart to travel longer/more', value: 'budgeteer' },
+        { label: 'Mix of cheap eats and nice hotels', value: 'balanced_spend' }
       ],
       allowCustomInput: true
     },
     
-    // BRANCHING TRIO 2: Questions 6-8 (Social → Discovery → Reflection)
-    // Question 6 - Branches
+    // Question 6 - Risk tolerance (Bold vs Cautious)
     {
       id: 'q6',
-      text: 'At the airport, you notice someone reading a book about where you\'re going. You...',
+      text: 'Trying street food in a new country. Your approach?',
       options: [
-        { label: 'Strike up a conversation', value: 'outgoing', nextQuestionId: 'q7-social' },
-        { label: 'Smile but keep to yourself', value: 'reserved', nextQuestionId: 'q7-solo' },
-        { label: 'Ask them for recommendations', value: 'resourceful', nextQuestionId: 'q7-social' }
+        { label: 'Yes! Most adventurous thing I can find', value: 'bold_risk' },
+        { label: 'If it is recommended and looks clean', value: 'cautious_safe' },
+        { label: 'Stick to restaurants for safety', value: 'very_cautious' }
       ],
       allowCustomInput: true
     },
     
-    // Question 7 - Two variants
+    // Question 7 - Decision making (Decisive vs Flexible)
     {
-      id: 'q7-social',
-      text: 'You meet other travelers at your hostel/hotel. They invite you to join their plans. You...',
+      id: 'q7',
+      text: 'Plans change last minute. Your reaction?',
       options: [
-        { label: 'Join immediately—the more the merrier', value: 'social', nextQuestionId: 'q8-shared' },
-        { label: 'Join for part of it, then do your own thing', value: 'balanced', nextQuestionId: 'q8-shared' },
-        { label: 'Politely decline, you prefer solo exploring', value: 'independent', nextQuestionId: 'q8-solo' }
-      ],
-      allowCustomInput: true
-    },
-    {
-      id: 'q7-solo',
-      text: 'You have a full afternoon free. What sounds best?',
-      options: [
-        { label: 'Find a cozy café and people-watch', value: 'observer', nextQuestionId: 'q8-solo' },
-        { label: 'Rent a bike and explore aimlessly', value: 'wanderer', nextQuestionId: 'q8-solo' },
-        { label: 'Visit a museum or cultural site', value: 'cultural', nextQuestionId: 'q8-shared' }
+        { label: 'Make a quick call and move forward', value: 'decisive_quick' },
+        { label: 'Roll with it, whatever happens', value: 'flexible_adapt' },
+        { label: 'Frustrated—I had this planned out', value: 'structured_rigid' }
       ],
       allowCustomInput: true
     },
     
-    // Question 8 - Final question, converges
+    // Question 8 - What makes it successful (Photography, Comfort, etc.)
     {
-      id: 'q8-shared',
-      text: 'Last day of the trip. What made it memorable?',
+      id: 'q8',
+      text: 'What would make this trip a total win?',
       options: [
-        { label: 'The people I met along the way', value: 'connections' },
-        { label: 'The unexpected moments and surprises', value: 'serendipity' },
-        { label: 'Seeing everything I wanted to see', value: 'completion' }
-      ],
-      allowCustomInput: true
-    },
-    {
-      id: 'q8-solo',
-      text: 'Last day of the trip. What are you taking home?',
-      options: [
-        { label: 'A deeper understanding of the place', value: 'insight' },
-        { label: 'Recharged and ready for life', value: 'renewal' },
-        { label: 'Stories and memories to share', value: 'stories' }
+        { label: 'Amazing photos for the memories', value: 'photographer' },
+        { label: 'Feeling totally recharged and pampered', value: 'comfort_seeker' },
+        { label: 'Authentic local experiences', value: 'culture_authentic' }
       ],
       allowCustomInput: true
     }
   ],
   
-  // Word Matrix: 20 first words × 20 second words = 400 combinations
+  // Word Matrix: 10 first words × 10 second words = 100 truly distinct combinations
   wordMatrix: {
     firstWords: [
-      'Spontaneous', 'Methodical', 'Bold', 'Thoughtful', 'Energetic',
-      'Relaxed', 'Curious', 'Practical', 'Adventurous', 'Cautious',
-      'Social', 'Independent', 'Flexible', 'Structured', 'Creative',
-      'Analytical', 'Intuitive', 'Deliberate', 'Impulsive', 'Balanced'
+      'Spontaneous',    // Wing it, no plans
+      'Structured',     // Everything organized
+      'Social',         // People-focused
+      'Independent',    // Prefers solo
+      'Flexible',       // Adapts easily
+      'Decisive',       // Quick decisions
+      'Relaxed',        // Low-key, chill
+      'Energetic',      // High energy, go-go
+      'Cautious',       // Safety first
+      'Bold'            // Takes risks
     ],
     secondWords: [
-      'Explorer', 'Planner', 'Wanderer', 'Connector', 'Dreamer',
-      'Organizer', 'Adventurer', 'Observer', 'Seeker', 'Settler',
-      'Networker', 'Soloist', 'Optimizer', 'Curator', 'Free Spirit',
-      'Strategist', 'Enthusiast', 'Collector', 'Navigator', 'Voyager'
+      'Planner',        // Itineraries & lists
+      'Free Spirit',    // No schedule
+      'Connector',      // Makes friends everywhere
+      'Soloist',        // Happy alone
+      'Foodie',         // All about eating
+      'Culture Seeker', // Museums & history
+      'Nature Lover',   // Outdoors & hiking
+      'Comfort Seeker', // Nice hotels & spas
+      'Budgeteer',      // Frugal & savvy
+      'Photographer'    // Documenting everything
     ],
     selectionPrompt: `You are analyzing a traveler's vacation style based on their quiz responses.
 
@@ -202,21 +152,24 @@ User's answers:
 Instructions:
 1. Consider the full story their answers tell - what they DO, how they adapt, what they value
 2. Look for patterns in planning style, social preferences, flexibility, and what makes travel meaningful to them
-3. Choose the FIRST WORD that describes their approach (e.g., how structured, spontaneous, social, etc.)
-4. Choose the SECOND WORD that describes their traveler archetype (e.g., their core travel identity)
-5. All words are positive - find the best match, not the perfect one
-6. Also identify 2-3 alternative combinations they were close to
+3. Choose the FIRST WORD that describes their approach (e.g., Spontaneous vs Structured, Social vs Independent)
+4. Choose the SECOND WORD that describes what they prioritize in travel (e.g., Foodie, Nature Lover, Culture Seeker)
+5. Each word is DISTINCT - there's clear daylight between them
+6. All words are positive - find the best match, not the perfect one
+7. Also identify 2 alternative combinations they were close to (not 3, just 2)
 
 Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "reasoning": "2-3 sentence explanation connecting their answers to this combination",
+  "reasoning": "2-3 sentence explanation. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names.",
   "alternatives": [
-    {"firstWord": "alternative1", "secondWord": "alternative1", "reason": "why this was close"},
-    {"firstWord": "alternative2", "secondWord": "alternative2", "reason": "why this was close"}
+    {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason why this was close"},
+    {"firstWord": "word2", "secondWord": "word2", "reason": "Brief reason why this was close"}
   ]
-}`
+}
+
+IMPORTANT: Do NOT make up names like "Natural Explorer" or "Adventurous Soul". Only use exact words from the lists provided.`
   },
   
   aiExplanation: {
@@ -224,12 +177,17 @@ Respond in JSON:
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a travel expert. Based on this traveler's quiz responses, they are a "{{archetype}}".
 
-CRITICAL: You must ONLY refer to them as "{{archetype}}" - do NOT create any other names or titles. Use this exact term throughout.
+⚠️ CRITICAL RULES - READ CAREFULLY:
+1. You must ONLY use the term "{{archetype}}" - this is their ONLY identity
+2. Do NOT create ANY other names, nicknames, or variations (NO "Natural Explorer", "Adventurous Soul", etc.)
+3. Do NOT add articles like "The" or "A" before {{archetype}}
+4. Every time you refer to their travel style, use EXACTLY "{{archetype}}" and nothing else
+5. You will be penalized if you make up any new names
 
 Write a warm, engaging explanation with these sections:
 
 ## Your Travel DNA
-A 2-3 sentence overview validating their "{{archetype}}" style with enthusiasm.
+Start with "As an {{archetype}}, you..." (use {{archetype}} EXACTLY as given). Write 2-3 sentences validating this style with enthusiasm. Do NOT write "You're a [something else]" - only use {{archetype}}.
 
 ## What I Noticed
 Highlight 2-3 specific patterns from their answers that reveal why they're a "{{archetype}}".
@@ -237,13 +195,13 @@ Highlight 2-3 specific patterns from their answers that reveal why they're a "{{
 ## You Were Also Close To...
 {{alternatives}}
 
-Briefly mention these alternative styles (1 sentence each) that they showed hints of, making them feel like they're multifaceted.
+Write 1 engaging sentence for each alternative explaining why they showed hints of this style.
 
 ## Tips for Your Next Trip
-1-2 practical, actionable tips that match their "{{archetype}}" style.
+1-2 practical, actionable tips that match the {{archetype}} style. Use "As an {{archetype}}, you should..." format.
 
 ## Where This Takes You
-End with an inspiring sentence about their next adventure as a "{{archetype}}".
+End with an inspiring sentence about their next adventure. Use "{{archetype}}" EXACTLY - no substitutions or creative variations.
 
 Their answers:
 {{answers}}
