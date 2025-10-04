@@ -10,13 +10,15 @@ import { aiModelQuiz } from './ai-model-quiz'
 import { vacationStyleQuiz } from './vacation-style-quiz'
 import { managerStyleQuiz } from './manager-style-quiz'
 import { crushQuiz } from './crush-quiz'
+import { flirtingStyleQuiz } from './flirting-style-quiz'
 
 // Registry of all available quizzes
 export const quizRegistry: Record<string, QuizConfig> = {
   'ai-model': aiModelQuiz,
   'vacation-style': vacationStyleQuiz,
   'manager-style': managerStyleQuiz,
-  'crush-quiz': crushQuiz
+  'crush-quiz': crushQuiz,
+  'flirting-style': flirtingStyleQuiz
   // Add new quizzes here:
   // 'naruto-character': narutoCharacterQuiz,
 }
