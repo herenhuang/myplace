@@ -129,6 +129,12 @@ export interface QuizResult {
     firstWord: string
     secondWord: string
     fullArchetype: string // "FirstWord SecondWord"
+    alternatives?: Array<{
+      firstWord: string
+      secondWord: string
+      fullArchetype: string
+      reason: string
+    }>
   }
   score?: number
   responses: QuizResponse[]

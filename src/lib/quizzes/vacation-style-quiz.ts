@@ -205,29 +205,49 @@ Instructions:
 3. Choose the FIRST WORD that describes their approach (e.g., how structured, spontaneous, social, etc.)
 4. Choose the SECOND WORD that describes their traveler archetype (e.g., their core travel identity)
 5. All words are positive - find the best match, not the perfect one
+6. Also identify 2-3 alternative combinations they were close to
 
 Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "reasoning": "2-3 sentence explanation connecting their answers to this combination"
+  "reasoning": "2-3 sentence explanation connecting their answers to this combination",
+  "alternatives": [
+    {"firstWord": "alternative1", "secondWord": "alternative1", "reason": "why this was close"},
+    {"firstWord": "alternative2", "secondWord": "alternative2", "reason": "why this was close"}
+  ]
 }`
   },
   
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a travel expert. Based on this traveler's quiz responses, they've been identified as a "{{archetype}}".
+    promptTemplate: `You're a travel expert. Based on this traveler's quiz responses, they are a "{{archetype}}".
 
-Write a warm, engaging 200-word explanation that:
-1. Validates their travel style with enthusiasm
-2. Highlights 2-3 specific patterns from their answers that reveal this archetype
-3. Gives 1-2 practical tips that match their style
-4. Ends with an inspiring line about their next adventure
+CRITICAL: You must ONLY refer to them as "{{archetype}}" - do NOT create any other names or titles. Use this exact term throughout.
+
+Write a warm, engaging explanation with these sections:
+
+## Your Travel DNA
+A 2-3 sentence overview validating their "{{archetype}}" style with enthusiasm.
+
+## What I Noticed
+Highlight 2-3 specific patterns from their answers that reveal why they're a "{{archetype}}".
+
+## You Were Also Close To...
+{{alternatives}}
+
+Briefly mention these alternative styles (1 sentence each) that they showed hints of, making them feel like they're multifaceted.
+
+## Tips for Your Next Trip
+1-2 practical, actionable tips that match their "{{archetype}}" style.
+
+## Where This Takes You
+End with an inspiring sentence about their next adventure as a "{{archetype}}".
 
 Their answers:
 {{answers}}
 
-Be personal, energetic, and make them feel seen. Use "you" throughout. Format as flowing paragraphs, not bullet points.`
+Be personal, energetic, and make them feel seen. Use "you" throughout. Use markdown formatting with ## for headers.`
   }
 }

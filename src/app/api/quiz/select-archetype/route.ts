@@ -65,12 +65,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Format alternatives if they exist
+    const alternatives = archetype.alternatives?.map((alt: any) => ({
+      firstWord: alt.firstWord,
+      secondWord: alt.secondWord,
+      fullArchetype: `${alt.firstWord} ${alt.secondWord}`,
+      reason: alt.reason || ''
+    })) || []
+
     return NextResponse.json({
       success: true,
       archetype: {
         firstWord: archetype.firstWord,
         secondWord: archetype.secondWord,
-        reasoning: archetype.reasoning || ''
+        reasoning: archetype.reasoning || '',
+        alternatives
       }
     })
 
