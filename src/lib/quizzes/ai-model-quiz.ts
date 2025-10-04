@@ -4,6 +4,7 @@ export const aiModelQuiz: QuizConfig = {
   id: 'ai-model',
   title: 'Which AI Model Are You?',
   description: 'Discover which AI personality matches yours!',
+  type: 'archetype',
   
   theme: {
     primaryColor: '#ff6b35',
@@ -15,6 +16,7 @@ export const aiModelQuiz: QuizConfig = {
   
   questions: [
     {
+      id: 'q1',
       text: "Someone asks you a question you don't know the answer to. What do you do?",
       options: [
         { label: "🤔 Admit it right away", value: "admit" },
@@ -24,6 +26,7 @@ export const aiModelQuiz: QuizConfig = {
       ]
     },
     {
+      id: 'q2',
       text: "You're explaining something complex. How do you approach it?",
       options: [
         { label: "📊 Break it into clear steps", value: "step-by-step" },
@@ -33,6 +36,7 @@ export const aiModelQuiz: QuizConfig = {
       ]
     },
     {
+      id: 'q3',
       text: "Someone disagrees with you. Your instinct?",
       options: [
         { label: "🤝 Find common ground first", value: "common ground" },
@@ -42,6 +46,7 @@ export const aiModelQuiz: QuizConfig = {
       ]
     },
     {
+      id: 'q4',
       text: "You have a creative project. Where do you start?",
       options: [
         { label: "🎯 Define the goal clearly", value: "define" },
@@ -51,6 +56,7 @@ export const aiModelQuiz: QuizConfig = {
       ]
     },
     {
+      id: 'q5',
       text: "How do you handle mistakes?",
       options: [
         { label: "🔍 Analyze what went wrong", value: "analyze" },
@@ -60,6 +66,7 @@ export const aiModelQuiz: QuizConfig = {
       ]
     },
     {
+      id: 'q6',
       text: "Someone needs help at midnight. What's your response?",
       options: [
         { label: "🌙 I'm always available", value: "always" },
@@ -69,6 +76,7 @@ export const aiModelQuiz: QuizConfig = {
       ]
     },
     {
+      id: 'q7',
       text: "You're given an impossible deadline. How do you react?",
       options: [
         { label: "🏃 Push hard to meet it anyway", value: "push" },
@@ -78,6 +86,7 @@ export const aiModelQuiz: QuizConfig = {
       ]
     },
     {
+      id: 'q8',
       text: "What's most important to you in your work?",
       options: [
         { label: "✨ Being creative and innovative", value: "creativity" },

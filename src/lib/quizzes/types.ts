@@ -12,13 +12,19 @@ export interface QuizOption {
   value: string
   /** Optional tooltip or hint text */
   hint?: string
+  /** For branching questions: ID of next question to show if this option is selected */
+  nextQuestionId?: string
 }
 
 export interface QuizQuestion {
+  /** Unique question ID for branching logic */
+  id: string
   /** Question text shown to user */
   text: string
-  /** Exactly 4 options per question */
-  options: [QuizOption, QuizOption, QuizOption, QuizOption]
+  /** 3-4 options per question */
+  options: QuizOption[]
+  /** Whether to show custom input field */
+  allowCustomInput?: boolean
 }
 
 export interface QuizPersonality {
@@ -74,6 +80,15 @@ export interface AIExplanationConfig {
   promptTemplate?: string
 }
 
+export interface WordMatrix {
+  /** 20 first words (descriptors like "Bold", "Methodical", etc.) - all positive */
+  firstWords: string[]
+  /** 20 second words (archetypes like "Adventurer", "Planner", etc.) - all positive */
+  secondWords: string[]
+  /** Prompt for AI to select best word combination */
+  selectionPrompt: string
+}
+
 export interface QuizConfig {
   /** Unique quiz identifier (lowercase-hyphenated) */
   id: string
@@ -81,30 +96,41 @@ export interface QuizConfig {
   title: string
   /** Optional subtitle or description */
   description?: string
+  /** Quiz type: archetype uses fixed personalities, story-matrix uses word combinations */
+  type: 'archetype' | 'story-matrix'
   /** Visual theme configuration */
   theme: QuizTheme
-  /** Array of questions (recommended 6-10) */
+  /** Array of questions (recommended 8+ for story-matrix, 6-10 for archetype) */
   questions: QuizQuestion[]
-  /** List of all possible result personalities */
-  personalities: QuizPersonality[]
-  /** Scoring rules that map answers to personalities */
-  scoring: QuizScoring
+  /** List of all possible result personalities (required for archetype type) */
+  personalities?: QuizPersonality[]
+  /** Scoring rules that map answers to personalities (required for archetype type) */
+  scoring?: QuizScoring
+  /** Word matrix for dynamic archetype generation (required for story-matrix type) */
+  wordMatrix?: WordMatrix
   /** Optional AI-generated explanation settings */
   aiExplanation?: AIExplanationConfig
 }
 
 export interface QuizResponse {
   questionIndex: number
+  questionId: string
   question: string
   selectedOption: string
   selectedValue: string
+  isCustomInput?: boolean
   timestamp: string
 }
 
 export interface QuizResult {
-  personalityId: string
-  personality: QuizPersonality
-  score: number
+  personalityId?: string // For archetype type
+  personality?: QuizPersonality // For archetype type
+  wordMatrixResult?: { // For story-matrix type
+    firstWord: string
+    secondWord: string
+    fullArchetype: string // "FirstWord SecondWord"
+  }
+  score?: number
   responses: QuizResponse[]
   explanation?: string
 }

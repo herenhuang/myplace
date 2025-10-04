@@ -7,7 +7,7 @@ import styles from './quiz.module.scss'
 interface QuizQuestionProps {
   config: QuizConfig
   questionIndex: number
-  onSelect: (value: string, label: string) => void
+  onSelect: (value: string, label: string, isCustom?: boolean) => void
   isLoading: boolean
 }
 
@@ -16,6 +16,8 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null)
   const [showComparison, setShowComparison] = useState(false)
+  const [customInput, setCustomInput] = useState('')
+  const [isCustomSelected, setIsCustomSelected] = useState(false)
   
   const question = config.questions[questionIndex]
 
@@ -25,13 +27,16 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     setSelectedValue(null)
     setSelectedLabel(null)
     setShowComparison(false)
+    setCustomInput('')
+    setIsCustomSelected(false)
 
     const timeouts: NodeJS.Timeout[] = []
-    const delays = [240, 160, 80, 0] // Reverse order - bottom first
+    const optionCount = question.options.length
+    const delays = Array.from({length: optionCount}, (_, i) => (optionCount - 1 - i) * 80)
 
     delays.forEach((delay, index) => {
       const timeout = setTimeout(() => {
-        setVisibleOptions(prev => [...prev, 3 - index]) // Add from bottom
+        setVisibleOptions(prev => [...prev, optionCount - 1 - index])
       }, delay + 100)
       timeouts.push(timeout)
     })
@@ -39,20 +44,29 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     return () => {
       timeouts.forEach(t => clearTimeout(t))
     }
-  }, [questionIndex])
+  }, [questionIndex, question.options.length])
 
-  const handleSelect = (value: string, label: string) => {
+  const handleSelect = (value: string, label: string, isCustom: boolean = false) => {
     if (isLoading || selectedValue) return
     
     // Show comparison first
     setSelectedValue(value)
     setSelectedLabel(label)
+    setIsCustomSelected(isCustom)
     setShowComparison(true)
     
     // Then proceed to next question after delay
     setTimeout(() => {
-      onSelect(value, label)
+      onSelect(value, label, isCustom)
     }, 2500) // Give time to see comparison
+  }
+
+  const handleCustomSubmit = () => {
+    if (!customInput.trim() || isLoading || selectedValue) return
+    
+    // Use the custom input as both value and label
+    const customValue = `custom_${Date.now()}`
+    handleSelect(customValue, customInput.trim(), true)
   }
 
   // Fetch stats after selection
@@ -122,7 +136,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
             <button
               key={index}
               className={`${styles.optionButton} ${isSelected ? styles.optionButtonSelected : ''} ${showStats ? styles.optionButtonWithStats : ''}`}
-              onClick={() => handleSelect(option.value, option.label)}
+              onClick={() => handleSelect(option.value, option.label, false)}
               disabled={isLoading || !isVisible || selectedValue !== null}
               style={{
                 opacity: isVisible ? 1 : 0,
@@ -153,6 +167,41 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
             </button>
           )
         })}
+
+        {/* Custom Input Field */}
+        {question.allowCustomInput && (
+          <div className={styles.customInputContainer}>
+            <input
+              type="text"
+              className={`${styles.customInput} ${isCustomSelected && showComparison ? styles.customInputSelected : ''}`}
+              placeholder="Or write your own answer..."
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleCustomSubmit()
+                }
+              }}
+              disabled={isLoading || selectedValue !== null}
+            />
+            {customInput.trim() && !selectedValue && (
+              <button
+                className={styles.customInputSubmit}
+                onClick={handleCustomSubmit}
+                disabled={isLoading}
+              >
+                →
+              </button>
+            )}
+            {isCustomSelected && showComparison && stats && (
+              <div className={styles.customInputStats}>
+                {getPercentage(selectedValue || '') > 0 
+                  ? `${getPercentage(selectedValue || '')}% of people said something similar`
+                  : 'You\'re the first to say this!'}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

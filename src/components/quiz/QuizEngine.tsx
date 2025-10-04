@@ -20,6 +20,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   const [sessionId, setSessionId] = useState<string>('')
   const [dbSessionId, setDbSessionId] = useState<string>('')
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [questionPath, setQuestionPath] = useState<string[]>([]) // Track which question IDs shown
   const [responses, setResponses] = useState<QuizResponse[]>([])
   const [result, setResult] = useState<QuizResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -176,7 +177,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   }
 
   // Handle option selection
-  const handleOptionSelect = async (optionValue: string, optionLabel: string) => {
+  const handleOptionSelect = async (optionValue: string, optionLabel: string, isCustom: boolean = false) => {
     if (isLoading) return
 
     setIsLoading(true)
@@ -184,14 +185,20 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     const currentQuestion = config.questions[currentQuestionIndex]
     const response: QuizResponse = {
       questionIndex: currentQuestionIndex,
+      questionId: currentQuestion.id,
       question: currentQuestion.text,
       selectedOption: optionLabel,
       selectedValue: optionValue,
+      isCustomInput: isCustom,
       timestamp: new Date().toISOString()
     }
 
     const newResponses = [...responses, response]
     setResponses(newResponses)
+
+    // Add current question ID to path
+    const newPath = [...questionPath, currentQuestion.id]
+    setQuestionPath(newPath)
 
     // Record response to database
     try {
@@ -207,11 +214,59 @@ export default function QuizEngine({ config }: QuizEngineProps) {
       console.error('Error recording response:', error)
     }
 
+    // Determine next question
+    let nextQuestionId: string | null = null
+
+    // Check for branching logic
+    if (!isCustom) {
+      const selectedOption = currentQuestion.options.find(opt => opt.value === optionValue)
+      if (selectedOption?.nextQuestionId) {
+        nextQuestionId = selectedOption.nextQuestionId
+      }
+    } else if (isCustom && currentQuestion.allowCustomInput) {
+      // For custom inputs on branching questions, analyze to get next question
+      try {
+        const analyzeResponse = await fetch('/api/quiz/analyze-custom-input', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            quizId: config.id,
+            questionId: currentQuestion.id,
+            customInput: optionLabel,
+            currentPath: newPath
+          })
+        })
+        
+        const analyzeData = await analyzeResponse.json()
+        if (analyzeData.nextQuestionId) {
+          nextQuestionId = analyzeData.nextQuestionId
+        }
+      } catch (error) {
+        console.error('Error analyzing custom input:', error)
+      }
+    }
+
+    // Find next question
+    let nextQuestionIndex: number | null = null
+
+    if (nextQuestionId) {
+      // Find question by ID
+      nextQuestionIndex = config.questions.findIndex(q => q.id === nextQuestionId)
+    } else {
+      // Default: go to next in array if not already visited
+      for (let i = currentQuestionIndex + 1; i < config.questions.length; i++) {
+        if (!newPath.includes(config.questions[i].id)) {
+          nextQuestionIndex = i
+          break
+        }
+      }
+    }
+
     // Check if quiz is complete
-    if (currentQuestionIndex >= config.questions.length - 1) {
+    if (nextQuestionIndex === null || nextQuestionIndex === -1) {
       await analyzeResults(newResponses)
     } else {
-      setCurrentQuestionIndex(currentQuestionIndex + 1)
+      setCurrentQuestionIndex(nextQuestionIndex)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
@@ -223,77 +278,151 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     setScreenState('analyzing')
 
     try {
-      // Calculate scores for each personality
-      const scores: Record<string, number> = {}
-      config.personalities.forEach(p => {
-        scores[p.id] = 0
-      })
+      if (config.type === 'archetype') {
+        // ARCHETYPE TYPE: Use fixed personalities and scoring rules
+        const scores: Record<string, number> = {}
+        config.personalities!.forEach(p => {
+          scores[p.id] = 0
+        })
 
-      quizResponses.forEach(response => {
-        const scoringRules = config.scoring.questions.find(
-          q => q.questionIndex === response.questionIndex
-        )
+        quizResponses.forEach(response => {
+          const scoringRules = config.scoring!.questions.find(
+            q => q.questionIndex === response.questionIndex
+          )
 
-        if (scoringRules && scoringRules.rules[response.selectedValue]) {
-          const pointsMap = scoringRules.rules[response.selectedValue]
-          Object.entries(pointsMap).forEach(([personalityId, points]) => {
-            scores[personalityId] = (scores[personalityId] || 0) + points
-          })
+          if (scoringRules && scoringRules.rules[response.selectedValue]) {
+            const pointsMap = scoringRules.rules[response.selectedValue]
+            Object.entries(pointsMap).forEach(([personalityId, points]) => {
+              scores[personalityId] = (scores[personalityId] || 0) + points
+            })
+          }
+        })
+
+        // Find highest scoring personality
+        let topPersonalityId = config.personalities![0].id
+        let highestScore = 0
+
+        Object.entries(scores).forEach(([personalityId, score]) => {
+          if (score > highestScore) {
+            highestScore = score
+            topPersonalityId = personalityId
+          }
+        })
+
+        const matchedPersonality = config.personalities!.find(p => p.id === topPersonalityId)!
+
+        // Generate AI explanation if enabled
+        let explanation = matchedPersonality.description || ''
+
+        if (config.aiExplanation?.enabled) {
+          try {
+            const aiResponse = await fetch('/api/quiz/explain', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sessionId: dbSessionId,
+                personalityId: topPersonalityId,
+                personalityName: matchedPersonality.name,
+                responses: quizResponses,
+                config: {
+                  model: config.aiExplanation.model,
+                  promptTemplate: config.aiExplanation.promptTemplate
+                }
+              })
+            })
+
+            const aiData = await aiResponse.json()
+            if (aiData.success && aiData.explanation) {
+              explanation = aiData.explanation
+            }
+          } catch (error) {
+            console.error('Error generating explanation:', error)
+          }
         }
-      })
 
-      // Find highest scoring personality
-      let topPersonalityId = config.personalities[0].id
-      let highestScore = 0
-
-      Object.entries(scores).forEach(([personalityId, score]) => {
-        if (score > highestScore) {
-          highestScore = score
-          topPersonalityId = personalityId
+        const finalResult: QuizResult = {
+          personalityId: topPersonalityId,
+          personality: matchedPersonality,
+          score: highestScore,
+          responses: quizResponses,
+          explanation
         }
-      })
 
-      const matchedPersonality = config.personalities.find(p => p.id === topPersonalityId)!
+        setResult(finalResult)
+        setScreenState('results')
+      } else {
+        // STORY-MATRIX TYPE: Use AI to select word combination
+        if (!config.wordMatrix) {
+          throw new Error('Word matrix required for story-matrix quiz type')
+        }
 
-      // Generate AI explanation if enabled
-      let explanation = matchedPersonality.description || ''
-
-      if (config.aiExplanation?.enabled) {
+        // Call API to select best archetype from word matrix
         try {
-          const aiResponse = await fetch('/api/quiz/explain', {
+          const selectResponse = await fetch('/api/quiz/select-archetype', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               sessionId: dbSessionId,
-              personalityId: topPersonalityId,
-              personalityName: matchedPersonality.name,
+              quizId: config.id,
               responses: quizResponses,
-              config: {
-                model: config.aiExplanation.model,
-                promptTemplate: config.aiExplanation.promptTemplate
-              }
+              wordMatrix: config.wordMatrix
             })
           })
 
-          const aiData = await aiResponse.json()
-          if (aiData.success && aiData.explanation) {
-            explanation = aiData.explanation
+          const selectData = await selectResponse.json()
+          
+          if (!selectData.success || !selectData.archetype) {
+            throw new Error('Failed to select archetype')
           }
+
+          const { firstWord, secondWord, reasoning } = selectData.archetype
+          const fullArchetype = `${firstWord} ${secondWord}`
+
+          // Generate AI explanation
+          let explanation = reasoning || ''
+
+          if (config.aiExplanation?.enabled) {
+            try {
+              const aiResponse = await fetch('/api/quiz/explain', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  sessionId: dbSessionId,
+                  archetype: fullArchetype,
+                  responses: quizResponses,
+                  config: {
+                    model: config.aiExplanation.model,
+                    promptTemplate: config.aiExplanation.promptTemplate
+                  }
+                })
+              })
+
+              const aiData = await aiResponse.json()
+              if (aiData.success && aiData.explanation) {
+                explanation = aiData.explanation
+              }
+            } catch (error) {
+              console.error('Error generating explanation:', error)
+            }
+          }
+
+          const finalResult: QuizResult = {
+            wordMatrixResult: {
+              firstWord,
+              secondWord,
+              fullArchetype
+            },
+            responses: quizResponses,
+            explanation
+          }
+
+          setResult(finalResult)
+          setScreenState('results')
         } catch (error) {
-          console.error('Error generating explanation:', error)
+          console.error('Error selecting archetype:', error)
+          throw error
         }
       }
-
-      const finalResult: QuizResult = {
-        personalityId: topPersonalityId,
-        personality: matchedPersonality,
-        score: highestScore,
-        responses: quizResponses,
-        explanation
-      }
-
-      setResult(finalResult)
-      setScreenState('results')
     } catch (error) {
       console.error('Error analyzing results:', error)
     }

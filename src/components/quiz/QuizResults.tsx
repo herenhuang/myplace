@@ -15,29 +15,36 @@ interface QuizResultsProps {
 export default function QuizResults({ config, result, onRestart }: QuizResultsProps) {
   const [showExplanation, setShowExplanation] = useState(false)
 
+  // Get display name - either from personality or word matrix
+  const displayName = result.personality?.name || result.wordMatrixResult?.fullArchetype || 'Your Result'
+  const displayImage = result.personality?.image
+  const displayTagline = result.personality?.tagline
+
   if (!showExplanation) {
     // Card view
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultsScreen}>
           <div className={styles.resultCard}>
-            {result.personality.image && (
+            {displayImage && (
               <div
                 className={styles.resultImage}
-                style={{ backgroundImage: `url(${result.personality.image})` }}
+                style={{ backgroundImage: `url(${displayImage})` }}
               />
             )}
-            <h1 className={styles.resultName}>{result.personality.name}</h1>
-            {result.personality.tagline && (
-              <p className={styles.resultTagline}>{result.personality.tagline}</p>
+            <h1 className={styles.resultName}>{displayName}</h1>
+            {displayTagline && (
+              <p className={styles.resultTagline}>{displayTagline}</p>
             )}
           </div>
 
-          {/* Show personality distribution comparison */}
-          <ResultsComparison
-            config={config}
-            userPersonalityId={result.personalityId}
-          />
+          {/* Show personality distribution comparison - only for archetype type */}
+          {config.type === 'archetype' && result.personalityId && (
+            <ResultsComparison
+              config={config}
+              userPersonalityId={result.personalityId}
+            />
+          )}
 
           <div className={styles.actionButtons}>
             {result.explanation && (
@@ -64,7 +71,7 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
   return (
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
-        <h1 className={styles.resultTitle}>{result.personality.name}</h1>
+        <h1 className={styles.resultTitle}>{displayName}</h1>
         <div className={styles.markdownContent}>
           <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
         </div>
