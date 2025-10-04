@@ -1,0 +1,557 @@
+// Bubble Popper Game Styles
+// ===========================
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+
+// Variables
+$primary-color: #3b82f6;
+$primary-color-dark: #2563eb;
+$primary-color-darker: #1d4ed8;
+$primary-color-light: #60a5fa;
+
+$bubble-color: #a78bfa;
+$bubble-color-light: #c4b5fd;
+$bubble-color-dark: #8b5cf6;
+
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+
+$border-radius-lg: 0.75rem;
+$border-radius-xl: 1rem;
+$border-radius-2xl: 1.5rem;
+$border-radius-full: 9999px;
+
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+$shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+// Mixins
+@mixin transition-all($duration: 200ms) {
+  transition: all $duration ease-in-out;
+}
+
+// Step Content (iPhone Container)
+.stepContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.stepContent {
+  flex: 1;
+  display: flex;
+}
+
+.imageContainer {
+  width: 50vh;
+  max-height: 90vh;
+  aspect-ratio: 4/7;
+  border-radius: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  box-shadow: -12px 36px 48px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+
+  &::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to bottom, rgba(255,255,255, 0.15), rgba(255,255,255, 0.05));
+    content: '';
+    border-radius: 36px;
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+// Welcome Screen
+.welcomeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 32px;
+  text-align: center;
+  z-index: 10;
+}
+
+.welcomeHeader {
+  margin-bottom: 2rem;
+  z-index: 10;
+}
+
+.welcomeTitle {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: white;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+  font-family: var(--font-instrument-serif);
+}
+
+.welcomeSubtitle {
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+.startButton {
+  padding: 14px 32px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.25px;
+  @include transition-all(300ms);
+  box-shadow: $shadow-lg;
+  cursor: pointer;
+  border: none;
+  background-color: white;
+  color: $primary-color-dark;
+  z-index: 10;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Game Screen
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  z-index: 10;
+}
+
+.gameHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  z-index: 10;
+}
+
+.gameStats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  font-family: var(--font-inter);
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.endButton {
+  padding: 8px 20px;
+  border-radius: 24px;
+  font-weight: 600;
+  font-size: 14px;
+  @include transition-all(200ms);
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  z-index: 10;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+// Bubbles Grid
+.bubblesGrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  flex: 1;
+  z-index: 10;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.bubble {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  @include transition-all(150ms);
+  background: linear-gradient(135deg, $bubble-color-light 0%, $bubble-color 50%, $bubble-color-dark 100%);
+  box-shadow: 
+    0 2px 8px rgba(139, 92, 246, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 
+      0 4px 12px rgba(139, 92, 246, 0.6),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  &.popped {
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
+    animation: popAnimation 0.3s ease-out;
+  }
+}
+
+.bubbleShine {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent);
+  pointer-events: none;
+}
+
+@keyframes popAnimation {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+// Results Screens
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.topText {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+}
+
+.resultHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  gap: 1rem;
+  height: 100%;
+}
+
+.resultCard {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: -4px 24px 48px rgba(0, 0, 0, 0.15);
+  margin-bottom: 16px;
+  text-align: center;
+  animation: fadeUp 0.5s ease-in-out;
+}
+
+.resultTitle {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-family: var(--font-instrument-serif);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: $primary-color-dark;
+}
+
+.resultSubtitle {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin-bottom: 24px;
+  color: $gray-700;
+  text-align: center;
+}
+
+.resultTagline {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: $gray-600;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.resultStats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid $gray-200;
+}
+
+.resultStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.resultStatValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: $primary-color;
+  font-family: var(--font-inter);
+}
+
+.resultStatLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: $gray-500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.appButton {
+  width: 80%;
+  max-width: 280px;
+  text-align: center;
+  padding: 14px 24px;
+  border-radius: 40px;
+  border: none;
+  @include transition-all(200ms);
+  cursor: pointer;
+  background-color: white;
+  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: -4px 16px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  span {
+    font-size: 16px;
+    font-weight: 600;
+    color: $primary-color-dark;
+    letter-spacing: -0.02em;
+  }
+}
+
+.textButton {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 10;
+  @include transition-all(200ms);
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+// Assessment Screen
+.assessmentTitle {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-family: var(--font-instrument-serif);
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+  color: white;
+}
+
+.assessmentActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.markdownContent {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+  color: white;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
+    font-family: var(--font-instrument-serif);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
+    font-family: var(--font-instrument-serif);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  p {
+    margin-bottom: 1rem;
+    opacity: 0.95;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  ul, ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+}
+
+.loadingContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: white;
+  font-weight: 500;
+  padding: 32px;
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Mobile Responsive
+@media screen and (max-width: 768px) {
+  .stepContainer {
+    flex-direction: column;
+  }
+
+  .imageContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100dvw;
+    height: 99.5dvh;
+    max-height: 100dvh;
+    z-index: 10;
+    border-radius: 0;
+    border: none;
+
+    &::after {
+      border-radius: 0;
+      height: 120%;
+    }
+  }
+
+  .bubblesGrid {
+    gap: 4px;
+  }
+
+  .welcomeTitle {
+    font-size: 32px;
+  }
+
+  .welcomeSubtitle {
+    font-size: 16px;
+  }
+}
+
