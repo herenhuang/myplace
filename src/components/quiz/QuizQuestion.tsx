@@ -99,6 +99,17 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         <div className={styles.questionText}>
           <h2>{question.text}</h2>
         </div>
+        
+        {/* Insight message - always rendered to reserve space, prevents layout shift */}
+        <div className={styles.questionInsight} style={{ 
+          opacity: (showComparison && stats && moreUniqueThan > 0) ? 1 : 0,
+          visibility: (showComparison && stats && moreUniqueThan > 0) ? 'visible' : 'hidden'
+        }}>
+          {showComparison && stats && moreUniqueThan > 0 
+            ? `✨ Your choice is more unique than ${moreUniqueThan}% of responses!`
+            : '\u00A0' /* Non-breaking space to maintain height */
+          }
+        </div>
       </div>
       <div className={styles.choicesContainer}>
         {question.options.map((option, index) => {
@@ -142,13 +153,6 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
             </button>
           )
         })}
-        
-        {/* Insight message after stats load */}
-        {showComparison && stats && moreUniqueThan > 0 && (
-          <div className={styles.questionInsight}>
-            ✨ Your choice is more unique than {moreUniqueThan}% of responses!
-          </div>
-        )}
       </div>
     </div>
   )

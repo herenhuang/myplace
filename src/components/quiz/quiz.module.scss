@@ -328,6 +328,7 @@
 
 .questionInsight {
   margin-top: 12px;
+  margin-bottom: 8px;
   padding: 10px 14px;
   background-color: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
@@ -336,7 +337,9 @@
   font-weight: 500;
   color: var(--quiz-primary-color, #ff6b35);
   text-align: center;
-  animation: fadeIn 0.5s ease;
+  min-height: 20px; // Reserve space so no layout shift
+  box-sizing: border-box;
+  transition: opacity 0.5s ease; // Smooth fade in/out
 }
 
 // Results Screen
