@@ -165,6 +165,10 @@ export default function ElevateSimulation() {
   const [isSendingMessage, setIsSendingMessage] = useState(false)
   const [bossIsTyping, setBossIsTyping] = useState(false)
   const [showBlobbertTip, setShowBlobbertTip] = useState(true)
+  const [showEndConversationButton, setShowEndConversationButton] = useState(false)
+  const [lastUserMessageTime, setLastUserMessageTime] = useState<number>(0)
+  const [hasSetBoundary, setHasSetBoundary] = useState(false)
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null)
   
   // Results state
   const [archetype, setArchetype] = useState<string>('')
@@ -380,6 +384,12 @@ export default function ElevateSimulation() {
       hasSeenBossResponse: false
     })
     
+    // Reset new state variables
+    setShowEndConversationButton(false)
+    setHasSetBoundary(false)
+    setLastUserMessageTime(0)
+    clearInactivityTimer()
+    
     // Initialize conversation with boss's first message
     setMessages([{
       role: 'boss',
@@ -391,12 +401,121 @@ export default function ElevateSimulation() {
     setShowBlobbertTip(true)
   }
 
+  // Check if message contains boundary-setting language
+  const detectBoundaryLanguage = (message: string): boolean => {
+    const boundaryPhrases = [
+      "can't", "cannot", "won't", "won't be able",
+      "on vacation", "time off", "unavailable",
+      "not available", "sorry", "no", "busy",
+      "with family", "disconnect", "recharge",
+      "later", "tomorrow", "next week", "when i'm back"
+    ]
+    
+    const lowerMessage = message.toLowerCase()
+    return boundaryPhrases.some(phrase => lowerMessage.includes(phrase))
+  }
+
+  // Start inactivity timer
+  const startInactivityTimer = () => {
+    // Clear existing timer
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+    }
+    
+    // Set new timer for 10 seconds
+    inactivityTimerRef.current = setTimeout(() => {
+      setShowEndConversationButton(true)
+    }, 10000)
+  }
+
+  // Clear inactivity timer
+  const clearInactivityTimer = () => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+      inactivityTimerRef.current = null
+    }
+  }
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      clearInactivityTimer()
+    }
+  }, [])
+
+  // Handle natural conversation ending
+  const handleNaturalEnd = async () => {
+    const currentMessageCount = conversationMetrics.messageCount
+    
+    // Analyze conversation to determine outcome
+    try {
+      const response = await fetch('/api/analyze-conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: messages,
+          messageCount: currentMessageCount
+        })
+      })
+      
+      const result = await response.json()
+      const sentiment = result.sentiment || 'reluctant_but_kind'
+      
+      console.log('📊 Natural end - Conversation sentiment:', sentiment)
+      
+      // Determine outcome based on message count and sentiment
+      let outcome = ''
+      if (currentMessageCount === 0) {
+        outcome = 'ignored'
+      } else if (currentMessageCount === 1) {
+        outcome = sentiment === 'boundary_setter_failed' || sentiment === 'worn_down' 
+          ? 'quick_peeker_boundary' 
+          : 'quick_peeker'
+      } else if (currentMessageCount >= 2 && currentMessageCount <= 3) {
+        outcome = sentiment === 'boundary_setter_failed' || sentiment === 'worn_down'
+          ? 'exited_boundary_aware'
+          : 'exited_early'
+      } else {
+        outcome = sentiment === 'boundary_setter_failed' || sentiment === 'worn_down'
+          ? 'held_boundaries_strong'
+          : 'held_boundaries'
+      }
+      
+      // Close conversation and show results
+      setShowIMessage(false)
+      setMessages([])
+      setConversationMetrics({
+        messageCount: 0,
+        startTime: 0,
+        outcome: outcome,
+        responseTimes: [],
+        hasSeenBossResponse: false
+      })
+      setShowEndConversationButton(false)
+      setHasSetBoundary(false)
+      clearInactivityTimer()
+      
+      // Generate results
+      await handleConversationEnd(currentMessageCount, outcome)
+    } catch (error) {
+      console.error('Error in natural end:', error)
+      // Fallback
+      await handleConversationEnd(currentMessageCount, 'held_boundaries')
+    }
+  }
+
   const sendUserMessage = async () => {
     if (!userMessageInput.trim() || isSendingMessage) return
     
     setIsSendingMessage(true)
     const messageText = userMessageInput.trim()
     setUserMessageInput('')
+    
+    // Detect if this message sets a boundary
+    const isBoundaryMessage = detectBoundaryLanguage(messageText)
+    if (isBoundaryMessage) {
+      setHasSetBoundary(true)
+    }
     
     // Add user message
     const userMessage = {
@@ -407,6 +526,9 @@ export default function ElevateSimulation() {
     
     const updatedMessages = [...messages, userMessage]
     setMessages(updatedMessages)
+    
+    // Update last message time for inactivity detection
+    setLastUserMessageTime(Date.now())
     
     // Update metrics
     const newMetrics = {
@@ -482,7 +604,15 @@ export default function ElevateSimulation() {
             // Mark that user has seen boss response
             setConversationMetrics(prev => ({ ...prev, hasSeenBossResponse: true }))
             
-            // Don't auto-end conversation - only end on explicit user action (call button or back button)
+            // If user had set a boundary, show end conversation button after boss responds
+            if (hasSetBoundary) {
+              setTimeout(() => {
+                setShowEndConversationButton(true)
+              }, 1500) // Show after a brief delay so they can read the response
+            }
+            
+            // Start inactivity timer
+            startInactivityTimer()
           } else if (result.response) {
             // Backwards compatibility: handle old single-response format
             setMessages(prev => [...prev, {
@@ -1787,88 +1917,6 @@ You likely feel a strong sense of duty to your work and teammates. While this de
             </div>
             
             <div className={styles.iMessageHeader}>
-              <button 
-                className={styles.backButton}
-                onClick={async () => {
-                  const currentMessageCount = conversationMetrics.messageCount
-                  const hasSeenResponse = conversationMetrics.hasSeenBossResponse
-                  
-                  // Analyze sentiment before determining outcome
-                  let outcome = ''
-                  
-                  if (currentMessageCount === 0) {
-                    outcome = 'ignored' // Never replied
-                  } else {
-                    // User engaged, analyze their messages to understand their exit
-                    try {
-                      const response = await fetch('/api/analyze-conversation', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          messages: messages,
-                          messageCount: currentMessageCount
-                        })
-                      })
-                      
-                      const result = await response.json()
-                      const sentiment = result.sentiment || 'reluctant_but_kind'
-                      
-                      console.log('📊 Back button - Conversation sentiment:', sentiment)
-                      
-                      // Map sentiment to exit behavior
-                      if (currentMessageCount === 1 && hasSeenResponse) {
-                        // Quick peek behavior
-                        if (sentiment === 'willing_helper') {
-                          outcome = 'quick_peeker_curious' // Curious but decided not worth it
-                        } else if (sentiment === 'boundary_setter_failed' || sentiment === 'worn_down') {
-                          outcome = 'quick_peeker_boundary' // Assessed and set boundary
-                        } else {
-                          outcome = 'quick_peeker' // Default
-                        }
-                      } else if (currentMessageCount >= 2 && currentMessageCount <= 3) {
-                        // Exited early
-                        if (sentiment === 'boundary_setter_failed' || sentiment === 'worn_down') {
-                          outcome = 'exited_boundary_aware' // Left after trying to set boundaries
-                        } else {
-                          outcome = 'exited_early' // Left for other reasons
-                        }
-                      } else {
-                        // Held boundaries (4+ messages)
-                        if (sentiment === 'boundary_setter_failed' || sentiment === 'worn_down') {
-                          outcome = 'held_boundaries_strong' // Consistently said no
-                        } else {
-                          outcome = 'held_boundaries' // Engaged but didn't give in
-                        }
-                      }
-                    } catch (error) {
-                      console.error('Error analyzing back button conversation:', error)
-                      // Fallback to simple logic
-                      if (currentMessageCount === 1 && hasSeenResponse) {
-                        outcome = 'quick_peeker'
-                      } else {
-                        outcome = 'exited_early'
-                      }
-                    }
-                  }
-                  
-                  setShowIMessage(false)
-                  setMessages([])
-                  setConversationMetrics({
-                    messageCount: 0,
-                    startTime: 0,
-                    outcome: outcome,
-                    responseTimes: [],
-                    hasSeenBossResponse: false
-                  })
-                  
-                  // Generate results
-                  setTimeout(() => {
-                    handleConversationEnd(currentMessageCount, outcome)
-                  }, 500)
-                }}
-              >
-                ‹ Back
-              </button>
               <div className={styles.contactInfo}>
                 <div className={styles.contactName}>Heewon (Your Boss)</div>
                 <div className={styles.contactStatus}>Active now</div>
@@ -1963,7 +2011,12 @@ You likely feel a strong sense of duty to your work and teammates. While this de
                 <input 
                   type="text" 
                   value={userMessageInput}
-                  onChange={(e) => setUserMessageInput(e.target.value)}
+                  onChange={(e) => {
+                    setUserMessageInput(e.target.value)
+                    // Reset inactivity timer when user types
+                    clearInactivityTimer()
+                    startInactivityTimer()
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !isSendingMessage) {
                       sendUserMessage()
@@ -1982,6 +2035,18 @@ You likely feel a strong sense of duty to your work and teammates. While this de
                 </button>
               </div>
             </div>
+            
+            {/* End Conversation Button - shows after boundary setting or inactivity */}
+            {showEndConversationButton && (
+              <div className={styles.endConversationContainer}>
+                <button 
+                  className={styles.endConversationButton}
+                  onClick={handleNaturalEnd}
+                >
+                  End conversation
+                </button>
+              </div>
+            )}
             
             {/* Blobbert tip overlay for iMessage */}
             {showBlobbertTip && (
