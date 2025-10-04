@@ -24,6 +24,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   const [responses, setResponses] = useState<QuizResponse[]>([])
   const [result, setResult] = useState<QuizResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [adaptedQuestions, setAdaptedQuestions] = useState<Record<number, string>>({}) // Store adapted narrative text
 
   const STORAGE_KEY = `quiz-${config.id}-state`
 
@@ -148,6 +149,40 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     }
   }, [screenState, currentQuestionIndex, responses, result, sessionId, saveState])
 
+  // Adapt narrative scene based on previous responses
+  // IMPORTANT: This is DISPLAY TEXT ONLY for immersion
+  // The adapted text is NOT saved or analyzed - only shown to the user for story continuity
+  const adaptNarrativeScene = async (questionIndex: number, previousResponses: QuizResponse[]) => {
+    // Only adapt for narrative quizzes
+    if (config.type !== 'narrative') return null
+
+    const question = config.questions[questionIndex]
+    if (!question.baseScenario || !config.storySetup) return null
+
+    try {
+      const response = await fetch('/api/quiz/adapt-narrative-scene', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          baseScenario: question.baseScenario,
+          previousResponses: previousResponses,
+          storySetup: config.storySetup
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.adaptedText) {
+        return data.adaptedText
+      }
+    } catch (error) {
+      console.error('Error adapting narrative scene:', error)
+    }
+
+    // Fallback to base scenario
+    return question.baseScenario.coreSetup
+  }
+
   // Start quiz
   const handleStartQuiz = async () => {
     setIsLoading(true)
@@ -183,10 +218,18 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     setIsLoading(true)
 
     const currentQuestion = config.questions[currentQuestionIndex]
+    
+    // IMPORTANT: Save the BASE scenario for analysis, NOT the adapted narrative!
+    // Adapted text is only for display - we want AI to analyze what YOU wrote, not its own embellishments
+    const questionTextForAnalysis = currentQuestion.text || 
+                                   (currentQuestion.baseScenario ? 
+                                     currentQuestion.baseScenario.coreSetup : 
+                                     'Question')
+    
     const response: QuizResponse = {
       questionIndex: currentQuestionIndex,
       questionId: currentQuestion.id,
-      question: currentQuestion.text,
+      question: questionTextForAnalysis, // Base scenario only - no adapted fluff
       selectedOption: optionLabel,
       selectedValue: optionValue,
       isCustomInput: isCustom,
@@ -265,12 +308,23 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     // Check if quiz is complete
     if (nextQuestionIndex === null || nextQuestionIndex === -1) {
       await analyzeResults(newResponses)
+      setIsLoading(false)
     } else {
+      // For narrative quizzes, adapt the next scene before showing it
+      if (config.type === 'narrative') {
+        const adaptedText = await adaptNarrativeScene(nextQuestionIndex, newResponses)
+        if (adaptedText) {
+          setAdaptedQuestions(prev => ({
+            ...prev,
+            [nextQuestionIndex]: adaptedText
+          }))
+        }
+      }
+      
       setCurrentQuestionIndex(nextQuestionIndex)
+      setIsLoading(false)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
-
-    setIsLoading(false)
   }
 
   // Analyze results
@@ -476,6 +530,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             questionIndex={currentQuestionIndex}
             onSelect={handleOptionSelect}
             isLoading={isLoading}
+            adaptedText={adaptedQuestions[currentQuestionIndex]}
           />
         )
 
