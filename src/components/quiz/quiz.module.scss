@@ -1,0 +1,339 @@
+// Quiz Template System - Themeable Styles
+
+.quizContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--quiz-bg-color, #ffffff);
+  color: var(--quiz-text-color, #1a1a1a);
+}
+
+.backgroundImage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  opacity: 0.9;
+}
+
+.progressBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  
+  .progressFill {
+    height: 100%;
+    background: var(--quiz-primary-color, #ff6b35);
+    transition: width 0.3s ease;
+  }
+}
+
+.contentContainer {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+// Welcome Screen
+.welcomeScreen {
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+  
+  .welcomeTitle {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+  
+  .welcomeDescription {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+  }
+  
+  .startButton {
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: var(--quiz-primary-color, #ff6b35);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Question Screen
+.questionScreen {
+  animation: slideIn 0.4s ease;
+  
+  .questionText {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    text-align: center;
+    line-height: 1.4;
+    
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .optionsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .optionButton {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 1);
+      border-color: var(--quiz-primary-color, #ff6b35);
+      transform: translateX(8px);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .optionLabel {
+      flex: 1;
+    }
+    
+    .optionArrow {
+      color: var(--quiz-primary-color, #ff6b35);
+      transition: transform 0.3s ease;
+    }
+    
+    &:hover .optionArrow {
+      transform: translateX(4px);
+    }
+  }
+}
+
+// Results Screen
+.resultsScreen {
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+  
+  .resultCard {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    
+    .resultImage {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 1.5rem;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .resultName {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--quiz-primary-color, #ff6b35);
+      
+      @media (max-width: 768px) {
+        font-size: 2rem;
+      }
+    }
+    
+    .resultTagline {
+      font-size: 1.3rem;
+      font-weight: 300;
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+    }
+  }
+  
+  .explanationContainer {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: left;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    
+    h1, h2, h3 {
+      color: var(--quiz-primary-color, #ff6b35);
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+    
+    p {
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    
+    ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+      
+      li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+      }
+    }
+  }
+  
+  .actionButtons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    
+    .actionButton {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: var(--quiz-primary-color, #ff6b35);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      }
+      
+      &.secondary {
+        background: var(--quiz-secondary-color, #ffa500);
+      }
+      
+      &.outline {
+        background: transparent;
+        border: 2px solid var(--quiz-primary-color, #ff6b35);
+        color: var(--quiz-primary-color, #ff6b35);
+      }
+    }
+  }
+}
+
+// Loading/Analyzing State
+.analyzingScreen {
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+  
+  .spinner {
+    width: 64px;
+    height: 64px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--quiz-primary-color, #ff6b35);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 2rem;
+  }
+  
+  .analyzingText {
+    font-size: 1.5rem;
+    font-weight: 300;
+    opacity: 0.8;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Button Animation Classes
+.optionButton {
+  &.animateIn {
+    animation: buttonSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+}
+
+@keyframes buttonSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
