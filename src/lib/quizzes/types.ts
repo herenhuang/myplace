@@ -16,11 +16,22 @@ export interface QuizOption {
   nextQuestionId?: string
 }
 
+export interface BaseScenario {
+  /** Time marker for narrative continuity (e.g., "Day 1, 9am" or "Week 2, Monday") */
+  timeMarker: string
+  /** Dimension this question tests (e.g., "vulnerability", "conflict_handling") */
+  dimension: string
+  /** Core setup of the scene (before AI adaptation) */
+  coreSetup: string
+}
+
 export interface QuizQuestion {
   /** Unique question ID for branching logic */
   id: string
-  /** Question text shown to user */
-  text: string
+  /** Question text shown to user (for archetype/story-matrix) */
+  text?: string
+  /** Base scenario for narrative quizzes (will be adapted by AI) */
+  baseScenario?: BaseScenario
   /** 3-4 options per question */
   options: QuizOption[]
   /** Whether to show custom input field */
@@ -89,6 +100,26 @@ export interface WordMatrix {
   selectionPrompt: string
 }
 
+export interface StoryCharacter {
+  /** Character name */
+  name: string
+  /** Character role in the story */
+  role: string
+  /** Brief personality description */
+  personality: string
+}
+
+export interface StorySetup {
+  /** Story title */
+  title: string
+  /** Story premise - sets up the situation, characters, stakes */
+  premise: string
+  /** Timeframe the story covers (e.g., "4 weeks", "48 hours") */
+  timeframe: string
+  /** Recurring characters in the story */
+  characters: StoryCharacter[]
+}
+
 export interface QuizConfig {
   /** Unique quiz identifier (lowercase-hyphenated) */
   id: string
@@ -96,17 +127,19 @@ export interface QuizConfig {
   title: string
   /** Optional subtitle or description */
   description?: string
-  /** Quiz type: archetype uses fixed personalities, story-matrix uses word combinations */
-  type: 'archetype' | 'story-matrix'
+  /** Quiz type: archetype uses fixed personalities, story-matrix uses word combinations, narrative is continuous story */
+  type: 'archetype' | 'story-matrix' | 'narrative'
   /** Visual theme configuration */
   theme: QuizTheme
-  /** Array of questions (recommended 8+ for story-matrix, 6-10 for archetype) */
+  /** Story setup for narrative quizzes (shown before Q1) */
+  storySetup?: StorySetup
+  /** Array of questions (recommended 8+ for story-matrix, 6-10 for archetype, 10 for narrative) */
   questions: QuizQuestion[]
   /** List of all possible result personalities (required for archetype type) */
   personalities?: QuizPersonality[]
   /** Scoring rules that map answers to personalities (required for archetype type) */
   scoring?: QuizScoring
-  /** Word matrix for dynamic archetype generation (required for story-matrix type) */
+  /** Word matrix for dynamic archetype generation (required for story-matrix and narrative types) */
   wordMatrix?: WordMatrix
   /** Optional AI-generated explanation settings */
   aiExplanation?: AIExplanationConfig

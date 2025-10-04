@@ -112,11 +112,17 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
   const userRank = sortedStats.findIndex(s => s.value === selectedValue) + 1
   const moreUniqueThan = sortedStats.slice(userRank).reduce((sum, s) => sum + s.percentage, 0)
 
+  // Get question text based on quiz type
+  const questionText = question.text || 
+                      (question.baseScenario ? question.baseScenario.coreSetup : '')
+  const timeMarker = question.baseScenario?.timeMarker
+
   return (
     <div className={styles.textContainer}>
       <div className={styles.topText}>
         <div className={styles.questionText}>
-          <h2>{question.text}</h2>
+          {timeMarker && <p className={styles.timeMarker}>{timeMarker}</p>}
+          <h2>{questionText}</h2>
         </div>
       </div>
       <div className={styles.choicesContainer}>

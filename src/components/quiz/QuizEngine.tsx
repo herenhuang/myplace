@@ -183,10 +183,17 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     setIsLoading(true)
 
     const currentQuestion = config.questions[currentQuestionIndex]
+    
+    // Get question text based on quiz type
+    const questionText = currentQuestion.text || 
+                        (currentQuestion.baseScenario ? 
+                          `${currentQuestion.baseScenario.timeMarker}: ${currentQuestion.baseScenario.coreSetup}` : 
+                          'Question')
+    
     const response: QuizResponse = {
       questionIndex: currentQuestionIndex,
       questionId: currentQuestion.id,
-      question: currentQuestion.text,
+      question: questionText,
       selectedOption: optionLabel,
       selectedValue: optionValue,
       isCustomInput: isCustom,
@@ -350,10 +357,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
         setResult(finalResult)
         setScreenState('results')
-      } else {
-        // STORY-MATRIX TYPE: Use AI to select word combination
+      } else if (config.type === 'story-matrix' || config.type === 'narrative') {
+        // STORY-MATRIX & NARRATIVE TYPES: Use AI to select word combination
         if (!config.wordMatrix) {
-          throw new Error('Word matrix required for story-matrix quiz type')
+          throw new Error('Word matrix required for story-matrix and narrative quiz types')
         }
 
         // Call API to select best archetype from word matrix
