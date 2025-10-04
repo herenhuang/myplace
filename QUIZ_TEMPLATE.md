@@ -67,16 +67,16 @@ export const yourQuizConfig: QuizConfig = {
   // REQUIRED: Visual theme configuration
   theme: {
     // Primary color (hex) - used for buttons, progress bar
-    primaryColor: '#ff6b35',
+    primaryColor: '#8b7355',
     
     // Secondary color (hex) - used for accents
-    secondaryColor: '#ffa500',
+    secondaryColor: '#c9b8a3',
     
     // Background color (hex) - overall page background
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fafafa',
     
     // Text color (hex)
-    textColor: '#1a1a1a',
+    textColor: '#2c2c2c',
     
     // Background image URL (relative to /public)
     backgroundImage: '/quiz/your-quiz-name/background.png',
@@ -262,10 +262,10 @@ export const narutoCharacterQuiz: QuizConfig = {
   description: 'Discover which ninja you are!',
   
   theme: {
-    primaryColor: '#ff6b1a',
-    secondaryColor: '#ffa500',
-    backgroundColor: '#fff5e6',
-    textColor: '#1a1a1a',
+    primaryColor: '#8b7355',
+    secondaryColor: '#c9b8a3',
+    backgroundColor: '#fafafa',
+    textColor: '#2c2c2c',
     backgroundImage: '/quiz/naruto-character/background.png'
   },
   
@@ -440,17 +440,23 @@ Before launching your quiz:
 
 ### Color Schemes:
 
+**Neutral & Universal (Default):**
+- Primary: `#8b7355`, Secondary: `#c9b8a3`, Background: `#fafafa`, Text: `#2c2c2c`
+
+**Minimal Gray:**
+- Primary: `#6b7280`, Secondary: `#9ca3af`, Background: `#f9fafb`, Text: `#1f2937`
+
 **Vibrant & Fun:**
-- Primary: `#ff6b35`, Secondary: `#ffa500`
+- Primary: `#ff6b35`, Secondary: `#ffa500`, Background: `#fff5e6`, Text: `#1a1a1a`
 
 **Cool & Calm:**
-- Primary: `#4a90e2`, Secondary: `#7ec8e3`
+- Primary: `#4a90e2`, Secondary: `#7ec8e3`, Background: `#f0f9ff`, Text: `#1e3a8a`
 
 **Nature & Growth:**
-- Primary: `#52b788`, Secondary: `#95d5b2`
+- Primary: `#52b788`, Secondary: `#95d5b2`, Background: `#f0fdf4`, Text: `#14532d`
 
 **Elegant & Professional:**
-- Primary: `#6c5ce7`, Secondary: `#a29bfe`
+- Primary: `#6c5ce7`, Secondary: `#a29bfe`, Background: `#faf5ff`, Text: `#4c1d95`
 
 ### Question Writing Tips:
 
@@ -526,10 +532,10 @@ export const yourStoryQuiz: QuizConfig = {
   type: 'story-matrix',  // ← KEY DIFFERENCE
   
   theme: {
-    primaryColor: '#00b4d8',
-    secondaryColor: '#90e0ef',
-    backgroundColor: '#f8f9fa',
-    textColor: '#212529',
+    primaryColor: '#8b7355',      // Neutral brown
+    secondaryColor: '#c9b8a3',    // Neutral tan
+    backgroundColor: '#fafafa',   // Neutral light gray
+    textColor: '#2c2c2c',         // Neutral dark gray
     backgroundImage: '/quiz/your-story-quiz/background.png'
   },
   

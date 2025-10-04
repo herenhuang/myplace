@@ -118,12 +118,16 @@ Their answers:
 
 ### Step 5: Choose Theme Colors
 
-Pick colors that match the topic:
-- **Adventure/Travel**: Blues, aquas, oranges
-- **Personality/Self**: Purples, pinks, warm tones
-- **Professional/Work**: Blues, greens, grays
-- **Food/Lifestyle**: Warm reds, oranges, yellows
-- **Creative/Art**: Vibrant, varied palette
+**Default: Always start with neutral tones**
+- Primary: `#8b7355`, Secondary: `#c9b8a3`, Background: `#fafafa`, Text: `#2c2c2c`
+
+**Only customize if topic has strong color association:**
+- **Adventure/Travel**: Blues, aquas (`#4a90e2`, `#7ec8e3`)
+- **Nature/Wellness**: Greens (`#52b788`, `#95d5b2`)
+- **Food/Lifestyle**: Warm tones (`#ff6b35`, `#ffa500`)
+- **Professional/Work**: Grays, blues (`#6b7280`, `#9ca3af`)
+
+**When in doubt, use neutral!**
 
 ### Step 6: Generate Complete Config File
 

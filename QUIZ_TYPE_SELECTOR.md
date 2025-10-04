@@ -140,6 +140,8 @@ Q4: Am I comfortable with AI selecting the final result?
 
 **Time**: 30-60 minutes
 
+**Theme**: Start with neutral colors (`#8b7355`, `#c9b8a3`, `#fafafa`, `#2c2c2c`)
+
 ### For Story-Matrix Quiz:
 1. Identify core dimensions of your topic
 2. Create 10 distinct "first words" (approaches)
@@ -150,6 +152,8 @@ Q4: Am I comfortable with AI selecting the final result?
 7. Test to ensure variety and accuracy
 
 **Time**: 1-2 hours
+
+**Theme**: Start with neutral colors (`#8b7355`, `#c9b8a3`, `#fafafa`, `#2c2c2c`)
 
 ---
 
