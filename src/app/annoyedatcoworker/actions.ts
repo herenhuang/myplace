@@ -206,6 +206,158 @@ export async function generateModelImage(modelName: string) {
   }
 }
 
+// Rule-based matching system - maps answer patterns to AI models
+function determineAIModel(steps: StepData[]): string {
+  // Initialize scores for each model
+  const scores: Record<string, number> = {
+    'GPT-4': 0,
+    'Claude': 0,
+    'Gemini': 0,
+    'Llama': 0,
+    'Mistral': 0,
+    'Perplexity': 0,
+    'Grok': 0,
+    'GPT-3.5': 0
+  }
+
+  steps.forEach((step) => {
+    const response = step.userResponse.toLowerCase()
+
+    // Q1: Someone asks you a question you don't know the answer to
+    if (response.includes('admit')) {
+      scores['Claude'] += 3 // Honest and transparent
+      scores['GPT-4'] += 2
+    } else if (response.includes('research')) {
+      scores['Perplexity'] += 3 // Research-focused
+      scores['Claude'] += 2
+    } else if (response.includes('think out loud')) {
+      scores['GPT-4'] += 3 // Exploratory thinking
+      scores['Gemini'] += 2
+    } else if (response.includes('redirect')) {
+      scores['Grok'] += 3 // Clever deflection
+      scores['GPT-3.5'] += 2
+    }
+
+    // Q2: Explaining something complex
+    if (response.includes('step-by-step')) {
+      scores['Claude'] += 3 // Methodical
+      scores['GPT-4'] += 2
+    } else if (response.includes('metaphors')) {
+      scores['GPT-4'] += 3 // Creative communication
+      scores['Gemini'] += 2
+    } else if (response.includes('quick and direct')) {
+      scores['Mistral'] += 3 // Speed-focused
+      scores['GPT-3.5'] += 2
+    } else if (response.includes('thorough')) {
+      scores['Claude'] += 3 // Comprehensive
+      scores['Perplexity'] += 2
+    }
+
+    // Q3: Someone disagrees with you
+    if (response.includes('common ground')) {
+      scores['GPT-4'] += 3 // Diplomatic
+      scores['Gemini'] += 2
+    } else if (response.includes('cite facts')) {
+      scores['Perplexity'] += 3 // Fact-based
+      scores['Claude'] += 2
+    } else if (response.includes('explore their perspective')) {
+      scores['GPT-4'] += 3 // Curious and open
+      scores['Gemini'] += 2
+    } else if (response.includes('both sides')) {
+      scores['Claude'] += 3 // Balanced analysis
+      scores['GPT-4'] += 2
+    }
+
+    // Q4: Creative project approach
+    if (response.includes('define the goal')) {
+      scores['Claude'] += 3 // Planned
+      scores['Mistral'] += 2
+    } else if (response.includes('just start')) {
+      scores['Grok'] += 3 // Spontaneous
+      scores['Llama'] += 2
+    } else if (response.includes('plan')) {
+      scores['Claude'] += 3 // Methodical
+      scores['GPT-4'] += 2
+    } else if (response.includes('multiple approaches')) {
+      scores['Gemini'] += 3 // Multimodal
+      scores['GPT-4'] += 2
+    }
+
+    // Q5: Handling mistakes
+    if (response.includes('analyze')) {
+      scores['Claude'] += 3 // Analytical
+      scores['Perplexity'] += 2
+    } else if (response.includes('fix and move on')) {
+      scores['Mistral'] += 3 // Efficient
+      scores['GPT-3.5'] += 2
+    } else if (response.includes('explain transparently')) {
+      scores['Claude'] += 3 // Transparent
+      scores['GPT-4'] += 2
+    } else if (response.includes('learn')) {
+      scores['GPT-4'] += 3 // Growth-oriented
+      scores['Llama'] += 2
+    }
+
+    // Q6: Midnight help request
+    if (response.includes('always available')) {
+      scores['GPT-3.5'] += 3 // 24/7 helpful
+      scores['Llama'] += 2
+    } else if (response.includes('boundaries')) {
+      scores['Claude'] += 3 // Self-aware limits
+      scores['Mistral'] += 2
+    } else if (response.includes('depends')) {
+      scores['GPT-4'] += 3 // Context-aware
+      scores['Gemini'] += 2
+    } else if (response.includes('resources')) {
+      scores['Perplexity'] += 3 // Resource provider
+      scores['GPT-4'] += 2
+    }
+
+    // Q7: Impossible deadline
+    if (response.includes('push')) {
+      scores['Mistral'] += 3 // Fast and determined
+      scores['GPT-3.5'] += 2
+    } else if (response.includes('negotiate')) {
+      scores['GPT-4'] += 3 // Diplomatic
+      scores['Claude'] += 2
+    } else if (response.includes('prioritize')) {
+      scores['Claude'] += 3 // Strategic
+      scores['GPT-4'] += 2
+    } else if (response.includes('help')) {
+      scores['Llama'] += 3 // Community-oriented
+      scores['Gemini'] += 2
+    }
+
+    // Q8: Most important value
+    if (response.includes('creativity')) {
+      scores['GPT-4'] += 3
+      scores['Gemini'] += 2
+    } else if (response.includes('accuracy')) {
+      scores['Claude'] += 3
+      scores['Perplexity'] += 2
+    } else if (response.includes('speed')) {
+      scores['Mistral'] += 3
+      scores['GPT-3.5'] += 2
+    } else if (response.includes('helpfulness')) {
+      scores['GPT-4'] += 3
+      scores['Llama'] += 2
+    }
+  })
+
+  // Find the model with highest score
+  let topModel = 'GPT-4'
+  let highestScore = 0
+
+  for (const [model, score] of Object.entries(scores)) {
+    if (score > highestScore) {
+      highestScore = score
+      topModel = model
+    }
+  }
+
+  return topModel
+}
+
 export async function analyzeModel(sessionId: string) {
   const supabase = await createClient()
   
@@ -236,49 +388,47 @@ export async function analyzeModel(sessionId: string) {
 
     const steps = sessionData.data?.steps || []
     
+    // Use rule-based matching to determine the model
+    const matchedModel = determineAIModel(steps)
+    
     const responseContext = steps
       .map((s: StepData) => `Q${s.stepNumber}: ${s.question}\nAnswer: ${s.userResponse}`)
       .join('\n\n')
 
-    const analysisPrompt = `You're an expert in AI models. Based on these behavioral responses, match the user to ONE specific AI model that best reflects their personality.
+    const analysisPrompt = `You're an expert in AI models. The user has been matched to ${matchedModel} based on their behavioral patterns. Write a personalized explanation of why they match this specific model.
 
-# Responses:
+# User's Responses:
 ${responseContext}
 
+# Matched Model: ${matchedModel}
+
 # Instructions:
-Analyze patterns and match to ANY AI model (GPT-4, Claude, Gemini, Llama, Mistral, Grok, GPT-3.5, Perplexity, DeepSeek, Command R, etc.).
+Write a 200-300 word explanation connecting their specific choices to ${matchedModel}'s personality and characteristics.
 
-Consider:
-- Communication: verbose/concise, creative/technical
-- Problem-solving: methodical/spontaneous
-- Values: accuracy, speed, creativity, helpfulness
-- Uncertainty: cautious/exploratory
+Structure:
+# Why You're ${matchedModel}
 
-Write 200-300 word explanation in this structure:
+[2-3 sentences connecting their choices to ${matchedModel}'s core traits]
 
-# Why You're [Model Name]
+## Your Style Matches ${matchedModel}
 
-[2-3 sentences connecting choices to model's core traits]
-
-## Your Style Matches [Model]
-
-- When you [choice], that's [Model] energy because [why]
-- You [choice], which matches how [Model] works: [insight]
+- When you [specific choice they made], that's ${matchedModel} energy because [why]
+- You [another specific choice], which matches how ${matchedModel} works: [insight]
 - [Another choice-to-model connection]
 
 ## What This Means
 
 [2-3 sentences about what this reveals - positive and insightful]
 
-**Fun Fact**: [One interesting model trait matching their answers]
+**Fun Fact**: [One interesting ${matchedModel} trait that matches their answers]
 
 Return JSON:
 {
-  "model": "[Model Name]",
+  "model": "${matchedModel}",
   "explanation": "[Full markdown explanation]"
 }
 
-Make it personal, playful, and specific!`
+Make it personal, playful, and specific to their actual choices!`
 
     const chatCompletion = await anthropic.messages.create({
       model: 'claude-3-7-sonnet-latest',
