@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
+import ResultsComparison from './ResultsComparison'
 import styles from './quiz.module.scss'
 
 interface QuizResultsProps {
@@ -17,35 +18,43 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
   if (!showExplanation) {
     // Card view
     return (
-      <div className={styles.resultsScreen}>
-        <div className={styles.resultCard}>
-          {result.personality.image && (
-            <div
-              className={styles.resultImage}
-              style={{ backgroundImage: `url(${result.personality.image})` }}
-            />
-          )}
-          <h1 className={styles.resultName}>{result.personality.name}</h1>
-          {result.personality.tagline && (
-            <p className={styles.resultTagline}>{result.personality.tagline}</p>
-          )}
-        </div>
+      <div className={styles.textContainer}>
+        <div className={styles.resultsScreen}>
+          <div className={styles.resultCard}>
+            {result.personality.image && (
+              <div
+                className={styles.resultImage}
+                style={{ backgroundImage: `url(${result.personality.image})` }}
+              />
+            )}
+            <h1 className={styles.resultName}>{result.personality.name}</h1>
+            {result.personality.tagline && (
+              <p className={styles.resultTagline}>{result.personality.tagline}</p>
+            )}
+          </div>
 
-        <div className={styles.actionButtons}>
-          {result.explanation && (
+          {/* Show personality distribution comparison */}
+          <ResultsComparison
+            config={config}
+            userPersonalityId={result.personalityId}
+          />
+
+          <div className={styles.actionButtons}>
+            {result.explanation && (
+              <button
+                className={styles.actionButton}
+                onClick={() => setShowExplanation(true)}
+              >
+                <span>See Why →</span>
+              </button>
+            )}
             <button
-              className={styles.actionButton}
-              onClick={() => setShowExplanation(true)}
+              className={`${styles.actionButton} ${styles.outline}`}
+              onClick={onRestart}
             >
-              See Why →
+              <span>Take Again</span>
             </button>
-          )}
-          <button
-            className={`${styles.actionButton} ${styles.outline}`}
-            onClick={onRestart}
-          >
-            Take Again
-          </button>
+          </div>
         </div>
       </div>
     )
@@ -53,9 +62,12 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
 
   // Explanation view
   return (
-    <div className={styles.resultsScreen}>
+    <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
-        <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
+        <h1 className={styles.resultTitle}>{result.personality.name}</h1>
+        <div className={styles.markdownContent}>
+          <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
+        </div>
       </div>
 
       <div className={styles.actionButtons}>
@@ -63,16 +75,15 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
           className={`${styles.actionButton} ${styles.secondary}`}
           onClick={() => setShowExplanation(false)}
         >
-          ← Back to Card
+          <span>← Back to Card</span>
         </button>
         <button
           className={`${styles.actionButton} ${styles.outline}`}
           onClick={onRestart}
         >
-          Take Again
+          <span>Take Again</span>
         </button>
       </div>
     </div>
   )
 }
-

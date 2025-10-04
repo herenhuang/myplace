@@ -11,19 +11,27 @@ interface QuizWelcomeProps {
 
 export default function QuizWelcome({ config, onStart, isLoading }: QuizWelcomeProps) {
   return (
-    <div className={styles.welcomeScreen}>
-      <h1 className={styles.welcomeTitle}>{config.title}</h1>
-      {config.description && (
-        <p className={styles.welcomeDescription}>{config.description}</p>
-      )}
-      <button
-        className={styles.startButton}
-        onClick={onStart}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Starting...' : 'Start Quiz'}
-      </button>
+    <div className={styles.welcomeContainer}>
+      <div className={styles.welcomeHeader}>
+        <h1 className={styles.welcomeTitle}>{config.title}</h1>
+        {config.description && (
+          <p className={styles.welcomeDescription}>{config.description}</p>
+        )}
+        <button
+          className={styles.appButton}
+          onClick={onStart}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className={styles.loadingSpinner}>
+              <div className={styles.spinner}></div>
+              <span>Starting...</span>
+            </div>
+          ) : (
+            <span>Start Quiz</span>
+          )}
+        </button>
+      </div>
     </div>
   )
 }
-

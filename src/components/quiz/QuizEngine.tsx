@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { QuizConfig, QuizResponse, QuizResult, QuizState } from '@/lib/quizzes/types'
 import { getOrCreateSessionId } from '@/lib/session'
+import PageContainer from '@/components/layout/PageContainer'
 import QuizWelcome from './QuizWelcome'
 import QuizQuestion from './QuizQuestion'
 import QuizResults from './QuizResults'
@@ -31,6 +32,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
     const root = document.documentElement
     root.style.setProperty('--quiz-primary-color', config.theme.primaryColor)
+    root.style.setProperty('--quiz-primary-color-dark', adjustColor(config.theme.primaryColor, -20))
     root.style.setProperty('--quiz-secondary-color', config.theme.secondaryColor)
     root.style.setProperty('--quiz-bg-color', config.theme.backgroundColor)
     root.style.setProperty('--quiz-text-color', config.theme.textColor)
@@ -42,13 +44,23 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     }
 
     return () => {
-      // Cleanup on unmount
       root.style.removeProperty('--quiz-primary-color')
+      root.style.removeProperty('--quiz-primary-color-dark')
       root.style.removeProperty('--quiz-secondary-color')
       root.style.removeProperty('--quiz-bg-color')
       root.style.removeProperty('--quiz-text-color')
     }
   }, [config.theme])
+
+  // Helper to darken color for hover states
+  function adjustColor(color: string, amount: number): string {
+    const hex = color.replace('#', '')
+    const num = parseInt(hex, 16)
+    const r = Math.max(0, Math.min(255, (num >> 16) + amount))
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount))
+    const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount))
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
+  }
 
   // Save state to localStorage
   const saveState = useCallback(() => {
@@ -140,7 +152,6 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     setIsLoading(true)
 
     try {
-      // Start session in database
       const response = await fetch('/api/quiz/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -303,7 +314,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   // Calculate progress
   const progress = currentQuestionIndex / config.questions.length
 
-  // Render content
+  // Render content for inside the phone container
   const renderContent = () => {
     switch (screenState) {
       case 'welcome':
@@ -348,30 +359,34 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   }
 
   return (
-    <div className={styles.quizContainer}>
-      {/* Background Image */}
-      {config.theme.backgroundImage && (
-        <div
-          className={styles.backgroundImage}
-          style={{ backgroundImage: `url(${config.theme.backgroundImage})` }}
-        />
-      )}
+    <PageContainer className="!max-w-none max-w-4xl">
+      <div className={styles.quizContainer}>
+        {/* Progress Bar */}
+        {screenState === 'question' && (
+          <div className={styles.progressContainer}>
+            <div className={styles.progressBarTrack}>
+              <div
+                className={styles.progressBarFill}
+                style={{ width: `${progress * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
 
-      {/* Progress Bar */}
-      {screenState === 'question' && (
-        <div className={styles.progressBar}>
-          <div
-            className={styles.progressFill}
-            style={{ width: `${progress * 100}%` }}
-          />
+        {/* Phone Container */}
+        <div className={styles.stepContainer}>
+          <div className={styles.stepContent}>
+            <div
+              className={styles.imageContainer}
+              style={{
+                backgroundImage: `url(${config.theme.backgroundImage})`
+              }}
+            >
+              {renderContent()}
+            </div>
+          </div>
         </div>
-      )}
-
-      {/* Content */}
-      <div className={styles.contentContainer}>
-        {renderContent()}
       </div>
-    </div>
+    </PageContainer>
   )
 }
-
