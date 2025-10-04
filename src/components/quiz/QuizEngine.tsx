@@ -5,6 +5,7 @@ import { QuizConfig, QuizResponse, QuizResult, QuizState } from '@/lib/quizzes/t
 import { getOrCreateSessionId } from '@/lib/session'
 import PageContainer from '@/components/layout/PageContainer'
 import QuizWelcome from './QuizWelcome'
+import QuizPersonalization from './QuizPersonalization'
 import QuizQuestion from './QuizQuestion'
 import QuizResults from './QuizResults'
 import styles from './quiz.module.scss'
@@ -13,7 +14,17 @@ interface QuizEngineProps {
   config: QuizConfig
 }
 
-type ScreenState = 'welcome' | 'question' | 'analyzing' | 'results'
+type ScreenState = 'welcome' | 'personalization' | 'question' | 'analyzing' | 'results'
+
+// Helper function to replace placeholders in text with personalization data
+function replacePlaceholders(text: string, data: Record<string, string>): string {
+  let result = text
+  Object.entries(data).forEach(([key, value]) => {
+    const placeholder = `{{${key}}}`
+    result = result.replace(new RegExp(placeholder, 'g'), value)
+  })
+  return result
+}
 
 export default function QuizEngine({ config }: QuizEngineProps) {
   const [screenState, setScreenState] = useState<ScreenState>('welcome')
@@ -25,6 +36,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   const [result, setResult] = useState<QuizResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [adaptedQuestions, setAdaptedQuestions] = useState<Record<number, string>>({}) // Store adapted narrative text
+  const [personalizationData, setPersonalizationData] = useState<Record<string, string>>({}) // Store user's personalization inputs
 
   const STORAGE_KEY = `quiz-${config.id}-state`
 
@@ -166,7 +178,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
         body: JSON.stringify({
           baseScenario: question.baseScenario,
           previousResponses: previousResponses,
-          storySetup: config.storySetup
+          storySetup: config.storySetup,
+          personalizationData: personalizationData // Include user's personalization inputs
         })
       })
 
@@ -183,11 +196,25 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     return question.baseScenario.coreSetup
   }
 
-  // Start quiz
+  // Handle personalization form submission (for narrative quizzes)
+  const handlePersonalizationSubmit = (data: Record<string, string>) => {
+    setPersonalizationData(data)
+    setScreenState('question') // Move to first question (story setup shows automatically)
+  }
+
+  // Start quiz (from welcome screen)
   const handleStartQuiz = async () => {
     setIsLoading(true)
 
     try {
+      // If there's a personalization form, show that first
+      if (config.personalizationForm) {
+        setScreenState('personalization')
+        setIsLoading(false)
+        return
+      }
+
+      // Otherwise, start the quiz normally
       const response = await fetch('/api/quiz/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -520,8 +547,18 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             config={config}
             onStart={handleStartQuiz}
             isLoading={isLoading}
+            personalizationData={personalizationData}
           />
         )
+
+      case 'personalization':
+        return config.personalizationForm ? (
+          <QuizPersonalization
+            form={config.personalizationForm}
+            onSubmit={handlePersonalizationSubmit}
+            isLoading={isLoading}
+          />
+        ) : null
 
       case 'question':
         return (
@@ -531,6 +568,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             onSelect={handleOptionSelect}
             isLoading={isLoading}
             adaptedText={adaptedQuestions[currentQuestionIndex]}
+            personalizationData={personalizationData}
           />
         )
 

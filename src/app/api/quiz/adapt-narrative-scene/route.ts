@@ -5,9 +5,19 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 })
 
+// Helper to replace placeholders like {{partnerName}} with actual values
+function replacePlaceholders(text: string, data: Record<string, string>): string {
+  let result = text
+  Object.entries(data).forEach(([key, value]) => {
+    const placeholder = `{{${key}}}`
+    result = result.replace(new RegExp(placeholder, 'g'), value)
+  })
+  return result
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { baseScenario, previousResponses, storySetup } = await request.json()
+    const { baseScenario, previousResponses, storySetup, personalizationData = {} } = await request.json()
 
     if (!baseScenario || !storySetup) {
       return NextResponse.json(
@@ -25,23 +35,28 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Replace placeholders in story setup with personalization data
+    const personalizedPremise = replacePlaceholders(storySetup.premise, personalizationData)
+
     // Format previous responses for the prompt
     const previousChoicesText = previousResponses
       .map((r: { question: string; selectedOption: string }, i: number) => 
         `Scene ${i + 1}: ${r.question}\nTheir choice: ${r.selectedOption}`)
       .join('\n\n')
 
-    // Format characters for context
+    // Format characters for context (with personalized names)
     const charactersText = storySetup.characters
-      .map((c: { name: string; role: string; personality: string }) => 
-        `- **${c.name}** (${c.role}): ${c.personality}`)
+      .map((c: { name: string; role: string; personality: string }) => {
+        const personalizedName = replacePlaceholders(c.name, personalizationData)
+        return `- **${personalizedName}** (${c.role}): ${c.personality}`
+      })
       .join('\n')
 
     // Create the adaptation prompt
     const prompt = `You are adapting a narrative quiz scene to make it feel continuous and personalized.
 
 STORY CONTEXT:
-${storySetup.premise}
+${personalizedPremise}
 
 CHARACTERS:
 ${charactersText}

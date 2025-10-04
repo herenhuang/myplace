@@ -964,3 +964,127 @@
   text-align: center;
   line-height: 1.4;
 }
+
+// Personalization Form
+.personalizationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 28px;
+  z-index: 3;
+  position: relative;
+  overflow-y: auto;
+}
+
+.personalizationContent {
+  max-width: 500px;
+  width: 100%;
+}
+
+.personalizationTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.personalizationInstructions {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.personalizationFields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.personalizationField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.personalizationLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  
+  .required {
+    color: var(--quiz-primary-color, #ff6b35);
+  }
+}
+
+.personalizationInput,
+.personalizationSelect {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1f2937;
+  background: white;
+  transition: all 0.2s;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--quiz-primary-color, #ff6b35);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.personalizationSelect {
+  cursor: pointer;
+}
+
+.personalizationInputError {
+  border-color: #ef4444;
+  
+  &:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+}
+
+.personalizationError {
+  font-size: 13px;
+  color: #ef4444;
+  margin-top: -4px;
+}
+
+.personalizationButton {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--quiz-primary-color, #ff6b35);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    background: var(--quiz-primary-color-dark, #e55a28);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
