@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { QuizConfig } from '@/lib/quizzes/types'
-import QuizComparison from './QuizComparison'
 import styles from './quiz.module.scss'
 
 interface QuizQuestionProps {
@@ -56,32 +55,62 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     }, 2500) // Give time to see comparison
   }
 
+  // Fetch stats after selection
+  const [stats, setStats] = useState<Array<{value: string, percentage: number}> | null>(null)
+
+  useEffect(() => {
+    if (showComparison) {
+      async function fetchStats() {
+        try {
+          const response = await fetch(
+            `/api/quiz/stats?quizId=${config.id}&questionIndex=${questionIndex}`
+          )
+          const data = await response.json()
+
+          if (data.success && data.questionStats) {
+            setStats(data.questionStats.options)
+          }
+        } catch (error) {
+          console.error('Error fetching stats:', error)
+        }
+      }
+
+      const timeout = setTimeout(fetchStats, 500)
+      return () => clearTimeout(timeout)
+    }
+  }, [showComparison, config.id, questionIndex])
+
+  // Get percentage for an option
+  const getPercentage = (value: string) => {
+    if (!stats) return 0
+    const stat = stats.find(s => s.value === value)
+    return stat?.percentage || 0
+  }
+
+  // Calculate insight
+  const selectedPercentage = selectedValue ? getPercentage(selectedValue) : 0
+  const sortedStats = stats ? [...stats].sort((a, b) => b.percentage - a.percentage) : []
+  const userRank = sortedStats.findIndex(s => s.value === selectedValue) + 1
+  const moreUniqueThan = sortedStats.slice(userRank).reduce((sum, s) => sum + s.percentage, 0)
+
   return (
     <div className={styles.textContainer}>
       <div className={styles.topText}>
         <div className={styles.questionText}>
           <h2>{question.text}</h2>
         </div>
-        
-        {/* Show comparison after selection */}
-        {showComparison && selectedValue && selectedLabel && (
-          <QuizComparison
-            quizId={config.id}
-            questionIndex={questionIndex}
-            userSelectedValue={selectedValue}
-            userSelectedLabel={selectedLabel}
-            options={question.options.map(o => ({ value: o.value, label: o.label }))}
-          />
-        )}
       </div>
       <div className={styles.choicesContainer}>
         {question.options.map((option, index) => {
           const isVisible = visibleOptions.includes(index)
           const isSelected = selectedValue === option.value
+          const percentage = getPercentage(option.value)
+          const showStats = showComparison && stats !== null
+
           return (
             <button
               key={index}
-              className={`${styles.optionButton} ${isSelected ? styles.optionButtonSelected : ''}`}
+              className={`${styles.optionButton} ${isSelected ? styles.optionButtonSelected : ''} ${showStats ? styles.optionButtonWithStats : ''}`}
               onClick={() => handleSelect(option.value, option.label)}
               disabled={isLoading || !isVisible || selectedValue !== null}
               style={{
@@ -92,11 +121,34 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
               }}
               title={option.hint}
             >
+              {/* Background fill showing percentage */}
+              {showStats && (
+                <div 
+                  className={`${styles.optionButtonFill} ${isSelected ? styles.optionButtonFillUser : ''}`}
+                  style={{ width: `${percentage}%` }}
+                />
+              )}
+              
               <span className={styles.optionLabel}>{option.label}</span>
-              <span className={styles.optionArrow}>→</span>
+              
+              {showStats ? (
+                <span className={styles.optionPercentage}>
+                  {percentage}%
+                  {isSelected && <span className={styles.youBadgeInline}>You</span>}
+                </span>
+              ) : (
+                <span className={styles.optionArrow}>→</span>
+              )}
             </button>
           )
         })}
+        
+        {/* Insight message after stats load */}
+        {showComparison && stats && moreUniqueThan > 0 && (
+          <div className={styles.questionInsight}>
+            ✨ Your choice is more unique than {moreUniqueThan}% of responses!
+          </div>
+        )}
       </div>
     </div>
   )

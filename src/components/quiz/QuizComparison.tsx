@@ -82,20 +82,21 @@ export default function QuizComparison({
           const isUserChoice = stat.value === userSelectedValue
           return (
             <div key={stat.value} className={styles.statRow}>
-              <div className={styles.statLabel}>
-                <span className={styles.statText}>
-                  {getLabel(stat.value)}
-                </span>
-                <span className={styles.statPercentage}>
-                  {stat.percentage}%
-                  {isUserChoice && <span className={styles.youBadge}>You</span>}
-                </span>
-              </div>
-              <div className={styles.statBar}>
-                <div 
-                  className={`${styles.statBarFill} ${isUserChoice ? styles.statBarFillUser : ''}`}
-                  style={{ width: `${stat.percentage}%` }}
-                />
+              <div className={styles.statBarContainer}>
+                <div className={styles.statBarBackground}>
+                  <div 
+                    className={`${styles.statBarFill} ${isUserChoice ? styles.statBarFillUser : ''}`}
+                    style={{ width: `${stat.percentage}%` }}
+                  >
+                    <span className={styles.statBarPercentage}>
+                      {stat.percentage}%
+                    </span>
+                  </div>
+                  <span className={styles.statBarLabel}>
+                    {getLabel(stat.value)}
+                    {isUserChoice && <span className={styles.youBadge}>You</span>}
+                  </span>
+                </div>
               </div>
             </div>
           )

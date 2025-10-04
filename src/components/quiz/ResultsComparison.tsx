@@ -68,20 +68,19 @@ export default function ResultsComparison({ config, userPersonalityId }: Results
           const isUser = stat.personalityId === userPersonalityId
           return (
             <div key={stat.personalityId} className={styles.personalityStatRow}>
-              <div className={styles.personalityStatLabel}>
-                <span className={styles.personalityStatName}>
-                  {getPersonalityName(stat.personalityId)}
-                </span>
-                <span className={styles.personalityStatPercentage}>
-                  {stat.percentage}%
-                  {isUser && <span className={styles.youBadge}>You</span>}
-                </span>
-              </div>
-              <div className={styles.personalityStatBar}>
+              <div className={styles.personalityStatBarBackground}>
                 <div
                   className={`${styles.personalityStatBarFill} ${isUser ? styles.personalityStatBarFillUser : ''}`}
                   style={{ width: `${stat.percentage}%` }}
-                />
+                >
+                  <span className={styles.personalityStatBarPercentage}>
+                    {stat.percentage}%
+                  </span>
+                </div>
+                <span className={styles.personalityStatLabel}>
+                  {getPersonalityName(stat.personalityId)}
+                  {isUser && <span className={styles.youBadge}>You</span>}
+                </span>
               </div>
             </div>
           )
