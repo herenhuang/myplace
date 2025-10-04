@@ -11,6 +11,14 @@ interface GameData {
   timeElapsed: number // in seconds
   completed: boolean
   quitEarly: boolean
+  poppingPattern: 'sequential' | 'random' | 'strategic'
+  poppingSequence: number[]
+}
+
+interface GameStats {
+  totalPlays: number
+  averageCompletion: number
+  averageTime: number
 }
 
 export default function BubblePopperPage() {
@@ -20,7 +28,11 @@ export default function BubblePopperPage() {
   const [isGameActive, setIsGameActive] = useState(false)
   const [gameData, setGameData] = useState<GameData | null>(null)
   const [assessment, setAssessment] = useState<string>('')
+  const [oneLiner, setOneLiner] = useState<string>('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isEnding, setIsEnding] = useState(false)
+  const [poppingSequence, setPoppingSequence] = useState<number[]>([])
+  const [gameStats, setGameStats] = useState<GameStats>({ totalPlays: 0, averageCompletion: 0, averageTime: 0 })
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Timer effect
@@ -46,8 +58,62 @@ export default function BubblePopperPage() {
   const handleStartGame = () => {
     setBubbles(Array(100).fill(false))
     setTimeElapsed(0)
+    setPoppingSequence([])
     setIsGameActive(true)
     setScreenState('game')
+    loadGameStats()
+  }
+
+  const loadGameStats = () => {
+    const stats = localStorage.getItem('bubbleGameStats')
+    if (stats) {
+      setGameStats(JSON.parse(stats))
+    }
+  }
+
+  const saveGameStats = (data: GameData) => {
+    const stats = gameStats
+    const updatedStats = {
+      totalPlays: stats.totalPlays + 1,
+      averageCompletion: ((stats.averageCompletion * stats.totalPlays) + data.bubblesPopped) / (stats.totalPlays + 1),
+      averageTime: ((stats.averageTime * stats.totalPlays) + data.timeElapsed) / (stats.totalPlays + 1)
+    }
+    setGameStats(updatedStats)
+    localStorage.setItem('bubbleGameStats', JSON.stringify(updatedStats))
+  }
+
+  const analyzePoppingPattern = (sequence: number[]): 'sequential' | 'random' | 'strategic' => {
+    if (sequence.length < 3) return 'random'
+    
+    // Check if mostly sequential (popping adjacent bubbles)
+    let sequentialCount = 0
+    for (let i = 1; i < sequence.length; i++) {
+      const diff = Math.abs(sequence[i] - sequence[i-1])
+      if (diff === 1 || diff === 10) { // Adjacent horizontally or vertically
+        sequentialCount++
+      }
+    }
+    
+    const sequentialRatio = sequentialCount / (sequence.length - 1)
+    
+    if (sequentialRatio > 0.7) return 'sequential'
+    
+    // Check if strategic (rows/columns pattern)
+    const firstRow = Math.floor(sequence[0] / 10)
+    const firstCol = sequence[0] % 10
+    let sameRowCol = 0
+    
+    for (let i = 1; i < Math.min(sequence.length, 10); i++) {
+      const row = Math.floor(sequence[i] / 10)
+      const col = sequence[i] % 10
+      if (row === firstRow || col === firstCol) {
+        sameRowCol++
+      }
+    }
+    
+    if (sameRowCol > 5) return 'strategic'
+    
+    return 'random'
   }
 
   const handleBubblePop = (index: number) => {
@@ -56,28 +122,38 @@ export default function BubblePopperPage() {
     const newBubbles = [...bubbles]
     newBubbles[index] = true
     setBubbles(newBubbles)
+    
+    // Track popping sequence
+    setPoppingSequence(prev => [...prev, index])
 
     // Check if all bubbles are popped
     const allPopped = newBubbles.every(b => b)
     if (allPopped) {
-      endGame(true)
+      endGame(true, [...poppingSequence, index])
     }
   }
 
-  const handleEndGame = () => {
-    endGame(false)
+  const handleEndGame = async () => {
+    setIsEnding(true)
+    await endGame(false, poppingSequence)
+    setIsEnding(false)
   }
 
-  const endGame = async (completed: boolean) => {
+  const endGame = async (completed: boolean, sequence: number[]) => {
     setIsGameActive(false)
     const bubblesPopped = bubbles.filter(b => b).length
+    const pattern = analyzePoppingPattern(sequence)
+    
     const data: GameData = {
       bubblesPopped,
       timeElapsed,
       completed,
-      quitEarly: !completed
+      quitEarly: !completed,
+      poppingPattern: pattern,
+      poppingSequence: sequence
     }
     setGameData(data)
+    saveGameStats(data)
     
     // Analyze and show archetype
     await analyzeGameplay(data)
@@ -93,31 +169,48 @@ export default function BubblePopperPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-3-7-sonnet-latest',
-          prompt: `You are a behavioral psychologist observing someone's gameplay patterns in a simple bubble-popping task.
+          sessionId: `bubble-${Date.now()}`,
+          responses: [],
+          config: {
+            model: 'claude-3-7-sonnet-latest',
+            promptTemplate: `You're a wise, slightly teasing friend who just watched someone play a bubble-popping game. You see what their choices reveal about them.
 
-Observations:
-- Bubbles Popped: ${data.bubblesPopped} / 100
-- Time Elapsed: ${formatTime(data.timeElapsed)}
-- Completion Status: ${data.completed ? 'Completed all bubbles' : 'Ended early'}
-- Completion Rate: ${data.bubblesPopped}%
+What happened:
+- They popped ${data.bubblesPopped} out of 100 bubbles
+- Took ${formatTime(data.timeElapsed)}
+- ${data.completed ? 'Completed every single bubble' : 'Hit end game early'}
 
-Write a thoughtful behavioral analysis in 3-4 paragraphs. Consider:
+Write 3-4 short, punchy paragraphs that make them feel SEEN. Be specific to their exact behavior:
 
-1. What does their approach to this repetitive, somewhat pointless task reveal about them?
-2. Did they follow through to completion or question the value of the task?
-3. Their pacing and persistence level
-4. What this might indicate about how they approach tasks in general
+${data.completed && data.timeElapsed < 60 ? 
+  'They FLEW through this. They saw 100 bubbles and went full speedrun mode. What does it say about someone who treats bubble wrap like a competitive sport?' :
+data.completed && data.timeElapsed < 180 ?
+  'They methodically popped every single one. Even when it got tedious, they kept going. That\'s not just patience - that\'s something else.' :
+data.completed ?
+  'They stuck with it for over 3 minutes popping virtual bubbles. Most people would\'ve quit. They didn\'t. Why?' :
+data.bubblesPopped >= 75 ?
+  'They got to 75+ and thought "okay, I get it" and ended it. They don\'t need to finish to prove a point. Interesting.' :
+data.bubblesPopped >= 40 ?
+  'They popped about half and was like "what am I even doing here?" and bounced. They question pointless tasks.' :
+data.bubblesPopped >= 10 ?
+  'They popped a few, realized this was going nowhere, and ended it. They don\'t waste time proving points.' :
+  'They literally hit end game almost immediately. They saw through this instantly. Respect.'}
 
-Write directly to them using "you" language. Be insightful but warm, observational but not judgmental. Focus on patterns rather than labels. Don't use archetype names or categories - just behavioral observations.
+Write in second person ("you"). Be playful but insightful. Call them out (lovingly). Make it feel like you KNOW them. Reference their specific numbers. Ask rhetorical questions. Be a wise friend who sees through their BS.
 
-Keep it conversational and make them feel understood.`
+Don't be generic. Don't say "this suggests" or "this indicates" - just SAY it. Be direct. Make them laugh and feel understood at the same time.`
+          }
         })
       })
 
       if (response.ok) {
         const result = await response.json()
         setAssessment(result.explanation || '')
+        
+        // Generate one-liner for results screen
+        generateOneLiner(data)
+      } else {
+        console.error('API error:', await response.text())
       }
     } catch (error) {
       console.error('Error analyzing gameplay:', error)
@@ -127,10 +220,37 @@ Keep it conversational and make them feel understood.`
   }
 
 
+  const generateOneLiner = (data: GameData) => {
+    const patternText = data.poppingPattern === 'sequential' ? 'methodically, one by one' : 
+                       data.poppingPattern === 'strategic' ? 'in a clear pattern' : 
+                       'all over the place'
+    
+    if (data.completed && data.timeElapsed < 60) {
+      setOneLiner(`Speed demon. Popped all 100 ${patternText} in under a minute.`)
+    } else if (data.completed) {
+      setOneLiner(`Finished the whole thing ${patternText}. That's commitment.`)
+    } else if (data.bubblesPopped >= 75) {
+      setOneLiner(`Got to ${data.bubblesPopped}, popping ${patternText}, then said "I'm good."`)
+    } else if (data.bubblesPopped >= 40) {
+      setOneLiner(`Popped ${data.bubblesPopped} bubbles ${patternText} before questioning life choices.`)
+    } else if (data.bubblesPopped >= 10) {
+      setOneLiner(`${data.bubblesPopped} bubbles was enough to get the point.`)
+    } else {
+      setOneLiner(`Nope. Not doing this. Ended it immediately.`)
+    }
+  }
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  const getPercentile = (value: number, average: number): string => {
+    if (gameStats.totalPlays < 2) return 'N/A'
+    const percentile = value > average ? Math.min(95, 50 + ((value - average) / average) * 50) : 
+                                        Math.max(5, 50 - ((average - value) / average) * 50)
+    return `${Math.round(percentile)}th`
   }
 
   const renderWelcome = () => (
@@ -154,15 +274,26 @@ Keep it conversational and make them feel understood.`
           <div className={styles.gameStats}>
             <div className={styles.stat}>
               <span className={styles.statValue}>{bubblesPopped}</span>
-              <span className={styles.statLabel}>/ 100</span>
+              <span className={styles.statLabel}>/ {bubbles.length}</span>
             </div>
             <div className={styles.stat}>
               <span className={styles.statValue}>{formatTime(timeElapsed)}</span>
               <span className={styles.statLabel}>time</span>
             </div>
           </div>
-          <button className={styles.endButton} onClick={handleEndGame}>
-            End Game
+          <button 
+            className={styles.endButton} 
+            onClick={handleEndGame}
+            disabled={isEnding}
+          >
+            {isEnding ? (
+              <>
+                <span className={styles.buttonSpinner}></span>
+                <span>Ending...</span>
+              </>
+            ) : (
+              'End Game'
+            )}
           </button>
         </div>
         
@@ -191,6 +322,9 @@ Keep it conversational and make them feel understood.`
         <div className={styles.resultHeader}>
           <div className={styles.resultCard}>
             <h2 className={styles.resultSubtitle}>Behavioral Observation</h2>
+            {oneLiner && (
+              <p className={styles.oneLiner}>{oneLiner}</p>
+            )}
             <div className={styles.resultStats}>
               <div className={styles.resultStat}>
                 <span className={styles.resultStatValue}>{gameData.bubblesPopped}</span>
@@ -210,7 +344,7 @@ Keep it conversational and make them feel understood.`
             className={styles.appButton}
             onClick={() => setScreenState('assessment')}
           >
-            <span>See Analysis →</span>
+            <span>See Full Analysis →</span>
           </button>
           <button 
             className={styles.textButton}
@@ -218,8 +352,10 @@ Keep it conversational and make them feel understood.`
               setScreenState('welcome')
               setBubbles(Array(100).fill(false))
               setTimeElapsed(0)
+              setPoppingSequence([])
               setGameData(null)
               setAssessment('')
+              setOneLiner('')
             }}
           >
             Play Again
@@ -244,17 +380,35 @@ Keep it conversational and make them feel understood.`
             </div>
           ) : (
             <div className={styles.markdownContent}>
-              {assessment && (
-                <div dangerouslySetInnerHTML={{ __html: assessment.replace(/\n/g, '<br/>') }} />
+              {assessment ? (
+                <div>
+                  {assessment.split('\n\n').filter(p => p.trim()).map((paragraph, idx) => (
+                    <p key={idx}>{paragraph.trim()}</p>
+                  ))}
+                </div>
+              ) : (
+                <p>No analysis available.</p>
               )}
               
-              <h2>Observed Metrics</h2>
+              <h2>Your Stats</h2>
               <ul>
                 <li><strong>Bubbles Popped:</strong> {gameData.bubblesPopped} / 100</li>
                 <li><strong>Time Elapsed:</strong> {formatTime(gameData.timeElapsed)}</li>
                 <li><strong>Completion:</strong> {gameData.completed ? 'Completed all bubbles' : 'Ended early'}</li>
-                <li><strong>Completion Rate:</strong> {gameData.bubblesPopped}%</li>
+                <li><strong>Popping Pattern:</strong> {gameData.poppingPattern.charAt(0).toUpperCase() + gameData.poppingPattern.slice(1)} {gameData.poppingPattern === 'sequential' ? '(one by one)' : gameData.poppingPattern === 'strategic' ? '(rows/columns)' : '(all over the place)'}</li>
               </ul>
+
+              {gameStats.totalPlays > 1 && (
+                <>
+                  <h2>Compared to Others</h2>
+                  <ul>
+                    <li><strong>Total Plays:</strong> {gameStats.totalPlays} (including yours)</li>
+                    <li><strong>Average Completion:</strong> {Math.round(gameStats.averageCompletion)} bubbles — You popped {gameData.bubblesPopped > gameStats.averageCompletion ? 'more' : 'fewer'} than average</li>
+                    <li><strong>Average Time:</strong> {formatTime(Math.round(gameStats.averageTime))} — You were {gameData.timeElapsed > gameStats.averageTime ? 'slower' : 'faster'} than average</li>
+                    <li><strong>Your Percentile:</strong> {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion)} percentile in completion</li>
+                  </ul>
+                </>
+              )}
             </div>
           )}
           
@@ -265,9 +419,10 @@ Keep it conversational and make them feel understood.`
                 setScreenState('welcome')
                 setBubbles(Array(100).fill(false))
                 setTimeElapsed(0)
+                setPoppingSequence([])
                 setGameData(null)
-                setArchetype(null)
                 setAssessment('')
+                setOneLiner('')
               }}
             >
               <span>Play Again</span>
