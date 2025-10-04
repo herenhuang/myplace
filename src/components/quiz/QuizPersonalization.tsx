@@ -48,7 +48,7 @@ export default function QuizPersonalization({ form, onSubmit, isLoading }: QuizP
   return (
     <div className={styles.personalizationContainer}>
       <div className={styles.personalizationContent}>
-        <h2 className={styles.personalizationTitle}>Let's Personalize Your Story</h2>
+        <h2 className={styles.personalizationTitle}>Let&apos;s Personalize Your Story</h2>
         
         {form.instructions && (
           <p className={styles.personalizationInstructions}>{form.instructions}</p>

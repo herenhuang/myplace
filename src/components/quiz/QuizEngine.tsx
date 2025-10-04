@@ -16,16 +16,6 @@ interface QuizEngineProps {
 
 type ScreenState = 'welcome' | 'personalization' | 'question' | 'analyzing' | 'results'
 
-// Helper function to replace placeholders in text with personalization data
-function replacePlaceholders(text: string, data: Record<string, string>): string {
-  let result = text
-  Object.entries(data).forEach(([key, value]) => {
-    const placeholder = `{{${key}}}`
-    result = result.replace(new RegExp(placeholder, 'g'), value)
-  })
-  return result
-}
-
 export default function QuizEngine({ config }: QuizEngineProps) {
   const [screenState, setScreenState] = useState<ScreenState>('welcome')
   const [sessionId, setSessionId] = useState<string>('')

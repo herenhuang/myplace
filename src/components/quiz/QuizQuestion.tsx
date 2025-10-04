@@ -10,6 +10,7 @@ interface QuizQuestionProps {
   onSelect: (value: string, label: string, isCustom?: boolean) => void
   isLoading: boolean
   adaptedText?: string // For narrative quizzes - AI-adapted scene text
+  personalizationData?: Record<string, string> // For narrative quizzes - user's personalization inputs
 }
 
 export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText }: QuizQuestionProps) {
