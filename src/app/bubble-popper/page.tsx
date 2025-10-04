@@ -1,6 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useTransition } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { getOrCreateSessionId } from '@/lib/session'
+import { saveAndAnalyze, getGlobalStats } from './actions'
+import type { User } from '@supabase/supabase-js'
 import PageContainer from '@/components/layout/PageContainer'
 import styles from './page.module.scss'
 
@@ -29,11 +33,44 @@ export default function BubblePopperPage() {
   const [gameData, setGameData] = useState<GameData | null>(null)
   const [assessment, setAssessment] = useState<string>('')
   const [oneLiner, setOneLiner] = useState<string>('')
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isAnalyzing, startAnalysis] = useTransition()
   const [isEnding, setIsEnding] = useState(false)
   const [poppingSequence, setPoppingSequence] = useState<number[]>([])
   const [gameStats, setGameStats] = useState<GameStats>({ totalPlays: 0, averageCompletion: 0, averageTime: 0 })
+  const [user, setUser] = useState<User | null>(null)
+  const [sessionId, setSessionId] = useState<string>('')
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Initialize user, session, and stats
+  useEffect(() => {
+    const supabase = createClient()
+    
+    const initialize = async () => {
+      // Get or create user
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      
+      // Get or create session
+      const sid = getOrCreateSessionId()
+      setSessionId(sid)
+      
+      // Sign in anonymously if needed
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (!data.session) {
+          await supabase.auth.signInAnonymously()
+        }
+      } catch {
+        // non-fatal
+      }
+      
+      // Load global stats
+      const stats = await getGlobalStats()
+      setGameStats(stats)
+    }
+    
+    initialize()
+  }, [])
 
   // Timer effect
   useEffect(() => {
@@ -61,25 +98,6 @@ export default function BubblePopperPage() {
     setPoppingSequence([])
     setIsGameActive(true)
     setScreenState('game')
-    loadGameStats()
-  }
-
-  const loadGameStats = () => {
-    const stats = localStorage.getItem('bubbleGameStats')
-    if (stats) {
-      setGameStats(JSON.parse(stats))
-    }
-  }
-
-  const saveGameStats = (data: GameData) => {
-    const stats = gameStats
-    const updatedStats = {
-      totalPlays: stats.totalPlays + 1,
-      averageCompletion: ((stats.averageCompletion * stats.totalPlays) + data.bubblesPopped) / (stats.totalPlays + 1),
-      averageTime: ((stats.averageTime * stats.totalPlays) + data.timeElapsed) / (stats.totalPlays + 1)
-    }
-    setGameStats(updatedStats)
-    localStorage.setItem('bubbleGameStats', JSON.stringify(updatedStats))
   }
 
   const analyzePoppingPattern = (sequence: number[]): 'sequential' | 'random' | 'strategic' => {
@@ -153,90 +171,82 @@ export default function BubblePopperPage() {
       poppingSequence: sequence
     }
     setGameData(data)
-    saveGameStats(data)
     
-    // Analyze and show archetype
-    await analyzeGameplay(data)
-    setScreenState('archetype')
-  }
-
-  const analyzeGameplay = async (data: GameData) => {
-    setIsAnalyzing(true)
+    // Generate one-liner for results screen
+    generateOneLiner(data)
     
-    try {
-      // Generate behavioral assessment
-      const response = await fetch('/api/quiz/explain', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: `bubble-${Date.now()}`,
-          responses: [],
-          config: {
-            model: 'claude-3-7-sonnet-latest',
-            promptTemplate: `You're a wise, slightly teasing friend who just watched someone play a bubble-popping game. You see what their choices reveal about them.
-
-What happened:
-- They popped ${data.bubblesPopped} out of 100 bubbles
-- Took ${formatTime(data.timeElapsed)}
-- ${data.completed ? 'Completed every single bubble' : 'Hit end game early'}
-
-Write 3-4 short, punchy paragraphs that make them feel SEEN. Be specific to their exact behavior:
-
-${data.completed && data.timeElapsed < 60 ? 
-  'They FLEW through this. They saw 100 bubbles and went full speedrun mode. What does it say about someone who treats bubble wrap like a competitive sport?' :
-data.completed && data.timeElapsed < 180 ?
-  'They methodically popped every single one. Even when it got tedious, they kept going. That\'s not just patience - that\'s something else.' :
-data.completed ?
-  'They stuck with it for over 3 minutes popping virtual bubbles. Most people would\'ve quit. They didn\'t. Why?' :
-data.bubblesPopped >= 75 ?
-  'They got to 75+ and thought "okay, I get it" and ended it. They don\'t need to finish to prove a point. Interesting.' :
-data.bubblesPopped >= 40 ?
-  'They popped about half and was like "what am I even doing here?" and bounced. They question pointless tasks.' :
-data.bubblesPopped >= 10 ?
-  'They popped a few, realized this was going nowhere, and ended it. They don\'t waste time proving points.' :
-  'They literally hit end game almost immediately. They saw through this instantly. Respect.'}
-
-Write in second person ("you"). Be playful but insightful. Call them out (lovingly). Make it feel like you KNOW them. Reference their specific numbers. Ask rhetorical questions. Be a wise friend who sees through their BS.
-
-Don't be generic. Don't say "this suggests" or "this indicates" - just SAY it. Be direct. Make them laugh and feel understood at the same time.`
-          }
-        })
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-        setAssessment(result.explanation || '')
-        
-        // Generate one-liner for results screen
-        generateOneLiner(data)
-      } else {
-        console.error('API error:', await response.text())
+    // Save and analyze (which also updates global stats)
+    startAnalysis(async () => {
+      const result = await saveAndAnalyze(data, sessionId)
+      if (result.success && result.analysis) {
+        setAssessment(result.analysis)
+        // Refresh global stats
+        const newStats = await getGlobalStats()
+        setGameStats(newStats)
+      } else if (result.error) {
+        console.error('Analysis error:', result.error)
+        setAssessment('Unable to generate analysis at this time.')
       }
-    } catch (error) {
-      console.error('Error analyzing gameplay:', error)
-    } finally {
-      setIsAnalyzing(false)
-    }
+    })
+    
+    setScreenState('archetype')
   }
 
 
   const generateOneLiner = (data: GameData) => {
+    // Track play count for variety
+    const playHistory = JSON.parse(localStorage.getItem('bubblePlayHistory') || '[]')
+    playHistory.push({ bubbles: data.bubblesPopped, time: data.timeElapsed, completed: data.completed })
+    if (playHistory.length > 10) playHistory.shift() // Keep only last 10
+    localStorage.setItem('bubblePlayHistory', JSON.stringify(playHistory))
+    
+    const playCount = playHistory.length
     const patternText = data.poppingPattern === 'sequential' ? 'methodically, one by one' : 
                        data.poppingPattern === 'strategic' ? 'in a clear pattern' : 
                        'all over the place'
     
     if (data.completed && data.timeElapsed < 60) {
-      setOneLiner(`Speed demon. Popped all 100 ${patternText} in under a minute.`)
+      const variations = [
+        `Speed demon. Popped all 100 ${patternText} in under a minute.`,
+        `Speedrunner energy. ${formatTime(data.timeElapsed)} for 100 bubbles. Impressive.`,
+        `Blitzed through it. ${formatTime(data.timeElapsed)} total. You don't mess around.`
+      ]
+      setOneLiner(variations[playCount % variations.length])
     } else if (data.completed) {
-      setOneLiner(`Finished the whole thing ${patternText}. That's commitment.`)
+      const variations = [
+        `Finished the whole thing ${patternText}. That's commitment.`,
+        `All 100 bubbles in ${formatTime(data.timeElapsed)}. You actually did it.`,
+        `Completed. ${formatTime(data.timeElapsed)} of your life you'll never get back. Worth it?`
+      ]
+      setOneLiner(variations[playCount % variations.length])
     } else if (data.bubblesPopped >= 75) {
-      setOneLiner(`Got to ${data.bubblesPopped}, popping ${patternText}, then said "I'm good."`)
+      const variations = [
+        `Got to ${data.bubblesPopped}, popping ${patternText}, then said "I'm good."`,
+        `${data.bubblesPopped} bubbles. Close enough to 100. Smart.`,
+        `Stopped at ${data.bubblesPopped}. Diminishing returns, right?`
+      ]
+      setOneLiner(variations[playCount % variations.length])
     } else if (data.bubblesPopped >= 40) {
-      setOneLiner(`Popped ${data.bubblesPopped} bubbles ${patternText} before questioning life choices.`)
+      const variations = [
+        `Popped ${data.bubblesPopped} bubbles ${patternText} before questioning life choices.`,
+        `${data.bubblesPopped} bubbles and out. You saw where this was going.`,
+        `Made it to ${data.bubblesPopped}. That's ${playCount > 1 ? 'still' : ''} more patient than most.`
+      ]
+      setOneLiner(variations[playCount % variations.length])
     } else if (data.bubblesPopped >= 10) {
-      setOneLiner(`${data.bubblesPopped} bubbles was enough to get the point.`)
+      const variations = [
+        `${data.bubblesPopped} bubbles was enough to get the point.`,
+        `Tried ${data.bubblesPopped}, decided it wasn't worth it. Fair.`,
+        `${data.bubblesPopped} bubbles. ${playCount > 2 ? "Third time and still not buying it?" : "Not impressed, huh?"}`
+      ]
+      setOneLiner(variations[playCount % variations.length])
     } else {
-      setOneLiner(`Nope. Not doing this. Ended it immediately.`)
+      const variations = [
+        `Nope. Not doing this. Ended it immediately.`,
+        `${data.bubblesPopped} bubbles and OUT. ${playCount > 1 ? "Again?! You really hate this." : "Respect the instant quit."}`,
+        `Literally ${data.bubblesPopped} bubbles. ${playCount > 2 ? "Why do you keep coming back?" : "You saw through it instantly."}`
+      ]
+      setOneLiner(variations[playCount % variations.length])
     }
   }
 
@@ -246,10 +256,20 @@ Don't be generic. Don't say "this suggests" or "this indicates" - just SAY it. B
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  const getPercentile = (value: number, average: number): string => {
+  const getPercentile = (value: number, average: number, isHigherBetter: boolean = true): string => {
     if (gameStats.totalPlays < 2) return 'N/A'
-    const percentile = value > average ? Math.min(95, 50 + ((value - average) / average) * 50) : 
-                                        Math.max(5, 50 - ((average - value) / average) * 50)
+    
+    const ratio = value / average
+    let percentile: number
+    
+    if (isHigherBetter) {
+      // For completion rate - higher is better
+      percentile = ratio > 1 ? Math.min(95, 50 + (ratio - 1) * 100) : Math.max(5, 50 * ratio)
+    } else {
+      // For time - lower is better (faster)
+      percentile = ratio < 1 ? Math.min(95, 50 + (1 - ratio) * 100) : Math.max(5, 100 - (ratio - 1) * 50)
+    }
+    
     return `${Math.round(percentile)}th`
   }
 
@@ -321,22 +341,17 @@ Don't be generic. Don't say "this suggests" or "this indicates" - just SAY it. B
       <div className={styles.textContainer}>
         <div className={styles.resultHeader}>
           <div className={styles.resultCard}>
-            <h2 className={styles.resultSubtitle}>Behavioral Observation</h2>
             {oneLiner && (
               <p className={styles.oneLiner}>{oneLiner}</p>
             )}
             <div className={styles.resultStats}>
               <div className={styles.resultStat}>
-                <span className={styles.resultStatValue}>{gameData.bubblesPopped}</span>
+                <span className={styles.resultStatValue}>{gameData.bubblesPopped}%</span>
                 <span className={styles.resultStatLabel}>bubbles popped</span>
               </div>
               <div className={styles.resultStat}>
                 <span className={styles.resultStatValue}>{formatTime(gameData.timeElapsed)}</span>
                 <span className={styles.resultStatLabel}>time</span>
-              </div>
-              <div className={styles.resultStat}>
-                <span className={styles.resultStatValue}>{gameData.bubblesPopped}%</span>
-                <span className={styles.resultStatLabel}>completion</span>
               </div>
             </div>
           </div>
@@ -400,12 +415,14 @@ Don't be generic. Don't say "this suggests" or "this indicates" - just SAY it. B
 
               {gameStats.totalPlays > 1 && (
                 <>
-                  <h2>Compared to Others</h2>
+                  <h2>Compared to All Players</h2>
                   <ul>
-                    <li><strong>Total Plays:</strong> {gameStats.totalPlays} (including yours)</li>
-                    <li><strong>Average Completion:</strong> {Math.round(gameStats.averageCompletion)} bubbles — You popped {gameData.bubblesPopped > gameStats.averageCompletion ? 'more' : 'fewer'} than average</li>
-                    <li><strong>Average Time:</strong> {formatTime(Math.round(gameStats.averageTime))} — You were {gameData.timeElapsed > gameStats.averageTime ? 'slower' : 'faster'} than average</li>
-                    <li><strong>Your Percentile:</strong> {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion)} percentile in completion</li>
+                    <li><strong>Total Plays Worldwide:</strong> {gameStats.totalPlays} games played</li>
+                    <li><strong>Your Completion:</strong> {gameData.bubblesPopped} bubbles — You're in the {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)} percentile</li>
+                    <li><strong>Your Speed:</strong> {formatTime(gameData.timeElapsed)} — You're in the {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)} percentile (faster is better)</li>
+                    <li><strong>Global Average:</strong> {Math.round(gameStats.averageCompletion)} bubbles in {formatTime(Math.round(gameStats.averageTime))}</li>
+                    {gameData.bubblesPopped > gameStats.averageCompletion && <li>🎉 <strong>Above average!</strong> You popped {Math.round(gameData.bubblesPopped - gameStats.averageCompletion)} more bubbles than most people</li>}
+                    {gameData.completed && <li>⭐ <strong>Completionist!</strong> You're one of the few who finished all 100 bubbles</li>}
                   </ul>
                 </>
               )}
