@@ -113,15 +113,14 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         <div className={styles.questionText}>
           <h2>{question.text}</h2>
         </div>
-        
-        {/* Small tooltip about uniqueness - only renders when there's something to show */}
+      </div>
+      <div className={styles.choicesContainer}>
+        {/* Small tooltip about uniqueness - positioned right above answers */}
         {showComparison && stats && moreUniqueThan > 0 && (
           <div className={styles.questionInsight}>
             ✨ Your choice is more unique than {moreUniqueThan}% of responses!
           </div>
         )}
-      </div>
-      <div className={styles.choicesContainer}>
         {question.options.map((option, index) => {
           const isVisible = visibleOptions.includes(index)
           const isSelected = selectedValue === option.value
