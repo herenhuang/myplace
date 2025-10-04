@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId, personalityId, personalityName, responses, config } = await request.json()
+    const { sessionId, personalityId, personalityName, archetype, responses, config } = await request.json()
 
     const supabase = await createClient()
 
@@ -36,9 +36,14 @@ export async function POST(request: NextRequest) {
 
     // Use custom prompt template or default
     const promptTemplate = config.promptTemplate || `Write a personalized explanation for why the user matched with {{personality}}. Their answers: {{answers}}`
+    
+    // Support both archetype (story-matrix) and personality (archetype) quiz types
+    const finalPersonality = archetype || personalityName || 'your result'
+    
     const prompt = promptTemplate
-      .replace(/\{\{personality\}\}/g, personalityName)
-      .replace(/\{\{personalityId\}\}/g, personalityId)
+      .replace(/\{\{archetype\}\}/g, finalPersonality)
+      .replace(/\{\{personality\}\}/g, finalPersonality)
+      .replace(/\{\{personalityId\}\}/g, personalityId || '')
       .replace(/\{\{answers\}\}/g, answersText)
 
     const chatCompletion = await anthropic.messages.create({

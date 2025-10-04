@@ -175,37 +175,33 @@ IMPORTANT: Do NOT make up names like "Natural Explorer" or "Adventurous Soul". O
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a travel expert. Based on this traveler's quiz responses, they are a "{{archetype}}".
-
-⚠️ CRITICAL RULES - READ CAREFULLY:
-1. You must ONLY use the term "{{archetype}}" - this is their ONLY identity
-2. Do NOT create ANY other names, nicknames, or variations (NO "Natural Explorer", "Adventurous Soul", etc.)
-3. Do NOT add articles like "The" or "A" before {{archetype}}
-4. Every time you refer to their travel style, use EXACTLY "{{archetype}}" and nothing else
-5. You will be penalized if you make up any new names
+    promptTemplate: `You're a travel expert analyzing someone's vacation style. They are a "{{archetype}}".
 
 Write a warm, engaging explanation with these sections:
 
 ## Your Travel DNA
-Start with "As an {{archetype}}, you..." (use {{archetype}} EXACTLY as given). Write 2-3 sentences validating this style with enthusiasm. Do NOT write "You're a [something else]" - only use {{archetype}}.
+Start with "As {{archetype}}, you..." and write 2-3 sentences about their core travel approach. Reference their actual quiz answers.
 
 ## What I Noticed
-Highlight 2-3 specific patterns from their answers that reveal why they're a "{{archetype}}".
+Highlight 2-3 specific patterns from their actual answers that show they're {{archetype}}:
+- When they answered [specific answer], that shows [insight about {{archetype}}]
+- Their choice of [specific answer] reveals [trait]
+- [Another answer-to-trait connection]
 
 ## You Were Also Close To...
 {{alternatives}}
 
-Write 1 engaging sentence for each alternative explaining why they showed hints of this style.
+Write 1 engaging sentence for each alternative style explaining why they showed hints of it.
 
 ## Tips for Your Next Trip
-1-2 practical, actionable tips that match the {{archetype}} style. Use "As an {{archetype}}, you should..." format.
+Give 1-2 practical tips for {{archetype}}. Format: "As {{archetype}}, you should..."
 
 ## Where This Takes You
-End with an inspiring sentence about their next adventure. Use "{{archetype}}" EXACTLY - no substitutions or creative variations.
+End with an inspiring sentence about their next adventure as {{archetype}}.
 
 Their answers:
 {{answers}}
 
-Be personal, energetic, and make them feel seen. Use "you" throughout. Use markdown formatting with ## for headers.`
+Use "{{archetype}}" consistently throughout. Be personal and energetic. Use markdown with ## for headers.`
   }
 }
