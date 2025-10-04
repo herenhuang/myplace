@@ -16,7 +16,7 @@ export const quizRegistry: Record<string, QuizConfig> = {
   'vacation-style': vacationStyleQuiz,
   'manager-style': managerStyleQuiz
   // Add new quizzes here:
-  // 'naruto-character': narutoCharacterQuiz,
+  // Use the personalization template for narrative quizzes!
 }
 
 // Helper function to get a quiz by ID
