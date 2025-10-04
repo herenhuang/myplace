@@ -197,6 +197,7 @@ How do you handle this?`
       id: 'q8-feelings-check',
       baseScenario: {
         timeMarker: "Week 4 - Feelings getting real",
+        dimension: "emotional_expression",
         coreSetup: `It's been almost a month. You're lying in bed at 11pm, and you just realized something:
 
 You have feelings. Like, real feelings. This isn't just fun dating anymore. You're actually falling for this person.
