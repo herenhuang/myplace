@@ -378,37 +378,38 @@ export default function BubblePopperPage() {
       )
     }
 
-    // Get first 2 sentences of assessment for the card
-    const getShortAssessment = () => {
-      if (!assessment) return ''
-      const firstParagraph = assessment.split('\n\n').filter(p => p.trim())[0] || ''
-      const sentences = firstParagraph.match(/[^.!?]+[.!?]+/g) || []
-      return sentences.slice(0, 2).join(' ').trim()
-    }
-    
-    const shortAssessment = getShortAssessment()
-
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultHeader}>
           <div className={styles.resultCard}>
-            <h3 className={styles.cardTitle}>Bubble Popper</h3>
+            <h3 className={styles.cardTitle}>PATIENCE TEST</h3>
             {oneLiner && (
               <p className={styles.oneLiner}>{oneLiner}</p>
             )}
-            {shortAssessment && (
-              <p className={styles.cardAnalysis}>{shortAssessment}</p>
+            
+            {/* Mysterious percentile stats only */}
+            {gameStats.totalPlays > 1 && (
+              <div className={styles.percentileGrid}>
+                <div className={styles.percentileBox}>
+                  <div className={styles.percentileNumber}>
+                    {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)}
+                  </div>
+                  <div className={styles.percentileLabel}>speed</div>
+                </div>
+                <div className={styles.percentileBox}>
+                  <div className={styles.percentileNumber}>
+                    {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)}
+                  </div>
+                  <div className={styles.percentileLabel}>completion</div>
+                </div>
+              </div>
             )}
-            <div className={styles.resultStats}>
-              <div className={styles.resultStat}>
-                <span className={styles.resultStatValue}>{gameData.bubblesPopped}</span>
-                <span className={styles.resultStatLabel}>bubbles</span>
+            
+            {gameStats.totalPlays > 1 && (
+              <div className={styles.globalNote}>
+                vs. {gameStats.totalPlays} players worldwide
               </div>
-              <div className={styles.resultStat}>
-                <span className={styles.resultStatValue}>{formatTime(gameData.timeElapsed)}</span>
-                <span className={styles.resultStatLabel}>time</span>
-              </div>
-            </div>
+            )}
           </div>
           <button 
             className={styles.appButton}
@@ -547,4 +548,3 @@ export default function BubblePopperPage() {
     </PageContainer>
   )
 }
-
