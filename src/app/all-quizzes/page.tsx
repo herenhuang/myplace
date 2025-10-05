@@ -1,14 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FlipReveal, FlipRevealItem } from '@/components/ui/flip-reveal'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { ALL_QUIZZES, QUIZ_CATEGORIES, type QuizCategory } from '@/lib/quizzes/all-quizzes-data'
+import UserButton from '@/components/ui/UserButton'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 export default function AllQuizzesPage() {
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory>('all')
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+    })
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-16 px-4 relative">
@@ -26,6 +37,11 @@ export default function AllQuizzesPage() {
             className="w-40 h-auto object-contain"
           />
         </Link>
+      </div>
+
+      {/* User Button in top-right corner */}
+      <div className="absolute top-6 right-6 z-10">
+        <UserButton user={user} />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -120,6 +136,26 @@ export default function AllQuizzesPage() {
             <span className="material-symbols-rounded">arrow_back</span>
             <span>Back to Home</span>
           </Link>
+        </div>
+
+        {/* Footer */}
+        <div className='mt-20 text-center border-t border-gray-300 pt-12'>
+          <a href="https://tally.so/r/mR91yP" target="_blank" rel="noopener noreferrer" className="hover:underline mx-auto w-fit block">
+            <p className='text-gray-900 mb-8 bg-gray-900/10 rounded-full w-fit text-base font-semibold tracking-tight px-5 py-3'>
+                Contact
+            </p>
+          </a>
+          <div className='mt-12 mb-8'>
+            <Link href="/" className="block hover:scale-105 transition-transform duration-200">
+              <Image
+                src='/MyPlace2.png'
+                alt='MyPlace Logo'
+                width={500}
+                height={300}
+                className='mx-auto w-40 h-auto object-contain'
+              />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

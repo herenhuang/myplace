@@ -122,9 +122,6 @@ const Section2: React.FC<Omit<SectionProps, 'user'>> = ({ scrollYProgress }) => 
         
         {/* Footer content integrated into games section */}
         <div className='mt-20 text-center border-t border-gray-700 pt-12'>
-          <h1 className='text-4xl tracking-tight text-white font-semibold mb-8 w-full'>
-            Let us know what you like by clicking to vote!
-          </h1>
           <a href="https://tally.so/r/mR91yP" target="_blank" rel="noopener noreferrer" className="hover:underline mx-auto w-fit block">
             <p className='text-white mb-8 bg-white/10 rounded-full w-fit text-base font-semibold tracking-tight px-5 py-3'>
                 Contact
