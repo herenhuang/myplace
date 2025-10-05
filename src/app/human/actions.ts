@@ -117,7 +117,7 @@ export async function recordHumanStep(
 
 export async function saveHumanAnalysis(
   sessionId: string,
-  analysisResult: any
+  analysisResult: unknown
 ) {
   try {
     const supabase = await createClient()
@@ -160,8 +160,9 @@ export async function saveHumanAnalysis(
     }
 
     console.log('✅ [HUMAN] Analysis saved successfully')
-    console.log(`   Metascore: ${analysisResult.metascore}/100`)
-    console.log(`   Level: ${analysisResult.humanessLevel}`)
+    const result = analysisResult as { metascore: number; humanessLevel: string }
+    console.log(`   Metascore: ${result.metascore}/100`)
+    console.log(`   Level: ${result.humanessLevel}`)
     
     return { success: true }
   } catch (error) {

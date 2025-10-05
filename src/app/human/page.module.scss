@@ -2,6 +2,7 @@
 
 .pageBg {
   min-height: 100dvh;
+  width: 1200px;
   padding: 2rem;
   box-sizing: border-box;
 
@@ -152,7 +153,10 @@
 }
 
 .contextBox {
-  
+  background: #ffffff;
+  border: 1px solid #f3f4f6; /* gray-100 */
+  border-radius: 0.75rem;
+  padding: 1rem;
 }
 
 .imageBox {
@@ -172,4 +176,65 @@
   font-weight: 700;
   color: #f97316;
   text-align: center;
+}
+
+.waveVisualization {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 3rem;
+}
+
+.waveCanvas {
+  width: 100%;
+  display: block;
+}
+
+/* Results Stepper Navigation */
+.stepNav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0 0 1.25rem 0;
+}
+
+.stepNavItem,
+.stepNavItemActive {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  background: #ffffff;
+  color: #4b5563; /* gray-600 */
+}
+
+.stepNavItemActive {
+  border-color: #fdba74; /* orange-300 */
+  background: #fff7ed; /* orange-50 */
+  color: #9a3412; /* orange-800 */
+}
+
+.stepIndex {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: #f3f4f6; /* gray-100 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.stepNavItemActive .stepIndex {
+  background: #fdba74; /* orange-300 */
+  color: #ffffff;
+}
+
+.stepLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
 }

@@ -1,15 +1,14 @@
-// Question bank for the Human Assessment
-// Each question is designed to elicit responses that differentiate human from AI behavior
-
 export interface HumanQuestion {
   stepNumber: number
-  type: 'open-ended' | 'word-association' | 'image-description' | 'forced-choice' | 'scenario'
+  type: 'open-ended' | 'word-association' | 'image-description' | 'forced-choice' | 'scenario' | 'word-combination' | 'shape-sorting' | 'shape-ordering'
   question: string
-  context?: string // Additional context or scenario description
-  imageUrl?: string // For image description questions
-  choices?: string[] // For multiple choice or forced choice questions
-  characterLimit?: number // For limited character responses
+  context?: string      
+  imageUrl?: string
+  choices?: string[]
+  characterLimit?: number
+  minCharacterLength?: number // Minimum character threshold for paragraph-length inputs
   placeholder?: string
+  requiredWords?: string[] // For word-combination questions
 }
 
 export const HUMAN_QUESTIONS: HumanQuestion[] = [
@@ -54,77 +53,50 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
   },
   {
     stepNumber: 6,
-    type: 'scenario',
-    question: "How do you respond?",
-    context: "A stranger approaches you on the street and asks: 'Excuse me, do you have the time?' But they're wearing a watch.",
-    placeholder: "Your Response...",
+    type: 'word-combination',
+    question: "Create a sentence using all three words:",
+    requiredWords: ['telescope', 'sandwich', 'melancholy'],
+    placeholder: "Write a sentence using all three words...",
+    characterLimit: 200
   },
   {
     stepNumber: 7,
-    type: 'forced-choice',
-    question: "Which would you rather experience?",
-    choices: [
-      "Win the lottery but lose all your memories from the past year",
-      "Keep your memories but never win anything by chance again"
-    ]
+    type: 'word-combination',
+    question: "Create a sentence using all three words:",
+    requiredWords: ['bicycle', 'thunderstorm', 'nostalgia'],
+    placeholder: "Write a sentence using all three words...",
+    characterLimit: 200
   },
   {
     stepNumber: 8,
-    type: 'scenario',
-    question: "What do you do?",
-    context: "You're in a crowded elevator. Someone farts. Nobody acknowledges it.",
-    placeholder: "Your Response...",
+    type: 'word-combination',
+    question: "Create a sentence using all three words:",
+    requiredWords: ['library', 'clockwork', 'whimsical'],
+    placeholder: "Write a sentence using all three words...",
+    characterLimit: 200
   },
   {
     stepNumber: 9,
-    type: 'open-ended',
-    question: "Complete this thought:",
-    context: "The thing about reality is...",
-    placeholder: "Your Response...",
+    type: 'scenario',
+    question: "How would you handle this?",
+    context: "You're at a coffee shop and overhear someone loudly discussing very personal details on their phone. Everyone around looks uncomfortable.",
+    placeholder: "Your response...",
+    characterLimit: 150,
+    minCharacterLength: 30
+  },
+  {
+    stepNumber: 10,
+    type: 'shape-sorting',
+    question: "Sort the shapes into 3 categories",
+    context: "Drag and drop the 9 shapes below into the 3 categories. Each shape has different properties: color (red, blue, green), shape (circle, square, triangle), and border (with or without border). Organize them however makes sense to you.",
+  },
+  {
+    stepNumber: 11,
+    type: 'shape-ordering',
+    question: "Order these shapes",
+    context: "You are presented with 9 unique shapes. Drag them into the sequence row below in whatever order you believe is best. There is no right or wrong answer.",
   }
 ]
-
-// AI behavioral markers to detect
-export const AI_MARKERS = {
-  tooFormal: [
-    'I would',
-    'I apologize',
-    'thank you for',
-    'it is important to',
-    'in my experience',
-    'as an AI'
-  ],
-  tooComprehensive: [
-    'firstly',
-    'secondly',
-    'in conclusion',
-    'furthermore',
-    'additionally',
-    'moreover'
-  ],
-  genericPoliteness: [
-    'please note',
-    'kindly',
-    'I hope this helps',
-    'feel free to',
-    'don\'t hesitate to'
-  ],
-  overExplanation: [
-    'this is because',
-    'the reason being',
-    'to clarify',
-    'in other words',
-    'what I mean is'
-  ]
-}
-
-// Human behavioral markers to detect
-export const HUMAN_MARKERS = {
-  casual: ['lol', 'haha', 'lmao', 'omg', 'tbh', 'ngl', 'fr', 'bruh'],
-  emotional: ['!', '...', '???', '!!', 'ugh', 'yikes', 'oof', 'damn'],
-  personal: ['my', 'I\'d', 'I\'m', 'honestly', 'probably', 'maybe', 'idk'],
-  colloquial: ['gonna', 'wanna', 'kinda', 'sorta', 'yeah', 'nah', 'dunno']
-}
 
 // Archetype definitions for Human Assessment
 export const HUMAN_ARCHETYPES = {
@@ -168,5 +140,15 @@ export const HUMAN_ARCHETYPES = {
     emoji: '🔥',
     traits: ['non_conformist', 'bold', 'challenging']
   }
+}
+
+// Validation function for word-combination questions
+export function validateWordCombination(response: string, requiredWords: string[]): boolean {
+  if (!response || !requiredWords) return false
+  
+  const lowercaseResponse = response.toLowerCase()
+  return requiredWords.every(word => 
+    lowercaseResponse.includes(word.toLowerCase())
+  )
 }
 

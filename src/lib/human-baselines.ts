@@ -145,105 +145,105 @@ export const AI_BASELINE_RESPONSES: QuestionBaselines[] = [
   },
   {
     stepNumber: 6,
-    questionType: 'scenario',
+    questionType: 'word-combination',
     baselines: [
       {
         model: 'claude',
-        response: 'I would politely check my phone and tell them the time, while perhaps wondering if their watch is broken or if they might need help with something else.'
+        response: 'Through the telescope, I observed the distant stars while eating my sandwich, feeling a profound melancholy about the vastness of space.'
       },
       {
         model: 'gpt',
-        response: 'I\'d check my phone and tell them the time. They might be asking because their watch battery died or they forgot to set it. I\'d respond helpfully regardless.'
+        response: 'The astronomer gazed through his telescope, pausing to eat his sandwich as melancholy thoughts about the universe filled his mind.'
       },
       {
         model: 'generic',
-        response: 'I would provide them with the current time from my phone or watch, as they may be asking for various reasons despite wearing a watch themselves.'
+        response: 'I used the telescope to look at the moon while enjoying my sandwich, experiencing a sense of melancholy about being alone.'
       },
       {
         model: 'concise',
-        response: 'Tell them the time.'
+        response: 'My telescope revealed distant galaxies as I ate my sandwich with melancholy.'
       },
       {
         model: 'median',
-        response: 'I\'d check my phone and tell them the time. Maybe their watch isn\'t working or they want to confirm the time.'
+        response: 'Looking through the telescope at the night sky, I ate my sandwich with a feeling of melancholy about the infinite cosmos.'
       }
     ]
   },
   {
     stepNumber: 7,
-    questionType: 'forced-choice',
+    questionType: 'word-combination',
     baselines: [
       {
         model: 'claude',
-        response: 'Keep your memories but never win anything by chance again'
+        response: 'Riding my bicycle through the thunderstorm brought back waves of nostalgia for childhood adventures in the rain.'
       },
       {
         model: 'gpt',
-        response: 'Keep your memories but never win anything by chance again'
+        response: 'The thunderstorm caught me on my bicycle, triggering nostalgia for similar stormy rides from my youth.'
       },
       {
         model: 'generic',
-        response: 'Keep your memories but never win anything by chance again'
+        response: 'I pedaled my bicycle faster as the thunderstorm approached, feeling nostalgia for simpler times when rain was just fun.'
       },
       {
         model: 'concise',
-        response: 'Keep your memories but never win anything by chance again'
+        response: 'My bicycle ride in the thunderstorm sparked childhood nostalgia.'
       },
       {
         model: 'median',
-        response: 'Keep your memories but never win anything by chance again'
+        response: 'As the thunderstorm began, I rode my bicycle home feeling nostalgia for carefree days of playing in the rain.'
       }
     ]
   },
   {
     stepNumber: 8,
-    questionType: 'scenario',
+    questionType: 'word-combination',
     baselines: [
       {
         model: 'claude',
-        response: 'I would maintain a neutral expression and continue facing forward, respecting the social convention of collective denial in this awkward situation.'
+        response: 'The library\'s old clockwork mechanism created a whimsical atmosphere as it chimed every hour among the ancient books.'
       },
       {
         model: 'gpt',
-        response: 'I\'d pretend nothing happened and look straight ahead or at my phone, following the unspoken rule that we all ignore it to avoid embarrassment.'
+        response: 'In the quiet library, the antique clockwork clock added a whimsical charm to the scholarly atmosphere.'
       },
       {
         model: 'generic',
-        response: 'I would remain quiet and not acknowledge it, as is the common social practice in such situations to maintain everyone\'s comfort.'
+        response: 'The library featured a beautiful clockwork clock that gave the reading room a whimsical, old-world character.'
       },
       {
         model: 'concise',
-        response: 'Ignore it and look at my phone.'
+        response: 'The library\'s clockwork clock created a whimsical ambiance.'
       },
       {
         model: 'median',
-        response: 'I\'d act like nothing happened and look at my phone or the floor numbers, following the social norm of pretending it didn\'t occur.'
+        response: 'The old library\'s clockwork timepiece added a whimsical touch to the studious environment.'
       }
     ]
   },
   {
     stepNumber: 9,
-    questionType: 'open-ended',
+    questionType: 'scenario',
     baselines: [
       {
         model: 'claude',
-        response: 'The thing about reality is that it\'s fundamentally shaped by our perception and interpretation, existing as both an objective external world and a subjective internal experience.'
+        response: 'I would discreetly move to a different area of the coffee shop to give them privacy while avoiding the uncomfortable situation for other patrons.'
       },
       {
         model: 'gpt',
-        response: 'The thing about reality is that it\'s often more complex than it appears, and what we perceive is filtered through our own experiences and biases.'
+        response: 'I\'d probably put on headphones or move to another table if possible, trying to give them privacy while making myself more comfortable.'
       },
       {
         model: 'generic',
-        response: 'The thing about reality is that it can be different from our expectations and is experienced uniquely by each individual based on their perspective.'
+        response: 'I would either move to a different location in the coffee shop or use headphones to avoid hearing the personal conversation and reduce the discomfort.'
       },
       {
         model: 'concise',
-        response: 'The thing about reality is that it\'s subjective.'
+        response: 'Move to another table or put in headphones.'
       },
       {
         model: 'median',
-        response: 'The thing about reality is that it\'s complex and often different from how we imagine it, shaped by both objective facts and subjective perception.'
+        response: 'I\'d try to move away from them or put on headphones to give them privacy and make the situation less awkward for everyone.'
       }
     ]
   }

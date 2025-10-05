@@ -1,68 +1,24 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import PageContainer from '@/components/layout/PageContainer'
 import styles from './page.module.scss'
+import ResultsTabs from './ResultsTabs'
+import { loadLocalCache, saveLocalCache, getQAFromSources, HUMAN_CACHE_KEY } from './utils'
 import { startHumanSession, recordHumanStep, saveHumanAnalysis } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
-import { HUMAN_QUESTIONS } from '@/lib/human-questions'
+import { HUMAN_QUESTIONS, validateWordCombination } from '@/lib/human-questions'
+import ShapeDragCanvas from '@/components/ShapeDragCanvas'
+import { ShapeData } from '@/components/dnd/draggableUtils'
+import ShapeOrderCanvas from '@/components/ShapeOrderCanvas'
 import { getBaselinesForQuestion } from '@/lib/human-baselines'
 import { HumanStepData, HumanAnalysisResult } from '@/lib/human-types'
+import { HUMAN_TEST_DISCLAIMER } from '@/lib/human-constants'
 import Image from 'next/image'
 
 type ScreenState = 'welcome' | 'confirmation' | 'simulation' | 'analyzing' | 'results-overview' | 'results-breakdown' | 'results-archetype'
 
-// Local cache for slide responses and analysis results
-const HUMAN_CACHE_KEY = 'human-results-cache-v1'
-
-interface HumanLocalCache {
-  sessionId: string
-  responses: HumanStepData[]
-  analysisResult?: HumanAnalysisResult
-  updatedAt: number
-}
-
-function loadLocalCache(sessionId: string): HumanLocalCache | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = localStorage.getItem(HUMAN_CACHE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as HumanLocalCache
-    if (parsed && parsed.sessionId === sessionId) return parsed
-    return null
-  } catch {
-    return null
-  }
-}
-
-function saveLocalCache(cache: HumanLocalCache) {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(HUMAN_CACHE_KEY, JSON.stringify(cache))
-  } catch {}
-}
-
-// Helper: get the most recent question/answer pair for a given step
-function getQAFromSources(
-  stepNumber: number,
-  liveResponses: HumanStepData[],
-  sessionId: string
-) {
-  // 1) live responses in memory
-  const fromLive = liveResponses.find(r => r.stepNumber === stepNumber)
-  if (fromLive) {
-    return { question: fromLive.question, userResponse: fromLive.userResponse }
-  }
-  // 2) cached responses in localStorage
-  const cached = loadLocalCache(sessionId)
-  const fromCache = cached?.responses?.find(r => r.stepNumber === stepNumber)
-  if (fromCache) {
-    return { question: fromCache.question, userResponse: fromCache.userResponse }
-  }
-  // 3) fallback to static question text only
-  const q = HUMAN_QUESTIONS.find(q => q.stepNumber === stepNumber)
-  return { question: q?.question || `Question ${stepNumber}`, userResponse: '' }
-}
+// helpers moved to ./utils
 
 // Orange mascot character for consistent branding
 const OrangeMascot = () => (
@@ -86,12 +42,23 @@ export default function HumanTestPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [stepStartTime, setStepStartTime] = useState(0)
   const [responses, setResponses] = useState<HumanStepData[]>([])
+  const [shapeSortingResults, setShapeSortingResults] = useState<{ [categoryId: string]: string[] }>({})
+  const [shapeOrderingResults, setShapeOrderingResults] = useState<string[]>([])
 
   // Results state
   const [analysisResult, setAnalysisResult] = useState<HumanAnalysisResult | null>(null)
   const [analysisError, setAnalysisError] = useState<string>('')
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const handleShapeSortComplete = useCallback((results: { [key: string]: ShapeData[] }) => {
+    // Convert ShapeData arrays to string arrays (shape IDs)
+    const convertedResults: { [categoryId: string]: string[] } = {}
+    Object.entries(results).forEach(([categoryId, shapes]) => {
+      convertedResults[categoryId] = shapes.map(shape => shape.id)
+    })
+    setShapeSortingResults(convertedResults)
+  }, []);
 
   // Initialize session and handle ?slide= param
   useEffect(() => {
@@ -105,7 +72,7 @@ export default function HumanTestPage() {
         setResponses(cached.responses)
         // If user navigates directly to breakdown and we have old analysis, hydrate it
         if (cached.analysisResult) {
-          setAnalysisResult(cached.analysisResult)
+          setAnalysisResult(cached.analysisResult as HumanAnalysisResult)
         }
       }
     }
@@ -161,14 +128,44 @@ export default function HumanTestPage() {
     if (!question) return
 
     let finalResponse = ''
+    let isReadyToSubmit = true;
     
     if (question.type === 'forced-choice') {
-      if (!selectedChoice) return
-      finalResponse = selectedChoice
+      if (!selectedChoice) {
+        isReadyToSubmit = false
+      } else {
+        finalResponse = selectedChoice
+      }
+    } else if (question.type === 'shape-sorting') {
+      // For shape sorting, we need to check if all shapes are categorized
+      const totalShapes = Object.values(shapeSortingResults).flat().length
+      if (totalShapes !== 9) {
+        alert('Please sort all 9 shapes into the 3 categories before continuing.')
+        isReadyToSubmit = false
+      }
+      finalResponse = JSON.stringify(shapeSortingResults)
+    } else if (question.type === 'shape-ordering') {
+      if (shapeOrderingResults.length !== 9) {
+        alert('Please order all 9 shapes in the sequence row before continuing.')
+        isReadyToSubmit = false
+      }
+      finalResponse = JSON.stringify(shapeOrderingResults);
     } else {
-      if (!userInput.trim()) return
+      if (!userInput.trim()) {
+        isReadyToSubmit = false
+      }
       finalResponse = userInput.trim()
+      
+      // Validate word-combination questions
+      if (question.type === 'word-combination' && question.requiredWords) {
+        if (!validateWordCombination(finalResponse, question.requiredWords)) {
+          alert(`Please use all three words in your sentence: ${question.requiredWords.join(', ')}`)
+          return
+        }
+      }
     }
+
+    if (!isReadyToSubmit) return;
 
     setIsLoading(true)
 
@@ -182,10 +179,13 @@ export default function HumanTestPage() {
         stepNumber: currentStepNumber,
         questionType: question.type,
         question: question.question,
+        context: question.context,
         userResponse: finalResponse,
         responseTimeMs,
         timestamp: new Date().toISOString(),
-        aiBaseline
+        aiBaseline,
+        shapeSortingResults: question.type === 'shape-sorting' ? shapeSortingResults : undefined,
+        shapeOrderingResults: question.type === 'shape-ordering' ? shapeOrderingResults : undefined
       }
 
       await recordHumanStep(dbSessionId, stepData)
@@ -211,6 +211,8 @@ export default function HumanTestPage() {
       setCurrentStepNumber(currentStepNumber + 1)
       setUserInput('')
       setSelectedChoice(null)
+      setShapeSortingResults({})
+      setShapeOrderingResults([])
       setStepStartTime(Date.now())
       
       // Focus input for next question
@@ -225,9 +227,11 @@ export default function HumanTestPage() {
   }
 
   const startAnalysis = async (allResponses: HumanStepData[]) => {
-    setScreenState('analyzing')
-    setIsLoading(true)
+    // Keep the screen layout; only swap results area contents
     setAnalysisError('')
+    setIsLoading(true)
+    // Immediately show the results container; ResultsTabs will render a loader if analysisResult is null
+    setScreenState('results-overview')
 
     try {
       const totalResponseTime = allResponses.reduce((sum, r) => sum + r.responseTimeMs, 0)
@@ -258,29 +262,25 @@ export default function HumanTestPage() {
           updatedAt: Date.now()
         })
         
-        // Wait a moment for dramatic effect
-        setTimeout(() => {
-          const params = new URLSearchParams(window.location.search)
-          const slideParam = params.get('slide')
-          if (slideParam === 'breakdown') {
-            setScreenState('results-breakdown')
-            // Scroll to an anchor if specific step is provided like ?slide=breakdown&step=5
-            const stepParam = parseInt(params.get('step') || '', 10)
-            if (!Number.isNaN(stepParam)) {
-              setTimeout(() => {
-                document.getElementById(`slide-${stepParam}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-              }, 300)
-            }
-          } else if (slideParam === 'archetype') {
-            setScreenState('results-archetype')
-          } else {
-            setScreenState('results-overview')
+        const params = new URLSearchParams(window.location.search)
+        const slideParam = params.get('slide')
+        if (slideParam === 'breakdown') {
+          setScreenState('results-breakdown')
+          const stepParam = parseInt(params.get('step') || '', 10)
+          if (!Number.isNaN(stepParam)) {
+            setTimeout(() => {
+              document.getElementById(`slide-${stepParam}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }, 300)
           }
-        }, 2000)
+        } else if (slideParam === 'archetype') {
+          setScreenState('results-archetype')
+        } else {
+          setScreenState('results-overview')
+        }
       } else {
         console.error('Analysis failed:', result.error)
         setAnalysisError(result.error || 'Analysis failed. Please try again.')
-        // Stay on analyzing screen to show error
+        // Keep results container open; ResultsTabs will show placeholder
       }
     } catch (error) {
       console.error('Error analyzing responses:', error)
@@ -329,12 +329,8 @@ export default function HumanTestPage() {
          <Image src="/elevate/blobbert.png" alt="Human" width={120} height={120} />
           
           <div className="text-left mt-8 mb-12">
-            <p className="text-black text-base leading-5 mb-6">
-              This environment is designed to mirror real-life interactions, and the most valuable input comes from you simply responding as you naturally would in everyday situations.
-            </p>
-            
-            <p className="text-black text-base leading-5">
-              There are no "right" or "wrong" answers — the goal is to capture authentic reactions, decisions, and behaviors as they unfold. By engaging normally, just as you would outside of this simulation, you help ensure the experience remains realistic, meaningful, and useful.
+            <p className="text-black text-base leading-5 whitespace-pre-line">
+              {HUMAN_TEST_DISCLAIMER}
             </p>
           </div>
 
@@ -355,9 +351,19 @@ export default function HumanTestPage() {
 
     const isMultipleChoice = question.type === 'forced-choice'
     const isWordAssociation = question.type === 'word-association'
-    const canSubmit = isMultipleChoice ? selectedChoice !== null : userInput.trim().length > 0
+    const isShapeSorting = question.type === 'shape-sorting'
+    const isShapeOrdering = question.type === 'shape-ordering'
+    const canSubmit = isMultipleChoice ? selectedChoice !== null : 
+                     isShapeSorting ? Object.values(shapeSortingResults).flat().length === 9 :
+                     isShapeOrdering ? shapeOrderingResults.length === 9 :
+                     userInput.trim().length > 0
     const characterCount = question.characterLimit ? userInput.length : null
     const isOverLimit = characterCount !== null && characterCount > question.characterLimit!
+    const isUnderMinLength = question.minCharacterLength ? userInput.trim().length < question.minCharacterLength : false
+    const canSubmitWithMinLength = isMultipleChoice ? selectedChoice !== null : 
+                                  isShapeSorting ? Object.values(shapeSortingResults).flat().length === 9 :
+                                  isShapeOrdering ? shapeOrderingResults.length === 9 :
+                                  userInput.trim().length >= (question.minCharacterLength || 0)
 
     return (
       <div className={`flex flex-col h-screen items-center justify-center ${styles.pageBg}`}>
@@ -403,11 +409,33 @@ export default function HumanTestPage() {
                     <div className={styles.promptWord}>{question.context}</div>
                   </div>
                 )}
+
+                {/* Word combination required words */}
+                {question.type === 'word-combination' && question.requiredWords && (
+                  <div className="flex gap-3 justify-center mt-4">
+                    {question.requiredWords.map((word, index) => (
+                      <div key={index} className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full font-medium">
+                        {word}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Input Area */}
               <div className={styles.inputArea}>
-                {isMultipleChoice && question.choices ? (
+                {isShapeSorting ? (
+                  <div className="w-full">
+                    <ShapeDragCanvas
+                      onComplete={handleShapeSortComplete}
+                      showLabels={true}
+                    />
+                  </div>
+                ) : isShapeOrdering ? (
+                  <div className="w-full">
+                    <ShapeOrderCanvas onOrderChange={setShapeOrderingResults} />
+                  </div>
+                ) : isMultipleChoice && question.choices ? (
                   <div className="space-y-3">
                     {question.choices.map((choice, index) => (
                       <button
@@ -444,8 +472,13 @@ export default function HumanTestPage() {
                       autoFocus
                     />
                     {characterCount !== null && (
-                      <div className={`text-sm mt-2 text-right ${isOverLimit ? 'text-red-500' : 'text-gray-500'}`}>
+                      <div className={`text-sm mt-2 text-right ${isOverLimit || isUnderMinLength ? 'text-red-500' : 'text-gray-500'}`}>
                         {characterCount} / {question.characterLimit}
+                        {isUnderMinLength && (
+                          <span className="block text-xs text-red-500">
+                            Minimum {question.minCharacterLength} characters required
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
@@ -454,7 +487,7 @@ export default function HumanTestPage() {
                 <div className="flex items-center justify-center">
                   <button
                     onClick={handleSubmitResponse}
-                    disabled={!canSubmit || isLoading || isOverLimit}
+                    disabled={!canSubmitWithMinLength || isLoading || isOverLimit || isUnderMinLength}
                     className="w-10 h-10 bg-black hover:bg-gray-800 text-white font-bold rounded-full text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
                   >
                     {isLoading ? (
@@ -547,7 +580,7 @@ export default function HumanTestPage() {
     let data = analysisResult
     if (!data && typeof window !== 'undefined' && sessionId) {
       const cached = loadLocalCache(sessionId)
-      if (cached?.analysisResult) data = cached.analysisResult
+      if (cached?.analysisResult) data = cached.analysisResult as HumanAnalysisResult
     }
     if (!data) return null
 
@@ -604,6 +637,40 @@ export default function HumanTestPage() {
             </div>
           </div>
 
+          {/* Personality multi-axis */}
+          {data.personality && (
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Personality Profile</h3>
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  { key: 'creative_conventional', label: 'Creative', lowLabel: 'Conventional', highLabel: 'Creative' },
+                  { key: 'analytical_intuitive', label: 'Intuitive', lowLabel: 'Analytical', highLabel: 'Intuitive' },
+                  { key: 'emotional_logical', label: 'Emotional', lowLabel: 'Logical', highLabel: 'Emotional' },
+                  { key: 'spontaneous_calculated', label: 'Spontaneous', lowLabel: 'Calculated', highLabel: 'Spontaneous' },
+                  { key: 'abstract_concrete', label: 'Abstract', lowLabel: 'Concrete', highLabel: 'Abstract' },
+                  { key: 'divergent_convergent', label: 'Divergent', lowLabel: 'Convergent', highLabel: 'Divergent' }
+                ].map((axis, idx) => {
+                  const value = data.personality[axis.key as keyof typeof data.personality]
+                  return (
+                    <div key={axis.key}>
+                      <div className="flex justify-between items-center mb-1 text-sm">
+                        <span className="text-gray-500">{axis.lowLabel}</span>
+                        <span className="text-gray-900 font-semibold">{value}</span>
+                        <span className="text-gray-500">{axis.highLabel}</span>
+                      </div>
+                      <div className={styles.gradientTrack}>
+                        <div
+                          className="h-2 bg-gradient-to-r from-gray-400 to-orange-500 rounded-full absolute left-0 top-0 transition-all duration-700"
+                          style={{ width: `${value}%`, transitionDelay: `${(idx + 4) * 120}ms` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           <button
             onClick={() => setScreenState('results-breakdown')}
             className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-full text-lg transition-colors shadow-lg"
@@ -615,14 +682,41 @@ export default function HumanTestPage() {
     )
   }
 
+  // Top results stepper navigation: Score → Breakdown → Archetype
+  const renderResultsNav = (active: 'results-overview' | 'results-breakdown' | 'results-archetype') => {
+    const items: Array<{ key: typeof active; label: string }> = [
+      { key: 'results-overview', label: 'Score' },
+      { key: 'results-breakdown', label: 'Breakdown' },
+      { key: 'results-archetype', label: 'Archetype' }
+    ]
+    return (
+      <div className={styles.stepNav}>
+        {items.map((it, idx) => (
+          <button
+            key={it.key}
+            className={it.key === active ? styles.stepNavItemActive : styles.stepNavItem}
+            onClick={() => setScreenState(it.key)}
+          >
+            <span className={styles.stepIndex}>{idx + 1}</span>
+            <span className={styles.stepLabel}>{it.label}</span>
+          </button>
+        ))}
+      </div>
+    )
+  }
+
   const renderBreakdown = () => {
     // Prefer live analysis; fallback to cache
     let data = analysisResult
     if (!data && typeof window !== 'undefined' && sessionId) {
       const cached = loadLocalCache(sessionId)
-      if (cached?.analysisResult) data = cached.analysisResult
+      if (cached?.analysisResult) data = cached.analysisResult as HumanAnalysisResult
     }
     if (!data) return null
+
+    // Split question steps (1-9) vs additional metrics (>9)
+    const questionBreakdown = data.breakdown.filter((b) => b.stepNumber >= 1 && b.stepNumber <= 9)
+    const extraMetrics = data.breakdown.filter((b) => b.stepNumber > 9)
 
     return (
       <div className={`${styles.pageBg} py-16`}>
@@ -633,13 +727,106 @@ export default function HumanTestPage() {
               Breakdown
             </h2>
             <p className="text-gray-600">
-              Insights from each of your {data.breakdown.length} responses
+              Insights from each of your {questionBreakdown.length} responses
             </p>
+          </div>
+
+          {/* Wave visualization canvas */}
+          <div className={styles.waveVisualization}>
+            <h3 className="text-sm font-medium text-gray-700 mb-4">Unexpectedness Journey</h3>
+            <canvas
+              className={styles.waveCanvas}
+              style={{ height: '120px' }}
+              ref={(el) => {
+                if (!el || !questionBreakdown || questionBreakdown.length === 0) return
+                const ctx = el.getContext('2d')
+                if (!ctx) return
+                
+                // Setup canvas with device pixel ratio
+                const rect = el.getBoundingClientRect()
+                const dpr = window.devicePixelRatio || 1
+                el.width = rect.width * dpr
+                el.height = 120 * dpr
+                ctx.scale(dpr, dpr)
+                
+                const width = rect.width
+                const height = 120
+                const padding = 20
+                const graphHeight = height - padding * 2
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, width, height)
+                
+                // Draw grid lines
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)'
+                ctx.lineWidth = 1
+                for (let i = 0; i <= 4; i++) {
+                  const y = padding + (graphHeight * i) / 4
+                  ctx.beginPath()
+                  ctx.moveTo(0, y)
+                  ctx.lineTo(width, y)
+                  ctx.stroke()
+                }
+                
+                // Calculate points
+                const points = questionBreakdown.map((item, index) => ({
+                  x: (index / (questionBreakdown.length - 1)) * width,
+                  y: padding + graphHeight - (item.percentile / 100) * graphHeight,
+                  percentile: item.percentile
+                }))
+                
+                // Draw smooth curve
+                ctx.beginPath()
+                ctx.strokeStyle = 'rgba(249, 115, 22, 0.8)'
+                ctx.lineWidth = 3
+                
+                // Move to first point
+                ctx.moveTo(points[0].x, points[0].y)
+                
+                // Draw smooth curve through points
+                for (let i = 1; i < points.length; i++) {
+                  const xMid = (points[i].x + points[i - 1].x) / 2
+                  const yMid = (points[i].y + points[i - 1].y) / 2
+                  const cp1x = (xMid + points[i - 1].x) / 2
+                  const cp2x = (xMid + points[i].x) / 2
+                  
+                  ctx.quadraticCurveTo(cp1x, points[i - 1].y, xMid, yMid)
+                  ctx.quadraticCurveTo(cp2x, points[i].y, points[i].x, points[i].y)
+                }
+                ctx.stroke()
+                
+                // Draw dots at each point
+                points.forEach((point, index) => {
+                  ctx.beginPath()
+                  ctx.arc(point.x, point.y, 4, 0, Math.PI * 2)
+                  ctx.fillStyle = point.percentile >= 70 ? 'rgba(249, 115, 22, 1)' : 'rgba(156, 163, 175, 1)'
+                  ctx.fill()
+                  
+                  // Draw step numbers below
+                  ctx.fillStyle = 'rgba(107, 114, 128, 0.8)'
+                  ctx.font = '12px sans-serif'
+                  ctx.textAlign = 'center'
+                  ctx.fillText((index + 1).toString(), point.x, height - 5)
+                })
+                
+                // Draw axis labels
+                ctx.fillStyle = 'rgba(107, 114, 128, 0.6)'
+                ctx.font = '10px sans-serif'
+                ctx.textAlign = 'right'
+                ctx.fillText('100%', width - 5, padding - 5)
+                ctx.fillText('0%', width - 5, height - padding + 15)
+              }}
+            />
+            <div className="flex justify-between mt-2 text-xs text-gray-500">
+              <span>Q1</span>
+              <span>Your Responses</span>
+              <span>Q{questionBreakdown.length}</span>
+            </div>
           </div>
 
           {/* All questions in vertical scroll */}
           <div className="space-y-6 mb-12">
-            {data.breakdown.map((item, index) => {
+            {questionBreakdown.map((item, index) => {
               const qa = getQAFromSources(item.stepNumber, responses, sessionId)
               return (
                 <div
@@ -688,11 +875,71 @@ export default function HumanTestPage() {
                         </p>
                       </div>
                     )}
+                    
+                    {/* AI/Human likelihood comparison */}
+                    {(item.aiLikelihood !== undefined || item.humanLikelihood !== undefined) && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="flex gap-4 text-sm">
+                          <div className="flex-1">
+                            <span className="text-gray-500">AI likelihood</span>
+                            <div className="mt-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gray-400 rounded-full"
+                                style={{ width: `${item.aiLikelihood || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-600">{item.aiLikelihood || 0}%</span>
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-gray-500">Human likelihood</span>
+                            <div className="mt-1 h-2 bg-orange-50 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-orange-400 rounded-full"
+                                style={{ width: `${item.humanLikelihood || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-orange-600">{item.humanLikelihood || 0}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )
             })}
           </div>
+
+          {/* Additional indicators (not counted as steps) */}
+          {extraMetrics.length > 0 && (
+            <div className="mb-16">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Additional Indicators</h3>
+              <div className="space-y-4">
+                {extraMetrics.map((item, idx) => (
+                  <div key={`m-${idx}`} className={styles.resultBlock}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm text-gray-500">Metric</div>
+                      {item.percentile >= 70 && (
+                        <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+                          {item.percentile}% unusual
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-black text-base leading-5 mb-2">{item.insight}</p>
+                    {item.highlight && (
+                      <div className={styles.highlightBox}>
+                        <div className="flex items-start gap-3">
+                          <span className="text-xl">✨</span>
+                          <div className="flex-1">
+                            <p className="text-sm text-purple-800">{item.highlight}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Continue button */}
           <div className="sticky bottom-8 left-0 right-0 flex justify-center">
@@ -713,7 +960,7 @@ export default function HumanTestPage() {
     let data = analysisResult
     if (!data && typeof window !== 'undefined' && sessionId) {
       const cached = loadLocalCache(sessionId)
-      if (cached?.analysisResult) data = cached.analysisResult
+      if (cached?.analysisResult) data = cached.analysisResult as HumanAnalysisResult
     }
     if (!data) return null
 
@@ -751,7 +998,7 @@ export default function HumanTestPage() {
           </div>
 
           {/* Overall analysis */}
-          <div className="mb-8 p-6 bg-gray-50 rounded-2xl border-l-4 border-gray-300">
+          <div className="mb-8 p-6 bg-gray-50 rounded-xl border-gray-300">
             <h3 className="font-bold text-gray-900 mb-2">Summary</h3>
              <p className="text-gray-700 leading-relaxed">
               {data.overallAnalysis}
@@ -791,9 +1038,17 @@ export default function HumanTestPage() {
       {screenState === 'confirmation' && renderConfirmation()}
       {screenState === 'simulation' && renderSimulation()}
       {screenState === 'analyzing' && renderAnalyzing()}
-      {screenState === 'results-overview' && renderOverview()}
-      {screenState === 'results-breakdown' && renderBreakdown()}
-      {screenState === 'results-archetype' && renderArchetype()}
+
+      {/* Unified Results Tabs container as a dedicated component */}
+      {(screenState === 'results-overview' || screenState === 'results-breakdown' || screenState === 'results-archetype') && (
+        <ResultsTabs
+          sessionId={sessionId}
+          analysisResult={analysisResult}
+          responses={responses}
+          activeTab={screenState}
+          onChangeTab={(tab) => setScreenState(tab)}
+        />
+      )}
     </PageContainer>
   )
 }
