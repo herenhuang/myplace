@@ -1,9 +1,9 @@
 import { QuizConfig } from './types'
 
-export const datingEnergyQuiz: QuizConfig = {
-  id: 'dating-energy',
-  title: 'What\'s Your Dating Energy?',
-  description: 'How do you really show up when you\'re trying to make a good impression?',
+export const firstDateEnergyQuiz: QuizConfig = {
+  id: 'first-date-energy',
+  title: 'What\'s Your First Date Energy?',
+  description: 'Discover how you really show up when you\'re trying to make a good impression on a date.',
   type: 'story-matrix',
 
   theme: {
@@ -151,7 +151,7 @@ User's dating patterns across the date:
 IMPORTANT WARNINGS:
 ⚠️ DO NOT use quiz title to create obvious combinations like "Confident Dater"
 ⚠️ AVOID boring combinations - be specific to their actual patterns
-⚠️ SECOND WORD must grammatically complete "What's Your Dating Energy?" → "What's Your [SecondWord]?" must sound natural
+⚠️ SECOND WORD must grammatically complete "What's Your First Date Energy?" → "What's Your [SecondWord]?" must sound natural
 ⚠️ CREATE UNEXPECTED, INSIGHTFUL COMBINATIONS
 
 Instructions:

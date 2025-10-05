@@ -1,9 +1,9 @@
 import { QuizConfig } from './types'
 
-export const communicationStyleQuiz: QuizConfig = {
-  id: 'communication-style',
-  title: 'What\'s Your Communication Style?',
-  description: 'Discover how you really talk, listen, and connect in relationships.',
+export const relationshipCommunicationQuiz: QuizConfig = {
+  id: 'relationship-communication',
+  title: 'What\'s Your Relationship Communication Style?',
+  description: 'Discover how you really talk, listen, and connect when you\'re dating someone.',
   type: 'story-matrix',
 
   theme: {
@@ -151,7 +151,7 @@ User's communication patterns:
 IMPORTANT WARNINGS:
 ⚠️ DO NOT use the quiz title to create obvious combinations like "Direct Communicator"
 ⚠️ AVOID generic/boring combinations - be specific to their actual patterns
-⚠️ SECOND WORD must grammatically complete the quiz title: "What's Your Communication Style?" → "What's Your [SecondWord]?" must make sense
+⚠️ SECOND WORD must grammatically complete the quiz title: "What's Your Relationship Communication Style?" → "What's Your [SecondWord]?" must make sense
 ⚠️ CREATE UNEXPECTED COMBINATIONS that feel fresh and insightful
 
 Instructions:

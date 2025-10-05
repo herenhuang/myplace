@@ -1,9 +1,9 @@
 import { QuizConfig } from './types'
 
-export const textingChemistryQuiz: QuizConfig = {
-  id: 'texting-chemistry',
-  title: 'What\'s Your Texting Chemistry?',
-  description: 'How do you really text when you like someone? (We all have a type.)',
+export const datingTextingStyleQuiz: QuizConfig = {
+  id: 'dating-texting-style',
+  title: 'What\'s Your Dating Texting Style?',
+  description: 'Discover how you really text when you like someone romantically.',
   type: 'story-matrix',
 
   theme: {
@@ -151,7 +151,7 @@ User's texting patterns:
 IMPORTANT WARNINGS:
 ⚠️ DO NOT use quiz title to create obvious combinations like "Eager Texter"
 ⚠️ AVOID boring combinations - be specific to their actual behavior
-⚠️ SECOND WORD must grammatically complete "What's Your Texting Chemistry?" → "What's Your [SecondWord]?" must sound natural
+⚠️ SECOND WORD must grammatically complete "What's Your Dating Texting Style?" → "What's Your [SecondWord]?" must sound natural
 ⚠️ CREATE UNEXPECTED, SPECIFIC COMBINATIONS
 
 Instructions:

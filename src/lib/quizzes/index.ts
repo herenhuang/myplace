@@ -13,9 +13,9 @@ import { crushQuiz } from './crush-quiz'
 import { flirtingStyleQuiz } from './flirting-style-quiz'
 import { howDoYouFallQuiz } from './how-do-you-fall-quiz'
 import { feedbackStyleQuiz } from './feedback-style-quiz'
-import { communicationStyleQuiz } from './communication-style-quiz'
-import { datingEnergyQuiz } from './dating-energy-quiz'
-import { textingChemistryQuiz } from './texting-chemistry-quiz'
+import { relationshipCommunicationQuiz } from './relationship-communication-quiz'
+import { firstDateEnergyQuiz } from './first-date-energy-quiz'
+import { datingTextingStyleQuiz } from './dating-texting-style-quiz'
 
 // Registry of all available quizzes
 export const quizRegistry: Record<string, QuizConfig> = {
@@ -26,9 +26,9 @@ export const quizRegistry: Record<string, QuizConfig> = {
   'flirting-style': flirtingStyleQuiz,
   'how-do-you-fall': howDoYouFallQuiz,
   'feedback-style': feedbackStyleQuiz,
-  'communication-style': communicationStyleQuiz,
-  'dating-energy': datingEnergyQuiz,
-  'texting-chemistry': textingChemistryQuiz
+  'relationship-communication': relationshipCommunicationQuiz,
+  'first-date-energy': firstDateEnergyQuiz,
+  'dating-texting-style': datingTextingStyleQuiz
   // Add new quizzes here:
   // Use the personalization template for narrative quizzes!
 }
