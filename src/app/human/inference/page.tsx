@@ -132,6 +132,7 @@ export default function HumanInferencePage() {
     const sid = getOrCreateSessionId()
 
     const stepData: HumanStepData = {
+      questionId: question.id,
       stepNumber,
       questionType: question.type,
       question: question.question,
@@ -151,7 +152,7 @@ export default function HumanInferencePage() {
       updatedAt: Date.now()
     }
     
-    const existingIndex = cached.responses.findIndex(r => r.stepNumber === stepNumber)
+    const existingIndex = cached.responses.findIndex(r => r.questionId === question.id)
     if (existingIndex >= 0) {
       cached.responses[existingIndex] = stepData
     } else {
@@ -202,6 +203,7 @@ export default function HumanInferencePage() {
         const sid = getOrCreateSessionId()
 
         const stepData: HumanStepData = {
+          questionId: question.id,
           stepNumber,
           questionType: question.type,
           question: question.question,
@@ -221,7 +223,7 @@ export default function HumanInferencePage() {
           updatedAt: Date.now()
         }
         
-        const existingIndex = cached.responses.findIndex(r => r.stepNumber === stepNumber)
+        const existingIndex = cached.responses.findIndex(r => r.questionId === question.id)
         if (existingIndex >= 0) {
           cached.responses[existingIndex] = stepData
         } else {
@@ -282,6 +284,7 @@ export default function HumanInferencePage() {
         if (!userResponse) continue
 
         const stepData: HumanStepData = {
+          questionId: question.id,
           stepNumber: question.stepNumber,
           questionType: question.type,
           question: question.question,

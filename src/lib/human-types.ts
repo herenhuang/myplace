@@ -1,6 +1,7 @@
 // Types for Human Assessment system
 
 export interface HumanStepData {
+  questionId: string // Unique identifier for the question
   stepNumber: number
   questionType: 'open-ended' | 'word-association' | 'image-description' | 'forced-choice' | 'scenario' | 'word-combination' | 'shape-sorting' | 'shape-ordering' | 'bubble-popper'
   question: string
@@ -58,6 +59,7 @@ export interface HumanAnalysisResult {
     divergent_convergent: number // 0 = convergent, 100 = divergent
   }
   breakdown: Array<{
+    questionId: string // Unique identifier for the question
     stepNumber: number
     question: string // The actual question asked
     userResponse: string // What the user answered

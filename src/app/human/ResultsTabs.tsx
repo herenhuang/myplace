@@ -16,13 +16,51 @@ interface Props {
   onChangeTab: (tab: ActiveTab) => void
 }
 
+// MBTI calculation function
+const calculateMBTI = (responses: HumanStepData[]): string => {
+  const mbtiResponses = responses.filter(r => r.stepNumber >= 1 && r.stepNumber <= 3)
+  
+  if (mbtiResponses.length < 3) return 'Unknown'
+  
+  let E = 0, I = 0, S = 0, N = 0, T = 0, F = 0, J = 0, P = 0
+  
+  // Question 1: Adaptability (E/I preference)
+  const q1Response = mbtiResponses.find(r => r.questionId === 'adaptability-schedule')?.userResponse
+  if (q1Response?.includes('adapt quickly')) E += 2
+  else if (q1Response?.includes('feel stressed')) I += 1
+  else if (q1Response?.includes('stick to my original')) I += 2
+  else if (q1Response?.includes('seek advice')) E += 1
+  
+  // Question 2: Team role (E/I and T/F preference)
+  const q2Response = mbtiResponses.find(r => r.questionId === 'team-role-preference')?.userResponse
+  if (q2Response?.includes('Leader')) { E += 2; T += 2 }
+  else if (q2Response?.includes('Facilitator')) { E += 1; F += 2 }
+  else if (q2Response?.includes('Contributor')) { I += 1; T += 1 }
+  else if (q2Response?.includes('Observer')) { I += 2; F += 1 }
+  
+  // Question 3: Problem-solving (S/N and T/F preference)
+  const q3Response = mbtiResponses.find(r => r.questionId === 'problem-solving-approach')?.userResponse
+  if (q3Response?.includes('logical analysis')) { S += 2; T += 2 }
+  else if (q3Response?.includes('trust my intuition')) { N += 2; F += 1 }
+  else if (q3Response?.includes('brainstorm creatively')) { N += 2; T += 1 }
+  else if (q3Response?.includes('consult with others')) { S += 1; F += 2 }
+  
+  // Determine MBTI type
+  const extroversion = E > I ? 'E' : 'I'
+  const sensing = S > N ? 'S' : 'N'
+  const thinking = T > F ? 'T' : 'F'
+  const judging = J > P ? 'J' : 'P'
+  
+  return extroversion + sensing + thinking + judging
+}
+
 export default function ResultsTabs({ sessionId, analysisResult, responses, activeTab, onChangeTab }: Props) {
   const data = analysisResult
 
   const questionBreakdown = useMemo(() => {
     if (!data) return [] as NonNullable<HumanAnalysisResult['breakdown']>
     
-    const filtered = data.breakdown.filter((b) => b.stepNumber >= 1 && b.stepNumber <= 12)
+    const filtered = data.breakdown.filter((b) => b.stepNumber >= 1 && b.stepNumber <= 15)
     
     // If we have responses but missing breakdown items, create fallback breakdown items
     const responseStepNumbers = responses.map(r => r.stepNumber)
@@ -34,6 +72,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
       const fallbackItems = missingSteps.map(stepNum => {
         const response = responses.find(r => r.stepNumber === stepNum)
         return {
+          questionId: response?.questionId || `step-${stepNum}`,
           stepNumber: stepNum,
           insight: `Response received: "${response?.userResponse || 'No response'}"`,
           percentile: 50,
@@ -76,6 +115,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
 
   return (
     <div className={styles.resultsRoot}>
+        <div className={styles.resultsContainer}>
       <div className={styles.stepNav}>
         {[
           { key: 'results-overview', label: 'Score' },
@@ -96,7 +136,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
       {activeTab === 'results-overview' && (
 
 
-        <div className="max-w-2xl mx-auto flex flex-col gap-8">
+                <div className="max-w-2xl mx-auto flex flex-col gap-8">
 
 
           {!data ? (
@@ -107,65 +147,103 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
           ) : (
           <>
 
-            <div className={styles.card}>
-                <h2 className="text-3xl font-bold mb-2 text-gray-900 text-center">Your Metascore</h2>
-                <p className="text-gray-600 text-center mb-8 capitalize">{data.humanessLevel.replace(/-/g, ' ')}</p>
-                <div className="mb-10 text-center">
-                    <div className="text-8xl font-bold text-orange-500 mb-4">{data.metascore}</div>
-                </div>
+                    <div className={styles.card}>
 
-                <div className="max-w-4xl mx-auto">
-                    <div className="mb-8 p-6"><p className="text-base text-black text-lg leading-6">{data.primaryArchetype.description}</p></div>
-                    <div className="mb-8"><div className="flex flex-wrap gap-2 justify-center">{data.primaryArchetype.traits.map((t, i)=>(<span key={i} className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">{t}</span>))}</div></div>
-                </div>
-            </div>
-            
-            <div className="flex gap-8">
-                <div className={styles.card}>   
-                    <div className="text-center mb-8"><div className={styles.archetypeEmoji}>🎭</div><h2 className={styles.archetypeName}>{data.primaryArchetype.name}</h2></div>
-                    <div className="mb-8 p-6"><p className="text-base text-black text-lg leading-6">{data.primaryArchetype.description}</p></div>
-                    <div className="mb-8"><div className="flex flex-wrap gap-2 justify-center">{data.primaryArchetype.traits.map((t, i)=>(<span key={i} className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">{t}</span>))}</div></div>
-                    <div className="mb-8 p-6 bg-gray-50 rounded-2xl border-l-4 border-gray-300"><h3 className="font-bold text-gray-900 mb-2">Summary</h3><p className="text-gray-700 leading-relaxed">{data.overallAnalysis}</p></div>
-                </div>
-
-                <div className={styles.card}>
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Breakdown</h3>
-                    <div className="space-y-4">
-                    {[{ name: 'Creativity', score: data.subscores.creativity, color: 'from-purple-400 to-purple-600' }, { name: 'Spontaneity', score: data.subscores.spontaneity, color: 'from-blue-400 to-blue-600' }, { name: 'Authenticity', score: data.subscores.authenticity, color: 'from-green-400 to-green-600' }].map((s, i) => (
-                        <div key={s.name}>
-                        <div className="flex justify-between items-center mb-2"><span className="text-gray-700 font-medium">{s.name}</span><span className="text-gray-900 font-bold">{s.score}</span></div>
-                        <div className={styles.gradientTrack}><div className={`h-2 bg-gradient-to-r ${s.color} rounded-full absolute left-0 top-0 transition-all duration-1000 ease-out`} style={{ width: `${s.score}%`, transitionDelay: `${(i + 1) * 200}ms` }} /></div>
+                        <h2 className="text-2xl font-bold mb-2 text-gray-900 text-center">Your Metascore</h2>
+          <p className="text-gray-600 text-center mb-8 capitalize">{data.humanessLevel.replace(/-/g, ' ')}</p>
+                        <div className="text-center">
+                            <h1 className={styles.metascore}>{data.metascore}</h1>
                         </div>
-                    ))}
+
+                        <div className="max-w-4xl mx-auto">
+                            <p className="text-base text-black py-6 text-center text-base leading-5 tracking-tight">
+                                {data.primaryArchetype.description}
+                            </p>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                                {data.primaryArchetype.traits.map((t, i)=>(
+                                    <span key={i} className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">{t}</span>
+                                ))}
+                            </div>
+                        </div>
                     </div>
+                    
+                    <div className="flex gap-8">
+
+                        <div className={styles.card + ' w-[320px]'}> 
+                              
+                            <div className={styles.archetypeEmoji}>🎭</div>
+                            <h2 className={styles.archetypeName}>
+                                {data.primaryArchetype.name}
+                            </h2>
+                            <p className="text-base text-black text-base leading-5">
+                                {data.primaryArchetype.description}
+                            </p>
+    
+          </div>
+
+                        <div className={styles.card + ' flex-1'}>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Breakdown</h3>
+            <div className="space-y-4">
+              {[{ name: 'Creativity', score: data.subscores.creativity, color: 'from-purple-400 to-purple-600' }, { name: 'Spontaneity', score: data.subscores.spontaneity, color: 'from-blue-400 to-blue-600' }, { name: 'Authenticity', score: data.subscores.authenticity, color: 'from-green-400 to-green-600' }].map((s, i) => (
+                <div key={s.name}>
+                  <div className="flex justify-between items-center mb-2"><span className="text-gray-700 font-medium">{s.name}</span><span className="text-gray-900 font-bold">{s.score}</span></div>
+                  <div className={styles.gradientTrack}><div className={`h-2 bg-gradient-to-r ${s.color} rounded-full absolute left-0 top-0 transition-all duration-1000 ease-out`} style={{ width: `${s.score}%`, transitionDelay: `${(i + 1) * 200}ms` }} /></div>
                 </div>
+              ))}
+                            </div>
+                            
+                            {/* MBTI Score */}
+                            <div className="mt-6 pt-4 border-t border-gray-200">
+                                <h4 className="text-sm font-semibold text-gray-900 mb-2">MBTI Type</h4>
+                                <div className="flex items-center gap-3">
+                                    <div className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-lg font-bold">
+                                        {calculateMBTI(responses)}
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                        Based on your personality responses
+                                    </div>
+                                </div>
+                            </div>
             </div>
+          </div>
 
           {data.personality && (
-            <div className={styles.card}>
-                <div className="mb-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Personality Profile</h3>
-                <div className="grid grid-cols-1 gap-3">
-                    {[
-                    { key: 'creative_conventional', lowLabel: 'Conventional', highLabel: 'Creative' },
-                    { key: 'analytical_intuitive', lowLabel: 'Analytical', highLabel: 'Intuitive' },
-                    { key: 'emotional_logical', lowLabel: 'Logical', highLabel: 'Emotional' },
-                    { key: 'spontaneous_calculated', lowLabel: 'Calculated', highLabel: 'Spontaneous' },
-                    { key: 'abstract_concrete', lowLabel: 'Concrete', highLabel: 'Abstract' },
-                    { key: 'divergent_convergent', lowLabel: 'Convergent', highLabel: 'Divergent' }
-                    ].map((axis, idx) => {
-                    const value = (data.personality as Record<string, number>)[axis.key]
-                    return (
-                        <div key={axis.key}>
-                        <div className="flex justify-between items-center mb-1 text-sm"><span className="text-gray-500">{axis.lowLabel}</span><span className="text-gray-900 font-semibold">{value}</span><span className="text-gray-500">{axis.highLabel}</span></div>
-                        <div className={styles.gradientTrack}><div className="h-2 bg-gradient-to-r from-gray-400 to-orange-500 rounded-full absolute left-0 top-0 transition-all duration-700" style={{ width: `${value}%`, transitionDelay: `${(idx + 4) * 120}ms` }} /></div>
+                    <div className={styles.card}>
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Personality Profile</h3>
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  { key: 'creative_conventional', lowLabel: 'Conventional', highLabel: 'Creative' },
+                  { key: 'analytical_intuitive', lowLabel: 'Analytical', highLabel: 'Intuitive' },
+                  { key: 'emotional_logical', lowLabel: 'Logical', highLabel: 'Emotional' },
+                  { key: 'spontaneous_calculated', lowLabel: 'Calculated', highLabel: 'Spontaneous' },
+                  { key: 'abstract_concrete', lowLabel: 'Concrete', highLabel: 'Abstract' },
+                  { key: 'divergent_convergent', lowLabel: 'Convergent', highLabel: 'Divergent' }
+                ].map((axis, idx) => {
+                  const value = (data.personality as Record<string, number>)[axis.key]
+                  return (
+                    <div key={axis.key}>
+                      <div className="flex justify-between items-center mb-1 text-sm">
+                        <span className="text-gray-500">
+                            {axis.lowLabel}
+                            </span>
+                            <span className="text-gray-900 font-semibold">
+                                {value}
+                            </span>
+                            <span className="text-gray-500">
+                                {axis.highLabel}
+                            </span>
                         </div>
-                    )
-                    })}
-                </div>
-                </div>
+                      <div className={styles.gradientTrack}>
+                        <div className={styles.gradientBar} style={{ width: `${value}%`, transitionDelay: `${(idx + 4) * 120}ms` }} />
+                        </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            
+                    </div>
+                    
           )}
           </>
           )}
@@ -205,108 +283,108 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                     </div>
                     <div className={styles.qaItem}>
                         <div className={styles.qaLabel}>Your Response</div>
-                        {(() => {
-                          const stepData = responses.find(r => r.stepNumber === item.stepNumber);
-                          const isGameQuestion = stepData?.questionType === 'shape-sorting' || stepData?.questionType === 'shape-ordering' || stepData?.questionType === 'bubble-popper';
-                          
-                          if (isGameQuestion && qa.userResponse && qa.userResponse !== '—') {
-                            try {
-                              const jsonData = JSON.parse(qa.userResponse);
-                              return (
-                                <div className="text-sm">
-                                  <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-black mb-2">
-                                    {JSON.stringify(jsonData, null, 2)}
-                                  </pre>
-                                  {stepData?.questionType === 'shape-sorting' && (
-                                    <div className="text-xs text-gray-600">
-                                      Interactive shape sorting result
-                                    </div>
-                                  )}
-                                  {stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData) && (
-                                    <div className="text-xs text-gray-600">
-                                      {jsonData.length} shapes ordered in sequence
-                                    </div>
-                                  )}
-                                      {stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object' && (
-                                        <div className="text-xs text-gray-600">
-                                          {jsonData.bubblesPopped || 0} bubbles popped in {jsonData.timeElapsed || 0}s
-                                          {jsonData.bubbleGrid && Array.isArray(jsonData.bubbleGrid) && (
-                                            <div className="mt-1">
-                                              10×10 grid captured ({jsonData.bubbleGrid.flat().filter((v: number) => v === 0).length} popped)
+                                {(() => {
+                                const stepData = responses.find(r => r.stepNumber === item.stepNumber);
+                                const isGameQuestion = stepData?.questionType === 'shape-sorting' || stepData?.questionType === 'shape-ordering' || stepData?.questionType === 'bubble-popper';
+                                
+                                if (isGameQuestion && qa.userResponse && qa.userResponse !== '—') {
+                                    try {
+                                    const jsonData = JSON.parse(qa.userResponse);
+                                    return (
+                                        <div className="text-sm">
+                                        <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-black mb-2">
+                                            {JSON.stringify(jsonData, null, 2)}
+                                        </pre>
+                                        {stepData?.questionType === 'shape-sorting' && (
+                                            <div className="text-xs text-gray-600">
+                                            Interactive shape sorting result
                                             </div>
-                                          )}
+                                        )}
+                                        {stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData) && (
+                                            <div className="text-xs text-gray-600">
+                                            {jsonData.length} shapes ordered in sequence
+                                            </div>
+                                        )}
+                                            {stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object' && (
+                                                <div className="text-xs text-gray-600">
+                                                {jsonData.bubblesPopped || 0} bubbles popped in {jsonData.timeElapsed || 0}s
+                                                {jsonData.bubbleGrid && Array.isArray(jsonData.bubbleGrid) && (
+                                                    <div className="mt-1">
+                                                    10×10 grid captured ({jsonData.bubbleGrid.flat().filter((v: number) => v === 0).length} popped)
+                                                    </div>
+                                                )}
+                                                </div>
+                                            )}
                                         </div>
-                                      )}
-                                </div>
-                              );
-                            } catch (e) {
-                              // If JSON parsing fails, show as regular text
-                              return <p className="text-black text-sm leading-5">{qa.userResponse}</p>;
-                            }
-                          }
-                          
-                          return <p className="text-black text-sm leading-5">{qa.userResponse || '—'}</p>;
-                        })()}
+                                    );
+                                    } catch (e) {
+                                    // If JSON parsing fails, show as regular text
+                                    return <p className="text-black text-sm leading-5">{qa.userResponse}</p>;
+                                    }
+                                }
+                                
+                                return <p className="text-black text-sm leading-5">{qa.userResponse || '—'}</p>;
+                                })()}
                     </div>
 
                    {/* AI examples */}
                    {item.aiExamples && (
                       <div className="mt-4 grid grid-cols-1 gap-3">
-                        {[
-                          { key: 'chatgpt', name: 'ChatGPT', iconClass: styles.iconGPT, response: item.aiExamples.chatgpt },
-                          { key: 'gemini', name: 'Gemini', iconClass: styles.iconGoogle, response: item.aiExamples.gemini },
-                          { key: 'claude', name: 'Claude', iconClass: styles.iconClaude, response: item.aiExamples.claude }
-                        ].map((ai) => (
-                          <div key={ai.key} className="rounded-xl border border-gray-200 p-3 bg-white">
-                            <div className="flex items-center gap-1.5 border-1 border-gray-300 px-2 py-1.5 mb-2 rounded-full w-fit">
-                              <div className={ai.iconClass}></div>
-                              <div className="text-xs font-semibold text-gray-900">{ai.name}</div>
-                            </div>
-                            {(() => {
-                              const stepData = responses.find(r => r.stepNumber === item.stepNumber);
-                              const isGameQuestion = stepData?.questionType === 'shape-sorting' || stepData?.questionType === 'shape-ordering' || stepData?.questionType === 'bubble-popper';
-                              
-                              if (isGameQuestion && ai.response && ai.response !== '—') {
-                                try {
-                                  const jsonData = JSON.parse(ai.response);
-                                  return (
-                                    <div className="text-sm">
-                                      <div className="text-gray-600 text-xs mb-1">JSON Response:</div>
-                                      <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-gray-800">
-                                        {JSON.stringify(jsonData, null, 2)}
-                                      </pre>
-                                      {stepData?.questionType === 'shape-sorting' && Array.isArray(jsonData) && (
-                                        <div className="mt-2 text-xs text-gray-600">
-                                          {jsonData.length} shapes sorted into categories
-                                        </div>
-                                      )}
-                                      {stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData) && (
-                                        <div className="mt-2 text-xs text-gray-600">
-                                          {jsonData.length} shapes arranged in sequence
-                                        </div>
-                                      )}
-                                      {stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object' && (
-                                        <div className="mt-2 text-xs text-gray-600">
-                                          {jsonData.bubblesPopped || 0} bubbles • {jsonData.duration || 0}s • {jsonData.pattern || 'unknown'} pattern
-                                          {jsonData.bubbleGrid && Array.isArray(jsonData.bubbleGrid) && (
-                                            <div className="mt-1">
-                                              10×10 grid ({jsonData.bubbleGrid.flat().filter((v: number) => v === 0).length} popped)
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
+                                {[
+                                { key: 'chatgpt', name: 'ChatGPT', iconClass: styles.iconGPT, response: item.aiExamples.chatgpt },
+                                { key: 'gemini', name: 'Gemini', iconClass: styles.iconGoogle, response: item.aiExamples.gemini },
+                                { key: 'claude', name: 'Claude', iconClass: styles.iconClaude, response: item.aiExamples.claude }
+                                ].map((ai) => (
+                                <div key={ai.key} className="rounded-xl border border-gray-200 p-3 bg-white">
+                                    <div className="flex items-center gap-1.5 border-1 border-gray-300 px-2 py-1.5 mb-2 rounded-full w-fit">
+                                    <div className={ai.iconClass}></div>
+                                    <div className="text-xs font-semibold text-gray-900">{ai.name}</div>
                                     </div>
-                                  );
-                                } catch (e) {
-                                  // If JSON parsing fails, show as regular text
-                                  return <p className="text-sm text-gray-800">{ai.response}</p>;
-                                }
-                              }
-                              
-                              return <p className="text-sm text-gray-800">{ai.response || '—'}</p>;
-                            })()}
-                          </div>
-                        ))}
+                                    {(() => {
+                                    const stepData = responses.find(r => r.stepNumber === item.stepNumber);
+                                    const isGameQuestion = stepData?.questionType === 'shape-sorting' || stepData?.questionType === 'shape-ordering' || stepData?.questionType === 'bubble-popper';
+                                    
+                                    if (isGameQuestion && ai.response && ai.response !== '—') {
+                                        try {
+                                        const jsonData = JSON.parse(ai.response);
+                                        return (
+                                            <div className="text-sm">
+                                            <div className="text-gray-600 text-xs mb-1">JSON Response:</div>
+                                            <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-gray-800">
+                                                {JSON.stringify(jsonData, null, 2)}
+                                            </pre>
+                                            {stepData?.questionType === 'shape-sorting' && Array.isArray(jsonData) && (
+                                                <div className="mt-2 text-xs text-gray-600">
+                                                {jsonData.length} shapes sorted into categories
+                                                </div>
+                                            )}
+                                            {stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData) && (
+                                                <div className="mt-2 text-xs text-gray-600">
+                                                {jsonData.length} shapes arranged in sequence
+                                                </div>
+                                            )}
+                                            {stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object' && (
+                                                <div className="mt-2 text-xs text-gray-600">
+                                                {jsonData.bubblesPopped || 0} bubbles • {jsonData.duration || 0}s • {jsonData.pattern || 'unknown'} pattern
+                                                {jsonData.bubbleGrid && Array.isArray(jsonData.bubbleGrid) && (
+                                                    <div className="mt-1">
+                                                    10×10 grid ({jsonData.bubbleGrid.flat().filter((v: number) => v === 0).length} popped)
+                            </div>
+                                                )}
+                        </div>
+                                            )}
+                            </div>
+                                        );
+                                        } catch (e) {
+                                        // If JSON parsing fails, show as regular text
+                                        return <p className="text-sm text-gray-800">{ai.response}</p>;
+                                        }
+                                    }
+                                    
+                                    return <p className="text-sm text-gray-800">{ai.response || '—'}</p>;
+                                    })()}
+                        </div>
+                                ))}
                       </div>
                     )}
                   
@@ -317,82 +395,82 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                     {item.highlight && (<div className={styles.highlightBox + ' mb-4'}><div className="flex items-start gap-3"><span className="text-xl">✨</span><div className="flex-1"><p className="text-sm font-bold text-purple-900 mb-1">Notable</p><p className="text-sm text-purple-800">{item.highlight}</p></div></div></div>)}
                     {item.wasUnexpected && (<div className={styles.percentileBox}><p className="text-sm text-orange-800"><span className="font-bold">{item.percentile}% out of the ordinary</span> — Your response stood out from typical patterns!</p></div>)}
 
-                    {/* Individual Scores */}
-                    {item.individualScores && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-3">Individual Analysis</h4>
-                        
-                        {/* Core Scores */}
-                        <div className="grid grid-cols-3 gap-3 mb-4">
-                          <div className="text-center p-2 bg-blue-50 rounded-lg">
-                            <div className="text-lg font-bold text-blue-700">{item.individualScores?.logicalCoherence || 'N/A'}</div>
-                            <div className="text-xs text-blue-600">Logical Coherence</div>
-                          </div>
-                          <div className="text-center p-2 bg-purple-50 rounded-lg">
-                            <div className="text-lg font-bold text-purple-700">{item.individualScores?.creativity || 'N/A'}</div>
-                            <div className="text-xs text-purple-600">Creativity</div>
-                          </div>
-                          <div className="text-center p-2 bg-green-50 rounded-lg">
-                            <div className="text-lg font-bold text-green-700">{item.individualScores?.insightfulness || 'N/A'}</div>
-                            <div className="text-xs text-green-600">Insightfulness</div>
-                          </div>
-                        </div>
+                            {/* Individual Scores */}
+                            {item.individualScores && (
+                            <div className="mt-4 pt-4 border-t border-gray-100">
+                                <h4 className="text-sm font-semibold text-gray-900 mb-3">Individual Analysis</h4>
+                                
+                                {/* Core Scores */}
+                                <div className="grid grid-cols-3 gap-3 mb-4">
+                                <div className="text-center p-2 bg-blue-50 rounded-lg">
+                                    <div className="text-lg font-bold text-blue-700">{item.individualScores?.logicalCoherence || 'N/A'}</div>
+                                    <div className="text-xs text-blue-600">Logical Coherence</div>
+                                </div>
+                                <div className="text-center p-2 bg-purple-50 rounded-lg">
+                                    <div className="text-lg font-bold text-purple-700">{item.individualScores?.creativity || 'N/A'}</div>
+                                    <div className="text-xs text-purple-600">Creativity</div>
+                                </div>
+                                <div className="text-center p-2 bg-green-50 rounded-lg">
+                                    <div className="text-lg font-bold text-green-700">{item.individualScores?.insightfulness || 'N/A'}</div>
+                                    <div className="text-xs text-green-600">Insightfulness</div>
+                                </div>
+                                </div>
 
-                        {/* Personality Traits */}
-                        <div className="mb-4">
-                          <h5 className="text-xs font-medium text-gray-700 mb-2">Personality Traits</h5>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Optimism:</span>
-                              <span className="font-medium">{item.individualScores?.personalityTraits?.optimism || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Spontaneity:</span>
-                              <span className="font-medium">{item.individualScores?.personalityTraits?.spontaneity || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Social Orientation:</span>
-                              <span className="font-medium">{item.individualScores?.personalityTraits?.socialOrientation || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Risk Tolerance:</span>
-                              <span className="font-medium">{item.individualScores?.personalityTraits?.riskTolerance || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Emotional Expression:</span>
-                              <span className="font-medium">{item.individualScores?.personalityTraits?.emotionalExpression || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Analytical vs Intuitive:</span>
-                              <span className="font-medium">{item.individualScores?.personalityTraits?.analyticalVsIntuitive || 'N/A'}</span>
-                            </div>
-                          </div>
-                        </div>
+                                {/* Personality Traits */}
+                                <div className="mb-4">
+                                <h5 className="text-xs font-medium text-gray-700 mb-2">Personality Traits</h5>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Optimism:</span>
+                                    <span className="font-medium">{item.individualScores?.personalityTraits?.optimism || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Spontaneity:</span>
+                                    <span className="font-medium">{item.individualScores?.personalityTraits?.spontaneity || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Social Orientation:</span>
+                                    <span className="font-medium">{item.individualScores?.personalityTraits?.socialOrientation || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Risk Tolerance:</span>
+                                    <span className="font-medium">{item.individualScores?.personalityTraits?.riskTolerance || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Emotional Expression:</span>
+                                    <span className="font-medium">{item.individualScores?.personalityTraits?.emotionalExpression || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Analytical vs Intuitive:</span>
+                                    <span className="font-medium">{item.individualScores?.personalityTraits?.analyticalVsIntuitive || 'N/A'}</span>
+                                    </div>
+                                </div>
+                                </div>
 
-                        {/* Quality Indicators */}
-                        <div>
-                          <h5 className="text-xs font-medium text-gray-700 mb-2">Quality Indicators</h5>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Completeness:</span>
-                              <span className="font-medium">{item.individualScores?.qualityIndicators?.completeness || 'N/A'}</span>
+                                {/* Quality Indicators */}
+                                <div>
+                                <h5 className="text-xs font-medium text-gray-700 mb-2">Quality Indicators</h5>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Completeness:</span>
+                                    <span className="font-medium">{item.individualScores?.qualityIndicators?.completeness || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Relevance:</span>
+                                    <span className="font-medium">{item.individualScores?.qualityIndicators?.relevance || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Personalization:</span>
+                                    <span className="font-medium">{item.individualScores?.qualityIndicators?.personalization || 'N/A'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                    <span className="text-gray-600">Authenticity:</span>
+                                    <span className="font-medium">{item.individualScores?.qualityIndicators?.authenticity || 'N/A'}</span>
+                                    </div>
+                                </div>
+                                </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Relevance:</span>
-                              <span className="font-medium">{item.individualScores?.qualityIndicators?.relevance || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Personalization:</span>
-                              <span className="font-medium">{item.individualScores?.qualityIndicators?.personalization || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Authenticity:</span>
-                              <span className="font-medium">{item.individualScores?.qualityIndicators?.authenticity || 'N/A'}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                            )}
 
                    
                   </div>
@@ -411,6 +489,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
           <div className="mb-8 p-6 bg-gray-50 rounded-2xl border-l-4 border-gray-300"><h3 className="font-bold text-gray-900 mb-2">Summary</h3><p className="text-gray-700 leading-relaxed">{data.overallAnalysis}</p></div>
         </div>
       )}
+      </div>
     </div>
   )
 }

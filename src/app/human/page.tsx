@@ -730,8 +730,8 @@ export default function HumanTestPage() {
     if (!data) return null
 
     // Split question steps (1-12) vs additional metrics (>12)
-    const questionBreakdown = data.breakdown.filter((b) => b.stepNumber >= 1 && b.stepNumber <= 12)
-    const extraMetrics = data.breakdown.filter((b) => b.stepNumber > 12)
+    const questionBreakdown = data.breakdown.filter((b) => b.stepNumber >= 1 && b.stepNumber <= 15)
+    const extraMetrics = data.breakdown.filter((b) => b.stepNumber > 15)
 
     return (
       <div className={`${styles.pageBg} py-16`}>

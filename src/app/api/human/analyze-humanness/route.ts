@@ -249,7 +249,14 @@ ${Object.entries(HUMAN_ARCHETYPES).map(([name, data]) => `- **${name}**: ${data.
 ## Output Format:
 Return ONLY valid JSON with no trailing commas, no comments, and no additional text.
 
-**CRITICAL: The breakdown array MUST contain exactly one entry for each question provided. Do not omit any questions.**
+**CRITICAL REQUIREMENTS:**
+1. The breakdown array MUST contain exactly one entry for each question provided. Do not omit any questions.
+2. The JSON MUST be complete and properly closed with all required brackets and braces.
+3. Every breakdown item MUST include all required fields: stepNumber, questionId, insight, percentile, wasUnexpected, aiLikelihood, humanLikelihood, and individualScores.
+4. The JSON structure MUST be valid and parseable.
+5. IMPORTANT: Return ONLY the JSON object, no additional text, explanations, or markdown formatting.
+6. Ensure all arrays and objects are properly closed with ] and } respectively.
+7. Do not truncate the response - include ALL questions in the breakdown array.
 
 \`\`\`json
 {
@@ -270,6 +277,7 @@ Return ONLY valid JSON with no trailing commas, no comments, and no additional t
   },
   "breakdown": [
       {
+        "questionId": "adaptability-schedule",
         "stepNumber": 1,
         "insight": "Response diverges significantly from all 3 AI models by being more specific and personal. The user's choice of personal items reveals authentic human experience and emotional connection to everyday objects, contrasting with the generic, functional approach typical of AI responses.",
         "percentile": 85,
@@ -317,6 +325,99 @@ IMPORTANT:
 - Include all required fields in valid JSON format
 
 Analyze these responses now by comparing the user to the AI baselines.`
+}
+
+// Fallback analysis creation function
+function createFallbackAnalysis(steps: HumanStepData[]) {
+  const breakdown = steps.map(step => {
+    // Generate more meaningful insights based on response characteristics
+    const responseLength = step.userResponse.length
+    const hasEmotionalWords = /feel|love|hate|angry|happy|sad|worried|excited|nervous|confident/i.test(step.userResponse)
+    const hasPersonalWords = /my|me|i|myself|personal|experience/i.test(step.userResponse)
+    const isDetailed = responseLength > 50
+    const isCreative = /creative|artistic|imaginative|unique|original/i.test(step.userResponse)
+    
+    // Calculate scores based on response characteristics
+    const logicalCoherence = Math.min(95, Math.max(60, 70 + (responseLength / 10)))
+    const creativity = isCreative ? 80 : Math.min(70, 50 + (responseLength / 20))
+    const insightfulness = isDetailed ? 75 : 60
+    const personalization = hasPersonalWords ? 80 : 40
+    const authenticity = hasEmotionalWords ? 85 : 60
+    
+    return {
+      questionId: step.questionId,
+      stepNumber: step.stepNumber,
+      question: step.question,
+      userResponse: step.userResponse,
+      insight: `Response analysis: "${step.userResponse}" - This response shows ${isDetailed ? 'detailed' : 'concise'} human communication patterns with ${hasEmotionalWords ? 'emotional expression' : 'practical focus'}. The ${isCreative ? 'creative' : 'conventional'} approach reveals authentic human decision-making processes.`,
+      percentile: Math.min(80, Math.max(20, 40 + (responseLength / 5))),
+      wasUnexpected: isCreative || hasEmotionalWords,
+      highlight: isCreative ? 'Shows creative thinking' : hasEmotionalWords ? 'Expresses emotions authentically' : null,
+      aiLikelihood: Math.max(20, 60 - (responseLength / 10)),
+      humanLikelihood: Math.min(90, 50 + (responseLength / 10)),
+      aiExamples: {
+        chatgpt: '',
+        gemini: '',
+        claude: ''
+      },
+      individualScores: {
+        logicalCoherence,
+        creativity,
+        insightfulness,
+        personalityTraits: {
+          optimism: hasEmotionalWords ? 70 : 50,
+          spontaneity: isDetailed ? 60 : 40,
+          socialOrientation: hasPersonalWords ? 70 : 50,
+          riskTolerance: isCreative ? 65 : 45,
+          emotionalExpression: hasEmotionalWords ? 85 : 40,
+          analyticalVsIntuitive: isCreative ? 30 : 70
+        },
+        qualityIndicators: {
+          completeness: isDetailed ? 85 : 60,
+          relevance: 80,
+          personalization,
+          authenticity
+        }
+      }
+    }
+  })
+
+  // Calculate overall scores based on breakdown
+  const avgCreativity = breakdown.reduce((sum, item) => sum + item.individualScores.creativity, 0) / breakdown.length
+  const avgSpontaneity = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.spontaneity, 0) / breakdown.length
+  const avgAuthenticity = breakdown.reduce((sum, item) => sum + item.individualScores.qualityIndicators.authenticity, 0) / breakdown.length
+  
+  const metascore = Math.round((avgCreativity + avgSpontaneity + avgAuthenticity) / 3)
+  const humanessLevel = metascore >= 70 ? 'human-like' : metascore >= 40 ? 'borderline' : 'ai-like'
+  
+  return {
+    metascore,
+    humanessLevel: humanessLevel as 'human-like' | 'borderline' | 'ai-like',
+    subscores: {
+      creativity: Math.round(avgCreativity),
+      spontaneity: Math.round(avgSpontaneity),
+      authenticity: Math.round(avgAuthenticity)
+    },
+    personality: {
+      creative_conventional: Math.round(avgCreativity),
+      analytical_intuitive: breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.analyticalVsIntuitive, 0) / breakdown.length,
+      emotional_logical: breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.emotionalExpression, 0) / breakdown.length,
+      spontaneous_calculated: Math.round(avgSpontaneity),
+      abstract_concrete: breakdown.reduce((sum, item) => sum + item.individualScores.creativity, 0) / breakdown.length,
+      divergent_convergent: Math.round(avgCreativity)
+    },
+    breakdown,
+    primaryArchetype: {
+      name: metascore >= 70 ? 'The Creative' : metascore >= 40 ? 'The Anchor' : 'The Pragmatist',
+      description: metascore >= 70 ? 'You demonstrate creative and authentic human responses with unique perspectives.' : 
+                  metascore >= 40 ? 'You show balanced human-like responses with consistent characteristics.' : 
+                  'You exhibit practical and analytical thinking patterns typical of structured approaches.',
+      traits: metascore >= 70 ? ['Creative', 'Authentic', 'Unique'] : 
+              metascore >= 40 ? ['Balanced', 'Consistent', 'Human-like'] : 
+              ['Practical', 'Analytical', 'Structured']
+    },
+    overallAnalysis: `Based on your ${breakdown.length} responses, you show ${humanessLevel} interaction patterns with ${metascore >= 70 ? 'high creativity and authenticity' : metascore >= 40 ? 'balanced characteristics' : 'practical and analytical approaches'} across different dimensions.`
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -429,7 +530,7 @@ ${questionsBlock}`
               { role: 'user', content: batchPrompt }
             ],
             temperature: 0.7,
-            max_tokens: 3000
+            max_tokens: 10000
           })
           
           const content = resp.choices?.[0]?.message?.content?.trim() || ''
@@ -512,7 +613,7 @@ ${questionsBlock}`
           { role: 'user', content: prompt }
         ],
         temperature: 0.2,
-        max_tokens: 2000,
+        max_tokens: 10000,
         response_format: { type: "json_object" }
       })
       content = chat.choices?.[0]?.message?.content || ''
@@ -531,7 +632,7 @@ ${questionsBlock}`
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-5-20250929',
-          max_tokens: 2000,
+          max_tokens: 10000,
           messages: [
             {
               role: 'user',
@@ -552,6 +653,12 @@ ${questionsBlock}`
     }
 
     console.log('📄 [HUMANNESS] Raw model response:', content.substring(0, 500))
+    console.log('📊 [HUMANNESS] Response length:', content.length, 'characters')
+    
+    // Check if response might be truncated
+    if (content.length > 8000 && !content.includes('"overallAnalysis"')) {
+      console.log('⚠️ [HUMANNESS] Response appears truncated - missing overallAnalysis')
+    }
 
     // Extract JSON from response
     let jsonString: string
@@ -565,7 +672,15 @@ ${questionsBlock}`
       if (jsonMatch) {
         jsonString = jsonMatch[0]
       } else {
-        jsonString = content.trim()
+        // Try to find JSON without code blocks
+        const jsonStart = content.indexOf('{')
+        const jsonEnd = content.lastIndexOf('}')
+        
+        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+          jsonString = content.substring(jsonStart, jsonEnd + 1)
+        } else {
+          jsonString = content.trim()
+        }
       }
     }
 
@@ -584,7 +699,63 @@ ${questionsBlock}`
     } catch (parseError) {
       console.error('❌ [HUMANNESS] JSON parse error:', parseError)
       console.error('📝 [HUMANNESS] Failed JSON string:', jsonString)
-      throw new Error('Failed to parse analysis result from Claude')
+      
+      // Try to fix common JSON issues with sophisticated approach
+      let fixedJson = jsonString
+      
+      // Count opening and closing brackets to determine what's missing
+      const openBraces = (fixedJson.match(/\{/g) || []).length
+      const closeBraces = (fixedJson.match(/\}/g) || []).length
+      const openBrackets = (fixedJson.match(/\[/g) || []).length
+      const closeBrackets = (fixedJson.match(/\]/g) || []).length
+      
+      console.log(`🔧 [JSON-FIX] Braces: ${openBraces} open, ${closeBraces} close`)
+      console.log(`🔧 [JSON-FIX] Brackets: ${openBrackets} open, ${closeBrackets} close`)
+      
+      // Add missing closing brackets
+      const missingBrackets = openBrackets - closeBrackets
+      const missingBraces = openBraces - closeBraces
+      
+      if (missingBrackets > 0) {
+        fixedJson = fixedJson + ']'.repeat(missingBrackets)
+        console.log(`🔧 [JSON-FIX] Added ${missingBrackets} closing brackets`)
+      }
+      
+      if (missingBraces > 0) {
+        fixedJson = fixedJson + '}'.repeat(missingBraces)
+        console.log(`🔧 [JSON-FIX] Added ${missingBraces} closing braces`)
+      }
+      
+      // Fix incomplete breakdown array
+      if (fixedJson.includes('"breakdown": [') && !fixedJson.includes(']')) {
+        fixedJson = fixedJson + ']'
+      }
+      
+      // Fix incomplete objects
+      if (fixedJson.includes('"personality": {') && !fixedJson.includes('}')) {
+        fixedJson = fixedJson + '}'
+      }
+      if (fixedJson.includes('"subscores": {') && !fixedJson.includes('}')) {
+        fixedJson = fixedJson + '}'
+      }
+      
+      try {
+        analysisResult = JSON.parse(fixedJson)
+        console.log('✅ [HUMANNESS] Successfully fixed and parsed JSON')
+      } catch (secondError) {
+        console.error('❌ [HUMANNESS] Still failed after JSON fix attempt:', secondError)
+        console.error('📝 [HUMANNESS] Fixed JSON string:', fixedJson)
+        
+        // Create fallback analysis result
+        console.log('🔄 [HUMANNESS] Creating fallback analysis result...')
+        analysisResult = createFallbackAnalysis(steps)
+      }
+    }
+
+    // Validate that the analysis result has all required fields
+    if (!analysisResult.metascore || !analysisResult.humanessLevel || !analysisResult.breakdown) {
+      console.log('⚠️ [HUMANNESS] Analysis result missing required fields, creating fallback...')
+      analysisResult = createFallbackAnalysis(steps)
     }
 
     console.log('\n✅ [STEP 3 COMPLETE] Analysis complete')
@@ -609,6 +780,7 @@ ${questionsBlock}`
       const fallbackItems = missingSteps.map(stepNum => {
         const step = steps.find(s => s.stepNumber === stepNum)
         return {
+          questionId: step?.questionId || `step-${stepNum}`,
           stepNumber: stepNum,
           insight: `Response analysis: "${step?.userResponse || 'No response provided'}" - This response shows basic human interaction patterns and provides insight into the user's communication style and thought processes.`,
           percentile: 50,

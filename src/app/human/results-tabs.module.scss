@@ -1,27 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Oswald:wght@200..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Oswald:wght@200..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Sora:wght@100..800&family=Unbounded:wght@200..900&display=swap');
 
 .resultsRoot {
     padding-top: 1rem;
+    width: 100%;
+    font-family: 'Sora', 'Lora', serif;
+    letter-spacing: -.5px;
+    background-image: linear-gradient(to top left, #ffded2, #ffe7ce);
+    padding: 48px;
+    box-sizing: border-box;
+}
+
+.resultsContainer{
     width: 800px;
     max-width: 100%;
-    font-family: 'Newsreader', 'Lora', serif;
+    margin: 0 auto;
+}
+
+.metascore{
+    font-family: 'Unbounded', 'Plus Jakarta Sans', sans-serif;
+    font-size: 100px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    color: rgb(255, 100, 44);
+    letter-spacing: -2px;
 }
 
 .card {
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 18px;
   padding: 24px;
-  box-shadow: -12px 24px 40px rgba(0,0,0,0.08);
+  box-shadow: -12px 36px 36px rgba(0,0,0,0.1);
 }
 
 .gradientTrack {
   width: 100%;
-  height: 0.5rem;
-  background: #f3f4f6;
-  border-radius: 9999px;
+  height: 32px;
+  background: linear-gradient(to right, rgba(#f97316, .2), rgba(#f9ad16, .2));
+  border-radius: 60px;
   position: relative;
   overflow: hidden;
+  box-shadow: inset -4px 4px 12px rgba(black, .03);
+}
+
+.gradientBar {
+  height: 100%;
+  border-radius: 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    margin: 6px;
+    border-radius: 40px;
+    background: linear-gradient(to right, #f97316, #f97316);
+    box-shadow: -2px 4px 8px rgba(black, .08);
+  }
 }
 
 .iconGPT { 
@@ -70,8 +110,20 @@
 .numberBadge { width: 2rem; height: 2rem; border-radius: 9999px; background: #fff7ed; color: #9a3412; display: flex; align-items: center; justify-content: center; font-weight: 700; }
 .highlightBox { background: #f5f3ff; border: 1px solid #e9d5ff; border-radius: 0.75rem; padding: 0.75rem; }
 .percentileBox { background: #ffedd5; border: 1px solid #fed7aa; border-radius: 0.75rem; padding: 0.75rem; }
-.archetypeEmoji { font-size: 3rem; }
-.archetypeName { font-size: 2.5rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; }
+
+.archetypeEmoji { 
+    font-size: 100px;
+}
+
+.archetypeName { 
+    font-family: 'Instrument Serif', 'Plus Jakarta Sans', sans-serif; 
+    font-size: 48px;
+    font-weight: 500;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #1f2937; 
+    letter-spacing: -2px;
+}
 
 /* Stepper */
 .stepNav { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0.5rem; margin: 0 0 1.25rem 0; }
