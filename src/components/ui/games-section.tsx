@@ -45,7 +45,8 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             'card-3': 0,
             'card-4': 0,
             'card-5': 0,
-            'card-6': 0
+            'card-6': 0,
+            'card-7': 0
           });
         });
     }, []);
@@ -163,6 +164,12 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           <clipPath id='clip-pattern8' clipPathUnits={'objectBoundingBox'}>
             <path
               d='M1 1H0V0.365648C0.0111437 0.322987 0.0446555 0.306894 0.110945 0.298564C0 0.231481 0.0794603 0.107906 0.22039 0.166751C0.157421 0.0690679 0.296852 -0.0156706 0.398801 0.0855445C0.407796 -0.0215584 0.578711 -0.0356796 0.604198 0.0867166C0.673163 -0.00154936 0.836582 0.0502345 0.782609 0.163217C0.890555 0.113787 1.01499 0.220886 0.887556 0.302092C0.957241 0.303259 0.983419 0.319478 1 0.365648V1Z'
+              fill='#D9D9D9'
+            />
+          </clipPath>
+          <clipPath id='clip-pattern9' clipPathUnits={'objectBoundingBox'}>
+            <path
+              d='M0.5 0C0.224 0 0 0.224 0 0.5C0 0.776 0.224 1 0.5 1C0.776 1 1 0.776 1 0.5C1 0.224 0.776 0 0.5 0Z'
               fill='#D9D9D9'
             />
           </clipPath>
@@ -372,6 +379,41 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               }`}
             >
               {votedCards.has('card-6') ? '✅' : '👍'} {loading['card-6'] ? '...' : (votes['card-6'] || 0)}
+            </button>
+          </div>
+        </div>
+        <div className={`${styles.gameCard} transform -rotate-1`}>
+          <div className={styles.wiggle}>
+            <a href="/bubble-popper" rel="noopener noreferrer" className="block group">
+              <div className={styles.gameCardInner}>
+                <figure style={{ clipPath: 'url(#clip-pattern9)' }}>
+                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-purple-500 to-pink-500 group-hover:scale-110 w-full cursor-pointer' />
+                </figure>
+                <div className={styles.gameContent}>
+                  <h3 className={styles.gameTitle}>Bubble Popper</h3>
+                  <div className={styles.tagContainer}>
+                    <span className={styles.tag}>Game</span>
+                    <span className={styles.tag}>Quick</span>
+                    <span className={styles.tag}>Personality</span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div className={styles.newBadge}>NEW</div>
+          <div className={styles.voteButtonContainer}>
+            <button 
+              onClick={() => handleVote('card-7')}
+              disabled={loading['card-7'] || votedCards.has('card-7')}
+              className={`${styles.voteButton} ${
+                votedCards.has('card-7') 
+                  ? styles.voted
+                  : loading['card-7'] 
+                    ? styles.loading 
+                    : styles.default
+              }`}
+            >
+              {votedCards.has('card-7') ? '✅' : '👍'} {loading['card-7'] ? '...' : (votes['card-7'] || 0)}
             </button>
           </div>
         </div>
