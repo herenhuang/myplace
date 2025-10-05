@@ -279,10 +279,18 @@ export default function BubblePopperPage() {
     try {
       // Dynamically import html2canvas
       const html2canvas = (await import('html2canvas')).default
-      
+
+      // Get the phone container to temporarily hide its overlay
+      const phoneContainer = cardRef.current.closest(`.${styles.imageContainer}`) as HTMLElement
+
+      // Temporarily hide the overlay during capture
+      if (phoneContainer) {
+        phoneContainer.style.setProperty('--overlay-opacity', '0')
+      }
+
       // Small delay to ensure fonts and styles are fully rendered
       await new Promise(resolve => setTimeout(resolve, 100))
-      
+
       // Capture the card as canvas with higher quality
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: '#e8f4f8',
@@ -293,6 +301,11 @@ export default function BubblePopperPage() {
         foreignObjectRendering: false,
         imageTimeout: 0,
       })
+
+      // Restore the overlay
+      if (phoneContainer) {
+        phoneContainer.style.removeProperty('--overlay-opacity')
+      }
 
       // Convert to blob with good quality
       canvas.toBlob(async (blob) => {
