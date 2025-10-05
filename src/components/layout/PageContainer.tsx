@@ -13,12 +13,7 @@ export default function PageContainer({
 }: PageContainerProps) {
   return (
     <div className="h-full flex items-center justify-center">
-      <main className={`
-        lifted overflow-y-auto
-        ${className}
-      `}>
         {children}
-      </main>
     </div>
   )
 }
