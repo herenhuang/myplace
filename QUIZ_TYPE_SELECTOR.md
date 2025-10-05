@@ -168,7 +168,7 @@ Q4: Do I want 100+ unique, personalized combinations?
 **Time**: 1-2 hours
 
 ### Narrative Quiz:
-1. **READ NARRATIVE_QUIZ_CREATION.md**
+1. **READ QUIZ_NARRATIVE_CREATION.md**
 2. Design your story arc
 3. Create 3-5 recurring characters
 4. Write story setup (premise, stakes)
@@ -250,20 +250,20 @@ All three are powerful! Choose based on your topic and how much time you have. 
 ## üìö Next Steps
 
 ### For Archetype Quizzes:
-1. Read **[ARCHETYPE_QUIZ_CREATION.md](ARCHETYPE_QUIZ_CREATION.md)** (Complete Archetype guide)
+1. Read **[QUIZ_ARCHETYPE_CREATION.md](QUIZ_ARCHETYPE_CREATION.md)** (Complete Archetype guide)
 2. Create your quiz config file with 4-8 personalities
 3. Set up scoring rules
 4. Test it!
 
 ### For Story-Matrix Quizzes:
-1. Read **[STORY_MATRIX_QUIZ_CREATION.md](STORY_MATRIX_QUIZ_CREATION.md)** (Complete Story-Matrix guide)
+1. Read **[QUIZ_STORY_MATRIX_CREATION.md](QUIZ_STORY_MATRIX_CREATION.md)** (Complete Story-Matrix guide)
 2. Generate your quiz following the 7 steps
-3. **IMPORTANT**: Run **[STORY_MATRIX_QUIZ_VALIDATOR.md](STORY_MATRIX_QUIZ_VALIDATOR.md)** for validation
+3. **IMPORTANT**: Run **[QUIZ_STORY_MATRIX_VALIDATOR.md](QUIZ_STORY_MATRIX_VALIDATOR.md)** for validation
 4. Fix any issues until you get PASS (9/9)
 5. Quiz is ready!
 
 ### For Narrative Quizzes:
-1. Read **[NARRATIVE_QUIZ_CREATION.md](NARRATIVE_QUIZ_CREATION.md)** (Complete Narrative guide)
+1. Read **[QUIZ_NARRATIVE_CREATION.md](QUIZ_NARRATIVE_CREATION.md)** (Complete Narrative guide)
 2. Create your story arc and characters
 3. Build the quiz config with timeline
 4. Test the narrative flow
@@ -275,12 +275,12 @@ All three are powerful! Choose based on your topic and how much time you have. 
 **Story-Matrix quizzes require a TWO-PHASE process:**
 
 **Phase 1: Generate**
-- Use **[STORY_MATRIX_QUIZ_CREATION.md](STORY_MATRIX_QUIZ_CREATION.md)**
+- Use **[QUIZ_STORY_MATRIX_CREATION.md](QUIZ_STORY_MATRIX_CREATION.md)**
 - Follow all 7 steps
 - Generate complete quiz config
 
 **Phase 2: Validate** ‚Üê **DO NOT SKIP**
-- Run **[STORY_MATRIX_QUIZ_VALIDATOR.md](STORY_MATRIX_QUIZ_VALIDATOR.md)**
+- Run **[QUIZ_STORY_MATRIX_VALIDATOR.md](QUIZ_STORY_MATRIX_VALIDATOR.md)**
 - Must achieve 9/9 criteria
 - Fix issues and re-validate until PASS
 

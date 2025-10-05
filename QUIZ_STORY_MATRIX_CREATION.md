@@ -4,8 +4,8 @@
 
 **Not sure which quiz type to use?** Read [QUIZ_TYPE_SELECTOR.md](QUIZ_TYPE_SELECTOR.md) first.
 
-- **Archetype quizzes** (fixed personalities) → Use [ARCHETYPE_QUIZ_CREATION.md](ARCHETYPE_QUIZ_CREATION.md)
-- **Narrative quizzes** (continuous story) → Use [NARRATIVE_QUIZ_CREATION.md](NARRATIVE_QUIZ_CREATION.md)
+- **Archetype quizzes** (fixed personalities) → Use [QUIZ_ARCHETYPE_CREATION.md](QUIZ_ARCHETYPE_CREATION.md)
+- **Narrative quizzes** (continuous story) → Use [QUIZ_NARRATIVE_CREATION.md](QUIZ_NARRATIVE_CREATION.md)
 - **Story-Matrix quizzes** (100 combinations from independent scenarios) → Use this file
 
 ---
@@ -261,7 +261,7 @@ The quality checker validates that:
 - No edge cases or issues slipped through
 
 **Process:**
-1. **Run [STORY_MATRIX_QUIZ_VALIDATOR.md](STORY_MATRIX_QUIZ_VALIDATOR.md)** on the generated quiz
+1. **Run [QUIZ_STORY_MATRIX_VALIDATOR.md](QUIZ_STORY_MATRIX_VALIDATOR.md)** on the generated quiz
 2. **If PASS (9/9 criteria)** → Quiz is complete and ready to use ✅
 3. **If FAIL** → Review specific issues flagged, fix them, then re-validate
 4. **Repeat until PASS** → No exceptions
@@ -296,7 +296,7 @@ Pre-validation checks:
 - [ ] Theme colors are appropriate for topic (default to neutral)
 - [ ] Quiz ID is lowercase with hyphens
 
-**Then proceed to Step 7: Run [STORY_MATRIX_QUIZ_VALIDATOR.md](STORY_MATRIX_QUIZ_VALIDATOR.md)**
+**Then proceed to Step 7: Run [QUIZ_STORY_MATRIX_VALIDATOR.md](QUIZ_STORY_MATRIX_VALIDATOR.md)**
 
 ---
 
@@ -373,7 +373,7 @@ A great story-matrix quiz should:
 5. **Generate natural names** - "Direct Coach" sounds right, not forced
 6. **Include meaningful alternatives** - Shows nuance in results
 7. **Be completable in 3-4 minutes** - 8 questions, each takes 20-30 seconds
-8. **Pass quality validation** - Achieves 9/9 on [STORY_MATRIX_QUIZ_VALIDATOR.md](STORY_MATRIX_QUIZ_VALIDATOR.md)
+8. **Pass quality validation** - Achieves 9/9 on [QUIZ_STORY_MATRIX_VALIDATOR.md](QUIZ_STORY_MATRIX_VALIDATOR.md)
 
 **If your quiz meets these metrics, it's ready for production!** 🎉
 

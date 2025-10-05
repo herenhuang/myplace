@@ -5,8 +5,8 @@
 **Not sure which quiz type to use?** Read [QUIZ_TYPE_SELECTOR.md](QUIZ_TYPE_SELECTOR.md) first.
 
 - **Archetype quizzes** (4-8 fixed personalities) → Use this file
-- **Story-Matrix quizzes** (100 combinations) → Use STORY_MATRIX_QUIZ_CREATION.md
-- **Narrative quizzes** (continuous story) → Use NARRATIVE_QUIZ_CREATION.md
+- **Story-Matrix quizzes** (100 combinations) → Use QUIZ_STORY_MATRIX_CREATION.md
+- **Narrative quizzes** (continuous story) → Use QUIZ_NARRATIVE_CREATION.md
 
 ---
 
