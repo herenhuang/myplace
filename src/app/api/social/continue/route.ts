@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { SOCIAL_CONTINUE_PROMPT } from '@/lib/social-prompts'
+import { SOCIAL_CONTINUE_PROMPT } from '@/lib/scenarios/social'
 
 interface ContinueRequest {
   userResponse: string

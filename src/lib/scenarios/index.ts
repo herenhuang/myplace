@@ -1,4 +1,4 @@
-import { ScenarioInfo } from '../types';
+import { ScenarioInfo } from './types';
 import { SCENARIO_INFO as CRISIS_INFO } from './crisis';
 import { SCENARIO_INFO as REMIX_INFO } from './remix';
 
