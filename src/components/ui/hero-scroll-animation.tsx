@@ -54,9 +54,15 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
 
         <div className='flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-12 md:pb-0 gap-4 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)]'>
           <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={500} height={300} className='w-40 h-auto object-contain' />
-          <h1 className='text-5xl font-bold text-center tracking-tight leading-[90%] w-[360px] mb-8'>
+          <h1 className='text-5xl font-bold text-center tracking-tight leading-[90%] w-[360px] mb-4'>
             Real, Interactive Simulations.
           </h1>
+          <Link
+            href="/all-quizzes"
+            className="mb-4 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300"
+          >
+            View All Quizzes
+          </Link>
           <div className="">
             <UserButton user={user} />
           </div>

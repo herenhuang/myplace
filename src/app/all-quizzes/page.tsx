@@ -1,0 +1,110 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { FlipReveal, FlipRevealItem } from '@/components/ui/flip-reveal'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { ALL_QUIZZES, QUIZ_CATEGORIES, type QuizCategory } from '@/lib/quizzes/all-quizzes-data'
+
+export default function AllQuizzesPage() {
+  const [selectedCategory, setSelectedCategory] = useState<QuizCategory>('all')
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            All Quizzes
+          </h1>
+          <p className="text-xl text-gray-600">
+            Discover yourself through interactive quizzes
+          </p>
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex justify-center mb-12">
+          <ToggleGroup
+            type="single"
+            className="bg-white rounded-lg border border-gray-200 p-1 shadow-sm"
+            value={selectedCategory}
+            onValueChange={(value) => {
+              if (value) setSelectedCategory(value as QuizCategory)
+            }}
+          >
+            {QUIZ_CATEGORIES.map((category) => (
+              <ToggleGroupItem
+                key={category.value}
+                value={category.value}
+                className="px-6 py-2 text-sm font-medium"
+              >
+                {category.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
+
+        {/* Quiz Grid with FlipReveal Animation */}
+        <FlipReveal
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          keys={[selectedCategory]}
+          showClass="block"
+          hideClass="hidden"
+        >
+          {ALL_QUIZZES.map((quiz) => {
+            const shouldShow =
+              selectedCategory === 'all' || quiz.category === selectedCategory
+
+            return (
+              <FlipRevealItem
+                key={quiz.id}
+                flipKey={shouldShow ? selectedCategory : 'hidden'}
+              >
+                <Link href={quiz.route} className="group block h-full">
+                  <div
+                    className="relative h-64 rounded-xl overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                    style={{ background: quiz.backgroundImage }}
+                  >
+                    {/* Overlay gradient for better text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                    {/* Quiz Title */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h3 className="text-xl font-bold mb-2 line-clamp-2">
+                        {quiz.title}
+                      </h3>
+                      <p className="text-sm text-white/90 line-clamp-2">
+                        {quiz.description}
+                      </p>
+                    </div>
+
+                    {/* Category Badge */}
+                    <div className="absolute top-4 right-4">
+                      <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-800 capitalize">
+                        {quiz.category}
+                      </span>
+                    </div>
+
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  </div>
+                </Link>
+              </FlipRevealItem>
+            )
+          })}
+        </FlipReveal>
+
+        {/* Back to Home Link */}
+        <div className="text-center mt-12">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <span className="material-symbols-rounded">arrow_back</span>
+            <span>Back to Home</span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
