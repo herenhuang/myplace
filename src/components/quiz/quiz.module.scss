@@ -236,19 +236,41 @@
 
 // Custom Input Styles
 .customInputContainer {
-  position: relative;
   margin-top: 0.5rem;
 }
 
+.customInputWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 22px;
+}
+
+.customInputFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: rgba(209, 213, 219, 0.5);
+  transition: width 0.4s ease-out;
+  z-index: 1;
+  border-radius: 22px;
+}
+
 .customInput {
+  position: relative;
+  z-index: 2;
   width: 100%;
   padding: 12px 50px 12px 14px;
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255, 0.5);
+  border: 2px solid rgba(255,255,255, 0.5);
   backdrop-filter: blur(10px);
   background-color: rgba(255,255,255, 0.6);
   box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.15);
   font-size: 14px;
+  font-weight: 500;
   color: #1f2937;
   transition: all 0.2s ease-in-out;
   font-family: inherit;
@@ -265,21 +287,31 @@
   }
 
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    opacity: 1;
+    cursor: default;
   }
 
   &.customInputSelected {
     background-color: rgba(255,255,255, 0.95);
     border-color: var(--quiz-primary-color, #ff6b35);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3), -4px 12px 24px rgba(0, 0, 0, 0.25);
   }
+}
+
+.customInputPercentage {
+  position: absolute;
+  right: 14px;
+  z-index: 3;
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  pointer-events: none;
 }
 
 .customInputSubmit {
   position: absolute;
   right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  z-index: 3;
   background: var(--quiz-primary-color, #ff6b35);
   border: none;
   border-radius: 50%;
@@ -294,7 +326,7 @@
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    transform: translateY(-50%) scale(1.1);
+    transform: scale(1.1);
     background: var(--quiz-primary-color-dark, #ea580c);
   }
 
@@ -392,13 +424,13 @@
   top: 0;
   height: 100%;
   background-color: rgba(209, 213, 219, 0.5);
-  transition: width 1s ease-out; // Smoother, longer animation
+  transition: width 0.4s ease-out;
   z-index: 1;
   border-radius: 22px; // Match button radius for clean edges
-  
+
   &.optionButtonFillUser {
-    background: linear-gradient(90deg, 
-      rgba(255, 107, 53, 0.6), 
+    background: linear-gradient(90deg,
+      rgba(255, 107, 53, 0.6),
       rgba(255, 165, 0, 0.6)
     );
   }
@@ -564,6 +596,15 @@
   line-height: 1.4;
   color: rgba(130, 44, 44, 0.7);
   margin-bottom: 0;
+}
+
+.totalPlaysText {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(130, 44, 44, 0.6);
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .markdownContent {

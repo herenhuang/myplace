@@ -42,10 +42,12 @@ export async function GET(request: NextRequest) {
 
       sessions.forEach(session => {
         const responses = session.data?.responses || []
-        const response = responses.find((r: { questionIndex: number; selectedValue?: string }) => r.questionIndex === qIndex)
-        
+        const response = responses.find((r: { questionIndex: number; selectedValue?: string; isCustomInput?: boolean }) => r.questionIndex === qIndex)
+
         if (response?.selectedValue) {
-          optionCounts[response.selectedValue] = (optionCounts[response.selectedValue] || 0) + 1
+          // Group all custom inputs together as 'custom_input'
+          const key = response.isCustomInput ? 'custom_input' : response.selectedValue
+          optionCounts[key] = (optionCounts[key] || 0) + 1
           totalForQuestion++
         }
       })
