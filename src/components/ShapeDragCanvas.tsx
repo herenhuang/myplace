@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -97,22 +97,84 @@ function DroppableCategory({ category, shapes }: DroppableCategoryProps) {
 interface ShapeDragCanvasProps {
   onComplete?: (results: { [key: string]: ShapeData[] }) => void
   showLabels?: boolean
+  initialState?: { [categoryId: string]: string[] }
 }
 
 export default function ShapeDragCanvas({ 
   onComplete, 
-  showLabels = true 
+  showLabels = true,
+  initialState
 }: ShapeDragCanvasProps) {
+  const [isMounted, setIsMounted] = useState(false)
+  
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+  
   const [shapes, setShapes] = useState<Record<string, ShapeData>>(
     INITIAL_SHAPES.reduce((acc, shape) => ({ ...acc, [shape.id]: shape }), {})
   );
 
-  const [containers, setContainers] = useState<Record<string, string[]>>({
-    unsorted: INITIAL_SHAPES.map(s => s.id),
-    category1: [],
-    category2: [],
-    category3: [],
-  });
+  // Initialize containers with cached state if provided
+  const getInitialContainers = () => {
+    if (initialState && Object.keys(initialState).length > 0) {
+      // If we have cached state, use it
+      const categorizedShapes = new Set<string>()
+      Object.values(initialState).forEach(shapeIds => {
+        shapeIds.forEach(id => categorizedShapes.add(id))
+      })
+      
+      // Shapes not in any category go back to unsorted
+      const unsortedShapes = INITIAL_SHAPES
+        .map(s => s.id)
+        .filter(id => !categorizedShapes.has(id))
+      
+      return {
+        unsorted: unsortedShapes,
+        category1: initialState.category1 || [],
+        category2: initialState.category2 || [],
+        category3: initialState.category3 || [],
+      }
+    }
+    
+    // Default state - all shapes unsorted
+    return {
+      unsorted: INITIAL_SHAPES.map(s => s.id),
+      category1: [],
+      category2: [],
+      category3: [],
+    }
+  }
+
+  const [containers, setContainers] = useState<Record<string, string[]>>(getInitialContainers());
+  
+  // Use a ref to track if we've loaded the initial state
+  const hasLoadedInitialState = useRef(false)
+  
+  // Update containers when initialState changes (e.g., when cache is loaded)
+  useEffect(() => {
+    // Only load once when initialState is first provided
+    if (initialState && Object.keys(initialState).length > 0 && !hasLoadedInitialState.current) {
+      console.log('[ShapeDragCanvas] Loading cached state:', initialState)
+      hasLoadedInitialState.current = true
+      
+      const categorizedShapes = new Set<string>()
+      Object.values(initialState).forEach(shapeIds => {
+        shapeIds.forEach(id => categorizedShapes.add(id))
+      })
+      
+      const unsortedShapes = INITIAL_SHAPES
+        .map(s => s.id)
+        .filter(id => !categorizedShapes.has(id))
+      
+      setContainers({
+        unsorted: unsortedShapes,
+        category1: initialState.category1 || [],
+        category2: initialState.category2 || [],
+        category3: initialState.category3 || [],
+      })
+    }
+  }, [initialState])
   
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
   
@@ -132,9 +194,18 @@ export default function ShapeDragCanvas({
   const totalShapesCount = Object.keys(shapes).length;
   const progress = Math.round((categorizedShapesCount / totalShapesCount) * 100)
 
-  // Check if all shapes are categorized
+  // Track if this is the initial render
+  const [isInitialRender, setIsInitialRender] = useState(true)
+  
+  // Call onComplete whenever containers change (not just when all shapes are categorized)
   useEffect(() => {
-    if (categorizedShapesCount === totalShapesCount && onComplete) {
+    // Skip the initial render to avoid unnecessary saves
+    if (isInitialRender) {
+      setIsInitialRender(false)
+      return
+    }
+    
+    if (onComplete) {
       const results = {
         category1: containers.category1.map(id => shapes[id]),
         category2: containers.category2.map(id => shapes[id]),
@@ -142,7 +213,7 @@ export default function ShapeDragCanvas({
       }
       onComplete(results)
     }
-  }, [categorizedShapesCount, totalShapesCount, onComplete, containers, shapes])
+  }, [containers]) // Remove onComplete and shapes from deps to avoid infinite loops
 
   const findContainer = (id: UniqueIdentifier) => {
     if (id in containers) {
@@ -205,6 +276,17 @@ export default function ShapeDragCanvas({
 
   // Get active shape for drag overlay
   const activeShape = activeId ? shapes[activeId as string] : null
+
+  // Prevent SSR to avoid hydration mismatch with dnd-kit
+  if (!isMounted) {
+    return (
+      <div className={styles.gameCanvas}>
+        <div className="flex items-center justify-center min-h-[400px] text-gray-400">
+          Loading...
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.gameCanvas}>

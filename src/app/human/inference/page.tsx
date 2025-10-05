@@ -138,9 +138,11 @@ export default function HumanInferencePage() {
         // Restore game results
         if (r.questionType === 'shape-sorting' && r.shapeSortingResults) {
           shapeSortMap[r.stepNumber] = r.shapeSortingResults
+          console.log('[Inference] Loading cached shape sorting for step', r.stepNumber, r.shapeSortingResults)
         }
         if (r.questionType === 'shape-ordering' && r.shapeOrderingResults) {
           shapeOrderMap[r.stepNumber] = r.shapeOrderingResults
+          console.log('[Inference] Loading cached shape ordering for step', r.stepNumber, r.shapeOrderingResults)
         }
         if (r.questionType === 'bubble-popper' && r.bubblePopperResults) {
           bubblePopperMap[r.stepNumber] = r.bubblePopperResults
@@ -151,6 +153,8 @@ export default function HumanInferencePage() {
       setShapeSortingResults(shapeSortMap)
       setShapeOrderingResults(shapeOrderMap)
       setBubblePopperResults(bubblePopperMap)
+      console.log('[Inference] Cache loaded. Shape sorting results:', shapeSortMap)
+      console.log('[Inference] Cache loaded. Shape ordering results:', shapeOrderMap)
       setAnalyzedSteps(cached.responses) // Load the full step data for display
     }
     if (cached?.analysisResult) {
@@ -525,11 +529,15 @@ export default function HumanInferencePage() {
                       <ShapeDragCanvas
                         onComplete={handleShapeSortComplete}
                         showLabels={true}
+                        initialState={shapeSortingResults[question.stepNumber]}
                       />
                     </div>
                   ) : question.type === 'shape-ordering' ? (
                     <div className="w-full">
-                      <ShapeOrderCanvas onOrderChange={handleShapeOrderChange} />
+                      <ShapeOrderCanvas 
+                        onOrderChange={handleShapeOrderChange}
+                        initialState={shapeOrderingResults[question.stepNumber]}
+                      />
                     </div>
                   ) : question.type === 'bubble-popper' ? (
                     <div className="w-full">

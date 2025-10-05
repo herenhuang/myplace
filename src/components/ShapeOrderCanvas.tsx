@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -39,17 +39,65 @@ const ORDERING_SHAPES: ShapeData[] = [
 
 interface ShapeOrderCanvasProps {
   onOrderChange?: (orderedIds: string[]) => void;
+  initialState?: string[];
 }
 
-export default function ShapeOrderCanvas({ onOrderChange }: ShapeOrderCanvasProps) {
+export default function ShapeOrderCanvas({ onOrderChange, initialState }: ShapeOrderCanvasProps) {
+  const [isMounted, setIsMounted] = useState(false)
+  
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+  
   const [shapes] = useState<Record<string, ShapeData>>(
     ORDERING_SHAPES.reduce((acc, shape) => ({ ...acc, [shape.id]: shape }), {})
   );
 
-  const [containers, setContainers] = useState<Record<string, string[]>>({
-    palette: ORDERING_SHAPES.map(s => s.id),
-    sequence: [],
-  });
+  // Initialize containers with cached state if provided
+  const getInitialContainers = () => {
+    if (initialState && initialState.length > 0) {
+      // If we have cached state, use it
+      const sequencedShapes = new Set(initialState)
+      const remainingShapes = ORDERING_SHAPES
+        .map(s => s.id)
+        .filter(id => !sequencedShapes.has(id))
+      
+      return {
+        palette: remainingShapes,
+        sequence: initialState,
+      }
+    }
+    
+    // Default state - all shapes in palette
+    return {
+      palette: ORDERING_SHAPES.map(s => s.id),
+      sequence: [],
+    }
+  }
+
+  const [containers, setContainers] = useState<Record<string, string[]>>(getInitialContainers());
+
+  // Use a ref to track if we've loaded the initial state
+  const hasLoadedInitialState = useRef(false)
+
+  // Update containers when initialState changes (e.g., when cache is loaded)
+  useEffect(() => {
+    // Only load once when initialState is first provided
+    if (initialState && initialState.length > 0 && !hasLoadedInitialState.current) {
+      console.log('[ShapeOrderCanvas] Loading cached state:', initialState)
+      hasLoadedInitialState.current = true
+      
+      const sequencedShapes = new Set(initialState)
+      const remainingShapes = ORDERING_SHAPES
+        .map(s => s.id)
+        .filter(id => !sequencedShapes.has(id))
+      
+      setContainers({
+        palette: remainingShapes,
+        sequence: initialState,
+      })
+    }
+  }, [initialState])
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
@@ -123,6 +171,17 @@ export default function ShapeOrderCanvas({ onOrderChange }: ShapeOrderCanvasProp
   };
 
   const activeShape = activeId ? shapes[activeId as string] : null;
+
+  // Prevent SSR to avoid hydration mismatch with dnd-kit
+  if (!isMounted) {
+    return (
+      <div className={styles.gameCanvas}>
+        <div className="flex items-center justify-center min-h-[400px] text-gray-400">
+          Loading...
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.gameCanvas}>

@@ -10,64 +10,148 @@ interface AnalyzeRequest {
 }
 
 // Helper functions to create standardized JSON representations for games
-function generateShapeDragJSON(results?: { [categoryId: string]: string[] }): any[] {
-  if (!results) return []
+function generateShapeDragJSON(results?: { [categoryId: string]: string[] }): any {
+  if (!results) return {}
   
-  const shapes = []
+  // Return the exact same format as user input
+  return results
+}
+
+// Get metadata about shapes for analysis
+function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): any {
+  if (!results) return {}
+  
+  const predefinedShapes = [
+    { id: 'shape-1', color: 'red', shape: 'circle', hasBorder: true },
+    { id: 'shape-2', color: 'blue', shape: 'square', hasBorder: false },
+    { id: 'shape-3', color: 'green', shape: 'triangle', hasBorder: true },
+    { id: 'shape-4', color: 'red', shape: 'square', hasBorder: false },
+    { id: 'shape-5', color: 'blue', shape: 'triangle', hasBorder: true },
+    { id: 'shape-6', color: 'green', shape: 'circle', hasBorder: false },
+    { id: 'shape-7', color: 'red', shape: 'triangle', hasBorder: true },
+    { id: 'shape-8', color: 'blue', shape: 'circle', hasBorder: false },
+    { id: 'shape-9', color: 'green', shape: 'square', hasBorder: true }
+  ]
+  
+  const metadata: any = {
+    totalShapes: 9,
+    categoriesUsed: Object.keys(results).length,
+    shapeProperties: {},
+    categoryAnalysis: {}
+  }
+  
+  // Build shape properties lookup
+  predefinedShapes.forEach(shape => {
+    metadata.shapeProperties[shape.id] = {
+      color: shape.color,
+      shape: shape.shape,
+      hasBorder: shape.hasBorder
+    }
+  })
+  
+  // Analyze each category
   for (const [categoryId, shapeIds] of Object.entries(results)) {
-    for (const shapeId of shapeIds) {
-      // Extract properties from shape ID (e.g., "shape-1" -> color:red, shape:circle, hasBorder:true)
-      const shapeIndex = parseInt(shapeId.split('-')[1]) - 1
-      const predefinedShapes = [
-        { color: 'red', shape: 'circle', hasBorder: true },
-        { color: 'blue', shape: 'square', hasBorder: false },
-        { color: 'green', shape: 'triangle', hasBorder: true },
-        { color: 'red', shape: 'square', hasBorder: false },
-        { color: 'blue', shape: 'triangle', hasBorder: true },
-        { color: 'green', shape: 'circle', hasBorder: false },
-        { color: 'red', shape: 'triangle', hasBorder: true },
-        { color: 'blue', shape: 'circle', hasBorder: false },
-        { color: 'green', shape: 'square', hasBorder: true }
-      ]
-      
-      if (shapeIndex >= 0 && shapeIndex < predefinedShapes.length) {
-        shapes.push({
-          id: shapeId,
-          category: categoryId,
-          ...predefinedShapes[shapeIndex]
-        })
+    const categoryShapes = shapeIds.map(id => predefinedShapes.find(s => s.id === id)).filter(Boolean)
+    
+    metadata.categoryAnalysis[categoryId] = {
+      count: shapeIds.length,
+      shapes: shapeIds,
+      // Analyze common properties in this category
+      colorCounts: categoryShapes.reduce((acc: any, shape: any) => {
+        acc[shape.color] = (acc[shape.color] || 0) + 1
+        return acc
+      }, {}),
+      shapeCounts: categoryShapes.reduce((acc: any, shape: any) => {
+        acc[shape.shape] = (acc[shape.shape] || 0) + 1
+        return acc
+      }, {}),
+      borderCounts: {
+        withBorder: categoryShapes.filter((s: any) => s.hasBorder).length,
+        withoutBorder: categoryShapes.filter((s: any) => !s.hasBorder).length
       }
     }
   }
-  return shapes
+  
+  return metadata
 }
 
 function generateShapeOrderJSON(results?: string[]): any[] {
   if (!results) return []
   
-  return results.map((shapeId, index) => {
-    const shapeIndex = parseInt(shapeId.split('-')[1]) - 1
-    const predefinedShapes = [
-      { color: 'red', shape: 'circle', hasBorder: false },
-      { color: 'blue', shape: 'square', hasBorder: true },
-      { color: 'green', shape: 'triangle', hasBorder: false },
-      { color: 'yellow', shape: 'square', hasBorder: false },
-      { color: 'purple', shape: 'triangle', hasBorder: true },
-      { color: 'pink', shape: 'circle', hasBorder: false },
-      { color: 'orange', shape: 'triangle', hasBorder: false },
-      { color: 'cyan', shape: 'circle', hasBorder: true },
-      { color: 'lime', shape: 'square', hasBorder: false }
-    ]
-    
-    if (shapeIndex >= 0 && shapeIndex < predefinedShapes.length) {
-      return {
-        id: shapeId,
-        position: index + 1,
-        ...predefinedShapes[shapeIndex]
-      }
+  // Return the exact same format as user input
+  return results
+}
+
+// Get metadata about shape ordering for analysis
+function getShapeOrderMetadata(results?: string[]): any {
+  if (!results) return {}
+  
+  const predefinedShapes = [
+    { id: 'ord-1', color: 'red', shape: 'circle', hasBorder: false },
+    { id: 'ord-2', color: 'blue', shape: 'square', hasBorder: true },
+    { id: 'ord-3', color: 'green', shape: 'triangle', hasBorder: false },
+    { id: 'ord-4', color: 'yellow', shape: 'square', hasBorder: false },
+    { id: 'ord-5', color: 'purple', shape: 'triangle', hasBorder: true },
+    { id: 'ord-6', color: 'pink', shape: 'circle', hasBorder: false },
+    { id: 'ord-7', color: 'orange', shape: 'triangle', hasBorder: false },
+    { id: 'ord-8', color: 'cyan', shape: 'circle', hasBorder: true },
+    { id: 'ord-9', color: 'lime', shape: 'square', hasBorder: false }
+  ]
+  
+  const metadata: any = {
+    totalShapes: results.length,
+    shapeProperties: {},
+    orderAnalysis: {
+      sequence: results,
+      patterns: []
     }
-    return { id: shapeId, position: index + 1 }
+  }
+  
+  // Build shape properties lookup
+  predefinedShapes.forEach(shape => {
+    metadata.shapeProperties[shape.id] = {
+      color: shape.color,
+      shape: shape.shape,
+      hasBorder: shape.hasBorder
+    }
   })
+  
+  // Analyze ordering patterns
+  if (results.length > 1) {
+    // Check for color patterns
+    const colors = results.map(id => predefinedShapes.find(s => s.id === id)?.color).filter(Boolean)
+    const colorGroups = colors.reduce((acc: any[], color, i) => {
+      if (i === 0 || color !== colors[i-1]) acc.push(1)
+      else acc[acc.length-1]++
+      return acc
+    }, [])
+    if (colorGroups.length < results.length / 2) metadata.orderAnalysis.patterns.push('grouped-by-color')
+    
+    // Check for shape patterns
+    const shapes = results.map(id => predefinedShapes.find(s => s.id === id)?.shape).filter(Boolean)
+    const shapeGroups = shapes.reduce((acc: any[], shape, i) => {
+      if (i === 0 || shape !== shapes[i-1]) acc.push(1)
+      else acc[acc.length-1]++
+      return acc
+    }, [])
+    if (shapeGroups.length < results.length / 2) metadata.orderAnalysis.patterns.push('grouped-by-shape')
+    
+    // Check for border patterns
+    const borders = results.map(id => predefinedShapes.find(s => s.id === id)?.hasBorder).filter(b => b !== undefined)
+    const borderGroups = borders.reduce((acc: any[], border, i) => {
+      if (i === 0 || border !== borders[i-1]) acc.push(1)
+      else acc[acc.length-1]++
+      return acc
+    }, [])
+    if (borderGroups.length < results.length / 2) metadata.orderAnalysis.patterns.push('grouped-by-border')
+    
+    // Check if no clear pattern (suggests randomness)
+    if (metadata.orderAnalysis.patterns.length === 0) {
+      metadata.orderAnalysis.patterns.push('no-clear-pattern')
+    }
+  }
+  
+  return metadata
 }
 
 function generateBubblePopperJSON(results?: any): any {
@@ -95,18 +179,20 @@ function buildAnalysisPromptWithAIComparison(
     let userResponseDisplay = step.userResponse
     let aiResponsesDisplay = `- ChatGPT: "${chatgptResp}"\n- Gemini: "${geminiResp}"\n- Claude: "${claudeResp}"`
 
-    // For game questions, show both raw JSON and formatted display
+    // For game questions, show both raw JSON and formatted display with metadata
     if (step.questionType === 'shape-sorting' && step.shapeSortingResults) {
       const gameJSON = generateShapeDragJSON(step.shapeSortingResults)
-      userResponseDisplay = `Raw: ${step.userResponse}\nFormatted: ${JSON.stringify(gameJSON, null, 2)}`
+      const metadata = getShapeDragMetadata(step.shapeSortingResults)
+      userResponseDisplay = `JSON: ${JSON.stringify(gameJSON, null, 2)}\n\nShape Properties & Analysis:\n${JSON.stringify(metadata, null, 2)}`
       aiResponsesDisplay = `- ChatGPT: ${chatgptResp}\n- Gemini: ${geminiResp}\n- Claude: ${claudeResp}`
     } else if (step.questionType === 'shape-ordering' && step.shapeOrderingResults) {
       const gameJSON = generateShapeOrderJSON(step.shapeOrderingResults)
-      userResponseDisplay = `Raw: ${step.userResponse}\nFormatted: ${JSON.stringify(gameJSON, null, 2)}`
+      const metadata = getShapeOrderMetadata(step.shapeOrderingResults)
+      userResponseDisplay = `JSON: ${JSON.stringify(gameJSON, null, 2)}\n\nShape Properties & Analysis:\n${JSON.stringify(metadata, null, 2)}`
       aiResponsesDisplay = `- ChatGPT: ${chatgptResp}\n- Gemini: ${geminiResp}\n- Claude: ${claudeResp}`
     } else if (step.questionType === 'bubble-popper' && step.bubblePopperResults) {
       const gameJSON = generateBubblePopperJSON(step.bubblePopperResults)
-      userResponseDisplay = `Raw: ${step.userResponse}\nFormatted: ${JSON.stringify(gameJSON, null, 2)}`
+      userResponseDisplay = `JSON: ${JSON.stringify(gameJSON, null, 2)}`
       aiResponsesDisplay = `- ChatGPT: ${chatgptResp}\n- Gemini: ${geminiResp}\n- Claude: ${claudeResp}`
     }
 
@@ -160,14 +246,14 @@ For each response, assign:
 - **Percentile** (0-100): How rare/unusual compared to the 3 AI responses (0 = very similar to AIs, 100 = extremely different/unique)
 - **AI Likelihood** (0-100): How likely an AI would give this exact response based on the 3 examples
 - **Human Likelihood** (0-100): How likely a human would give this response
-- **Insight**: A detailed, meaningful psychological analysis of what this response reveals about the user's personality, thinking patterns, emotional expression, and behavioral tendencies. This must be substantial (2-3 sentences minimum) and provide genuine psychological insight about their personality profile.
+- **Insight**: A detailed, meaningful psychological analysis of what this response reveals about the user's personality, thinking patterns, emotional expression, and behavioral tendencies. This must be substantial (2-3 sentences minimum) and provide genuine psychological insight about their personality profile. CRITICAL: Do NOT use phrases like "Response analysis" or "Your response shows". Do NOT quote the user's response verbatim. Instead, provide specific psychological insights based on the choice/behavior demonstrated. Focus on what this reveals about their cognitive style, decision-making patterns, values, and personality traits.
 - **Was Unexpected**: Boolean - did the user response diverge significantly from all 3 AI patterns?
 
 **Individual Response Analysis:**
 For each question, provide detailed individual scores:
 
 1. **Logical Coherence** (0-100): How much sense does the response make?
-   - For word combinations: Does the sentence actually make grammatical and logical sense?
+   - For word combinations: CRITICAL - Does the response form a grammatically correct and logically coherent sentence? If the user just lists the required words without connecting them meaningfully, score 0-15. If they create fragments or incomplete sentences, score 16-35. Only proper sentences with logical connections between words score above 50.
    - For text responses: Is it coherent, or just gibberish?
    - For scenarios: Does the response address the situation appropriately?
    - For shape sorting: Do the categories show logical reasoning or random grouping?
@@ -229,6 +315,23 @@ As an expert psychologist, analyze the user's complete personality profile acros
 - **Values & Beliefs**: What principles guide their choices?
 - **Strengths & Growth Areas**: Key personality assets and development opportunities
 - **Behavioral Patterns**: Consistent themes across responses
+
+### Special Analysis for Interactive Tasks:
+
+**Shape Sorting (Question 13):**
+- Analyze the sorting logic: Did they sort by color, shape, border, or a combination?
+- What does their categorization reveal about their cognitive style (systematic vs. intuitive)?
+- How complex or simple is their sorting logic? Does it show attention to detail or preference for simplicity?
+
+**Shape Ordering (Question 14):**  
+- What ordering pattern did they use? (color groups, shape groups, random, aesthetic, etc.)
+- Does the ordering show structured thinking or spontaneous arrangement?
+- What does this reveal about their preference for order vs. chaos?
+
+**Bubble Popping (Question 15):**
+- How many bubbles did they pop? What does this say about task completion tendency?
+- How long did they take? Does this show patience, impulsiveness, or deliberation?
+- What pattern did they follow (if any)? Does this reveal methodical vs. random behavior?
 
 ##### Calibration Rules (CRITICAL - PREVENT INFLATION)
 **Core Principle**: Most human responses should score 30-60. Only truly exceptional responses deserve 70+.
@@ -369,115 +472,6 @@ IMPORTANT:
 Analyze these responses now by comparing the user to the AI baselines.`
 }
 
-// Fallback analysis creation function
-function createFallbackAnalysis(steps: HumanStepData[]) {
-  const breakdown = steps.map(step => {
-    // Generate more meaningful insights based on response characteristics
-    const responseLength = step.userResponse.length
-    const hasEmotionalWords = /feel|love|hate|angry|happy|sad|worried|excited|nervous|confident/i.test(step.userResponse)
-    const hasPersonalWords = /my|me|i|myself|personal|experience/i.test(step.userResponse)
-    const isDetailed = responseLength > 50
-    const isCreative = /creative|artistic|imaginative|unique|original/i.test(step.userResponse)
-    
-    // Calculate scores based on response characteristics
-    const logicalCoherence = Math.min(95, Math.max(60, 70 + (responseLength / 10)))
-    const creativity = isCreative ? 80 : Math.min(70, 50 + (responseLength / 20))
-    const insightfulness = isDetailed ? 75 : 60
-    const personalization = hasPersonalWords ? 80 : 40
-    const authenticity = hasEmotionalWords ? 85 : 60
-    
-    return {
-      questionId: step.questionId,
-      stepNumber: step.stepNumber,
-      question: step.question,
-      userResponse: step.userResponse,
-      insight: `Response analysis: "${step.userResponse}" - Your response shows ${isDetailed ? 'detailed' : 'concise'} communication patterns with ${hasEmotionalWords ? 'emotional expression' : 'practical focus'}. Your ${isCreative ? 'creative' : 'conventional'} approach reveals authentic decision-making processes and ${hasPersonalWords ? 'personal investment' : 'objective analysis'} in your thinking.`,
-      percentile: Math.min(80, Math.max(20, 40 + (responseLength / 5))),
-      wasUnexpected: isCreative || hasEmotionalWords,
-      highlight: isCreative ? 'Shows creative thinking' : hasEmotionalWords ? 'Expresses emotions authentically' : null,
-      aiLikelihood: Math.max(20, 60 - (responseLength / 10)),
-      humanLikelihood: Math.min(90, 50 + (responseLength / 10)),
-      aiExamples: {
-        chatgpt: '',
-        gemini: '',
-        claude: ''
-      },
-      individualScores: {
-        logicalCoherence,
-        creativity,
-        insightfulness,
-        personalityTraits: {
-          optimism: hasEmotionalWords ? 70 : 50,
-          spontaneity: isDetailed ? 60 : 40,
-          socialOrientation: hasPersonalWords ? 70 : 50,
-          riskTolerance: isCreative ? 65 : 45,
-          emotionalExpression: hasEmotionalWords ? 85 : 40,
-          analyticalVsIntuitive: isCreative ? 30 : 70
-        },
-        qualityIndicators: {
-          completeness: isDetailed ? 85 : 60,
-          relevance: 80,
-          personalization,
-          authenticity
-        }
-      }
-    }
-  })
-
-  // Calculate overall scores based on breakdown
-  const avgCreativity = breakdown.reduce((sum, item) => sum + item.individualScores.creativity, 0) / breakdown.length
-  const avgSpontaneity = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.spontaneity, 0) / breakdown.length
-  const avgAuthenticity = breakdown.reduce((sum, item) => sum + item.individualScores.qualityIndicators.authenticity, 0) / breakdown.length
-  
-  const metascore = Math.round((avgCreativity + avgSpontaneity + avgAuthenticity) / 3)
-  const humanessLevel = metascore >= 70 ? 'human-like' : metascore >= 40 ? 'borderline' : 'ai-like'
-
-  // Derive MBTI from fallback scores
-  const avgAnalyticalVsIntuitive = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.analyticalVsIntuitive, 0) / breakdown.length
-  const avgEmotionalExpression = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.emotionalExpression, 0) / breakdown.length
-  const avgSocialOrientation = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.socialOrientation, 0) / breakdown.length
-
-  const E = avgSocialOrientation > 55 ? 1 : 0
-  const I = avgSocialOrientation < 45 ? 1 : 0
-  const N = avgAnalyticalVsIntuitive > 55 ? 1 : 0
-  const S = avgAnalyticalVsIntuitive < 45 ? 1 : 0
-  const F = avgEmotionalExpression > 55 ? 1 : 0
-  const T = avgEmotionalExpression < 45 ? 1 : 0
-  const P = avgSpontaneity > 55 ? 1 : 0
-  const J = avgSpontaneity < 45 ? 1 : 0
-  
-  const mbtiType = `${I > E ? 'I' : 'E'}${S > N ? 'S' : 'N'}${T > F ? 'T' : 'F'}${J > P ? 'J' : 'P'}`
-  
-  return {
-    metascore,
-    humanessLevel: humanessLevel as 'human-like' | 'borderline' | 'ai-like',
-    mbtiType,
-    subscores: {
-      creativity: Math.round(avgCreativity),
-      spontaneity: Math.round(avgSpontaneity),
-      authenticity: Math.round(avgAuthenticity)
-    },
-    personality: {
-      creative_conventional: Math.round(avgCreativity),
-      analytical_intuitive: breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.analyticalVsIntuitive, 0) / breakdown.length,
-      emotional_logical: breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.emotionalExpression, 0) / breakdown.length,
-      spontaneous_calculated: Math.round(avgSpontaneity),
-      abstract_concrete: breakdown.reduce((sum, item) => sum + item.individualScores.creativity, 0) / breakdown.length,
-      divergent_convergent: Math.round(avgCreativity)
-    },
-    breakdown,
-    primaryArchetype: {
-      name: metascore >= 70 ? 'The Creative' : metascore >= 40 ? 'The Anchor' : 'The Pragmatist',
-      description: metascore >= 70 ? 'You demonstrate creative and authentic responses with unique perspectives and imaginative thinking.' : 
-                  metascore >= 40 ? 'You show balanced responses with consistent characteristics and reliable decision-making.' : 
-                  'You exhibit practical and analytical thinking patterns with structured approaches to problem-solving.',
-      traits: metascore >= 70 ? ['Creative', 'Authentic', 'Unique'] : 
-              metascore >= 40 ? ['Balanced', 'Consistent', 'Human-like'] : 
-              ['Practical', 'Analytical', 'Structured']
-    },
-    overallAnalysis: `Based on your ${breakdown.length} responses, you demonstrate ${humanessLevel} interaction patterns with ${metascore >= 70 ? 'high creativity and authenticity' : metascore >= 40 ? 'balanced characteristics' : 'practical and analytical approaches'}. Your personality profile shows ${metascore >= 70 ? 'creative thinking with strong emotional expression and intuitive decision-making' : metascore >= 40 ? 'balanced cognitive styles with both analytical and creative tendencies' : 'systematic thinking with practical problem-solving approaches'}. You exhibit ${metascore >= 70 ? 'natural leadership qualities and collaborative communication' : metascore >= 40 ? 'adaptable communication styles with balanced social tendencies' : 'structured communication with clear, direct expression'} across different dimensions.`
-  }
-}
 
 export async function POST(request: NextRequest) {
   const startTime = performance.now()
@@ -576,20 +570,33 @@ export async function POST(request: NextRequest) {
 
           let questionText = `Q${step.stepNumber}: `
           
-          if (questionDef.type === 'word-association') {
+          if (questionDef.type === 'forced-choice' && questionDef.choices) {
+            questionText += `${questionDef.question}\nChoices:\n${questionDef.choices.map((choice, idx) => `${idx + 1}. ${choice}`).join('\n')}\nRespond with just the choice text (not the number).`
+          } else if (questionDef.type === 'word-association') {
             const userLength = step.userResponse.length
             const targetLength = Math.max(Math.min(userLength, 25), 5) // 5-25 chars for word association
             questionText += `(~${targetLength} chars) ${questionDef.question}\nContext: ${questionDef.context || ''}`
           } else if (questionDef.type === 'word-combination' && questionDef.requiredWords) {
             const userLength = step.userResponse.length
             const targetLength = Math.max(Math.min(userLength, 200), 50) // 50-200 chars
-            questionText += `(~${targetLength} chars) ${questionDef.question}\nRequired words: ${questionDef.requiredWords.join(', ')}`
+            questionText += `(~${targetLength} chars) ${questionDef.question}\nRequired words: ${questionDef.requiredWords.join(', ')}\nCreate a proper sentence using all three words.`
           } else if (questionDef.type === 'shape-sorting') {
-            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nRespond with concise JSON: [{"id":"shape-1","category":"category1"},...]`
+            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nYou have 9 shapes with these properties:
+- shape-1: red circle with border
+- shape-2: blue square without border
+- shape-3: green triangle with border
+- shape-4: red square without border
+- shape-5: blue triangle with border
+- shape-6: green circle without border
+- shape-7: red triangle with border
+- shape-8: blue circle without border
+- shape-9: green square with border
+Respond with JSON showing how you sorted them into 3 categories: {"category1":["shape-1","shape-2","shape-3"],"category2":["shape-4","shape-5","shape-6"],"category3":["shape-7","shape-8","shape-9"]}`
           } else if (questionDef.type === 'shape-ordering') {
-            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nRespond with JSON: [{"id":"ord-1","position":1},...]`
+            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nYou have 9 unique shapes (ord-1 through ord-9). Order them as you see fit.
+Respond with JSON array: ["ord-1","ord-2","ord-3","ord-4","ord-5","ord-6","ord-7","ord-8","ord-9"]`
           } else if (questionDef.type === 'bubble-popper') {
-            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nRespond with JSON: {"bubblesPopped":25,"duration":120,"pattern":"random"}`
+            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nRespond with JSON: {"bubblesPopped":25,"timeElapsed":30,"completed":true,"bubbleGrid":[[0,1,1,0,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]]}`
           } else {
             const userLength = step.userResponse.length
             const targetLength = Math.max(Math.min(userLength, 150), 30) // 30-150 chars for efficiency
@@ -601,7 +608,7 @@ export async function POST(request: NextRequest) {
           return questionText
         }).join('\n\n---\n\n')
 
-        return `Answer each of the following ${allSteps.length} questions concisely. Match approximate character lengths specified. Use XML-style tags:
+        return `Answer each of the following ${allSteps.length} questions concisely. For multiple choice questions, select one of the provided choices. For word combination questions, create proper sentences using all required words. Match approximate character lengths specified. Use XML-style tags:
 
 <Q1>[answer]</Q1>
 <Q2>[answer]</Q2>
@@ -709,7 +716,7 @@ ${questionsBlock}`
       })
 
       // Keep the same model family (Claude Sonnet) via OpenRouter
-      const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-3.5-sonnet-20241022'
+      const model = 'google/gemini-2.5-pro'
 
       const chat = await client.chat.completions.create({
         model,
@@ -717,7 +724,7 @@ ${questionsBlock}`
           { role: 'user', content: prompt }
         ],
         temperature: 0.2,
-        max_tokens: 10000,
+        max_tokens: 100000,
         response_format: { type: "json_object" }
       })
       content = chat.choices?.[0]?.message?.content || ''
@@ -850,16 +857,15 @@ ${questionsBlock}`
         console.error('❌ [HUMANNESS] Still failed after JSON fix attempt:', secondError)
         console.error('📝 [HUMANNESS] Fixed JSON string:', fixedJson)
         
-        // Create fallback analysis result
-        console.log('🔄 [HUMANNESS] Creating fallback analysis result...')
-        analysisResult = createFallbackAnalysis(steps)
+        // Throw error instead of using fallback
+        throw new Error(`Failed to parse AI analysis response after multiple attempts: ${secondError}`)
       }
     }
 
     // Validate that the analysis result has all required fields
     if (!analysisResult.metascore || !analysisResult.humanessLevel || !analysisResult.breakdown) {
-      console.log('⚠️ [HUMANNESS] Analysis result missing required fields, creating fallback...')
-      analysisResult = createFallbackAnalysis(steps)
+      console.error('❌ [HUMANNESS] Analysis result missing required fields:', Object.keys(analysisResult))
+      throw new Error('AI analysis response is missing required fields (metascore, humanessLevel, or breakdown)')
     }
 
     console.log('\n✅ [STEP 3 COMPLETE] Analysis complete')
@@ -883,50 +889,9 @@ ${questionsBlock}`
     }
     
     if (missingSteps.length > 0) {
-      console.log(`⚠️ [VALIDATION] Missing breakdown for steps: ${missingSteps.join(', ')}`)
-      console.log(`⚠️ [VALIDATION] Expected: ${expectedStepNumbers.join(', ')}, Got: ${breakdownStepNumbers.join(', ')}`)
-      
-      // Create fallback breakdown items for missing steps
-      const fallbackItems = missingSteps.map(stepNum => {
-        const step = steps.find(s => s.stepNumber === stepNum)
-        return {
-          questionId: step?.questionId || `step-${stepNum}`,
-          stepNumber: stepNum,
-          insight: `Response analysis: "${step?.userResponse || 'No response provided'}" - This response shows basic human interaction patterns and provides insight into the user's communication style and thought processes.`,
-          percentile: 50,
-          wasUnexpected: false,
-          highlight: null,
-          aiLikelihood: 50,
-          humanLikelihood: 50,
-          aiExamples: {
-            chatgpt: '',
-            gemini: '',
-            claude: ''
-          },
-          individualScores: {
-            logicalCoherence: 50,
-            creativity: 50,
-            insightfulness: 50,
-            personalityTraits: {
-              optimism: 50,
-              spontaneity: 50,
-              socialOrientation: 50,
-              riskTolerance: 50,
-              emotionalExpression: 50,
-              analyticalVsIntuitive: 50
-            },
-            qualityIndicators: {
-              completeness: 50,
-              relevance: 50,
-              personalization: 50,
-              authenticity: 50
-            }
-          }
-        }
-      })
-      
-      analysisResult.breakdown = [...(analysisResult.breakdown || []), ...fallbackItems].sort((a, b) => a.stepNumber - b.stepNumber)
-      console.log(`✅ [VALIDATION] Added ${fallbackItems.length} fallback breakdown items`)
+      console.error(`❌ [VALIDATION] Missing breakdown for steps: ${missingSteps.join(', ')}`)
+      console.error(`❌ [VALIDATION] Expected: ${expectedStepNumbers.join(', ')}, Got: ${breakdownStepNumbers.join(', ')}`)
+      throw new Error(`AI analysis is incomplete: missing analysis for ${missingSteps.length} questions (steps: ${missingSteps.join(', ')})`)
     } else {
       console.log(`✅ [VALIDATION] All ${expectedStepNumbers.length} questions have breakdown items`)
     }
@@ -951,8 +916,25 @@ ${questionsBlock}`
       }
     })
     
-    
     analysisResult.breakdown = enrichedBreakdown
+
+    // Fix decimal places - round all numerical values to whole numbers
+    function roundAllNumbers(obj: any): any {
+      if (typeof obj === 'number') {
+        return Math.round(obj)
+      } else if (Array.isArray(obj)) {
+        return obj.map(roundAllNumbers)
+      } else if (obj && typeof obj === 'object') {
+        const rounded: any = {}
+        for (const [key, value] of Object.entries(obj)) {
+          rounded[key] = roundAllNumbers(value)
+        }
+        return rounded
+      }
+      return obj
+    }
+
+    analysisResult = roundAllNumbers(analysisResult)
 
     return NextResponse.json({ success: true, analysis: analysisResult })
   } catch (error) {

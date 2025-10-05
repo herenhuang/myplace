@@ -13,9 +13,7 @@ export default function PageContainer({
 }: PageContainerProps) {
   return (
     <div className="h-full flex items-center justify-center">
-
         {children}
-
     </div>
   )
 }
