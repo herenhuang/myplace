@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { QuizConfig, QuizResponse, QuizResult, QuizState } from '@/lib/quizzes/types'
 import { getOrCreateSessionId } from '@/lib/session'
 import PageContainer from '@/components/layout/PageContainer'
@@ -28,6 +28,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [adaptedQuestions, setAdaptedQuestions] = useState<Record<number, string>>({}) // Store adapted narrative text
   const [personalizationData, setPersonalizationData] = useState<Record<string, string>>({}) // Store user's personalization inputs
+  const recommendationRef = useRef<HTMLDivElement>(null)
 
   const STORAGE_KEY = `quiz-${config.id}-state`
 
@@ -625,7 +626,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             sessionId={sessionId}
             onBackToCard={() => setScreenState('results')}
             onRestart={handleRestart}
-            recommendationRef={{ current: null }}
+            recommendationRef={recommendationRef}
           />
         ) : null
 
