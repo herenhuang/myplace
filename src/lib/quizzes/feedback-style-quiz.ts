@@ -87,33 +87,9 @@ export const feedbackStyleQuiz: QuizConfig = {
       allowCustomInput: true
     },
     
-    // Question 7 - Feedback frequency preference
+    // Question 7 - Receiving vague feedback
     {
       id: 'q7',
-      text: 'Your new manager asks how you like to receive feedback. You tell them...',
-      options: [
-        { label: '"In the moment when you notice something"', value: 'continuous_real_time' },
-        { label: '"Let\'s do regular 1:1s where we can discuss"', value: 'structured_scheduled' },
-        { label: '"However feels natural to you"', value: 'flexible_adaptive' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 8 - Feedback on sensitive topic
-    {
-      id: 'q8',
-      text: 'Someone on your team has been showing up late to everything. You need to address it. You...',
-      options: [
-        { label: 'Name it directly: "I\'ve noticed you\'ve been late, what\'s going on?"', value: 'direct_concerned' },
-        { label: 'Start with empathy: "Hey, is everything okay? You seem stretched..."', value: 'empathetic_check_in' },
-        { label: 'Frame it around impact: "When you\'re late, the team waits..."', value: 'impact_focused' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 9 - Receiving vague feedback
-    {
-      id: 'q9',
       text: 'Someone tells you: "Your work is good but could be more strategic." That\'s all they say. You...',
       options: [
         { label: 'Push for specifics: "Can you give me an example of what that looks like?"', value: 'clarity_seeker' },
@@ -122,10 +98,10 @@ export const feedbackStyleQuiz: QuizConfig = {
       ],
       allowCustomInput: true
     },
-    
-    // Question 10 - Feedback to someone more senior
+
+    // Question 8 - Feedback to someone more senior
     {
-      id: 'q10',
+      id: 'q8',
       text: 'Your manager made a decision that you think is a mistake. You...',
       options: [
         { label: 'Speak up: "Can I share a different perspective?"', value: 'candid_upward' },
@@ -151,16 +127,16 @@ export const feedbackStyleQuiz: QuizConfig = {
       'Data-Driven'      // Evidence-based
     ],
     secondWords: [
-      'Growth-Pusher',      // Development focused
-      'Relationship-Keeper', // Preserve connection
+      'Growth Catalyst',    // Development focused
+      'Relationship Builder', // Preserve connection
       'Truth-Teller',       // Honesty above all
-      'Behavior-Focused',   // Specific actions
+      'Pragmatist',         // Specific actions focus
       'Coach',              // Teaching approach
       'Mirror',             // Reflection helper
-      'Encourager',         // Positive reinforcement
-      'Standards-Holder',   // High bar maintained
+      'Validator',          // Positive reinforcement
+      'Perfectionist',      // High bar maintained
       'Problem-Solver',     // Solution-oriented
-      'Context-Builder'     // Understanding why
+      'Storyteller'         // Understanding why/context
     ],
     selectionPrompt: `You are analyzing someone's feedback style based on their quiz responses.
 
@@ -177,7 +153,7 @@ Instructions:
 1. Consider the full story their answers tell - how they give feedback, how they receive it, what they value in feedback conversations
 2. Look for patterns in directness, timing, emotional awareness, and what they're trying to achieve with feedback
 3. Choose the FIRST WORD that describes their feedback approach (e.g., Direct vs Diplomatic, Continuous vs Structured)
-4. Choose the SECOND WORD that describes what they prioritize in feedback (e.g., Growth-Pusher, Relationship-Keeper, Truth-Teller)
+4. Choose the SECOND WORD that describes what they prioritize in feedback (e.g., Growth Catalyst, Truth-Teller, Coach)
 5. Each word is DISTINCT - there's clear daylight between them
 6. All words are positive - find the best match, not the perfect one
 7. Also identify 2 alternative combinations they were close to (not 3, just 2)

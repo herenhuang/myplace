@@ -87,33 +87,9 @@ export const crushQuiz: QuizConfig = {
       allowCustomInput: true
     },
     
-    // Question 7 - Future Thoughts
+    // Question 7 - Vulnerability Test
     {
-      id: 'q7-future-scenarios',
-      text: 'When you imagine the future, where are they in that picture?',
-      options: [
-        { label: 'Right there next to me, specifically', value: 'romantic_future' },
-        { label: 'In my life somehow, but the details are fuzzy', value: 'vague_presence' },
-        { label: 'Haven\'t really thought about it that way', value: 'not_considered' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 8 - Attention Competition
-    {
-      id: 'q8-others-interested',
-      text: 'Someone else in your life expresses romantic interest in you. Your first thought is...',
-      options: [
-        { label: 'But what about [their name]?', value: 'comparing_to_crush' },
-        { label: 'This could be really great actually', value: 'open_to_others' },
-        { label: 'I feel guilty even though nothing happened with [their name]', value: 'emotional_commitment' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 9 - Vulnerability Test
-    {
-      id: 'q9-sharing-feelings',
+      id: 'q7-sharing-feelings',
       text: 'You have big news (good or bad). How quickly do you want to tell them?',
       options: [
         { label: 'They\'re literally the first person I think of', value: 'priority_person' },
@@ -122,10 +98,10 @@ export const crushQuiz: QuizConfig = {
       ],
       allowCustomInput: true
     },
-    
-    // Question 10 - The Honest Question
+
+    // Question 8 - The Honest Question
     {
-      id: 'q10-gut-feeling',
+      id: 'q8-gut-feeling',
       text: 'Be honest with yourself: If they wanted to kiss you right now, you\'d...',
       options: [
         { label: 'Yes. Absolutely yes.', value: 'definite_yes' },

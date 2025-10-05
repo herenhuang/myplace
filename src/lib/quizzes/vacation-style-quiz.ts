@@ -30,11 +30,11 @@ export const vacationStyleQuiz: QuizConfig = {
     // Question 2 - What you prioritize (Foodie, Culture, Nature, Photography, Comfort)
     {
       id: 'q2',
-      text: 'What is the highlight of any trip for you?',
+      text: 'You have one free day in a new city. No plans. You...',
       options: [
-        { label: 'Finding the best local food spots', value: 'foodie' },
-        { label: 'Hiking trails or beaches', value: 'nature' },
-        { label: 'Museums, history, and architecture', value: 'culture' }
+        { label: 'Find the best-rated local restaurant on my phone', value: 'foodie' },
+        { label: 'Head to the nearest trail or beach', value: 'nature' },
+        { label: 'Walk to the historic district or main museum', value: 'culture' }
       ],
       allowCustomInput: true
     },
@@ -66,11 +66,11 @@ export const vacationStyleQuiz: QuizConfig = {
     // Question 5 - Budget consciousness (Budgeteer)
     {
       id: 'q5',
-      text: 'When it comes to spending on vacation...',
+      text: 'You\'re at dinner. The menu is pricey but everything looks amazing. You...',
       options: [
-        { label: 'I splurge—treat yourself', value: 'comfort_spender' },
-        { label: 'Budget smart to travel longer/more', value: 'budgeteer' },
-        { label: 'Mix of cheap eats and nice hotels', value: 'balanced_spend' }
+        { label: 'Order what I want - I\'m on vacation', value: 'comfort_spender' },
+        { label: 'Find the affordable option so I can travel longer', value: 'budgeteer' },
+        { label: 'Get one nice thing + one budget thing', value: 'balanced_spend' }
       ],
       allowCustomInput: true
     },
@@ -102,11 +102,11 @@ export const vacationStyleQuiz: QuizConfig = {
     // Question 8 - What makes it successful (Photography, Comfort, etc.)
     {
       id: 'q8',
-      text: 'What would make this trip a total win?',
+      text: 'You\'re packing for the trip. What\'s the one thing you absolutely cannot forget?',
       options: [
-        { label: 'Amazing photos for the memories', value: 'photographer' },
-        { label: 'Feeling totally recharged and pampered', value: 'comfort_seeker' },
-        { label: 'Authentic local experiences', value: 'culture_authentic' }
+        { label: 'My camera - I need to capture everything', value: 'photographer' },
+        { label: 'Skincare/comfort items - I need to feel good', value: 'comfort_seeker' },
+        { label: 'Phrasebook or translation app - I want to connect', value: 'culture_authentic' }
       ],
       allowCustomInput: true
     }
@@ -133,10 +133,10 @@ export const vacationStyleQuiz: QuizConfig = {
       'Soloist',        // Happy alone
       'Foodie',         // All about eating
       'Culture Seeker', // Museums & history
-      'Nature Lover',   // Outdoors & hiking
-      'Comfort Seeker', // Nice hotels & spas
-      'Budgeteer',      // Frugal & savvy
-      'Photographer'    // Documenting everything
+      'Thrill Seeker',  // Extreme/adventurous activities
+      'Relaxer',        // Nice hotels & spas
+      'Saver',          // Frugal & savvy
+      'Documentarian'   // Capturing everything
     ],
     selectionPrompt: `You are analyzing a traveler's vacation style based on their quiz responses.
 

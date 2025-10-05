@@ -188,7 +188,7 @@ if (quiz.type === 'narrative' && quiz.storySetup) {
 ## 📝 How to Create a Narrative Quiz
 
 ### Step 1: Read the Template
-**File**: `NARRATIVE_QUIZ_TEMPLATE.md` (comprehensive guide we just created)
+**File**: `NARRATIVE_QUIZ_CREATION.md` (comprehensive guide we just created)
 
 ### Step 2: Structure Your Story
 ```typescript
@@ -370,12 +370,12 @@ When implementing narrative support:
 
 We've created:
 
-1. **NARRATIVE_QUIZ_TEMPLATE.md** - Complete guide to creating narrative quizzes
+1. **NARRATIVE_QUIZ_CREATION.md** - Complete guide to creating narrative quizzes
 2. **Updated QUIZ_TYPE_SELECTOR.md** - Now includes narrative as 3rd option
 3. **This file** - Implementation notes for developers
 
 ### For Quiz Creators:
-→ Read `NARRATIVE_QUIZ_TEMPLATE.md`
+→ Read `NARRATIVE_QUIZ_CREATION.md`
 
 ### For Developers:
 → Use this file to implement the system

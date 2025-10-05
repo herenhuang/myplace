@@ -609,6 +609,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             config={config}
             result={result}
             onRestart={handleRestart}
+            sessionId={dbSessionId}
           />
         ) : null
 

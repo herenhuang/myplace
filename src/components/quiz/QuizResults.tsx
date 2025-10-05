@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
+import QuizRecommendationFooter from './QuizRecommendationFooter'
 import styles from './quiz.module.scss'
 
 interface QuizResultsProps {
   config: QuizConfig
   result: QuizResult
   onRestart: () => void
+  sessionId?: string
 }
 
 interface AnalyticsData {
@@ -19,7 +21,7 @@ interface AnalyticsData {
   secondWordStats: Record<string, { count: number; percentage: number }>
 }
 
-export default function QuizResults({ config, result, onRestart }: QuizResultsProps) {
+export default function QuizResults({ config, result, onRestart, sessionId }: QuizResultsProps) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
 
@@ -135,6 +137,11 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
         <div className={styles.markdownContent}>
           <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
         </div>
+
+        {/* Quiz Recommendation Footer */}
+        {sessionId && (
+          <QuizRecommendationFooter sessionId={sessionId} />
+        )}
       </div>
 
       <div className={styles.actionButtons}>

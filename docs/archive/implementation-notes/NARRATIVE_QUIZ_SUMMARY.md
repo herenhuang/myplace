@@ -95,7 +95,7 @@ you want us to do?'"
 ## 📖 Documentation Created
 
 ### For Quiz Creators:
-**`NARRATIVE_QUIZ_TEMPLATE.md`** - Complete guide
+**`NARRATIVE_QUIZ_CREATION.md`** - Complete guide
 - What is narrative type
 - When to use it
 - How to structure stories
@@ -233,7 +233,7 @@ export const managerFirstWeeksQuiz: QuizConfig = {
 ## 🚀 Next Steps
 
 ### To Create a Narrative Quiz:
-1. Read `NARRATIVE_QUIZ_TEMPLATE.md`
+1. Read `NARRATIVE_QUIZ_CREATION.md`
 2. Design your story arc
 3. Create 3-5 memorable characters
 4. Write 10 base scenarios chronologically
@@ -260,7 +260,7 @@ Every choice matters. Every scene connects. Every result feels deeply personal.
 
 ## 📁 Files Created
 
-1. **NARRATIVE_QUIZ_TEMPLATE.md** - Complete creation guide (10+ pages)
+1. **NARRATIVE_QUIZ_CREATION.md** - Complete creation guide (10+ pages)
 2. **QUIZ_TYPE_SELECTOR.md** - Updated with narrative type
 3. **NARRATIVE_IMPLEMENTATION_NOTES.md** - Technical architecture
 4. **This file** - Quick reference summary
