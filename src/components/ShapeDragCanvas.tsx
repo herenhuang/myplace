@@ -31,17 +31,17 @@ export interface CategoryData {
   color: string
 }
 
-// Predefined shapes with varied properties
+// Grouping task shapes - designed for categorization and pattern recognition
 const INITIAL_SHAPES: ShapeData[] = [
-  { id: 'shape-1', color: 'red', shape: 'circle', hasBorder: true, category: null },
-  { id: 'shape-2', color: 'blue', shape: 'square', hasBorder: false, category: null },
-  { id: 'shape-3', color: 'green', shape: 'triangle', hasBorder: true, category: null },
-  { id: 'shape-4', color: 'red', shape: 'square', hasBorder: false, category: null },
-  { id: 'shape-5', color: 'blue', shape: 'triangle', hasBorder: true, category: null },
-  { id: 'shape-6', color: 'green', shape: 'circle', hasBorder: false, category: null },
-  { id: 'shape-7', color: 'red', shape: 'triangle', hasBorder: true, category: null },
-  { id: 'shape-8', color: 'blue', shape: 'circle', hasBorder: false, category: null },
-  { id: 'shape-9', color: 'green', shape: 'square', hasBorder: true, category: null },
+  { id: 'shape-1', color: 'brown', shape: 'house', hasBorder: true, category: null },
+  { id: 'shape-2', color: 'red', shape: 'car', hasBorder: false, category: null },
+  { id: 'shape-3', color: 'green', shape: 'tree', hasBorder: true, category: null },
+  { id: 'shape-4', color: 'blue', shape: 'gear', hasBorder: false, category: null },
+  { id: 'shape-5', color: 'cyan', shape: 'drop', hasBorder: true, category: null },
+  { id: 'shape-6', color: 'orange', shape: 'flame', hasBorder: false, category: null },
+  { id: 'shape-7', color: 'indigo', shape: 'phone', hasBorder: true, category: null },
+  { id: 'shape-8', color: 'red', shape: 'apple', hasBorder: false, category: null },
+  { id: 'shape-9', color: 'yellow', shape: 'lightning', hasBorder: true, category: null },
 ]
 
 const CATEGORIES: CategoryData[] = [
@@ -67,27 +67,28 @@ function DroppableCategory({ category, shapes }: DroppableCategoryProps) {
     <div className="flex flex-col items-center">
       <div 
         ref={setNodeRef}
-        className={`w-32 h-64 rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-4 transition-colors ${
+        className={`w-32 h-64 rounded-lg border-2 border-dashed flex flex-col items-center justify-center transition-colors ${
           isOver 
             ? 'border-blue-500 bg-blue-100' 
             : 'border-gray-300 hover:border-gray-400'
         }`}
         style={{ backgroundColor: isOver ? '#dbeafe' : category.color + '40' }}
       >
-
-        <div className="flex flex-wrap gap-2 justify-center min-h-[100px] w-full">
-          <SortableContext items={categoryShapes.map(s => s.id)} strategy={rectSortingStrategy}>
-            {categoryShapes.map((shape) => (
-              <DraggableShape key={shape.id} id={shape.id} shape={shape} />
-            ))}
-          </SortableContext>
-        </div>
-        
-        {categoryShapes.length === 0 && (
-          <div className="text-gray-400 text-sm">
-            {isOver ? 'Drop here!' : 'Drop shapes here'}
+        <div className="p-4 w-full h-full flex flex-col items-center justify-center">
+          <div className="flex flex-wrap gap-2 justify-center min-h-[100px] w-full">
+            <SortableContext items={categoryShapes.map(s => s.id)} strategy={rectSortingStrategy}>
+              {categoryShapes.map((shape) => (
+                <DraggableShape key={shape.id} id={shape.id} shape={shape} />
+              ))}
+            </SortableContext>
           </div>
-        )}
+          
+          {categoryShapes.length === 0 && (
+            <div className="text-gray-400 text-sm">
+              {isOver ? 'Drop here!' : 'Drop shapes here'}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

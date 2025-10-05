@@ -135,7 +135,7 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
     stepNumber: 13,
     type: 'shape-sorting',
     question: "Sort the shapes into 3 categories",
-    context: "Drag and drop the 9 shapes below into the 3 categories. Each shape has different properties: color (red, blue, green), shape (circle, square, triangle), and border (with or without border). Organize them however makes sense to you.",
+    context: "Drag and drop the 9 shapes below into the 3 categories. Organize them however makes sense to you.",
   },
   {
     id: 'shape-ordering-task',

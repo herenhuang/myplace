@@ -5,27 +5,29 @@ import React from 'react'
 // Shape data structure (copied from draggableUtils)
 interface ShapeData {
   id: string;
-  color: 'red' | 'blue' | 'green' | 'yellow' | 'purple' | 'pink' | 'orange' | 'cyan' | 'lime';
-  shape: 'circle' | 'square' | 'triangle';
+  color: 'red' | 'blue' | 'green' | 'yellow' | 'purple' | 'pink' | 'orange' | 'cyan' | 'lime' | 'brown' | 'teal' | 'indigo';
+  shape: 'circle' | 'square' | 'triangle' | 'house' | 'car' | 'tree' | 'gear' | 'drop' | 'flame' | 'phone' | 'apple' | 'lightning' | 
+         'seedling' | 'plant' | 'mature-tree' | 'crescent' | 'half-moon' | 'full-moon' | 'small-triangle' | 'medium-triangle' | 'large-triangle';
   hasBorder: boolean;
 }
 
 const COLOR_MAP: Record<ShapeData['color'], string> = {
   red: '#ef4444', blue: '#3b82f6', green: '#10b981', yellow: '#facc15',
-  purple: '#8b5cf6', pink: '#ec4899', orange: '#f97316', cyan: '#06b6d4', lime: '#84cc16'
+  purple: '#8b5cf6', pink: '#ec4899', orange: '#f97316', cyan: '#06b6d4', lime: '#84cc16',
+  brown: '#8b4513', teal: '#14b8a6', indigo: '#6366f1'
 };
 
-// Shape definitions (copied from ShapeOrderCanvas)
+// Ordering task shapes - designed for sequential and hierarchical reasoning (copied from ShapeOrderCanvas)
 const ORDERING_SHAPES: ShapeData[] = [
-  { id: 'ord-1', color: 'red',    shape: 'circle',   hasBorder: false },
-  { id: 'ord-2', color: 'blue',   shape: 'square',   hasBorder: true  },
-  { id: 'ord-3', color: 'green',  shape: 'triangle', hasBorder: false },
-  { id: 'ord-4', color: 'yellow', shape: 'square',   hasBorder: false },
-  { id: 'ord-5', color: 'purple', shape: 'triangle', hasBorder: true  },
-  { id: 'ord-6', color: 'pink',   shape: 'circle',   hasBorder: false },
-  { id: 'ord-7', color: 'orange', shape: 'triangle', hasBorder: false },
-  { id: 'ord-8', color: 'cyan',   shape: 'circle',   hasBorder: true  },
-  { id: 'ord-9', color: 'lime',   shape: 'square',   hasBorder: false },
+  { id: 'ord-1', color: 'green',  shape: 'seedling',        hasBorder: false },
+  { id: 'ord-2', color: 'green',  shape: 'plant',           hasBorder: true  },
+  { id: 'ord-3', color: 'green',  shape: 'mature-tree',     hasBorder: false },
+  { id: 'ord-4', color: 'yellow', shape: 'crescent',        hasBorder: false },
+  { id: 'ord-5', color: 'yellow', shape: 'half-moon',       hasBorder: true  },
+  { id: 'ord-6', color: 'yellow', shape: 'full-moon',       hasBorder: false },
+  { id: 'ord-7', color: 'blue',   shape: 'small-triangle',  hasBorder: false },
+  { id: 'ord-8', color: 'blue',   shape: 'medium-triangle', hasBorder: true  },
+  { id: 'ord-9', color: 'blue',   shape: 'large-triangle',  hasBorder: false },
 ];
 
 interface ReadOnlyShapeSequenceProps {
@@ -42,12 +44,63 @@ function StaticShape({ shape, size = 'small' }: { shape: ShapeData; size?: 'smal
 
   const renderShape = () => {
     switch (shape.shape) {
+      // Basic shapes
       case 'circle': 
         return <circle cx={shapeSize/2} cy={shapeSize/2} r={shapeSize/2 - 2} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />
       case 'square': 
         return <rect x={2} y={2} width={shapeSize-4} height={shapeSize-4} rx={2} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />
       case 'triangle': 
         return <polygon points={`${shapeSize/2},2 ${shapeSize-2},${shapeSize-2} 2,${shapeSize-2}`} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />
+      
+      // Ordering task shapes (scaled for size)
+      case 'seedling':
+        const seedlingScale = shapeSize / 50;
+        return (
+          <g fill={color} stroke={strokeColor} strokeWidth={strokeWidth} transform={`scale(${seedlingScale})`}>
+            <rect x="23" y="35" width="4" height="10" fill="brown" />
+            <path d="M25,35 Q20,30 18,25 Q20,22 25,25" />
+            <path d="M25,32 Q30,27 32,22 Q30,19 25,22" />
+          </g>
+        );
+      case 'plant':
+        const plantScale = shapeSize / 50;
+        return (
+          <g fill={color} stroke={strokeColor} strokeWidth={strokeWidth} transform={`scale(${plantScale})`}>
+            <rect x="22" y="30" width="6" height="15" fill="brown" />
+            <ellipse cx="18" cy="25" rx="8" ry="4" />
+            <ellipse cx="32" cy="22" rx="6" ry="3" />
+            <ellipse cx="25" cy="18" rx="5" ry="3" />
+          </g>
+        );
+      case 'mature-tree':
+        const matureTreeScale = shapeSize / 50;
+        return (
+          <g fill={color} stroke={strokeColor} strokeWidth={strokeWidth} transform={`scale(${matureTreeScale})`}>
+            <rect x="20" y="30" width="10" height="15" fill="brown" />
+            <circle cx="25" cy="15" r="12" />
+            <circle cx="18" cy="22" r="8" />
+            <circle cx="32" cy="22" r="8" />
+            <circle cx="25" cy="25" r="6" />
+          </g>
+        );
+      case 'crescent':
+        return <path d={`M${shapeSize*0.7},${shapeSize/2} C${shapeSize*0.7},${shapeSize*0.3} ${shapeSize*0.54},${shapeSize*0.16} ${shapeSize*0.34},${shapeSize*0.16} C${shapeSize*0.44},${shapeSize*0.16} ${shapeSize/2},${shapeSize*0.3} ${shapeSize/2},${shapeSize/2} C${shapeSize/2},${shapeSize*0.7} ${shapeSize*0.44},${shapeSize*0.84} ${shapeSize*0.34},${shapeSize*0.84} C${shapeSize*0.54},${shapeSize*0.84} ${shapeSize*0.7},${shapeSize*0.7} ${shapeSize*0.7},${shapeSize/2}Z`} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />;
+      case 'half-moon':
+        return (
+          <g fill={color} stroke={strokeColor} strokeWidth={strokeWidth}>
+            <circle cx={shapeSize/2} cy={shapeSize/2} r={shapeSize*0.36} />
+            <circle cx={shapeSize*0.6} cy={shapeSize/2} r={shapeSize*0.36} fill="white" />
+          </g>
+        );
+      case 'full-moon':
+        return <circle cx={shapeSize/2} cy={shapeSize/2} r={shapeSize*0.36} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />;
+      case 'small-triangle':
+        return <polygon points={`${shapeSize/2},${shapeSize*0.36} ${shapeSize*0.6},${shapeSize*0.56} ${shapeSize*0.4},${shapeSize*0.56}`} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />;
+      case 'medium-triangle':
+        return <polygon points={`${shapeSize/2},${shapeSize*0.24} ${shapeSize*0.7},${shapeSize*0.64} ${shapeSize*0.3},${shapeSize*0.64}`} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />;
+      case 'large-triangle':
+        return <polygon points={`${shapeSize/2},${shapeSize*0.16} ${shapeSize*0.8},${shapeSize*0.72} ${shapeSize*0.2},${shapeSize*0.72}`} fill={color} stroke={strokeColor} strokeWidth={strokeWidth} />;
+      
       default: 
         return null
     }

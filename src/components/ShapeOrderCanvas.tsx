@@ -25,16 +25,17 @@ import styles from './GameCanvas.module.scss'
 
 // --- Main ShapeOrderCanvas Component ---
 
+// Ordering task shapes - designed for sequential and hierarchical reasoning
 const ORDERING_SHAPES: ShapeData[] = [
-  { id: 'ord-1', color: 'red',    shape: 'circle',   hasBorder: false },
-  { id: 'ord-2', color: 'blue',   shape: 'square',   hasBorder: true  },
-  { id: 'ord-3', color: 'green',  shape: 'triangle', hasBorder: false },
-  { id: 'ord-4', color: 'yellow', shape: 'square',   hasBorder: false },
-  { id: 'ord-5', color: 'purple', shape: 'triangle', hasBorder: true  },
-  { id: 'ord-6', color: 'pink',   shape: 'circle',   hasBorder: false },
-  { id: 'ord-7', color: 'orange', shape: 'triangle', hasBorder: false },
-  { id: 'ord-8', color: 'cyan',   shape: 'circle',   hasBorder: true  },
-  { id: 'ord-9', color: 'lime',   shape: 'square',   hasBorder: false },
+  { id: 'ord-1', color: 'green',  shape: 'seedling',        hasBorder: false },
+  { id: 'ord-2', color: 'green',  shape: 'plant',           hasBorder: true  },
+  { id: 'ord-3', color: 'green',  shape: 'mature-tree',     hasBorder: false },
+  { id: 'ord-4', color: 'yellow', shape: 'crescent',        hasBorder: false },
+  { id: 'ord-5', color: 'yellow', shape: 'half-moon',       hasBorder: true  },
+  { id: 'ord-6', color: 'yellow', shape: 'full-moon',       hasBorder: false },
+  { id: 'ord-7', color: 'blue',   shape: 'small-triangle',  hasBorder: false },
+  { id: 'ord-8', color: 'blue',   shape: 'medium-triangle', hasBorder: true  },
+  { id: 'ord-9', color: 'blue',   shape: 'large-triangle',  hasBorder: false },
 ];
 
 interface ShapeOrderCanvasProps {
@@ -192,39 +193,41 @@ export default function ShapeOrderCanvas({ onOrderChange, initialState }: ShapeO
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      {/* Palette Area (match ShapeDragCanvas styling) */}
+      {/* Palette Area (exact visual boundary matching) */}
       <DroppableArea
         id="palette"
-        baseClassName="relative w-full bg-gray-50 rounded-xl p-6 mb-8 border-2 border-transparent transition-colors"
+        baseClassName="relative w-full bg-gray-50 rounded-xl mb-8 border-2 border-transparent transition-colors"
         overClassName="!border-blue-500 !bg-blue-50"
       >
         {(isOver) => (
-          <SortableContext items={containers.palette} strategy={rectSortingStrategy}>
-            <div className="flex flex-wrap gap-4 justify-center rounded-xl min-h-[112px]">
-              {containers.palette.map((id) => (
-                <DraggableShape key={id} id={id} shape={shapes[id]} />
-              ))}
-              {containers.palette.length === 0 && (
-                <div className={`text-sm flex items-center justify-center w-full py-4 ${isOver ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
-                  {isOver ? 'Drop here to return' : 'All shapes ordered!'}
-                </div>
-              )}
-            </div>
-          </SortableContext>
+          <div className="p-6">
+            <SortableContext items={containers.palette} strategy={rectSortingStrategy}>
+              <div className="flex flex-wrap gap-4 justify-center min-h-[112px] items-center">
+                {containers.palette.map((id) => (
+                  <DraggableShape key={id} id={id} shape={shapes[id]} />
+                ))}
+                {containers.palette.length === 0 && (
+                  <div className={`text-sm flex items-center justify-center w-full py-4 ${isOver ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
+                    {isOver ? 'Drop here to return' : 'All shapes ordered!'}
+                  </div>
+                )}
+              </div>
+            </SortableContext>
+          </div>
         )}
       </DroppableArea>
 
-      {/* Sequence Drop Zone (match ShapeDragCanvas droppable styles) */}
+      {/* Sequence Drop Zone (exact visual boundary matching) */}
       <DroppableArea
         id="sequence"
-        baseClassName="w-full rounded-xl p-6 border-2 border-dashed transition-colors min-h-[120px]"
+        baseClassName="w-full rounded-xl border-2 border-dashed transition-colors min-h-[120px]"
         overClassName="!border-blue-500 !bg-blue-100"
         style={{ borderColor: '#bfdbfe', backgroundColor: '#eff6ff' }}
       >
         {(isOver) => (
-          <div className="w-full h-full">
+          <div className="p-6 h-full">
             <SortableContext items={containers.sequence} strategy={horizontalListSortingStrategy}>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 min-h-[72px] items-center">
                 {containers.sequence.map((id) => (
                   <DraggableShape key={id} id={id} shape={shapes[id]} />
                 ))}

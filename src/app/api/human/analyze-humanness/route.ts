@@ -21,16 +21,17 @@ function generateShapeDragJSON(results?: { [categoryId: string]: string[] }): an
 function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): any {
   if (!results) return {}
   
+  // Grouping task shapes - designed for categorization and pattern recognition
   const predefinedShapes = [
-    { id: 'shape-1', color: 'red', shape: 'circle', hasBorder: true },
-    { id: 'shape-2', color: 'blue', shape: 'square', hasBorder: false },
-    { id: 'shape-3', color: 'green', shape: 'triangle', hasBorder: true },
-    { id: 'shape-4', color: 'red', shape: 'square', hasBorder: false },
-    { id: 'shape-5', color: 'blue', shape: 'triangle', hasBorder: true },
-    { id: 'shape-6', color: 'green', shape: 'circle', hasBorder: false },
-    { id: 'shape-7', color: 'red', shape: 'triangle', hasBorder: true },
-    { id: 'shape-8', color: 'blue', shape: 'circle', hasBorder: false },
-    { id: 'shape-9', color: 'green', shape: 'square', hasBorder: true }
+    { id: 'shape-1', color: 'brown', shape: 'house', hasBorder: true, concept: 'shelter', category: 'manufactured' },
+    { id: 'shape-2', color: 'red', shape: 'car', hasBorder: false, concept: 'transportation', category: 'manufactured' },
+    { id: 'shape-3', color: 'green', shape: 'tree', hasBorder: true, concept: 'nature', category: 'organic' },
+    { id: 'shape-4', color: 'blue', shape: 'gear', hasBorder: false, concept: 'mechanical', category: 'manufactured' },
+    { id: 'shape-5', color: 'cyan', shape: 'drop', hasBorder: true, concept: 'water', category: 'natural-element' },
+    { id: 'shape-6', color: 'orange', shape: 'flame', hasBorder: false, concept: 'fire', category: 'natural-element' },
+    { id: 'shape-7', color: 'indigo', shape: 'phone', hasBorder: true, concept: 'communication', category: 'technology' },
+    { id: 'shape-8', color: 'red', shape: 'apple', hasBorder: false, concept: 'food', category: 'organic' },
+    { id: 'shape-9', color: 'yellow', shape: 'lightning', hasBorder: true, concept: 'energy', category: 'natural-force' }
   ]
   
   const metadata: any = {
@@ -40,12 +41,14 @@ function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): any
     categoryAnalysis: {}
   }
   
-  // Build shape properties lookup
+  // Build shape properties lookup with psychological meaning
   predefinedShapes.forEach(shape => {
     metadata.shapeProperties[shape.id] = {
       color: shape.color,
       shape: shape.shape,
-      hasBorder: shape.hasBorder
+      hasBorder: shape.hasBorder,
+      concept: shape.concept,
+      category: shape.category
     }
   })
   
@@ -68,7 +71,24 @@ function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): any
       borderCounts: {
         withBorder: categoryShapes.filter((s: any) => s.hasBorder).length,
         withoutBorder: categoryShapes.filter((s: any) => !s.hasBorder).length
-      }
+      },
+      // Psychological concept analysis
+      conceptCounts: categoryShapes.reduce((acc: any, shape: any) => {
+        acc[shape.concept] = (acc[shape.concept] || 0) + 1
+        return acc
+      }, {}),
+      categoryCounts: categoryShapes.reduce((acc: any, shape: any) => {
+        acc[shape.category] = (acc[shape.category] || 0) + 1
+        return acc
+      }, {}),
+      // Grouping patterns
+      groupingPattern: categoryShapes.length > 1 ? (() => {
+        const categories = [...new Set(categoryShapes.map((s: any) => s.category))]
+        const concepts = [...new Set(categoryShapes.map((s: any) => s.concept))]
+        if (categories.length === 1) return `${categories[0]}-focused`
+        if (concepts.length === categoryShapes.length) return 'diverse-concepts'
+        return 'mixed-pattern'
+      })() : 'single-item'
     }
   }
   
@@ -86,16 +106,17 @@ function generateShapeOrderJSON(results?: string[]): any[] {
 function getShapeOrderMetadata(results?: string[]): any {
   if (!results) return {}
   
+  // Ordering task shapes - designed for sequential and hierarchical reasoning
   const predefinedShapes = [
-    { id: 'ord-1', color: 'red', shape: 'circle', hasBorder: false },
-    { id: 'ord-2', color: 'blue', shape: 'square', hasBorder: true },
-    { id: 'ord-3', color: 'green', shape: 'triangle', hasBorder: false },
-    { id: 'ord-4', color: 'yellow', shape: 'square', hasBorder: false },
-    { id: 'ord-5', color: 'purple', shape: 'triangle', hasBorder: true },
-    { id: 'ord-6', color: 'pink', shape: 'circle', hasBorder: false },
-    { id: 'ord-7', color: 'orange', shape: 'triangle', hasBorder: false },
-    { id: 'ord-8', color: 'cyan', shape: 'circle', hasBorder: true },
-    { id: 'ord-9', color: 'lime', shape: 'square', hasBorder: false }
+    { id: 'ord-1', color: 'green', shape: 'seedling', hasBorder: false, concept: 'growth', stage: 1, sequence: 'plant-growth' },
+    { id: 'ord-2', color: 'green', shape: 'plant', hasBorder: true, concept: 'growth', stage: 2, sequence: 'plant-growth' },
+    { id: 'ord-3', color: 'green', shape: 'mature-tree', hasBorder: false, concept: 'growth', stage: 3, sequence: 'plant-growth' },
+    { id: 'ord-4', color: 'yellow', shape: 'crescent', hasBorder: false, concept: 'lunar-phase', stage: 1, sequence: 'moon-phases' },
+    { id: 'ord-5', color: 'yellow', shape: 'half-moon', hasBorder: true, concept: 'lunar-phase', stage: 2, sequence: 'moon-phases' },
+    { id: 'ord-6', color: 'yellow', shape: 'full-moon', hasBorder: false, concept: 'lunar-phase', stage: 3, sequence: 'moon-phases' },
+    { id: 'ord-7', color: 'blue', shape: 'small-triangle', hasBorder: false, concept: 'size-progression', stage: 1, sequence: 'triangle-sizes' },
+    { id: 'ord-8', color: 'blue', shape: 'medium-triangle', hasBorder: true, concept: 'size-progression', stage: 2, sequence: 'triangle-sizes' },
+    { id: 'ord-9', color: 'blue', shape: 'large-triangle', hasBorder: false, concept: 'size-progression', stage: 3, sequence: 'triangle-sizes' }
   ]
   
   const metadata: any = {
@@ -107,12 +128,15 @@ function getShapeOrderMetadata(results?: string[]): any {
     }
   }
   
-  // Build shape properties lookup
+  // Build shape properties lookup with sequential meaning
   predefinedShapes.forEach(shape => {
     metadata.shapeProperties[shape.id] = {
       color: shape.color,
       shape: shape.shape,
-      hasBorder: shape.hasBorder
+      hasBorder: shape.hasBorder,
+      concept: shape.concept,
+      stage: shape.stage,
+      sequence: shape.sequence
     }
   })
   
@@ -144,6 +168,58 @@ function getShapeOrderMetadata(results?: string[]): any {
       return acc
     }, [])
     if (borderGroups.length < results.length / 2) metadata.orderAnalysis.patterns.push('grouped-by-border')
+    
+    // Check for sequential reasoning patterns (NEW PSYCHOLOGICAL ANALYSIS)
+    const sequences = results.map(id => predefinedShapes.find(s => s.id === id)?.sequence).filter(Boolean)
+    const stages = results.map(id => predefinedShapes.find(s => s.id === id)?.stage).filter(Boolean)
+    
+    // Check for perfect sequential progression within same sequence
+    const sequenceGroups = sequences.reduce((acc: any, seq, i) => {
+      if (seq && stages[i] !== undefined) {
+        if (!acc[seq]) acc[seq] = []
+        acc[seq].push({ position: i, stage: stages[i] })
+      }
+      return acc
+    }, {})
+    
+    for (const [seqName, items] of Object.entries(sequenceGroups) as any) {
+      if (items.length >= 2) {
+        // Check if stages are in ascending order
+        const isAscending = items.every((item: any, i: number) => i === 0 || item.stage > items[i-1].stage)
+        // Check if stages are consecutive within the sequence
+        const isConsecutive = items.every((item: any, i: number) => i === 0 || item.position === items[i-1].position + 1)
+        
+        if (isAscending && isConsecutive) {
+          metadata.orderAnalysis.patterns.push(`perfect-${seqName}-sequence`)
+        } else if (isAscending) {
+          metadata.orderAnalysis.patterns.push(`ascending-${seqName}-sequence`)
+        } else {
+          metadata.orderAnalysis.patterns.push(`grouped-${seqName}-sequence`)
+        }
+      }
+    }
+    
+    // Analyze sequential thinking preference
+    const totalSequenceShapes = Object.values(sequenceGroups).reduce((acc: number, items: any) => acc + (items?.length || 0), 0)
+    if (totalSequenceShapes >= results.length * 0.6) {
+      metadata.orderAnalysis.patterns.push('sequence-focused-thinking')
+    }
+    
+    // Check for temporal vs spatial vs hierarchical reasoning
+    const temporalSequences = ['plant-growth', 'moon-phases']
+    const spatialSequences = ['triangle-sizes']
+    const temporalCount = results.filter(id => {
+      const seq = predefinedShapes.find(s => s.id === id)?.sequence
+      return seq && temporalSequences.includes(seq)
+    }).length
+    const spatialCount = results.filter(id => {
+      const seq = predefinedShapes.find(s => s.id === id)?.sequence
+      return seq && spatialSequences.includes(seq)
+    }).length
+    
+    if (temporalCount > spatialCount) metadata.orderAnalysis.patterns.push('temporal-reasoning-preference')
+    else if (spatialCount > temporalCount) metadata.orderAnalysis.patterns.push('spatial-reasoning-preference')
+    else if (temporalCount === spatialCount && temporalCount > 0) metadata.orderAnalysis.patterns.push('balanced-reasoning-approach')
     
     // Check if no clear pattern (suggests randomness)
     if (metadata.orderAnalysis.patterns.length === 0) {
