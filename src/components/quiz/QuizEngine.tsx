@@ -142,6 +142,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
       const sid = getOrCreateSessionId()
       setSessionId(sid)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.id])
 
   // Save state whenever it changes

@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-})
 
 export async function POST(request: NextRequest) {
   try {
-    const { quizId, questionId, customInput, currentPath } = await request.json()
+    const { quizId, questionId, customInput } = await request.json()
 
     if (!quizId || !questionId || !customInput) {
       return NextResponse.json(

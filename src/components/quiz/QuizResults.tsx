@@ -30,24 +30,24 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
 
   // Fetch analytics when explanation is shown
   useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch('/api/quiz/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ quizId: config.id })
+        })
+        const data = await response.json()
+        setAnalytics(data)
+      } catch (error) {
+        console.error('Error fetching analytics:', error)
+      }
+    }
+
     if (showExplanation && !analytics) {
       fetchAnalytics()
     }
-  }, [showExplanation])
-
-  const fetchAnalytics = async () => {
-    try {
-      const response = await fetch('/api/quiz/analytics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quizId: config.id })
-      })
-      const data = await response.json()
-      setAnalytics(data)
-    } catch (error) {
-      console.error('Error fetching analytics:', error)
-    }
-  }
+  }, [showExplanation, analytics, config.id])
 
   const getUserUniqueness = () => {
     if (!analytics) return null
@@ -123,7 +123,7 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
         <div className={styles.explanationHeader}>
           <h2 className={styles.resultNameSmall}>{displayName}</h2>
           {displayTagline && (
-            <p className={styles.resultTaglineExplanation}>"{displayTagline}"</p>
+            <p className={styles.resultTaglineExplanation}>&ldquo;{displayTagline}&rdquo;</p>
           )}
           {analytics && analytics.totalPlays > 0 && (
             <p className={styles.totalPlaysText}>
