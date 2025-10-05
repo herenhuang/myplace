@@ -19,9 +19,11 @@ interface RecommendationData {
 
 interface Props {
   sessionId: string
+  onBackToCard: () => void
+  onRestart: () => void
 }
 
-export default function QuizRecommendationFooter({ sessionId }: Props) {
+export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRestart }: Props) {
   const [loading, setLoading] = useState(true)
   const [recommendation, setRecommendation] = useState<RecommendationData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -155,8 +157,8 @@ export default function QuizRecommendationFooter({ sessionId }: Props) {
     <motion.div
       ref={footerRef}
       className={styles.recommendationFooter}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.95, rotateX: 5 }}
+      animate={{ opacity: 1, scale: 1, rotateX: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
     >
       <div className={styles.psHeader}>ps.</div>
@@ -208,6 +210,22 @@ export default function QuizRecommendationFooter({ sessionId }: Props) {
           >
             or see all quizzes
           </a>
+
+          {/* Action buttons inside the recommendation card */}
+          <div className={styles.actionButtons}>
+            <button
+              className={`${styles.actionButton} ${styles.secondary}`}
+              onClick={onBackToCard}
+            >
+              <span>← Back to Card</span>
+            </button>
+            <button
+              className={`${styles.actionButton} ${styles.outline}`}
+              onClick={onRestart}
+            >
+              <span>Take Again</span>
+            </button>
+          </div>
         </motion.div>
       ) : null}
     </motion.div>

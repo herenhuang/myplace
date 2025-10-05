@@ -169,6 +169,52 @@
     }
   }
 
+  .actionButtons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .actionButton {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+
+    &.secondary {
+      background: rgba(0, 0, 0, 0.04);
+      color: #333;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.08);
+        transform: translateY(-1px);
+      }
+    }
+
+    &.outline {
+      background: transparent;
+      color: #667eea;
+      border: 2px solid #667eea;
+
+      &:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-1px);
+      }
+    }
+
+    span {
+      display: inline-block;
+    }
+  }
+
   // Mobile responsive
   @media (max-width: 768px) {
     margin-top: 3rem;

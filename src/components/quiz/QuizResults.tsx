@@ -140,23 +140,12 @@ export default function QuizResults({ config, result, onRestart, sessionId }: Qu
 
         {/* Quiz Recommendation Footer */}
         {sessionId && (
-          <QuizRecommendationFooter sessionId={sessionId} />
+          <QuizRecommendationFooter
+            sessionId={sessionId}
+            onBackToCard={() => setShowExplanation(false)}
+            onRestart={onRestart}
+          />
         )}
-      </div>
-
-      <div className={styles.actionButtons}>
-        <button
-          className={`${styles.actionButton} ${styles.secondary}`}
-          onClick={() => setShowExplanation(false)}
-        >
-          <span>← Back to Card</span>
-        </button>
-        <button
-          className={`${styles.actionButton} ${styles.outline}`}
-          onClick={onRestart}
-        >
-          <span>Take Again</span>
-        </button>
       </div>
     </div>
   )
