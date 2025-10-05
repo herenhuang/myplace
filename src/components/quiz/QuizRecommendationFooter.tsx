@@ -21,7 +21,7 @@ interface Props {
   sessionId: string
   onBackToCard: () => void
   onRestart: () => void
-  recommendationRef: React.RefObject<HTMLDivElement>
+  recommendationRef: React.RefObject<HTMLDivElement | null>
 }
 
 export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRestart, recommendationRef }: Props) {
