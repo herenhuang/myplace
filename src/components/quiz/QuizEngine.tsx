@@ -8,13 +8,14 @@ import QuizWelcome from './QuizWelcome'
 import QuizPersonalization from './QuizPersonalization'
 import QuizQuestion from './QuizQuestion'
 import QuizResults from './QuizResults'
+import QuizRecommendationFooter from './QuizRecommendationFooter'
 import styles from './quiz.module.scss'
 
 interface QuizEngineProps {
   config: QuizConfig
 }
 
-type ScreenState = 'welcome' | 'personalization' | 'question' | 'analyzing' | 'results'
+type ScreenState = 'welcome' | 'personalization' | 'question' | 'analyzing' | 'results' | 'recommendation'
 
 export default function QuizEngine({ config }: QuizEngineProps) {
   const [screenState, setScreenState] = useState<ScreenState>('welcome')
@@ -614,7 +615,17 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             config={config}
             result={result}
             onRestart={handleRestart}
+            onShowRecommendation={sessionId ? () => setScreenState('recommendation') : undefined}
+          />
+        ) : null
+
+      case 'recommendation':
+        return sessionId ? (
+          <QuizRecommendationFooter
             sessionId={sessionId}
+            onBackToCard={() => setScreenState('results')}
+            onRestart={handleRestart}
+            recommendationRef={{ current: null }}
           />
         ) : null
 

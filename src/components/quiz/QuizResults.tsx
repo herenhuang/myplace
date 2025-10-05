@@ -1,18 +1,16 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { useScroll, useTransform, motion } from 'framer-motion'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
-import QuizRecommendationFooter from './QuizRecommendationFooter'
 import styles from './quiz.module.scss'
 
 interface QuizResultsProps {
   config: QuizConfig
   result: QuizResult
   onRestart: () => void
-  sessionId?: string
+  onShowRecommendation?: () => void
 }
 
 interface AnalyticsData {
@@ -22,12 +20,9 @@ interface AnalyticsData {
   secondWordStats: Record<string, { count: number; percentage: number }>
 }
 
-export default function QuizResults({ config, result, onRestart, sessionId }: QuizResultsProps) {
+export default function QuizResults({ config, result, onRestart, onShowRecommendation }: QuizResultsProps) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
-
-  // Hooks must be at the top level - always call them
-  const recommendationRef = useRef<HTMLDivElement>(null)
 
   // Get display name - either from personality or word matrix
   const displayName = result.personality?.name || result.wordMatrixResult?.fullArchetype || 'Your Result'
@@ -124,36 +119,45 @@ export default function QuizResults({ config, result, onRestart, sessionId }: Qu
   const uniqueness = getUserUniqueness()
 
   return (
-    <>
-      <div className={styles.textContainer}>
-        <div className={styles.explanationContainer}>
-          <div className={styles.explanationHeader}>
-            <h2 className={styles.resultNameSmall}>{displayName}</h2>
-            {displayTagline && (
-              <p className={styles.resultTaglineExplanation}>&ldquo;{displayTagline}&rdquo;</p>
-            )}
-            {analytics && analytics.totalPlays > 0 && (
-              <p className={styles.totalPlaysText}>
-                Based on {analytics.totalPlays} {analytics.totalPlays === 1 ? 'play' : 'plays'}
-                {uniqueness && ` · ${uniqueness}`}
-              </p>
-            )}
-          </div>
-          <div className={styles.markdownContent}>
-            <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
-          </div>
+    <div className={styles.textContainer}>
+      <div className={styles.explanationContainer}>
+        <div className={styles.explanationHeader}>
+          <h2 className={styles.resultNameSmall}>{displayName}</h2>
+          {displayTagline && (
+            <p className={styles.resultTaglineExplanation}>&ldquo;{displayTagline}&rdquo;</p>
+          )}
+          {analytics && analytics.totalPlays > 0 && (
+            <p className={styles.totalPlaysText}>
+              Based on {analytics.totalPlays} {analytics.totalPlays === 1 ? 'play' : 'plays'}
+              {uniqueness && ` · ${uniqueness}`}
+            </p>
+          )}
         </div>
-      </div>
+        <div className={styles.markdownContent}>
+          <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
+        </div>
 
-      {/* Quiz Recommendation as a full page section at the bottom */}
-      {sessionId && (
-        <QuizRecommendationFooter
-          sessionId={sessionId}
-          onBackToCard={() => setShowExplanation(false)}
-          onRestart={onRestart}
-          recommendationRef={recommendationRef}
-        />
-      )}
-    </>
+        {/* Scroll down CTA */}
+        {onShowRecommendation && (
+          <div style={{ textAlign: 'center', marginTop: '3rem', padding: '2rem' }}>
+            <button
+              onClick={onShowRecommendation}
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                padding: '1rem 2rem',
+                borderRadius: '12px',
+                fontSize: '1rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              See What's Next →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
