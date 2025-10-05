@@ -626,12 +626,6 @@ export default function HumanTestPage() {
             <div className="text-8xl font-bold text-orange-500 mb-4">
               {data.metascore}
             </div>
-            <div className={styles.gradientTrack}>
-              <div 
-                className="h-2 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full absolute left-0 top-0 transition-all duration-1000 ease-out"
-                style={{ width: `${data.metascore}%` }}
-              />
-            </div>
           </div>
 
           {/* Subscores */}
@@ -735,9 +729,9 @@ export default function HumanTestPage() {
     }
     if (!data) return null
 
-    // Split question steps (1-9) vs additional metrics (>9)
-    const questionBreakdown = data.breakdown.filter((b) => b.stepNumber >= 1 && b.stepNumber <= 9)
-    const extraMetrics = data.breakdown.filter((b) => b.stepNumber > 9)
+    // Split question steps (1-12) vs additional metrics (>12)
+    const questionBreakdown = data.breakdown.filter((b) => b.stepNumber >= 1 && b.stepNumber <= 12)
+    const extraMetrics = data.breakdown.filter((b) => b.stepNumber > 12)
 
     return (
       <div className={`${styles.pageBg} py-16`}>

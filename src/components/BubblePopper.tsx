@@ -16,6 +16,7 @@ interface GameData {
   quitEarly: boolean
   poppingPattern: 'sequential' | 'random' | 'strategic'
   poppingSequence: number[]
+  bubbleGrid: number[][] // 2D array: 0 = popped, 1 = unpopped
 }
 
 interface GameStats {
@@ -161,13 +162,26 @@ export default function BubblePopper({ onComplete }: BubblePopperProps) {
     const bubblesPopped = bubbles.filter(b => b).length
     const pattern = analyzePoppingPattern(sequence)
     
+    // Convert 1D bubbles array to 2D grid (10x10)
+    // 0 = popped, 1 = unpopped
+    const bubbleGrid: number[][] = []
+    for (let row = 0; row < 10; row++) {
+      const rowData: number[] = []
+      for (let col = 0; col < 10; col++) {
+        const index = row * 10 + col
+        rowData.push(bubbles[index] ? 0 : 1) // 0 if popped, 1 if unpopped
+      }
+      bubbleGrid.push(rowData)
+    }
+    
     const data: GameData = {
       bubblesPopped,
       timeElapsed,
       completed,
       quitEarly: !completed,
       poppingPattern: pattern,
-      poppingSequence: sequence
+      poppingSequence: sequence,
+      bubbleGrid
     }
     setGameData(data)
     

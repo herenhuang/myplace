@@ -31,8 +31,54 @@ export default function HumanInferencePage() {
   const [analysisError, setAnalysisError] = useState<string>('')
   const [activeTab, setActiveTab] = useState<ResultsTab>('results-overview')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analyzedSteps, setAnalyzedSteps] = useState<HumanStepData[]>([])
 
   const inputRefs = useRef<Record<number, HTMLTextAreaElement | HTMLInputElement | null>>({})
+
+  // Helper function to check if a question is complete (reused from page.tsx logic)
+  const isQuestionComplete = useCallback((question: typeof HUMAN_QUESTIONS[0]) => {
+    const response = responses[question.stepNumber] || ''
+    
+    if (question.type === 'forced-choice') {
+      return response !== ''
+    } else if (question.type === 'shape-sorting') {
+      const results = shapeSortingResults[question.stepNumber]
+      return results && Object.values(results).flat().length === 9
+    } else if (question.type === 'shape-ordering') {
+      const results = shapeOrderingResults[question.stepNumber]
+      return results && results.length === 9
+    } else if (question.type === 'bubble-popper') {
+      const results = bubblePopperResults[question.stepNumber]
+      return results !== null && results !== undefined
+    } else {
+      // Text-based questions
+      const trimmedResponse = response.trim()
+      if (question.minCharacterLength && trimmedResponse.length < question.minCharacterLength) {
+        return false
+      }
+      if (question.characterLimit && trimmedResponse.length > question.characterLimit) {
+        return false
+      }
+      if (question.type === 'word-combination' && question.requiredWords) {
+        return validateWordCombination(trimmedResponse, question.requiredWords)
+      }
+      return trimmedResponse.length > 0
+    }
+  }, [responses, shapeSortingResults, shapeOrderingResults, bubblePopperResults])
+
+  // Status icon component
+  const StatusIcon = ({ isComplete }: { isComplete: boolean }) => (
+    <div 
+      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
+        isComplete 
+          ? 'bg-green-100 text-green-700 border-2 border-green-300' 
+          : 'bg-gray-100 text-gray-500 border-2 border-gray-300'
+      }`}
+      title={isComplete ? 'Ready for AI analysis' : 'Incomplete - needs response'}
+    >
+      {isComplete ? '✓' : '○'}
+    </div>
+  )
 
   // Initialize session
   useEffect(() => {
@@ -43,10 +89,30 @@ export default function HumanInferencePage() {
     const cached = loadLocalCache(sid)
     if (cached?.responses) {
       const responseMap: Record<number, string> = {}
+      const shapeSortMap: Record<number, { [categoryId: string]: string[] }> = {}
+      const shapeOrderMap: Record<number, string[]> = {}
+      const bubblePopperMap: Record<number, any> = {}
+      
       cached.responses.forEach(r => {
         responseMap[r.stepNumber] = r.userResponse
+        
+        // Restore game results
+        if (r.questionType === 'shape-sorting' && r.shapeSortingResults) {
+          shapeSortMap[r.stepNumber] = r.shapeSortingResults
+        }
+        if (r.questionType === 'shape-ordering' && r.shapeOrderingResults) {
+          shapeOrderMap[r.stepNumber] = r.shapeOrderingResults
+        }
+        if (r.questionType === 'bubble-popper' && r.bubblePopperResults) {
+          bubblePopperMap[r.stepNumber] = r.bubblePopperResults
+        }
       })
+      
       setResponses(responseMap)
+      setShapeSortingResults(shapeSortMap)
+      setShapeOrderingResults(shapeOrderMap)
+      setBubblePopperResults(bubblePopperMap)
+      setAnalyzedSteps(cached.responses) // Load the full step data for display
     }
     if (cached?.analysisResult) {
       setAnalysisResult(cached.analysisResult as HumanAnalysisResult)
@@ -57,6 +123,44 @@ export default function HumanInferencePage() {
     setResponses(prev => ({ ...prev, [stepNumber]: value }))
   }, [])
 
+  // Helper function to save game results to cache
+  const saveGameResultToCache = useCallback((stepNumber: number, jsonString: string, gameResults: any) => {
+    const question = HUMAN_QUESTIONS.find(q => q.stepNumber === stepNumber)
+    if (!question) return
+
+    // Always use getOrCreateSessionId() to ensure we have a valid session ID
+    const sid = getOrCreateSessionId()
+
+    const stepData: HumanStepData = {
+      stepNumber,
+      questionType: question.type,
+      question: question.question,
+      userResponse: jsonString,
+      responseTimeMs: Date.now() - (focusTimes[stepNumber] || Date.now()),
+      timestamp: new Date().toISOString(),
+      aiBaseline: getBaselinesForQuestion(stepNumber),
+      shapeSortingResults: question.type === 'shape-sorting' ? gameResults : undefined,
+      shapeOrderingResults: question.type === 'shape-ordering' ? gameResults : undefined,
+      bubblePopperResults: question.type === 'bubble-popper' ? gameResults : undefined
+    }
+
+    // Update cache
+    const cached = loadLocalCache(sid) || {
+      sessionId: sid,
+      responses: [],
+      updatedAt: Date.now()
+    }
+    
+    const existingIndex = cached.responses.findIndex(r => r.stepNumber === stepNumber)
+    if (existingIndex >= 0) {
+      cached.responses[existingIndex] = stepData
+    } else {
+      cached.responses.push(stepData)
+    }
+    cached.updatedAt = Date.now()
+    saveLocalCache(cached)
+  }, [focusTimes])
+
   const handleShapeSortComplete = useCallback((results: { [key: string]: ShapeData[] }) => {
     const stepNumber = 10; // Shape sorting is always step 10
     const convertedResults: { [categoryId: string]: string[] } = {}
@@ -64,20 +168,26 @@ export default function HumanInferencePage() {
       convertedResults[categoryId] = shapes.map(shape => shape.id)
     })
     setShapeSortingResults(prev => ({ ...prev, [stepNumber]: convertedResults }))
-    handleInputChange(stepNumber, JSON.stringify(convertedResults))
-  }, [handleInputChange]);
+    const jsonString = JSON.stringify(convertedResults)
+    handleInputChange(stepNumber, jsonString)
+    saveGameResultToCache(stepNumber, jsonString, convertedResults)
+  }, [handleInputChange, saveGameResultToCache]);
 
   const handleShapeOrderChange = useCallback((orderedIds: string[]) => {
     const stepNumber = 11; // Shape ordering is always step 11
     setShapeOrderingResults(prev => ({ ...prev, [stepNumber]: orderedIds }));
-    handleInputChange(stepNumber, JSON.stringify(orderedIds));
-  }, [handleInputChange]);
+    const jsonString = JSON.stringify(orderedIds)
+    handleInputChange(stepNumber, jsonString);
+    saveGameResultToCache(stepNumber, jsonString, orderedIds)
+  }, [handleInputChange, saveGameResultToCache]);
 
   const handleBubblePopperComplete = useCallback((results: any) => {
     const stepNumber = 12; // Bubble popper is always step 12
     setBubblePopperResults(prev => ({...prev, [stepNumber]: results}));
-    handleInputChange(stepNumber, JSON.stringify(results));
-  }, [handleInputChange]);
+    const jsonString = JSON.stringify(results)
+    handleInputChange(stepNumber, jsonString);
+    saveGameResultToCache(stepNumber, jsonString, results)
+  }, [handleInputChange, saveGameResultToCache]);
 
   const handleInputFocus = (stepNumber: number) => {
     setFocusTimes(prev => ({ ...prev, [stepNumber]: Date.now() }))
@@ -88,6 +198,9 @@ export default function HumanInferencePage() {
     if (responses[stepNumber]?.trim()) {
       const question = HUMAN_QUESTIONS.find(q => q.stepNumber === stepNumber)
       if (question) {
+        // Always use getOrCreateSessionId() to ensure we have a valid session ID
+        const sid = getOrCreateSessionId()
+
         const stepData: HumanStepData = {
           stepNumber,
           questionType: question.type,
@@ -102,8 +215,8 @@ export default function HumanInferencePage() {
         }
 
         // Update cache
-        const cached = loadLocalCache(sessionId) || {
-          sessionId,
+        const cached = loadLocalCache(sid) || {
+          sessionId: sid,
           responses: [],
           updatedAt: Date.now()
         }
@@ -206,10 +319,12 @@ export default function HumanInferencePage() {
       }
 
       setAnalysisResult(result.analysis)
+      setAnalyzedSteps(steps) // Store the analyzed steps for display
       
       // Cache the results
-      const cache = loadLocalCache(sessionId) || {
-        sessionId,
+      const sid = getOrCreateSessionId()
+      const cache = loadLocalCache(sid) || {
+        sessionId: sid,
         responses: steps,
         updatedAt: Date.now()
       }
@@ -235,6 +350,7 @@ export default function HumanInferencePage() {
     setAnalysisResult(null)
     setAnalysisError('')
     setIsAnalyzing(false)
+    setAnalyzedSteps([])
     // Clear cache
     if (sessionId) {
       localStorage.removeItem(`human-results-cache-v2`)
@@ -251,7 +367,10 @@ export default function HumanInferencePage() {
               {HUMAN_QUESTIONS.map((question) => (
                 <div key={question.stepNumber} className={styles.questionCard}>
                   <div className={styles.questionHeader}>
-                    <span className={styles.questionNumber}>{question.stepNumber}</span>
+                    <div className="flex items-center gap-3">
+                      <span className={styles.questionNumber}>{question.stepNumber}</span>
+                      <StatusIcon isComplete={isQuestionComplete(question)} />
+                    </div>
                     <h3 className={styles.questionText}>{question.question}</h3>
                   </div>
 
@@ -375,7 +494,7 @@ export default function HumanInferencePage() {
               <ResultsTabs
                 sessionId={sessionId}
                 analysisResult={analysisResult}
-                responses={[]}
+                responses={analyzedSteps}
                 activeTab={activeTab}
                 onChangeTab={setActiveTab}
               />

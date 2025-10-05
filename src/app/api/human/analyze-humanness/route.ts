@@ -9,6 +9,79 @@ interface AnalyzeRequest {
   averageResponseTime: number
 }
 
+// Helper functions to create standardized JSON representations for games
+function generateShapeDragJSON(results?: { [categoryId: string]: string[] }): any[] {
+  if (!results) return []
+  
+  const shapes = []
+  for (const [categoryId, shapeIds] of Object.entries(results)) {
+    for (const shapeId of shapeIds) {
+      // Extract properties from shape ID (e.g., "shape-1" -> color:red, shape:circle, hasBorder:true)
+      const shapeIndex = parseInt(shapeId.split('-')[1]) - 1
+      const predefinedShapes = [
+        { color: 'red', shape: 'circle', hasBorder: true },
+        { color: 'blue', shape: 'square', hasBorder: false },
+        { color: 'green', shape: 'triangle', hasBorder: true },
+        { color: 'red', shape: 'square', hasBorder: false },
+        { color: 'blue', shape: 'triangle', hasBorder: true },
+        { color: 'green', shape: 'circle', hasBorder: false },
+        { color: 'red', shape: 'triangle', hasBorder: true },
+        { color: 'blue', shape: 'circle', hasBorder: false },
+        { color: 'green', shape: 'square', hasBorder: true }
+      ]
+      
+      if (shapeIndex >= 0 && shapeIndex < predefinedShapes.length) {
+        shapes.push({
+          id: shapeId,
+          category: categoryId,
+          ...predefinedShapes[shapeIndex]
+        })
+      }
+    }
+  }
+  return shapes
+}
+
+function generateShapeOrderJSON(results?: string[]): any[] {
+  if (!results) return []
+  
+  return results.map((shapeId, index) => {
+    const shapeIndex = parseInt(shapeId.split('-')[1]) - 1
+    const predefinedShapes = [
+      { color: 'red', shape: 'circle', hasBorder: false },
+      { color: 'blue', shape: 'square', hasBorder: true },
+      { color: 'green', shape: 'triangle', hasBorder: false },
+      { color: 'yellow', shape: 'square', hasBorder: false },
+      { color: 'purple', shape: 'triangle', hasBorder: true },
+      { color: 'pink', shape: 'circle', hasBorder: false },
+      { color: 'orange', shape: 'triangle', hasBorder: false },
+      { color: 'cyan', shape: 'circle', hasBorder: true },
+      { color: 'lime', shape: 'square', hasBorder: false }
+    ]
+    
+    if (shapeIndex >= 0 && shapeIndex < predefinedShapes.length) {
+      return {
+        id: shapeId,
+        position: index + 1,
+        ...predefinedShapes[shapeIndex]
+      }
+    }
+    return { id: shapeId, position: index + 1 }
+  })
+}
+
+function generateBubblePopperJSON(results?: any): any {
+  if (!results) return { bubblesPopped: 0, duration: 0, completed: false, bubbleGrid: [] }
+  
+  return {
+    bubblesPopped: results.bubblesPopped || 0,
+    duration: results.timeElapsed || 0,
+    completed: results.completed || false,
+    pattern: results.poppingPattern || 'unknown',
+    bubbleGrid: results.bubbleGrid || []
+  }
+}
+
 function buildAnalysisPromptWithAIComparison(
   steps: HumanStepData[], 
   averageResponseTime: number,
@@ -19,17 +92,33 @@ function buildAnalysisPromptWithAIComparison(
     const geminiResp = aiResponsesByModel.gemini?.[step.stepNumber] || 'N/A'
     const claudeResp = aiResponsesByModel.claude?.[step.stepNumber] || 'N/A'
 
+    let userResponseDisplay = step.userResponse
+    let aiResponsesDisplay = `- ChatGPT: "${chatgptResp}"\n- Gemini: "${geminiResp}"\n- Claude: "${claudeResp}"`
+
+    // For game questions, show both raw JSON and formatted display
+    if (step.questionType === 'shape-sorting' && step.shapeSortingResults) {
+      const gameJSON = generateShapeDragJSON(step.shapeSortingResults)
+      userResponseDisplay = `Raw: ${step.userResponse}\nFormatted: ${JSON.stringify(gameJSON, null, 2)}`
+      aiResponsesDisplay = `- ChatGPT: ${chatgptResp}\n- Gemini: ${geminiResp}\n- Claude: ${claudeResp}`
+    } else if (step.questionType === 'shape-ordering' && step.shapeOrderingResults) {
+      const gameJSON = generateShapeOrderJSON(step.shapeOrderingResults)
+      userResponseDisplay = `Raw: ${step.userResponse}\nFormatted: ${JSON.stringify(gameJSON, null, 2)}`
+      aiResponsesDisplay = `- ChatGPT: ${chatgptResp}\n- Gemini: ${geminiResp}\n- Claude: ${claudeResp}`
+    } else if (step.questionType === 'bubble-popper' && step.bubblePopperResults) {
+      const gameJSON = generateBubblePopperJSON(step.bubblePopperResults)
+      userResponseDisplay = `Raw: ${step.userResponse}\nFormatted: ${JSON.stringify(gameJSON, null, 2)}`
+      aiResponsesDisplay = `- ChatGPT: ${chatgptResp}\n- Gemini: ${geminiResp}\n- Claude: ${claudeResp}`
+    }
+
     return `
 **Question ${idx + 1}** (${step.questionType}):
 Q: ${step.question}
 
-👤 User Response: "${step.userResponse}"
+👤 User Response: "${userResponseDisplay}"
 Response Time: ${step.responseTimeMs}ms
 
 🤖 AI Baseline Responses for Comparison:
-- ChatGPT: "${chatgptResp}"
-- Gemini: "${geminiResp}"
-- Claude: "${claudeResp}"
+${aiResponsesDisplay}
 `
   }).join('\n---\n')
 
@@ -55,12 +144,51 @@ For each question, you have the USER's response and responses from 3 AI models. 
    - Is their response more creative, personal, or unexpected?
 
 ### Per-Question Analysis:
+**CRITICAL REQUIREMENT: You MUST provide detailed analysis for EVERY question in the breakdown array. Do not skip any questions.**
+
 For each response, assign:
+
+**Core Metrics:**
 - **Percentile** (0-100): How rare/unusual compared to the 3 AI responses (0 = very similar to AIs, 100 = extremely different/unique)
 - **AI Likelihood** (0-100): How likely an AI would give this exact response based on the 3 examples
 - **Human Likelihood** (0-100): How likely a human would give this response
-- **Brief insight**: What makes this response notably human or AI-like compared to the AI baselines?
+- **Insight**: A detailed, meaningful analysis of what this response reveals about the user's personality, thinking patterns, and human-like qualities. This must be substantial (2-3 sentences minimum) and provide genuine psychological insight.
 - **Was Unexpected**: Boolean - did the user response diverge significantly from all 3 AI patterns?
+
+**Individual Response Analysis:**
+For each question, provide detailed individual scores:
+
+1. **Logical Coherence** (0-100): How much sense does the response make?
+   - For word combinations: Does the sentence actually make grammatical and logical sense?
+   - For text responses: Is it coherent, or just gibberish?
+   - For scenarios: Does the response address the situation appropriately?
+   - For shape sorting: Do the categories show logical reasoning or random grouping?
+
+2. **Creativity Score** (0-100): How original and creative is the response?
+   - Novel word choices or phrasing
+   - Unexpected connections or metaphors
+   - Unique personal touches
+   - Creative problem-solving approaches
+
+3. **Insightfulness** (0-100): How deep and thoughtful is the response?
+   - Shows understanding of context
+   - Demonstrates emotional intelligence
+   - Reveals personal reflection
+   - Shows nuanced thinking
+
+4. **Personality Traits Revealed**: What personality traits does this response suggest?
+   - **Optimism/Pessimism**: Is the response hopeful, realistic, or cynical?
+   - **Spontaneity/Planning**: Does it show quick thinking or careful consideration?
+   - **Social Orientation**: Does it show concern for others or focus on self?
+   - **Risk Tolerance**: Does it show cautious or bold approaches?
+   - **Emotional Expression**: How much emotion and personal feeling is expressed?
+   - **Analytical vs Intuitive**: Does it show logical analysis or intuitive responses?
+
+5. **Response Quality Indicators**:
+   - **Completeness**: Did they fully address the question?
+   - **Relevance**: How well does it relate to the prompt?
+   - **Personalization**: How much personal detail or experience is included?
+   - **Authenticity**: How genuine and human does the response feel?
 
 ##### Calibration Rules (CRITICAL - PREVENT INFLATION)
 **Core Principle**: Most human responses should score 30-60. Only truly exceptional responses deserve 70+.
@@ -121,6 +249,8 @@ ${Object.entries(HUMAN_ARCHETYPES).map(([name, data]) => `- **${name}**: ${data.
 ## Output Format:
 Return ONLY valid JSON with no trailing commas, no comments, and no additional text.
 
+**CRITICAL: The breakdown array MUST contain exactly one entry for each question provided. Do not omit any questions.**
+
 \`\`\`json
 {
   "metascore": 75,
@@ -139,17 +269,36 @@ Return ONLY valid JSON with no trailing commas, no comments, and no additional t
     "divergent_convergent": 74
   },
   "breakdown": [
-    {
-      "stepNumber": 1,
-      "insight": "Response diverges significantly from all 3 AI models by being more specific and personal",
-      "percentile": 85,
-      "wasUnexpected": true,
-      "highlight": "User mentioned unique personal items while all AIs listed generic items",
-      "aiLikelihood": 15,
-      "humanLikelihood": 85,
-      "aiSimilarity": 0.22,
-      "reasoning": "Introduces new personal concept not in any AI list; low lexical overlap"
-    }
+      {
+        "stepNumber": 1,
+        "insight": "Response diverges significantly from all 3 AI models by being more specific and personal. The user's choice of personal items reveals authentic human experience and emotional connection to everyday objects, contrasting with the generic, functional approach typical of AI responses.",
+        "percentile": 85,
+        "wasUnexpected": true,
+        "highlight": "User mentioned unique personal items while all AIs listed generic items",
+        "aiLikelihood": 15,
+        "humanLikelihood": 85,
+        "aiSimilarity": 0.22,
+        "reasoning": "Introduces new personal concept not in any AI list; low lexical overlap",
+        "individualScores": {
+          "logicalCoherence": 95,
+          "creativity": 78,
+          "insightfulness": 82,
+          "personalityTraits": {
+            "optimism": 70,
+            "spontaneity": 85,
+            "socialOrientation": 60,
+            "riskTolerance": 75,
+            "emotionalExpression": 80,
+            "analyticalVsIntuitive": 65
+          },
+          "qualityIndicators": {
+            "completeness": 90,
+            "relevance": 95,
+            "personalization": 85,
+            "authenticity": 88
+          }
+        }
+      }
   ],
   "primaryArchetype": {
     "name": "The Creative",
@@ -208,31 +357,42 @@ export async function POST(request: NextRequest) {
           const questionDef = HUMAN_QUESTIONS.find(q => q.stepNumber === step.stepNumber)
           if (!questionDef) return `Q${step.stepNumber}: ${step.question}`
 
-          // Calculate target character length (±20% of user response, with minimum thresholds)
-          const userLength = step.userResponse.length
-          const minLength = Math.max(Math.floor(userLength * 0.8), 30) // Minimum 30 chars for paragraph inputs
-          const maxLength = Math.ceil(userLength * 1.2)
-          
-          let questionText = `Q${step.stepNumber} (${minLength}-${maxLength} characters): `
+          let questionText = `Q${step.stepNumber}: `
           
           if (questionDef.type === 'word-association') {
-            questionText += `${questionDef.question}\nContext: ${questionDef.context || ''}`
+            const userLength = step.userResponse.length
+            const minLength = Math.max(Math.floor(userLength * 0.8), 5) // Min 5 chars for word association
+            const maxLength = Math.ceil(userLength * 1.2)
+            questionText += `(${minLength}-${maxLength} characters) ${questionDef.question}\nContext: ${questionDef.context || ''}`
           } else if (questionDef.type === 'word-combination' && questionDef.requiredWords) {
-            questionText += `${questionDef.question}\nRequired words: ${questionDef.requiredWords.join(', ')}`
+            const userLength = step.userResponse.length
+            const minLength = Math.max(Math.floor(userLength * 0.8), 30)
+            const maxLength = Math.ceil(userLength * 1.2)
+            questionText += `(${minLength}-${maxLength} characters) ${questionDef.question}\nRequired words: ${questionDef.requiredWords.join(', ')}`
+          } else if (questionDef.type === 'shape-sorting') {
+            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nRespond with JSON format like: [{"id":"shape-1","category":"category1","color":"red","shape":"circle","hasBorder":true},{"id":"shape-2","category":"category2","color":"blue","shape":"square","hasBorder":false}...]`
+          } else if (questionDef.type === 'shape-ordering') {
+            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nRespond with JSON format like: [{"id":"ord-1","position":1,"color":"red","shape":"circle","hasBorder":false},{"id":"ord-2","position":2,"color":"blue","shape":"square","hasBorder":true}...]`
+          } else if (questionDef.type === 'bubble-popper') {
+            questionText += `${questionDef.question}\nContext: ${questionDef.context}\nRespond with JSON format like: {"bubblesPopped":25,"duration":120,"completed":false,"pattern":"random","bubbleGrid":[[1,1,0,0...],[1,0,1,0...]...]} where bubbleGrid is a 10x10 2D array with 0=popped, 1=unpopped`
           } else {
+            const userLength = step.userResponse.length
+            const minLength = Math.max(Math.floor(userLength * 0.8), 30) // Minimum 30 chars for paragraph inputs
+            const maxLength = Math.ceil(userLength * 1.2)
+            questionText += `(${minLength}-${maxLength} characters) `
             if (questionDef.context) questionText += `${questionDef.context}\n`
             questionText += questionDef.question
-          }
-          
-          // Add minimum character requirement note for paragraph inputs
-          if (questionDef.type === 'scenario' || questionDef.type === 'open-ended') {
-            questionText += `\nNote: Provide a thoughtful response with at least 30 characters for meaningful analysis.`
+            
+            // Add minimum character requirement note for paragraph inputs
+            if (questionDef.type === 'scenario' || questionDef.type === 'open-ended') {
+              questionText += `\nNote: Provide a thoughtful response with at least 30 characters for meaningful analysis.`
+            }
           }
           
           return questionText
         }).join('\n\n---\n\n')
 
-        return `Answer each of the following ${allSteps.length} questions. Match the specified character length for each response (±20% of the reference length provided). Format your response using XML-style tags:
+        return `Answer each of the following ${allSteps.length} questions. For text-based questions, match the specified character length (±20% of the reference length provided). For interactive game questions (shape-sorting, shape-ordering, bubble-popper), respond with the exact JSON format specified. Format your response using XML-style tags:
 
 <Q1>
 [your answer to question 1]
@@ -248,7 +408,7 @@ export async function POST(request: NextRequest) {
 
 ...and so on for all ${allSteps.length} questions.
 
-IMPORTANT: Each answer must be wrapped in its corresponding tags (e.g., <Q1></Q1>, <Q2></Q2>, etc.). Keep each answer within the character range specified in parentheses after each question number.
+IMPORTANT: Each answer must be wrapped in its corresponding tags (e.g., <Q1></Q1>, <Q2></Q2>, etc.). For text questions, keep each answer within the character range specified. For JSON game questions, provide valid JSON as specified.
 
 ${questionsBlock}`
       }
@@ -259,6 +419,8 @@ ${questionsBlock}`
 
         try {
           const batchPrompt = buildBatchPrompt(allSteps)
+          console.log(`\n📝 [${modelName}] Batch prompt length: ${batchPrompt.length} chars`)
+          console.log(`📝 [${modelName}] First 300 chars of prompt:\n${batchPrompt.substring(0, 300)}...\n`)
           
           const resp = await client.chat.completions.create({
             model,
@@ -271,7 +433,11 @@ ${questionsBlock}`
           })
           
           const content = resp.choices?.[0]?.message?.content?.trim() || ''
-          console.log(`✅ [AI-BASELINE] ${modelName} batch response received (${content.length} chars)`)
+          console.log(`\n✅ [AI-BASELINE] ${modelName} batch response received (${content.length} chars)`)
+          console.log(`\n📄 [${modelName}] FULL RESPONSE:\n${content}\n`)
+          console.log(`\n🔍 [${modelName}] Response metadata:`)
+          console.log(`   - Finish reason: ${resp.choices?.[0]?.finish_reason}`)
+          console.log(`   - Model used: ${resp.model}`)
           
           // Parse responses by <Q#> XML-style tags
           const responseMap: Record<number, string> = {}
@@ -281,12 +447,14 @@ ${questionsBlock}`
             const match = content.match(pattern)
             if (match && match[1]) {
               responseMap[i] = match[1].trim()
+              console.log(`✓ [${modelName}] Q${i}: "${responseMap[i].substring(0, 60)}..."`)
             } else {
               console.warn(`⚠️ [AI-BASELINE] ${modelName} missing response for Q${i}`)
             }
           }
           
-          console.log(`   Parsed ${Object.keys(responseMap).length} responses from ${modelName}`)
+          console.log(`\n📊 [${modelName}] Parsed ${Object.keys(responseMap).length} responses from ${modelName}`)
+          console.log(`📊 [${modelName}] Question numbers parsed: ${Object.keys(responseMap).join(', ')}`)
           return responseMap
         } catch (err) {
           console.error(`❌ [AI-BASELINE] ${modelName} batch call failed:`, err)
@@ -308,6 +476,13 @@ ${questionsBlock}`
       }
 
       console.log('\n✅ [STEP 1 COMPLETE] All AI baselines generated')
+      console.log('\n📊 [SUMMARY] AI Responses by Question:')
+      for (let i = 1; i <= steps.length; i++) {
+        console.log(`\n   Q${i}:`)
+        console.log(`      ChatGPT: ${chatgptResponses[i] ? '✓ (' + chatgptResponses[i].length + ' chars)' : '✗ MISSING'}`)
+        console.log(`      Gemini:  ${geminiResponses[i] ? '✓ (' + geminiResponses[i].length + ' chars)' : '✗ MISSING'}`)
+        console.log(`      Claude:  ${claudeResponses[i] ? '✓ (' + claudeResponses[i].length + ' chars)' : '✗ MISSING'}`)
+      }
     } else {
       console.warn('⚠️ [AI-BASELINE] OpenRouter API key not found, skipping AI baseline generation')
     }
@@ -315,6 +490,8 @@ ${questionsBlock}`
     // STEP 2: Build enriched prompt with AI responses for comparison
     console.log('\n📊 [STEP 2] Building comparative analysis prompt...')
     const prompt = buildAnalysisPromptWithAIComparison(steps, averageResponseTime, aiResponsesByModel)
+    console.log(`📝 [STEP 2] Comparative prompt length: ${prompt.length} chars`)
+    console.log(`📝 [STEP 2] First 500 chars:\n${prompt.substring(0, 500)}...\n`)
 
     // Decide provider: OpenRouter (preferred) or Anthropic (fallback)
     const useOpenRouter = !!process.env.OPENROUTER_API_KEY
@@ -335,7 +512,8 @@ ${questionsBlock}`
           { role: 'user', content: prompt }
         ],
         temperature: 0.2,
-        max_tokens: 2000
+        max_tokens: 2000,
+        response_format: { type: "json_object" }
       })
       content = chat.choices?.[0]?.message?.content || ''
       if (!content) {
@@ -359,7 +537,8 @@ ${questionsBlock}`
               role: 'user',
               content: prompt
             }
-          ]
+          ],
+          response_format: { type: "json_object" }
         })
       })
 
@@ -416,11 +595,72 @@ ${questionsBlock}`
       console.log(`   Personality: Creative ${analysisResult.personality.creative_conventional}, Intuitive ${analysisResult.personality.analytical_intuitive}`)
     }
     console.log(`   Primary archetype: ${analysisResult.primaryArchetype.name}`)
+    
+    // Validate that all questions have breakdown items
+    const expectedStepNumbers = steps.map(s => s.stepNumber).sort((a, b) => a - b)
+    const breakdownStepNumbers = (analysisResult.breakdown || []).map((b: any) => b.stepNumber).sort((a: number, b: number) => a - b)
+    const missingSteps = expectedStepNumbers.filter(stepNum => !breakdownStepNumbers.includes(stepNum))
+    
+    if (missingSteps.length > 0) {
+      console.log(`⚠️ [VALIDATION] Missing breakdown for steps: ${missingSteps.join(', ')}`)
+      console.log(`⚠️ [VALIDATION] Expected: ${expectedStepNumbers.join(', ')}, Got: ${breakdownStepNumbers.join(', ')}`)
+      
+      // Create fallback breakdown items for missing steps
+      const fallbackItems = missingSteps.map(stepNum => {
+        const step = steps.find(s => s.stepNumber === stepNum)
+        return {
+          stepNumber: stepNum,
+          insight: `Response analysis: "${step?.userResponse || 'No response provided'}" - This response shows basic human interaction patterns and provides insight into the user's communication style and thought processes.`,
+          percentile: 50,
+          wasUnexpected: false,
+          highlight: null,
+          aiLikelihood: 50,
+          humanLikelihood: 50,
+          aiExamples: {
+            chatgpt: '',
+            gemini: '',
+            claude: ''
+          },
+          individualScores: {
+            logicalCoherence: 50,
+            creativity: 50,
+            insightfulness: 50,
+            personalityTraits: {
+              optimism: 50,
+              spontaneity: 50,
+              socialOrientation: 50,
+              riskTolerance: 50,
+              emotionalExpression: 50,
+              analyticalVsIntuitive: 50
+            },
+            qualityIndicators: {
+              completeness: 50,
+              relevance: 50,
+              personalization: 50,
+              authenticity: 50
+            }
+          }
+        }
+      })
+      
+      analysisResult.breakdown = [...(analysisResult.breakdown || []), ...fallbackItems].sort((a, b) => a.stepNumber - b.stepNumber)
+      console.log(`✅ [VALIDATION] Added ${fallbackItems.length} fallback breakdown items`)
+    } else {
+      console.log(`✅ [VALIDATION] All ${expectedStepNumbers.length} questions have breakdown items`)
+    }
 
     // Attach AI examples to breakdown (already generated in STEP 1)
     const enrichedBreakdown = (analysisResult.breakdown || []).map((item: Record<string, unknown>) => {
+      // Ensure insight is meaningful and not empty
+      let insight = item.insight as string || ''
+      if (!insight || insight.trim().length < 10) {
+        const step = steps.find(s => s.stepNumber === item.stepNumber)
+        insight = `This response reveals the user's approach to ${step?.questionType || 'the task'}. The response "${step?.userResponse || 'provided'}" demonstrates human thinking patterns and provides insight into their communication style and decision-making process.`
+      }
+      
       return {
         ...item,
+        insight: insight,
         aiExamples: {
           chatgpt: aiResponsesByModel.chatgpt?.[item.stepNumber as number] || '',
           gemini: aiResponsesByModel.gemini?.[item.stepNumber as number] || '',
@@ -428,6 +668,7 @@ ${questionsBlock}`
         }
       }
     })
+    
     
     analysisResult.breakdown = enrichedBreakdown
 

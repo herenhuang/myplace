@@ -51,7 +51,7 @@ export function DraggableShape({ id, shape }: DraggableShapeProps) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
-      <div className="w-14 h-14 flex items-center justify-center bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+      <div className="w-14 h-14 flex items-center justify-center">
         <svg width="50" height="50" viewBox="0 0 50 50">{renderShape()}</svg>
       </div>
     </div>

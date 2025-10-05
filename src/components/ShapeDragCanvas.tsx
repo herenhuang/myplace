@@ -21,6 +21,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { ShapeData, DraggableShape } from './dnd/draggableUtils'
+import styles from './GameCanvas.module.scss'
 
 
 export interface CategoryData {
@@ -206,7 +207,7 @@ export default function ShapeDragCanvas({
   const activeShape = activeId ? shapes[activeId as string] : null
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 border-1 border-gray-300 rounded-lg">
+    <div className={styles.gameCanvas}>
 
       <DndContext
         sensors={sensors}
@@ -229,7 +230,7 @@ export default function ShapeDragCanvas({
         </div>
 
         {/* Category drop zones */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           {CATEGORIES.map((category) => (
             <div key={category.id}>
               <DroppableCategory category={category} shapes={containers[category.id].map(id => shapes[id])} />

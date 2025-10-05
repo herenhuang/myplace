@@ -21,6 +21,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { ShapeData, DraggableShape, DroppableArea } from './dnd/draggableUtils'
+import styles from './GameCanvas.module.scss'
 
 // --- Main ShapeOrderCanvas Component ---
 
@@ -124,7 +125,7 @@ export default function ShapeOrderCanvas({ onOrderChange }: ShapeOrderCanvasProp
   const activeShape = activeId ? shapes[activeId as string] : null;
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 border-1 border-gray-300 rounded-lg">
+    <div className={styles.gameCanvas}>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCorners}

@@ -13,7 +13,15 @@ export interface HumanStepData {
   creativityScore?: number // 0-100
   shapeSortingResults?: { [categoryId: string]: string[] } // For shape-sorting questions
   shapeOrderingResults?: string[] // For shape-ordering questions
-  bubblePopperResults?: any // For bubble-popper questions
+  bubblePopperResults?: {
+    bubblesPopped: number
+    timeElapsed: number
+    completed: boolean
+    quitEarly: boolean
+    poppingPattern: 'sequential' | 'random' | 'strategic'
+    poppingSequence: number[]
+    bubbleGrid: number[][] // 2D array: 0 = popped, 1 = unpopped
+  } // For bubble-popper questions
   linguisticMarkers?: {
     aiMarkers: string[]
     humanMarkers: string[]
@@ -63,6 +71,25 @@ export interface HumanAnalysisResult {
       chatgpt?: string
       gemini?: string
       claude?: string
+    }
+    individualScores?: {
+      logicalCoherence: number // 0-100: How much sense does the response make?
+      creativity: number // 0-100: How original and creative is the response?
+      insightfulness: number // 0-100: How deep and thoughtful is the response?
+      personalityTraits: {
+        optimism: number // 0-100: How optimistic vs pessimistic
+        spontaneity: number // 0-100: How spontaneous vs planned
+        socialOrientation: number // 0-100: How socially oriented vs self-focused
+        riskTolerance: number // 0-100: How risk-taking vs cautious
+        emotionalExpression: number // 0-100: How emotionally expressive
+        analyticalVsIntuitive: number // 0-100: How analytical vs intuitive
+      }
+      qualityIndicators: {
+        completeness: number // 0-100: Did they fully address the question?
+        relevance: number // 0-100: How well does it relate to the prompt?
+        personalization: number // 0-100: How much personal detail included?
+        authenticity: number // 0-100: How genuine and human does it feel?
+      }
     }
   }>
   primaryArchetype: {
