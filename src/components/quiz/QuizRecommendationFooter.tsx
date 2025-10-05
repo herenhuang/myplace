@@ -80,6 +80,7 @@ export default function QuizRecommendationFooter({ sessionId }: Props) {
 
   const fetchRecommendation = async () => {
     try {
+      console.log('Fetching recommendation with sessionId:', sessionId)
       const res = await fetch('/api/quiz/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,6 +88,7 @@ export default function QuizRecommendationFooter({ sessionId }: Props) {
       })
 
       const data = await res.json()
+      console.log('Recommendation response:', data)
 
       if (!res.ok) {
         // If user completed all quizzes, don't show error

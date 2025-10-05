@@ -14,11 +14,14 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
 
-    // Get session data
+    // Get session data (lookup by session_id which is the client-generated UUID)
+    // Get the most recent one if there are multiple
     const { data: sessionData, error: sessionError } = await supabase
       .from('sessions')
       .select('*')
-      .eq('id', sessionId)
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: false })
+      .limit(1)
       .single()
 
     if (sessionError || !sessionData) {
@@ -34,11 +37,11 @@ export async function POST(request: NextRequest) {
     // Get archetype/personality from result
     const archetype = result?.fullArchetype || result?.personalityName || result?.personalityId || 'Unknown'
 
-    // Check if recommendation already exists for this session
+    // Check if recommendation already exists for this session (use database id)
     const { data: existingRec } = await supabase
       .from('quiz_recommendations')
       .select('*')
-      .eq('session_id', sessionId)
+      .eq('session_id', sessionData.id)
       .single()
 
     if (existingRec) {
@@ -47,7 +50,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         id: existingRec.id,
         quizId: existingRec.recommended_quiz_id,
-        quiz: recommendedQuiz,
+        quiz: {
+          id: existingRec.recommended_quiz_id,
+          title: recommendedQuiz?.title || 'Quiz',
+          description: recommendedQuiz?.description
+        },
         reasoning: existingRec.reasoning,
         cta: existingRec.cta
       })
@@ -158,11 +165,11 @@ Return ONLY valid JSON, no markdown formatting:
       throw new Error('AI response missing required fields')
     }
 
-    // Save recommendation to database
+    // Save recommendation to database (use the database session id, not the client UUID)
     const { data: savedRec, error: saveError } = await supabase
       .from('quiz_recommendations')
       .insert({
-        session_id: sessionId,
+        session_id: sessionData.id, // Use the database ID, not the client session_id
         source_quiz_id: quizId,
         source_archetype: archetype,
         recommended_quiz_id: recommendation.quizId,
@@ -184,7 +191,11 @@ Return ONLY valid JSON, no markdown formatting:
     return NextResponse.json({
       id: savedRec?.id,
       quizId: recommendation.quizId,
-      quiz: recommendedQuiz,
+      quiz: {
+        id: recommendation.quizId,
+        title: recommendedQuiz?.title || 'Quiz',
+        description: recommendedQuiz?.description
+      },
       reasoning: recommendation.reasoning,
       cta: recommendation.cta || 'Take This Quiz →'
     })

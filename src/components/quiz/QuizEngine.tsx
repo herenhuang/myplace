@@ -411,7 +411,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
         // Save complete session to database
         try {
-          await fetch('/api/quiz/complete', {
+          const completeResponse = await fetch('/api/quiz/complete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -425,6 +425,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
               }
             })
           })
+          const completeData = await completeResponse.json()
+          if (completeData.success && completeData.sessionId) {
+            setDbSessionId(completeData.sessionId)
+          }
         } catch (error) {
           console.error('Error saving quiz completion:', error)
         }
@@ -513,7 +517,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
           // Save complete session to database
           try {
-            await fetch('/api/quiz/complete', {
+            const completeResponse = await fetch('/api/quiz/complete', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -530,6 +534,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                 }
               })
             })
+            const completeData = await completeResponse.json()
+            if (completeData.success && completeData.sessionId) {
+              setDbSessionId(completeData.sessionId)
+            }
           } catch (error) {
             console.error('Error saving quiz completion:', error)
           }
@@ -606,7 +614,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             config={config}
             result={result}
             onRestart={handleRestart}
-            sessionId={dbSessionId}
+            sessionId={sessionId}
           />
         ) : null
 
