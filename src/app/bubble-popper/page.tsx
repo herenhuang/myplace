@@ -38,6 +38,7 @@ export default function BubblePopperPage() {
   const [gameStats, setGameStats] = useState<GameStats>({ totalPlays: 0, averageCompletion: 0, averageTime: 0 })
   const [sessionId, setSessionId] = useState<string>('')
   const [personalStats, setPersonalStats] = useState<{ totalRounds: number; totalBubbles: number }>({ totalRounds: 0, totalBubbles: 0 })
+  const [isSharing, setIsSharing] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -271,53 +272,87 @@ export default function BubblePopperPage() {
   }
 
   const handleShare = async () => {
-    if (!cardRef.current) return
+    if (!cardRef.current || isSharing) return
+
+    setIsSharing(true)
 
     try {
       // Dynamically import html2canvas
       const html2canvas = (await import('html2canvas')).default
       
-      // Capture the card as canvas
+      // Small delay to ensure fonts and styles are fully rendered
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Capture the card as canvas with higher quality
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: '#e8f4f8',
-        scale: 2,
-        logging: false
+        scale: 2, // 2x is good balance between quality and performance
+        logging: false,
+        useCORS: true,
+        allowTaint: false,
+        foreignObjectRendering: false,
+        removeContainer: true,
+        imageTimeout: 0,
+        // Add padding around the card
+        width: cardRef.current.offsetWidth,
+        height: cardRef.current.offsetHeight,
+        windowWidth: cardRef.current.offsetWidth,
+        windowHeight: cardRef.current.offsetHeight,
       })
 
-      // Convert to blob
+      // Convert to blob with good quality
       canvas.toBlob(async (blob) => {
-        if (!blob) return
+        if (!blob) {
+          alert('Failed to generate image. Please try again.')
+          setIsSharing(false)
+          return
+        }
 
-        const file = new File([blob], 'patience-test-results.png', { type: 'image/png' })
+        const file = new File([blob], 'bubble-popper-results.png', { type: 'image/png' })
 
-        // Try Web Share API (mobile)
-        if (navigator.share && navigator.canShare({ files: [file] })) {
+        // Try Web Share API first (works on mobile and some desktop browsers)
+        if (navigator.share) {
           try {
-            await navigator.share({
-              files: [file],
-              title: 'Bubble Popping',
-              text: 'Check out my bubble popping results!'
-            })
+            // Check if we can share files
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: 'My Bubble Popper Results',
+                text: 'Check out my bubble popping results!'
+              })
+            } else {
+              // Share without file (just text and URL)
+              await navigator.share({
+                title: 'My Bubble Popper Results',
+                text: 'Check out my bubble popping results!',
+                url: window.location.href
+              })
+              // Still download the image for them to share manually
+              downloadImage(canvas)
+            }
           } catch (err) {
-            // User cancelled or error - fall through to download
+            // User cancelled or error
             if ((err as Error).name !== 'AbortError') {
               downloadImage(canvas)
             }
           }
         } else {
-          // Fallback to download
+          // Fallback: download the image directly
           downloadImage(canvas)
         }
-      }, 'image/png')
+        
+        setIsSharing(false)
+      }, 'image/png', 0.95) // Slightly compressed for better performance
     } catch (error) {
       console.error('Share failed:', error)
-      alert('Unable to share. Please try again.')
+      alert('Unable to generate share image. Please try again.')
+      setIsSharing(false)
     }
   }
 
   const downloadImage = (canvas: HTMLCanvasElement) => {
     const link = document.createElement('a')
-    link.download = 'patience-test-results.png'
+    link.download = 'bubble-popper-results.png'
     link.href = canvas.toDataURL('image/png')
     link.click()
   }
@@ -342,7 +377,9 @@ export default function BubblePopperPage() {
       percentile = ratio < 1 ? Math.min(95, 50 + (1 - ratio) * 100) : Math.max(5, 100 - (ratio - 1) * 50)
     }
     
-    return `${Math.round(percentile)}th`
+    // Convert to "Top X%" format (100 - percentile to show top percentage)
+    const topPercent = Math.max(1, Math.min(99, Math.round(100 - percentile)))
+    return `Top ${topPercent}%`
   }
 
   const renderWelcome = () => (
@@ -461,8 +498,16 @@ export default function BubblePopperPage() {
             <button 
               className={styles.appButton}
               onClick={handleShare}
+              disabled={isSharing}
             >
-              <span>Share Results</span>
+              {isSharing ? (
+                <>
+                  <span className={styles.buttonSpinner}></span>
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <span>Share Results</span>
+              )}
             </button>
             <button 
               className={styles.textButton}
@@ -530,8 +575,8 @@ export default function BubblePopperPage() {
                   <h2>Compared to All Players</h2>
                   <ul>
                     <li><strong>Total Plays Worldwide:</strong> {gameStats.totalPlays} games played</li>
-                    <li><strong>Your Completion:</strong> {gameData.bubblesPopped} bubbles — You&apos;re in the {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)} percentile</li>
-                    <li><strong>Your Speed:</strong> {formatTime(gameData.timeElapsed)} — You&apos;re in the {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)} percentile (faster is better)</li>
+                    <li><strong>Your Completion:</strong> {gameData.bubblesPopped} bubbles — You&apos;re {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)} of all players!</li>
+                    <li><strong>Your Speed:</strong> {formatTime(gameData.timeElapsed)} — You&apos;re {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)} of all players! (faster is better)</li>
                     <li><strong>Global Average:</strong> {Math.round(gameStats.averageCompletion)} bubbles in {formatTime(Math.round(gameStats.averageTime))}</li>
                     {gameData.completed && <li>⭐ <strong>Completionist!</strong> You&apos;re one of the few who finished all 100 bubbles</li>}
                   </ul>
@@ -544,8 +589,16 @@ export default function BubblePopperPage() {
             <button 
               className={styles.appButton}
               onClick={handleShare}
+              disabled={isSharing}
             >
-              <span>Share Results</span>
+              {isSharing ? (
+                <>
+                  <span className={styles.buttonSpinner}></span>
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <span>Share Results</span>
+              )}
             </button>
             <button 
               className={styles.textButton}
