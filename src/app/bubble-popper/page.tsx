@@ -286,18 +286,12 @@ export default function BubblePopperPage() {
       // Capture the card as canvas with higher quality
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: '#e8f4f8',
-        scale: 2, // 2x is good balance between quality and performance
+        scale: 2,
         logging: false,
         useCORS: true,
-        allowTaint: false,
+        allowTaint: true,
         foreignObjectRendering: false,
-        removeContainer: true,
         imageTimeout: 0,
-        // Add padding around the card
-        width: cardRef.current.offsetWidth,
-        height: cardRef.current.offsetHeight,
-        windowWidth: cardRef.current.offsetWidth,
-        windowHeight: cardRef.current.offsetHeight,
       })
 
       // Convert to blob with good quality
@@ -463,32 +457,39 @@ export default function BubblePopperPage() {
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultHeader}>
-          <div className={styles.resultCard} ref={cardRef}>
-            <h3 className={styles.cardTitle}>BUBBLE POPPER</h3>
+          <div 
+            className={styles.resultCard} 
+            ref={cardRef}
+            style={{
+              backgroundColor: '#ffffff',
+              border: '2px solid rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            <h3 className={styles.cardTitle} style={{ color: '#374151' }}>BUBBLE POPPER</h3>
             {oneLiner && (
-              <p className={styles.oneLiner}>{oneLiner}</p>
+              <p className={styles.oneLiner} style={{ color: '#000000' }}>{oneLiner}</p>
             )}
             
             {/* Mysterious percentile stats only */}
             {gameStats.totalPlays > 1 && (
               <div className={styles.percentileGrid}>
-                <div className={styles.percentileBox}>
-                  <div className={styles.percentileNumber}>
+                <div className={styles.percentileBox} style={{ backgroundColor: '#f3f4f6' }}>
+                  <div className={styles.percentileNumber} style={{ color: '#000000' }}>
                     {getPercentile(gameData.timeElapsed, gameStats.averageTime, false)}
                   </div>
-                  <div className={styles.percentileLabel}>speed</div>
+                  <div className={styles.percentileLabel} style={{ color: '#374151' }}>speed</div>
                 </div>
-                <div className={styles.percentileBox}>
-                  <div className={styles.percentileNumber}>
+                <div className={styles.percentileBox} style={{ backgroundColor: '#f3f4f6' }}>
+                  <div className={styles.percentileNumber} style={{ color: '#000000' }}>
                     {getPercentile(gameData.bubblesPopped, gameStats.averageCompletion, true)}
                   </div>
-                  <div className={styles.percentileLabel}>completion</div>
+                  <div className={styles.percentileLabel} style={{ color: '#374151' }}>completion</div>
                 </div>
               </div>
             )}
             
             {gameStats.totalPlays > 1 && (
-              <div className={styles.globalNote}>
+              <div className={styles.globalNote} style={{ color: '#374151' }}>
                 vs. {gameStats.totalPlays} players worldwide
               </div>
             )}

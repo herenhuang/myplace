@@ -329,26 +329,15 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   margin-bottom: 16px;
   text-align: center;
   animation: fadeUp 0.5s ease-in-out;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  position: relative;
-  
-  // Add a subtle gradient background that will render in screenshots
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
-    z-index: -1;
-  }
+  border: 2px solid rgba(0, 0, 0, 0.15);
 }
 
 .cardTitle {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: $gray-500;
+  color: $gray-700;
   margin-bottom: 20px;
   font-family: var(--font-inter);
 }
@@ -377,7 +366,7 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   font-size: 20px;
   font-weight: 700;
   line-height: 1.5;
-  color: $gray-900;
+  color: #000000;
   text-align: center;
   margin-bottom: 16px;
   max-width: 100%;
@@ -472,34 +461,34 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 .percentileBox {
   text-align: center;
   padding: 20px 16px;
-  background: #f9fafb;
+  background: #f3f4f6;
   border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(0, 0, 0, 0.15);
 }
 
 .percentileNumber {
-  font-size: 36px;
-  font-weight: 700;
-  color: $gray-900;
-  font-family: var(--font-instrument-serif);
-  letter-spacing: -0.03em;
+  font-size: 26px;
+  font-weight: 800;
+  color: #000000;
+  font-family: var(--font-inter);
+  letter-spacing: -0.02em;
   line-height: 1;
   margin-bottom: 8px;
 }
 
 .percentileLabel {
-  font-size: 10px;
-  font-weight: 600;
-  color: $gray-500;
+  font-size: 11px;
+  font-weight: 700;
+  color: $gray-700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   font-family: var(--font-inter);
 }
 
 .globalNote {
-  font-size: 11px;
-  font-weight: 500;
-  color: $gray-500;
+  font-size: 12px;
+  font-weight: 600;
+  color: $gray-700;
   text-align: center;
   margin-top: 4px;
   font-style: italic;
