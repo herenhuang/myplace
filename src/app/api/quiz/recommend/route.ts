@@ -125,13 +125,14 @@ Pick THE BEST next quiz for them based on:
 3. Natural progression (what question does their result raise?)
 4. Cross-domain insights (would a different theme give them surprising self-awareness?)
 
-Write a personalized note (2-4 sentences) that:
-- References 1-2 specific answers they gave (makes them feel heard)
+Write a SHORT personalized note (MAX 100 characters including spaces) that:
 - Notices a pattern they might not see themselves
 - Creates curiosity about what they'll discover
 - Feels like a "ps." from a friend who gets them
 - Uses "you" language, conversational and warm
-- Includes 1 emoji max (at the very end if it fits naturally)
+- NO emojis
+
+CRITICAL: The reasoning text MUST be 100 characters or less. Count carefully.
 
 Also suggest compelling CTA button text (be creative but clear - default is "Take This Quiz →" but you can improve it).
 

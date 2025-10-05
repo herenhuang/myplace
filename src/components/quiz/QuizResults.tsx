@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { useScroll, useTransform, motion } from 'framer-motion'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
 import QuizRecommendationFooter from './QuizRecommendationFooter'
@@ -24,6 +25,9 @@ interface AnalyticsData {
 export default function QuizResults({ config, result, onRestart, sessionId }: QuizResultsProps) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+
+  // Hooks must be at the top level - always call them
+  const recommendationRef = useRef<HTMLDivElement>(null)
 
   // Get display name - either from personality or word matrix
   const displayName = result.personality?.name || result.wordMatrixResult?.fullArchetype || 'Your Result'
@@ -120,33 +124,36 @@ export default function QuizResults({ config, result, onRestart, sessionId }: Qu
   const uniqueness = getUserUniqueness()
 
   return (
-    <div className={styles.textContainer}>
-      <div className={styles.explanationContainer}>
-        <div className={styles.explanationHeader}>
-          <h2 className={styles.resultNameSmall}>{displayName}</h2>
-          {displayTagline && (
-            <p className={styles.resultTaglineExplanation}>&ldquo;{displayTagline}&rdquo;</p>
-          )}
-          {analytics && analytics.totalPlays > 0 && (
-            <p className={styles.totalPlaysText}>
-              Based on {analytics.totalPlays} {analytics.totalPlays === 1 ? 'play' : 'plays'}
-              {uniqueness && ` · ${uniqueness}`}
-            </p>
-          )}
+    <>
+      <div className={styles.textContainer}>
+        <div className={styles.explanationContainer}>
+          <div className={styles.explanationHeader}>
+            <h2 className={styles.resultNameSmall}>{displayName}</h2>
+            {displayTagline && (
+              <p className={styles.resultTaglineExplanation}>&ldquo;{displayTagline}&rdquo;</p>
+            )}
+            {analytics && analytics.totalPlays > 0 && (
+              <p className={styles.totalPlaysText}>
+                Based on {analytics.totalPlays} {analytics.totalPlays === 1 ? 'play' : 'plays'}
+                {uniqueness && ` · ${uniqueness}`}
+              </p>
+            )}
+          </div>
+          <div className={styles.markdownContent}>
+            <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
+          </div>
         </div>
-        <div className={styles.markdownContent}>
-          <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
-        </div>
-
-        {/* Quiz Recommendation Footer */}
-        {sessionId && (
-          <QuizRecommendationFooter
-            sessionId={sessionId}
-            onBackToCard={() => setShowExplanation(false)}
-            onRestart={onRestart}
-          />
-        )}
       </div>
-    </div>
+
+      {/* Quiz Recommendation as a full page section at the bottom */}
+      {sessionId && (
+        <QuizRecommendationFooter
+          sessionId={sessionId}
+          onBackToCard={() => setShowExplanation(false)}
+          onRestart={onRestart}
+          recommendationRef={recommendationRef}
+        />
+      )}
+    </>
   )
 }

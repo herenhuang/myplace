@@ -87,8 +87,8 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  overflow-y: auto; // ← CHANGED: auto instead of scroll (only shows when needed)
-  overflow-x: hidden; // ← ADDED: No horizontal scroll
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .topText {
