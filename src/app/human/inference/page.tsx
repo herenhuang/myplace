@@ -27,6 +27,8 @@ export default function HumanInferencePage() {
   const [shapeOrderingResults, setShapeOrderingResults] = useState<Record<number, string[]>>({})
   const [bubblePopperResults, setBubblePopperResults] = useState<Record<number, any>>({})
   const [focusTimes, setFocusTimes] = useState<Record<number, number>>({})
+  const [pausedTimes, setPausedTimes] = useState<Record<number, number>>({})
+  const [isTabVisible, setIsTabVisible] = useState(true)
   const [analysisResult, setAnalysisResult] = useState<HumanAnalysisResult | null>(null)
   const [analysisError, setAnalysisError] = useState<string>('')
   const [activeTab, setActiveTab] = useState<ResultsTab>('results-overview')
@@ -79,6 +81,43 @@ export default function HumanInferencePage() {
       {isComplete ? '✓' : '○'}
     </div>
   )
+
+  // High-precision timing and tab visibility handling
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const isVisible = !document.hidden
+      setIsTabVisible(isVisible)
+      
+      if (!isVisible) {
+        // Tab became hidden - record pause time for all active focus times
+        const now = performance.now()
+        const newPausedTimes: Record<number, number> = {}
+        Object.keys(focusTimes).forEach(stepNum => {
+          newPausedTimes[parseInt(stepNum)] = now
+        })
+        setPausedTimes(newPausedTimes)
+      } else {
+        // Tab became visible - adjust focus times to exclude paused duration
+        const now = performance.now()
+        const adjustedFocusTimes: Record<number, number> = {}
+        Object.entries(focusTimes).forEach(([stepNumStr, focusTime]) => {
+          const stepNum = parseInt(stepNumStr)
+          const pauseTime = pausedTimes[stepNum]
+          if (pauseTime) {
+            const pauseDuration = now - pauseTime
+            adjustedFocusTimes[stepNum] = focusTime + pauseDuration
+          } else {
+            adjustedFocusTimes[stepNum] = focusTime
+          }
+        })
+        setFocusTimes(adjustedFocusTimes)
+        setPausedTimes({})
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [focusTimes, pausedTimes])
 
   // Initialize session
   useEffect(() => {
@@ -133,7 +172,7 @@ export default function HumanInferencePage() {
           questionType: question.type,
           question: question.question,
           userResponse: response,
-          responseTimeMs: Date.now() - (focusTimes[question.stepNumber] || Date.now()),
+          responseTimeMs: Math.round(performance.now() - (focusTimes[question.stepNumber] || performance.now())),
           timestamp: new Date().toISOString(),
           aiBaseline: getBaselinesForQuestion(question.stepNumber),
         }
@@ -181,7 +220,7 @@ export default function HumanInferencePage() {
       questionType: question.type,
       question: question.question,
       userResponse: jsonString,
-      responseTimeMs: Date.now() - (focusTimes[stepNumber] || Date.now()),
+      responseTimeMs: Math.round(performance.now() - (focusTimes[stepNumber] || performance.now())),
       timestamp: new Date().toISOString(),
       aiBaseline: getBaselinesForQuestion(stepNumber),
       shapeSortingResults: question.type === 'shape-sorting' ? gameResults : undefined,
@@ -253,7 +292,7 @@ export default function HumanInferencePage() {
   }, [handleInputChange, saveGameResultToCache]);
 
   const handleInputFocus = (stepNumber: number) => {
-    setFocusTimes(prev => ({ ...prev, [stepNumber]: Date.now() }))
+    setFocusTimes(prev => ({ ...prev, [stepNumber]: performance.now() }))
   }
 
   const handleInputBlur = (stepNumber: number) => {
@@ -270,7 +309,7 @@ export default function HumanInferencePage() {
           questionType: question.type,
           question: question.question,
           userResponse: responses[stepNumber].trim(),
-          responseTimeMs: Date.now() - (focusTimes[stepNumber] || Date.now()),
+          responseTimeMs: Math.round(performance.now() - (focusTimes[stepNumber] || performance.now())),
           timestamp: new Date().toISOString(),
           aiBaseline: getBaselinesForQuestion(stepNumber),
           shapeSortingResults: question.type === 'shape-sorting' ? shapeSortingResults[stepNumber] : undefined,
@@ -371,7 +410,7 @@ export default function HumanInferencePage() {
           questionType: question.type,
           question: question.question,
           userResponse,
-          responseTimeMs: Math.max(1000, Math.random() * 3000 + 2000), // Approximate timing
+          responseTimeMs: Math.round(Math.max(1000, Math.random() * 3000 + 2000)), // Approximate timing, validated bounds
           timestamp: new Date().toISOString(),
           aiBaseline: getBaselinesForQuestion(question.stepNumber),
           shapeSortingResults: question.type === 'shape-sorting' ? shapeSortingResults[question.stepNumber] : undefined,

@@ -102,7 +102,6 @@ export interface HumanAnalysisResult {
     traits: string[]
   }
   overallAnalysis: string
-  humanessLevel: 'very-ai-like' | 'borderline' | 'human-like' | 'exceptionally-human'
 }
 
 export interface AIBaselineResponse {
@@ -132,4 +131,3 @@ export interface PopulationStats {
   }>
   averageResponseTime: number
 }
-

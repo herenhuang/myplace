@@ -46,72 +46,141 @@ export async function startHumanSession(clientSessionId?: string) {
   }
 }
 
+// Queue for batching database operations
+let batchQueue: Array<{ sessionId: string; stepData: HumanStepData; resolve: (value: any) => void; reject: (error: any) => void }> = []
+let batchTimeout: NodeJS.Timeout | null = null
+
 export async function recordHumanStep(
   sessionId: string,
   stepData: HumanStepData
 ) {
+  // Input validation
+  if (!sessionId?.trim()) {
+    console.error('❌ [HUMAN] Session ID is required')
+    return { error: 'Invalid session. Please try again.' }
+  }
+
+  if (!stepData || !stepData.userResponse?.trim() || typeof stepData.responseTimeMs !== 'number') {
+    console.error('❌ [HUMAN] Complete step data is required')
+    return { error: 'Invalid step data. Please try again.' }
+  }
+
+  // Validate response time bounds
+  if (stepData.responseTimeMs < 100 || stepData.responseTimeMs > 600000) {
+    console.warn(`⚠️ [HUMAN] Unusual response time: ${stepData.responseTimeMs}ms`)
+  }
+
+  console.log(`📝 [HUMAN] Recording Step ${stepData.stepNumber} (${stepData.questionType}): "${stepData.userResponse.substring(0, 50)}..." [${stepData.responseTimeMs}ms]`)
+
+  return new Promise((resolve, reject) => {
+    // Add to batch queue
+    batchQueue.push({ sessionId, stepData, resolve, reject })
+
+    // Clear existing timeout
+    if (batchTimeout) {
+      clearTimeout(batchTimeout)
+    }
+
+    // Process batch after delay OR if queue is full
+    const shouldProcessImmediately = batchQueue.length >= 3 // Process immediately for every 3 steps
+    
+    if (shouldProcessImmediately) {
+      processBatch()
+    } else {
+      // Delayed batch processing
+      batchTimeout = setTimeout(processBatch, 1000) // 1 second delay
+    }
+  })
+}
+
+async function processBatch() {
+  if (batchQueue.length === 0) return
+
+  const currentBatch = [...batchQueue]
+  batchQueue = []
+  batchTimeout = null
+
+  console.log(`🔄 [HUMAN] Processing batch of ${currentBatch.length} steps`)
+
   try {
     const supabase = await createClient()
+    const groupedBySession = new Map<string, typeof currentBatch>()
 
-    // Validate required parameters
-    if (!sessionId) {
-      console.error('❌ [HUMAN] Session ID is required')
-      return { error: 'Invalid session. Please try again.' }
-    }
-
-    if (!stepData || !stepData.userResponse) {
-      console.error('❌ [HUMAN] Step data is required')
-      return { error: 'Invalid step data. Please try again.' }
-    }
-
-    console.log(`\n📝 [HUMAN] Recording Step ${stepData.stepNumber}:`)
-    console.log(`   Question Type: ${stepData.questionType}`)
-    console.log(`   User Response: "${stepData.userResponse}"`)
-    console.log(`   Response Time: ${stepData.responseTimeMs}ms`)
-
-    // Get current session
-    const { data: sessionData, error: fetchError } = await supabase
-      .from('sessions')
-      .select('*')
-      .eq('id', sessionId)
-      .single()
-
-    if (fetchError || !sessionData) {
-      console.error('Error fetching session:', fetchError)
-      return { error: 'Could not retrieve session.' }
-    }
-
-    // Add new step to data
-    const updatedSteps = [...(sessionData.data?.steps || []), stepData]
-    const totalResponseTime = updatedSteps.reduce((sum, step) => sum + step.responseTimeMs, 0)
-    const averageResponseTime = totalResponseTime / updatedSteps.length
-
-    const updatedData: HumanSessionData = {
-      ...sessionData.data,
-      steps: updatedSteps,
-      meta: {
-        ...sessionData.data.meta,
-        totalResponseTime,
-        averageResponseTime
+    // Group by session ID
+    currentBatch.forEach(item => {
+      if (!groupedBySession.has(item.sessionId)) {
+        groupedBySession.set(item.sessionId, [])
       }
-    }
+      groupedBySession.get(item.sessionId)!.push(item)
+    })
 
-    // Update session
-    const { error: updateError } = await supabase
-      .from('sessions')
-      .update({ data: updatedData })
-      .eq('id', sessionId)
+    // Process each session
+    const sessionPromises = Array.from(groupedBySession.entries()).map(async ([sessionId, sessionBatch]) => {
+      try {
+        // Get current session data once
+        const { data: sessionData, error: fetchError } = await supabase
+          .from('sessions')
+          .select('data')
+          .eq('id', sessionId)
+          .single()
 
-    if (updateError) {
-      console.error('Error updating session:', updateError)
-      return { error: 'Failed to save step.' }
-    }
+        if (fetchError || !sessionData) {
+          throw new Error(`Could not retrieve session ${sessionId}: ${fetchError?.message}`)
+        }
 
-    console.log('✅ [HUMAN] Step recorded successfully')
-    return { success: true }
+        // Add all new steps at once
+        const existingSteps = sessionData.data?.steps || []
+        const newSteps = sessionBatch.map(item => item.stepData)
+        const allSteps = [...existingSteps, ...newSteps]
+        
+        const totalResponseTime = allSteps.reduce((sum, step) => sum + step.responseTimeMs, 0)
+        const averageResponseTime = totalResponseTime / allSteps.length
+
+        const updatedData: HumanSessionData = {
+          ...sessionData.data,
+          steps: allSteps,
+          meta: {
+            ...sessionData.data?.meta,
+            totalResponseTime,
+            averageResponseTime,
+            lastUpdated: new Date().toISOString()
+          }
+        }
+
+        // Single database update per session
+        const { error: updateError } = await supabase
+          .from('sessions')
+          .update({ data: updatedData })
+          .eq('id', sessionId)
+
+        if (updateError) {
+          throw new Error(`Failed to update session ${sessionId}: ${updateError.message}`)
+        }
+
+        // Resolve all promises for this session
+        sessionBatch.forEach(item => item.resolve({ success: true }))
+        console.log(`✅ [HUMAN] Batch saved ${sessionBatch.length} steps for session ${sessionId}`)
+
+      } catch (error) {
+        console.error(`❌ [HUMAN] Batch error for session ${sessionId}:`, error)
+        // Reject all promises for this session
+        sessionBatch.forEach(item => item.reject({ error: error instanceof Error ? error.message : 'Failed to save step.' }))
+      }
+    })
+
+    await Promise.all(sessionPromises)
+    
   } catch (error) {
-    console.error('Error recording step:', error)
-    return { error: 'Failed to record step.' }
+    console.error('❌ [HUMAN] Batch processing failed:', error)
+    // Reject all remaining promises
+    currentBatch.forEach(item => item.reject({ error: 'Batch processing failed.' }))
+  }
+}
+
+// Force process remaining batch on cleanup
+export async function flushBatch() {
+  if (batchQueue.length > 0) {
+    await processBatch()
   }
 }
 
@@ -230,4 +299,3 @@ export async function getPopulationStats(stepNumber: number, questionType: strin
     return { error: 'Failed to get population stats.' }
   }
 }
-

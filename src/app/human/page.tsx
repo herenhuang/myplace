@@ -42,6 +42,10 @@ export default function HumanTestPage() {
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [stepStartTime, setStepStartTime] = useState(0)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [analysisStage, setAnalysisStage] = useState('')
+  const [isTabVisible, setIsTabVisible] = useState(true)
+  const [pausedTime, setPausedTime] = useState(0)
   const [responses, setResponses] = useState<HumanStepData[]>([])
   const [shapeSortingResults, setShapeSortingResults] = useState<{ [categoryId: string]: string[] }>({})
   const [shapeOrderingResults, setShapeOrderingResults] = useState<string[]>([])
@@ -67,6 +71,27 @@ export default function HumanTestPage() {
   }, []);
 
   // Initialize session and handle ?slide= param
+  // High-precision timing and tab visibility handling
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const isVisible = !document.hidden
+      setIsTabVisible(isVisible)
+      
+      if (!isVisible && stepStartTime > 0) {
+        // Tab became hidden - record pause time
+        setPausedTime(performance.now())
+      } else if (isVisible && pausedTime > 0) {
+        // Tab became visible - adjust start time to exclude paused duration
+        const pauseDuration = performance.now() - pausedTime
+        setStepStartTime(prev => prev + pauseDuration)
+        setPausedTime(0)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [stepStartTime, pausedTime])
+
   useEffect(() => {
     const sid = getOrCreateSessionId()
     setSessionId(sid)
@@ -131,7 +156,7 @@ export default function HumanTestPage() {
     setBubblePopperResults(null)
 
     setScreenState('simulation')
-    setStepStartTime(Date.now())
+    setStepStartTime(performance.now())
   }
 
   const getCurrentQuestion = () => {
@@ -191,7 +216,13 @@ export default function HumanTestPage() {
     setIsLoading(true)
 
     try {
-      const responseTimeMs = Date.now() - stepStartTime
+      const responseTimeMs = Math.round(performance.now() - stepStartTime)
+      
+      // Validate timing bounds (200ms to 300s)
+      const validatedResponseTime = Math.min(Math.max(responseTimeMs, 200), 300000)
+      if (responseTimeMs !== validatedResponseTime) {
+        console.warn(`⚠️ Response time ${responseTimeMs}ms outside normal bounds, adjusted to ${validatedResponseTime}ms`)
+      }
 
       // Get predefined AI baseline responses
       const aiBaseline = getBaselinesForQuestion(currentStepNumber)
@@ -203,7 +234,7 @@ export default function HumanTestPage() {
         question: question.question,
         context: question.context,
         userResponse: finalResponse,
-        responseTimeMs,
+        responseTimeMs: validatedResponseTime,
         timestamp: new Date().toISOString(),
         aiBaseline,
         shapeSortingResults: question.type === 'shape-sorting' ? shapeSortingResults : undefined,
@@ -238,7 +269,7 @@ export default function HumanTestPage() {
       setShapeSortingResults({})
       setShapeOrderingResults([])
       setBubblePopperResults(null)
-      setStepStartTime(Date.now())
+      setStepStartTime(performance.now())
       
       // Focus input for next question
       setTimeout(() => {
@@ -257,6 +288,8 @@ export default function HumanTestPage() {
     setAnalysisError('')
     setScreenState('analyzing')
     setIsLoading(true)
+    setAnalysisProgress(0)
+    setAnalysisStage('Initializing analysis...')
 
     try {
       const totalResponseTime = allResponses.reduce((sum, r) => sum + r.responseTimeMs, 0)
@@ -267,6 +300,17 @@ export default function HumanTestPage() {
       // Make sure we have the latest responses for the analysis
       const currentResponses = responses.length > 0 ? responses : allResponses
 
+      // Set up progress tracking
+      const progressInterval = setInterval(() => {
+        setAnalysisProgress(prev => {
+          if (prev < 90) return prev + Math.random() * 10
+          return prev
+        })
+      }, 800)
+
+      setAnalysisStage('Generating AI baselines...')
+      setAnalysisProgress(10)
+
       const response = await fetch('/api/human/analyze-humanness', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -276,6 +320,10 @@ export default function HumanTestPage() {
         })
       })
 
+      clearInterval(progressInterval)
+      setAnalysisProgress(95)
+      setAnalysisStage('Finalizing results...')
+
       const result = await response.json()
 
       if (result.success && result.analysis) {
@@ -284,6 +332,9 @@ export default function HumanTestPage() {
         
         // Ensure the responses state is also up-to-date
         setResponses(currentResponses)
+
+        setAnalysisProgress(100)
+        setAnalysisStage('Complete!')
 
         await saveHumanAnalysis(dbSessionId, analysis)
         // Persist analysis to cache
@@ -312,11 +363,13 @@ export default function HumanTestPage() {
       } else {
         console.error('Analysis failed:', result.error)
         setAnalysisError(result.error || 'Analysis failed. Please try again.')
+        setAnalysisStage('Analysis failed')
         // Keep results container open; ResultsTabs will show placeholder
       }
     } catch (error) {
       console.error('Error analyzing responses:', error)
       setAnalysisError('Network error. Please check your connection and try again.')
+      setAnalysisStage('Network error occurred')
     } finally {
       setIsLoading(false)
     }
@@ -404,7 +457,14 @@ export default function HumanTestPage() {
       <div className={`flex flex-col h-screen items-center justify-center ${styles.pageBg}`}>
         <div className="max-w-4xl w-full h-full flex flex-col items-center justify-center relative">
 
-            <div className="w-full bg-gray-200 rounded-full h-1 absolute top-0 left-0">
+            <div 
+              className="w-full bg-gray-200 rounded-full h-1 absolute top-0 left-0"
+              role="progressbar"
+              aria-valuenow={currentStepNumber}
+              aria-valuemin={1}
+              aria-valuemax={HUMAN_QUESTIONS.length}
+              aria-label={`Question ${currentStepNumber} of ${HUMAN_QUESTIONS.length}`}
+            >
               <div
                 className="bg-orange-500 h-1 rounded-full transition-all duration-300"
                 style={{ width: `${(currentStepNumber / HUMAN_QUESTIONS.length) * 100}%` }}
@@ -484,6 +544,16 @@ export default function HumanTestPage() {
                             ? 'border-orange-500 bg-orange-50 font-medium'
                             : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
                         }`}
+                        role="radio"
+                        aria-checked={selectedChoice === choice}
+                        aria-label={`Option: ${choice}`}
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            setSelectedChoice(choice)
+                          }
+                        }}
                       >
                         {choice}
                       </button>
@@ -508,9 +578,17 @@ export default function HumanTestPage() {
                       rows={isWordAssociation ? 1 : 4}
                       maxLength={question.characterLimit}
                       autoFocus
+                      aria-label={`Response input for: ${question.question}`}
+                      aria-describedby={characterCount !== null ? `char-count-${currentStepNumber}` : undefined}
+                      aria-invalid={isOverLimit || isUnderMinLength}
                     />
                     {characterCount !== null && (
-                      <div className={`text-sm mt-2 text-right ${isOverLimit || isUnderMinLength ? 'text-red-500' : 'text-gray-500'}`}>
+                      <div 
+                        id={`char-count-${currentStepNumber}`}
+                        className={`text-sm mt-2 text-right ${isOverLimit || isUnderMinLength ? 'text-red-500' : 'text-gray-500'}`}
+                        role="status" 
+                        aria-live="polite"
+                      >
                         {characterCount} / {question.characterLimit}
                         {isUnderMinLength && (
                           <span className="block text-xs text-red-500">
@@ -527,6 +605,8 @@ export default function HumanTestPage() {
                     onClick={handleSubmitResponse}
                     disabled={!canSubmitWithMinLength || isLoading || isOverLimit || isUnderMinLength}
                     className="w-10 h-10 bg-black hover:bg-gray-800 text-white font-bold rounded-full text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
+                    aria-label={isLoading ? 'Processing response...' : 'Submit response and continue to next question'}
+                    title={isLoading ? 'Processing...' : 'Submit and continue'}
                   >
                     {isLoading ? (
                       <svg
@@ -567,7 +647,7 @@ export default function HumanTestPage() {
   const renderAnalyzing = () => {
     return (
       <div className={`flex flex-col items-center justify-center ${styles.pageBg}`}>
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-12 text-center">
+        <div className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-12 text-center">
           {!analysisError ? (
             <>
               <div className="mb-8">
@@ -580,8 +660,30 @@ export default function HumanTestPage() {
                 Analyzing...
               </h2>
               
-              <p className="text-gray-600 text-lg">
-                Measuring your humanness against AI patterns...
+              <div className="mb-6">
+                <div 
+                  className="w-full bg-gray-200 rounded-full h-3 mb-3"
+                  role="progressbar"
+                  aria-valuenow={Math.round(analysisProgress)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Analysis progress"
+                >
+                  <div 
+                    className="bg-gradient-to-r from-orange-400 to-orange-600 h-3 rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${analysisProgress}%` }}
+                  />
+                </div>
+                <p className="text-gray-600 text-sm font-medium">
+                  {analysisStage}
+                </p>
+                <p className="text-gray-500 text-xs mt-1">
+                  {Math.round(analysisProgress)}% complete
+                </p>
+              </div>
+              
+              <p className="text-gray-600 text-base">
+                Comparing your responses against AI patterns from multiple models...
               </p>
             </>
           ) : (
@@ -1084,4 +1186,3 @@ export default function HumanTestPage() {
     </PageContainer>
   )
 }
-
