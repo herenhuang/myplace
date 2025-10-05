@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { FlipReveal, FlipRevealItem } from '@/components/ui/flip-reveal'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { ALL_QUIZZES, QUIZ_CATEGORIES, type QuizCategory } from '@/lib/quizzes/all-quizzes-data'
@@ -10,15 +11,31 @@ export default function AllQuizzesPage() {
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory>('all')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-16 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-16 px-4 relative">
+      {/* Dot pattern background - same as homepage */}
+      <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle,#e2e8f0_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+
+      {/* Logo in top-left corner - same as homepage */}
+      <div className="absolute top-6 left-6 z-10">
+        <Link href="/" className="block hover:scale-105 transition-transform duration-200">
+          <Image
+            src="/MyPlace2.png"
+            alt="MyPlace Logo"
+            width={500}
+            height={300}
+            className="w-40 h-auto object-contain"
+          />
+        </Link>
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 mt-20">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            All Quizzes
+            All Games
           </h1>
           <p className="text-xl text-gray-600">
-            Discover yourself through interactive quizzes
+          Every play adds to your living map of judgment, taste, and instinct
           </p>
         </div>
 
