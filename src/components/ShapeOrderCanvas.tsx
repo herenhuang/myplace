@@ -40,10 +40,9 @@ const ORDERING_SHAPES: ShapeData[] = [
 interface ShapeOrderCanvasProps {
   onOrderChange?: (orderedIds: string[]) => void;
   initialState?: string[];
-  isInteractive?: boolean;
 }
 
-export default function ShapeOrderCanvas({ onOrderChange, initialState, isInteractive = true }: ShapeOrderCanvasProps) {
+export default function ShapeOrderCanvas({ onOrderChange, initialState }: ShapeOrderCanvasProps) {
   const [isMounted, setIsMounted] = useState(false)
   
   useEffect(() => {
@@ -184,48 +183,6 @@ export default function ShapeOrderCanvas({ onOrderChange, initialState, isIntera
     )
   }
 
-  // Render read-only version if not interactive
-  if (!isInteractive) {
-    return (
-      <div className={styles.gameCanvas}>
-        {/* Palette Area - read-only */}
-        {containers.palette.length > 0 && (
-          <div className="relative w-full bg-gray-50 rounded-xl p-6 mb-8 border-2 border-transparent">
-            <div className="flex flex-wrap gap-4 justify-center rounded-xl min-h-[112px]">
-              {containers.palette.map((id) => (
-                <div key={id} className="pointer-events-none">
-                  <DraggableShape id={id} shape={shapes[id]} />
-                </div>
-              ))}
-            </div>
-            {containers.palette.length === 0 && (
-              <div className="text-sm flex items-center justify-center w-full py-4 text-gray-400">
-                All shapes ordered!
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Sequence Display - read-only */}
-        <div className="w-full rounded-xl p-6 border-2 border-dashed min-h-[120px]" style={{ borderColor: '#bfdbfe', backgroundColor: '#eff6ff' }}>
-          <div className="w-full h-full">
-            <div className="flex flex-wrap gap-3">
-              {containers.sequence.map((id) => (
-                <div key={id} className="pointer-events-none">
-                  <DraggableShape id={id} shape={shapes[id]} />
-                </div>
-              ))}
-              {containers.sequence.length === 0 && (
-                <div className="flex-1 text-center py-5 text-blue-500">
-                  No shapes in sequence
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.gameCanvas}>

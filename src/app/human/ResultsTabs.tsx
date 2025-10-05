@@ -5,8 +5,8 @@ import styles from './results-tabs.module.scss'
 import { HumanAnalysisResult, HumanStepData } from '@/lib/human-types'
 import { getQAFromSources } from './utils'
 import WaveChart from './WaveChart'
-import ShapeDragCanvas from '@/components/ShapeDragCanvas'
-import ShapeOrderCanvas from '@/components/ShapeOrderCanvas'
+import ReadOnlyShapeSort from '@/components/ReadOnlyShapeSort'
+import ReadOnlyShapeSequence from '@/components/ReadOnlyShapeSequence'
 import ReadOnlyBubbleGrid from '@/components/ReadOnlyBubbleGrid'
 
 import Image from 'next/image'
@@ -271,36 +271,25 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                     
                                     if (stepData?.questionType === 'shape-sorting' && typeof jsonData === 'object' && !Array.isArray(jsonData)) {
                                         return (
-                                            <div className="text-sm w-[200px]">
+                                            <div className="text-sm">
                                                 <div className="text-xs text-gray-600 mb-2">Interactive shape sorting result</div>
-                                                <div className="scale-75 origin-top-left transform">
-                                                    <ShapeDragCanvas 
-                                                        initialState={jsonData} 
-                                                        isInteractive={false} 
-                                                        showLabels={true}
-                                                    />
-                                                </div>
+                                                <ReadOnlyShapeSort data={jsonData} size="small" showLabels={true} />
                                             </div>
                                         );
                                     }
                                     
                                     if (stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData)) {
                                         return (
-                                            <div className="text-sm w-[200px]">
+                                            <div className="text-sm">
                                                 <div className="text-xs text-gray-600 mb-2">{jsonData.length} shapes ordered in sequence</div>
-                                                <div className="scale-75 origin-top-left transform">
-                                                    <ShapeOrderCanvas 
-                                                        initialState={jsonData} 
-                                                        isInteractive={false}
-                                                    />
-                                                </div>
+                                                <ReadOnlyShapeSequence data={jsonData} size="small" />
                                             </div>
                                         );
                                     }
                                     
                                     if (stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object') {
                                         return (
-                                            <div className="text-sm w-fit h-fit">
+                                            <div className="text-sm">
                                                 <div className="text-xs text-gray-600 mb-2">Bubble popper game result</div>
                                                 <ReadOnlyBubbleGrid data={jsonData} size="small" />
                                             </div>
@@ -309,7 +298,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                     
                                     // Fallback to JSON display if visual component fails
                                     return (
-                                        <div className="text-sm w-fit h-fit">
+                                        <div className="text-sm">
                                         <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-black mb-2">
                                             {JSON.stringify(jsonData, null, 2)}
                                         </pre>
@@ -368,15 +357,9 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                             
                                             if (typeof sortingData === 'object' && !Array.isArray(sortingData)) {
                                                 return (
-                                                    <div className="text-sm w-fit h-fit">
+                                                    <div className="text-sm">
                                                         <div className="text-gray-600 text-xs mb-2">{ai.name} shape sorting</div>
-                                                        <div className="scale-65 origin-top-left transform">
-                                                            <ShapeDragCanvas 
-                                                                initialState={sortingData} 
-                                                                isInteractive={false} 
-                                                                showLabels={true}
-                                                            />
-                                                        </div>
+                                                        <ReadOnlyShapeSort data={sortingData} size="small" showLabels={false} />
                                                     </div>
                                                 );
                                             }
@@ -384,21 +367,16 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                         
                                         if (stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData)) {
                                             return (
-                                                <div className="text-sm w-fit h-fit">
+                                                <div className="text-sm">
                                                     <div className="text-gray-600 text-xs mb-2">{ai.name} shape ordering ({jsonData.length} shapes)</div>
-                                                    <div className="scale-65 origin-top-left transform">
-                                                        <ShapeOrderCanvas 
-                                                            initialState={jsonData} 
-                                                            isInteractive={false}
-                                                        />
-                                                    </div>
+                                                    <ReadOnlyShapeSequence data={jsonData} size="small" />
                                                 </div>
                                             );
                                         }
                                         
                                         if (stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object') {
                                             return (
-                                                <div className="text-sm w-fit h-fit">
+                                                <div className="text-sm">
                                                     <div className="text-gray-600 text-xs mb-2">{ai.name} bubble popper</div>
                                                     <ReadOnlyBubbleGrid data={jsonData} size="small" />
                                                 </div>
@@ -407,7 +385,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                         
                                         // Fallback to JSON display
                                         return (
-                                            <div className="text-sm w-fit h-fit">
+                                            <div className="text-sm">
                                             <div className="text-gray-600 text-xs mb-1">JSON Response:</div>
                                             <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-gray-800">
                                                 {JSON.stringify(jsonData, null, 2)}
