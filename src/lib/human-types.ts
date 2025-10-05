@@ -2,7 +2,7 @@
 
 export interface HumanStepData {
   stepNumber: number
-  questionType: 'open-ended' | 'word-association' | 'image-description' | 'forced-choice' | 'scenario' | 'word-combination' | 'shape-sorting' | 'shape-ordering'
+  questionType: 'open-ended' | 'word-association' | 'image-description' | 'forced-choice' | 'scenario' | 'word-combination' | 'shape-sorting' | 'shape-ordering' | 'bubble-popper'
   question: string
   context?: string // Context/setup for the question
   userResponse: string
@@ -13,6 +13,7 @@ export interface HumanStepData {
   creativityScore?: number // 0-100
   shapeSortingResults?: { [categoryId: string]: string[] } // For shape-sorting questions
   shapeOrderingResults?: string[] // For shape-ordering questions
+  bubblePopperResults?: any // For bubble-popper questions
   linguisticMarkers?: {
     aiMarkers: string[]
     humanMarkers: string[]

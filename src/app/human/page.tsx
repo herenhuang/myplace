@@ -11,6 +11,7 @@ import { HUMAN_QUESTIONS, validateWordCombination } from '@/lib/human-questions'
 import ShapeDragCanvas from '@/components/ShapeDragCanvas'
 import { ShapeData } from '@/components/dnd/draggableUtils'
 import ShapeOrderCanvas from '@/components/ShapeOrderCanvas'
+import BubblePopper from '@/components/BubblePopper'
 import { getBaselinesForQuestion } from '@/lib/human-baselines'
 import { HumanStepData, HumanAnalysisResult } from '@/lib/human-types'
 import { HUMAN_TEST_DISCLAIMER } from '@/lib/human-constants'
@@ -44,6 +45,7 @@ export default function HumanTestPage() {
   const [responses, setResponses] = useState<HumanStepData[]>([])
   const [shapeSortingResults, setShapeSortingResults] = useState<{ [categoryId: string]: string[] }>({})
   const [shapeOrderingResults, setShapeOrderingResults] = useState<string[]>([])
+  const [bubblePopperResults, setBubblePopperResults] = useState<any>(null)
 
   // Results state
   const [analysisResult, setAnalysisResult] = useState<HumanAnalysisResult | null>(null)
@@ -58,6 +60,10 @@ export default function HumanTestPage() {
       convertedResults[categoryId] = shapes.map(shape => shape.id)
     })
     setShapeSortingResults(convertedResults)
+  }, []);
+
+  const handleBubblePopperComplete = useCallback((results: any) => {
+    setBubblePopperResults(results)
   }, []);
 
   // Initialize session and handle ?slide= param
@@ -150,6 +156,12 @@ export default function HumanTestPage() {
         isReadyToSubmit = false
       }
       finalResponse = JSON.stringify(shapeOrderingResults);
+    } else if (question.type === 'bubble-popper') {
+      if (!bubblePopperResults) {
+        // This should not happen if the button is only enabled after completion
+        isReadyToSubmit = false;
+      }
+      finalResponse = JSON.stringify(bubblePopperResults);
     } else {
       if (!userInput.trim()) {
         isReadyToSubmit = false
@@ -185,7 +197,8 @@ export default function HumanTestPage() {
         timestamp: new Date().toISOString(),
         aiBaseline,
         shapeSortingResults: question.type === 'shape-sorting' ? shapeSortingResults : undefined,
-        shapeOrderingResults: question.type === 'shape-ordering' ? shapeOrderingResults : undefined
+        shapeOrderingResults: question.type === 'shape-ordering' ? shapeOrderingResults : undefined,
+        bubblePopperResults: question.type === 'bubble-popper' ? bubblePopperResults : undefined
       }
 
       await recordHumanStep(dbSessionId, stepData)
@@ -213,6 +226,7 @@ export default function HumanTestPage() {
       setSelectedChoice(null)
       setShapeSortingResults({})
       setShapeOrderingResults([])
+      setBubblePopperResults(null)
       setStepStartTime(Date.now())
       
       // Focus input for next question
@@ -353,9 +367,11 @@ export default function HumanTestPage() {
     const isWordAssociation = question.type === 'word-association'
     const isShapeSorting = question.type === 'shape-sorting'
     const isShapeOrdering = question.type === 'shape-ordering'
+    const isBubblePopper = question.type === 'bubble-popper'
     const canSubmit = isMultipleChoice ? selectedChoice !== null : 
                      isShapeSorting ? Object.values(shapeSortingResults).flat().length === 9 :
                      isShapeOrdering ? shapeOrderingResults.length === 9 :
+                     isBubblePopper ? bubblePopperResults !== null :
                      userInput.trim().length > 0
     const characterCount = question.characterLimit ? userInput.length : null
     const isOverLimit = characterCount !== null && characterCount > question.characterLimit!
@@ -363,6 +379,7 @@ export default function HumanTestPage() {
     const canSubmitWithMinLength = isMultipleChoice ? selectedChoice !== null : 
                                   isShapeSorting ? Object.values(shapeSortingResults).flat().length === 9 :
                                   isShapeOrdering ? shapeOrderingResults.length === 9 :
+                                  isBubblePopper ? bubblePopperResults !== null :
                                   userInput.trim().length >= (question.minCharacterLength || 0)
 
     return (
@@ -434,6 +451,10 @@ export default function HumanTestPage() {
                 ) : isShapeOrdering ? (
                   <div className="w-full">
                     <ShapeOrderCanvas onOrderChange={setShapeOrderingResults} />
+                  </div>
+                ) : isBubblePopper ? (
+                  <div className="w-full">
+                    <BubblePopper onComplete={handleBubblePopperComplete} />
                   </div>
                 ) : isMultipleChoice && question.choices ? (
                   <div className="space-y-3">

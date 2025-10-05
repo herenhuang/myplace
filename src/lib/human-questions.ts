@@ -1,6 +1,6 @@
 export interface HumanQuestion {
   stepNumber: number
-  type: 'open-ended' | 'word-association' | 'image-description' | 'forced-choice' | 'scenario' | 'word-combination' | 'shape-sorting' | 'shape-ordering'
+  type: 'open-ended' | 'word-association' | 'image-description' | 'forced-choice' | 'scenario' | 'word-combination' | 'shape-sorting' | 'shape-ordering' | 'bubble-popper'
   question: string
   context?: string      
   imageUrl?: string
@@ -95,6 +95,12 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
     type: 'shape-ordering',
     question: "Order these shapes",
     context: "You are presented with 9 unique shapes. Drag them into the sequence row below in whatever order you believe is best. There is no right or wrong answer.",
+  },
+  {
+    stepNumber: 12,
+    type: 'bubble-popper',
+    question: "Pop the bubbles",
+    context: "Take as much or as little time as you'd like. There is no goal. End the game when you're ready.",
   }
 ]
 

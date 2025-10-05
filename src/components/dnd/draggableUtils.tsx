@@ -3,6 +3,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useDroppable } from '@dnd-kit/core';
 
 // --- Core Shape Data Structure ---
 export interface ShapeData {
@@ -32,7 +33,7 @@ export function DraggableShape({ id, shape }: DraggableShapeProps) {
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 100 : 'auto',
-  };
+  } as React.CSSProperties;
 
   const renderShape = () => {
     const size = 50;
@@ -53,6 +54,26 @@ export function DraggableShape({ id, shape }: DraggableShapeProps) {
       <div className="w-14 h-14 flex items-center justify-center bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
         <svg width="50" height="50" viewBox="0 0 50 50">{renderShape()}</svg>
       </div>
+    </div>
+  );
+}
+
+// --- Reusable Droppable Area (render-prop exposes isOver) ---
+interface DroppableAreaProps {
+  id: string;
+  baseClassName?: string;
+  overClassName?: string;
+  style?: React.CSSProperties;
+  children: (isOver: boolean) => React.ReactNode;
+}
+
+export function DroppableArea({ id, baseClassName = '', overClassName = '', style, children }: DroppableAreaProps) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  const className = `${baseClassName} ${isOver ? overClassName : ''}`.trim();
+
+  return (
+    <div ref={setNodeRef} className={className} style={style}>
+      {children(isOver)}
     </div>
   );
 }

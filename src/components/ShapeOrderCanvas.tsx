@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import {
   DndContext,
   DragOverlay,
-  closestCenter,
+  closestCorners,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -12,15 +12,15 @@ import {
   DragEndEvent,
   DragStartEvent,
   UniqueIdentifier,
-  useDroppable,
 } from '@dnd-kit/core'
 import {
   SortableContext,
   sortableKeyboardCoordinates,
+  rectSortingStrategy,
   horizontalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable'
-import { ShapeData, DraggableShape } from './dnd/draggableUtils'
+import { ShapeData, DraggableShape, DroppableArea } from './dnd/draggableUtils'
 
 // --- Main ShapeOrderCanvas Component ---
 
@@ -59,7 +59,9 @@ export default function ShapeOrderCanvas({ onOrderChange }: ShapeOrderCanvasProp
   }, [containers.sequence, onOrderChange]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -79,87 +81,105 @@ export default function ShapeOrderCanvas({ onOrderChange }: ShapeOrderCanvasProp
       return;
     }
 
-    const activeContainer = findContainer(active.id);
-    const overContainer = findContainer(over.id);
+    const activeId = active.id;
+    const overId = over.id;
+
+    const activeContainer = findContainer(activeId);
+    const overContainer = findContainer(overId);
 
     if (!activeContainer || !overContainer) {
       setActiveId(null);
       return;
     }
 
-    if (active.id !== over.id) {
-        setContainers((prev) => {
-            const activeItems = prev[activeContainer];
-            const overItems = prev[overContainer];
-            const activeIndex = activeItems.indexOf(active.id as string);
-            const overIndex = over.id in prev ? overItems.length : (overItems.indexOf(over.id as string) === -1 ? overItems.length : overItems.indexOf(over.id as string));
-    
-            const newContainers = { ...prev };
-    
-            if (activeContainer === overContainer) {
-                if (activeIndex !== overIndex) {
-                    newContainers[activeContainer] = arrayMove(overItems, activeIndex, overIndex);
-                }
-            } else {
-                newContainers[activeContainer] = activeItems.filter((item) => item !== active.id);
-                newContainers[overContainer] = [
-                    ...overItems.slice(0, overIndex),
-                    active.id as string,
-                    ...overItems.slice(overIndex),
-                ];
-            }
-    
-            return newContainers;
-        });
+    if (activeId !== overId) {
+      setContainers((prev) => {
+        const activeItems = prev[activeContainer];
+        const overItems = prev[overContainer];
+        const activeIndex = activeItems.indexOf(activeId as string);
+        const overIndex = over.id in prev ? overItems.length : overItems.indexOf(overId as string);
+
+        const newContainers = { ...prev };
+
+        if (activeContainer === overContainer) {
+          if (activeIndex !== overIndex) {
+            newContainers[activeContainer] = arrayMove(overItems, activeIndex, overIndex);
+          }
+        } else {
+          newContainers[activeContainer] = activeItems.filter((item) => item !== activeId);
+          newContainers[overContainer] = [
+            ...overItems.slice(0, overIndex),
+            activeId as string,
+            ...overItems.slice(overIndex),
+          ];
+        }
+
+        return newContainers;
+      });
     }
 
     setActiveId(null);
   };
-  
-  const { setNodeRef: paletteRef, isOver: isOverPalette } = useDroppable({ id: 'palette' });
-  const { setNodeRef: sequenceRef, isOver: isOverSequence } = useDroppable({ id: 'sequence' });
 
   const activeShape = activeId ? shapes[activeId as string] : null;
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      {/* Palette Area */}
-      <div ref={paletteRef} className={`relative w-full bg-gray-50 rounded-lg p-4 mb-4 transition-colors ${isOverPalette ? 'bg-gray-100' : ''}`}>
-        <SortableContext items={containers.palette}>
-          <div className="grid grid-cols-5 gap-4">
-            {containers.palette.map((id) => (
-              <DraggableShape key={id} id={id} shape={shapes[id]} />
-            ))}
-          </div>
-        </SortableContext>
-        {containers.palette.length === 0 && <div className="text-gray-400 text-center py-8">All shapes have been ordered.</div>}
-      </div>
-
-      {/* Sequence Drop Zone */}
-      <div
-        ref={sequenceRef}
-        className={`w-full bg-blue-50 rounded-lg p-4 border-2 border-dashed ${
-          isOverSequence ? 'border-blue-500' : 'border-blue-200'
-        }`}
-        style={{ minHeight: '100px' }}
+    <div className="w-full max-w-6xl mx-auto p-6 border-1 border-gray-300 rounded-lg">
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      {/* Palette Area (match ShapeDragCanvas styling) */}
+      <DroppableArea
+        id="palette"
+        baseClassName="relative w-full bg-gray-50 rounded-xl p-6 mb-8"
+        overClassName=""
       >
-        <SortableContext items={containers.sequence} strategy={horizontalListSortingStrategy}>
-          <div className="flex flex-wrap gap-3">
-            {containers.sequence.map((id) => (
-              <DraggableShape key={id} id={id} shape={shapes[id]} />
-            ))}
-            {containers.sequence.length === 0 && (
-              <div className="text-blue-500 flex-1 text-center py-5">Drag shapes here to create your sequence</div>
-            )}
-          </div>
-        </SortableContext>
-      </div>
+        {() => (
+          <SortableContext items={containers.palette} strategy={rectSortingStrategy}>
+            <div className="flex flex-wrap gap-4 justify-center bg-gray-50 rounded-xl min-h-[112px]">
+              {containers.palette.map((id) => (
+                <DraggableShape key={id} id={id} shape={shapes[id]} />
+              ))}
+              {containers.palette.length === 0 && (
+                <div className="text-gray-400 text-sm flex items-center justify-center w-full py-4">All shapes ordered!</div>
+              )}
+            </div>
+          </SortableContext>
+        )}
+      </DroppableArea>
+
+      {/* Sequence Drop Zone (match ShapeDragCanvas droppable styles) */}
+      <DroppableArea
+        id="sequence"
+        baseClassName="w-full rounded-xl p-6 border-2 border-dashed"
+        overClassName="border-blue-500 bg-blue-100"
+        style={{ borderColor: '#bfdbfe', backgroundColor: '#eff6ff' }}
+      >
+        {(isOver) => (
+          <SortableContext items={containers.sequence} strategy={horizontalListSortingStrategy}>
+            <div className="flex flex-wrap gap-3">
+              {containers.sequence.map((id) => (
+                <DraggableShape key={id} id={id} shape={shapes[id]} />
+              ))}
+              {containers.sequence.length === 0 && (
+                <div className="text-blue-500 flex-1 text-center py-5">Drag shapes here to create your sequence</div>
+              )}
+            </div>
+          </SortableContext>
+        )}
+      </DroppableArea>
 
       <DragOverlay>
         {activeShape ? (
+          <div className="rotate-12 scale-110 opacity-90">
             <DraggableShape id={activeShape.id} shape={activeShape} />
+          </div>
         ) : null}
       </DragOverlay>
     </DndContext>
+    </div>
   );
 }

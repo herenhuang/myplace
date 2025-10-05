@@ -11,6 +11,7 @@ import ResultsTabs from '../ResultsTabs'
 import ShapeDragCanvas from '@/components/ShapeDragCanvas'
 import { ShapeData } from '@/components/dnd/draggableUtils'
 import ShapeOrderCanvas from '@/components/ShapeOrderCanvas'
+import BubblePopper from '@/components/BubblePopper'
 import styles from './inference.module.scss'
 import PageContainer from '@/components/layout/PageContainer'
 
@@ -24,6 +25,7 @@ export default function HumanInferencePage() {
   const [responses, setResponses] = useState<Record<number, string>>({})
   const [shapeSortingResults, setShapeSortingResults] = useState<Record<number, { [categoryId: string]: string[] }>>({})
   const [shapeOrderingResults, setShapeOrderingResults] = useState<Record<number, string[]>>({})
+  const [bubblePopperResults, setBubblePopperResults] = useState<Record<number, any>>({})
   const [focusTimes, setFocusTimes] = useState<Record<number, number>>({})
   const [analysisResult, setAnalysisResult] = useState<HumanAnalysisResult | null>(null)
   const [analysisError, setAnalysisError] = useState<string>('')
@@ -71,6 +73,12 @@ export default function HumanInferencePage() {
     handleInputChange(stepNumber, JSON.stringify(orderedIds));
   }, [handleInputChange]);
 
+  const handleBubblePopperComplete = useCallback((results: any) => {
+    const stepNumber = 12; // Bubble popper is always step 12
+    setBubblePopperResults(prev => ({...prev, [stepNumber]: results}));
+    handleInputChange(stepNumber, JSON.stringify(results));
+  }, [handleInputChange]);
+
   const handleInputFocus = (stepNumber: number) => {
     setFocusTimes(prev => ({ ...prev, [stepNumber]: Date.now() }))
   }
@@ -89,7 +97,8 @@ export default function HumanInferencePage() {
           timestamp: new Date().toISOString(),
           aiBaseline: getBaselinesForQuestion(stepNumber),
           shapeSortingResults: question.type === 'shape-sorting' ? shapeSortingResults[stepNumber] : undefined,
-          shapeOrderingResults: question.type === 'shape-ordering' ? shapeOrderingResults[stepNumber] : undefined
+          shapeOrderingResults: question.type === 'shape-ordering' ? shapeOrderingResults[stepNumber] : undefined,
+          bubblePopperResults: question.type === 'bubble-popper' ? bubblePopperResults[stepNumber] : undefined
         }
 
         // Update cache
@@ -168,7 +177,8 @@ export default function HumanInferencePage() {
           timestamp: new Date().toISOString(),
           aiBaseline: getBaselinesForQuestion(question.stepNumber),
           shapeSortingResults: question.type === 'shape-sorting' ? shapeSortingResults[question.stepNumber] : undefined,
-          shapeOrderingResults: question.type === 'shape-ordering' ? shapeOrderingResults[question.stepNumber] : undefined
+          shapeOrderingResults: question.type === 'shape-ordering' ? shapeOrderingResults[question.stepNumber] : undefined,
+          bubblePopperResults: question.type === 'bubble-popper' ? bubblePopperResults[question.stepNumber] : undefined
         }
         steps.push(stepData)
       }
@@ -220,6 +230,7 @@ export default function HumanInferencePage() {
     setResponses({})
     setShapeSortingResults({})
     setShapeOrderingResults({})
+    setBubblePopperResults({})
     setFocusTimes({})
     setAnalysisResult(null)
     setAnalysisError('')
@@ -276,6 +287,10 @@ export default function HumanInferencePage() {
                   ) : question.type === 'shape-ordering' ? (
                     <div className="w-full">
                       <ShapeOrderCanvas onOrderChange={handleShapeOrderChange} />
+                    </div>
+                  ) : question.type === 'bubble-popper' ? (
+                    <div className="w-full">
+                      <BubblePopper onComplete={handleBubblePopperComplete} />
                     </div>
                   ) : question.type === 'forced-choice' && question.choices ? (
                     <div className={styles.choicesContainer}>
