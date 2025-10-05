@@ -5,6 +5,9 @@ import styles from './results-tabs.module.scss'
 import { HumanAnalysisResult, HumanStepData } from '@/lib/human-types'
 import { getQAFromSources } from './utils'
 import WaveChart from './WaveChart'
+import ShapeDragCanvas from '@/components/ShapeDragCanvas'
+import ShapeOrderCanvas from '@/components/ShapeOrderCanvas'
+import ReadOnlyBubbleGrid from '@/components/ReadOnlyBubbleGrid'
 
 import Image from 'next/image'
 type ActiveTab = 'results-overview' | 'results-breakdown' | 'results-archetype'
@@ -265,31 +268,54 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                 if (isGameQuestion && qa.userResponse && qa.userResponse !== '—') {
                                     try {
                                     const jsonData = JSON.parse(qa.userResponse);
+                                    
+                                    if (stepData?.questionType === 'shape-sorting' && typeof jsonData === 'object' && !Array.isArray(jsonData)) {
+                                        return (
+                                            <div className="text-sm w-[200px]">
+                                                <div className="text-xs text-gray-600 mb-2">Interactive shape sorting result</div>
+                                                <div className="scale-75 origin-top-left transform">
+                                                    <ShapeDragCanvas 
+                                                        initialState={jsonData} 
+                                                        isInteractive={false} 
+                                                        showLabels={true}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    
+                                    if (stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData)) {
+                                        return (
+                                            <div className="text-sm w-[200px]">
+                                                <div className="text-xs text-gray-600 mb-2">{jsonData.length} shapes ordered in sequence</div>
+                                                <div className="scale-75 origin-top-left transform">
+                                                    <ShapeOrderCanvas 
+                                                        initialState={jsonData} 
+                                                        isInteractive={false}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    
+                                    if (stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object') {
+                                        return (
+                                            <div className="text-sm w-fit h-fit">
+                                                <div className="text-xs text-gray-600 mb-2">Bubble popper game result</div>
+                                                <ReadOnlyBubbleGrid data={jsonData} size="small" />
+                                            </div>
+                                        );
+                                    }
+                                    
+                                    // Fallback to JSON display if visual component fails
                                     return (
-                                        <div className="text-sm">
+                                        <div className="text-sm w-fit h-fit">
                                         <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-black mb-2">
                                             {JSON.stringify(jsonData, null, 2)}
                                         </pre>
-                                        {stepData?.questionType === 'shape-sorting' && (
-                                            <div className="text-xs text-gray-600">
-                                            Interactive shape sorting result
-                                            </div>
-                                        )}
-                                        {stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData) && (
-                                            <div className="text-xs text-gray-600">
-                                            {jsonData.length} shapes ordered in sequence
-                                            </div>
-                                        )}
-                                            {stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object' && (
-                                                <div className="text-xs text-gray-600">
-                                                {jsonData.bubblesPopped || 0} bubbles popped in {jsonData.timeElapsed || 0}s
-                                                {jsonData.bubbleGrid && Array.isArray(jsonData.bubbleGrid) && (
-                                                    <div className="mt-1">
-                                                    10×10 grid captured ({jsonData.bubbleGrid.flat().filter((v: number) => v === 0).length} popped)
-                                                    </div>
-                                                )}
-                                                </div>
-                                            )}
+                                        <div className="text-xs text-gray-600">
+                                            Game data visualization unavailable
+                                        </div>
                                         </div>
                                     );
                                     } catch (e) {
@@ -327,33 +353,69 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                     if (isGameQuestion && ai.response && ai.response !== '—') {
                                         try {
                                         const jsonData = JSON.parse(ai.response);
+                                        
+                                        if (stepData?.questionType === 'shape-sorting') {
+                                            // Handle both object format and array format from AI responses
+                                            let sortingData = jsonData;
+                                            if (Array.isArray(jsonData)) {
+                                                // Convert array format to object format if needed
+                                                sortingData = {
+                                                    category1: jsonData.slice(0, 3),
+                                                    category2: jsonData.slice(3, 6),
+                                                    category3: jsonData.slice(6, 9)
+                                                };
+                                            }
+                                            
+                                            if (typeof sortingData === 'object' && !Array.isArray(sortingData)) {
+                                                return (
+                                                    <div className="text-sm w-fit h-fit">
+                                                        <div className="text-gray-600 text-xs mb-2">{ai.name} shape sorting</div>
+                                                        <div className="scale-65 origin-top-left transform">
+                                                            <ShapeDragCanvas 
+                                                                initialState={sortingData} 
+                                                                isInteractive={false} 
+                                                                showLabels={true}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        }
+                                        
+                                        if (stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData)) {
+                                            return (
+                                                <div className="text-sm w-fit h-fit">
+                                                    <div className="text-gray-600 text-xs mb-2">{ai.name} shape ordering ({jsonData.length} shapes)</div>
+                                                    <div className="scale-65 origin-top-left transform">
+                                                        <ShapeOrderCanvas 
+                                                            initialState={jsonData} 
+                                                            isInteractive={false}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                        
+                                        if (stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object') {
+                                            return (
+                                                <div className="text-sm w-fit h-fit">
+                                                    <div className="text-gray-600 text-xs mb-2">{ai.name} bubble popper</div>
+                                                    <ReadOnlyBubbleGrid data={jsonData} size="small" />
+                                                </div>
+                                            );
+                                        }
+                                        
+                                        // Fallback to JSON display
                                         return (
-                                            <div className="text-sm">
+                                            <div className="text-sm w-fit h-fit">
                                             <div className="text-gray-600 text-xs mb-1">JSON Response:</div>
                                             <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-gray-800">
                                                 {JSON.stringify(jsonData, null, 2)}
                                             </pre>
-                                            {stepData?.questionType === 'shape-sorting' && Array.isArray(jsonData) && (
-                                                <div className="mt-2 text-xs text-gray-600">
-                                                {jsonData.length} shapes sorted into categories
-                            </div>
-                                            )}
-                                            {stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData) && (
-                                                <div className="mt-2 text-xs text-gray-600">
-                                                {jsonData.length} shapes arranged in sequence
-                        </div>
-                                            )}
-                                            {stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object' && (
-                                                <div className="mt-2 text-xs text-gray-600">
-                                                {jsonData.bubblesPopped || 0} bubbles • {jsonData.duration || 0}s • {jsonData.pattern || 'unknown'} pattern
-                                                {jsonData.bubbleGrid && Array.isArray(jsonData.bubbleGrid) && (
-                                                    <div className="mt-1">
-                                                    10×10 grid ({jsonData.bubbleGrid.flat().filter((v: number) => v === 0).length} popped)
-                            </div>
-                                                )}
-                        </div>
-                                            )}
-                            </div>
+                                            <div className="mt-2 text-xs text-gray-600">
+                                                Visual representation unavailable
+                                            </div>
+                                            </div>
                                         );
                                         } catch (e) {
                                         // If JSON parsing fails, show as regular text

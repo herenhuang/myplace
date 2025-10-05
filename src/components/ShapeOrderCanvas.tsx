@@ -40,9 +40,10 @@ const ORDERING_SHAPES: ShapeData[] = [
 interface ShapeOrderCanvasProps {
   onOrderChange?: (orderedIds: string[]) => void;
   initialState?: string[];
+  isInteractive?: boolean;
 }
 
-export default function ShapeOrderCanvas({ onOrderChange, initialState }: ShapeOrderCanvasProps) {
+export default function ShapeOrderCanvas({ onOrderChange, initialState, isInteractive = true }: ShapeOrderCanvasProps) {
   const [isMounted, setIsMounted] = useState(false)
   
   useEffect(() => {
@@ -183,6 +184,49 @@ export default function ShapeOrderCanvas({ onOrderChange, initialState }: ShapeO
     )
   }
 
+  // Render read-only version if not interactive
+  if (!isInteractive) {
+    return (
+      <div className={styles.gameCanvas}>
+        {/* Palette Area - read-only */}
+        {containers.palette.length > 0 && (
+          <div className="relative w-full bg-gray-50 rounded-xl p-6 mb-8 border-2 border-transparent">
+            <div className="flex flex-wrap gap-4 justify-center rounded-xl min-h-[112px]">
+              {containers.palette.map((id) => (
+                <div key={id} className="pointer-events-none">
+                  <DraggableShape id={id} shape={shapes[id]} />
+                </div>
+              ))}
+            </div>
+            {containers.palette.length === 0 && (
+              <div className="text-sm flex items-center justify-center w-full py-4 text-gray-400">
+                All shapes ordered!
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Sequence Display - read-only */}
+        <div className="w-full rounded-xl p-6 border-2 border-dashed min-h-[120px]" style={{ borderColor: '#bfdbfe', backgroundColor: '#eff6ff' }}>
+          <div className="w-full h-full">
+            <div className="flex flex-wrap gap-3">
+              {containers.sequence.map((id) => (
+                <div key={id} className="pointer-events-none">
+                  <DraggableShape id={id} shape={shapes[id]} />
+                </div>
+              ))}
+              {containers.sequence.length === 0 && (
+                <div className="flex-1 text-center py-5 text-blue-500">
+                  No shapes in sequence
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.gameCanvas}>
     <DndContext
@@ -194,17 +238,19 @@ export default function ShapeOrderCanvas({ onOrderChange, initialState }: ShapeO
       {/* Palette Area (match ShapeDragCanvas styling) */}
       <DroppableArea
         id="palette"
-        baseClassName="relative w-full bg-gray-50 rounded-xl p-6 mb-8"
-        overClassName=""
+        baseClassName="relative w-full bg-gray-50 rounded-xl p-6 mb-8 border-2 border-transparent transition-colors"
+        overClassName="!border-blue-500 !bg-blue-50"
       >
-        {() => (
+        {(isOver) => (
           <SortableContext items={containers.palette} strategy={rectSortingStrategy}>
-            <div className="flex flex-wrap gap-4 justify-center bg-gray-50 rounded-xl min-h-[112px]">
+            <div className="flex flex-wrap gap-4 justify-center rounded-xl min-h-[112px]">
               {containers.palette.map((id) => (
                 <DraggableShape key={id} id={id} shape={shapes[id]} />
               ))}
               {containers.palette.length === 0 && (
-                <div className="text-gray-400 text-sm flex items-center justify-center w-full py-4">All shapes ordered!</div>
+                <div className={`text-sm flex items-center justify-center w-full py-4 ${isOver ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
+                  {isOver ? 'Drop here to return' : 'All shapes ordered!'}
+                </div>
               )}
             </div>
           </SortableContext>
@@ -214,21 +260,25 @@ export default function ShapeOrderCanvas({ onOrderChange, initialState }: ShapeO
       {/* Sequence Drop Zone (match ShapeDragCanvas droppable styles) */}
       <DroppableArea
         id="sequence"
-        baseClassName="w-full rounded-xl p-6 border-2 border-dashed"
-        overClassName="border-blue-500 bg-blue-100"
+        baseClassName="w-full rounded-xl p-6 border-2 border-dashed transition-colors min-h-[120px]"
+        overClassName="!border-blue-500 !bg-blue-100"
         style={{ borderColor: '#bfdbfe', backgroundColor: '#eff6ff' }}
       >
         {(isOver) => (
-          <SortableContext items={containers.sequence} strategy={horizontalListSortingStrategy}>
-            <div className="flex flex-wrap gap-3">
-              {containers.sequence.map((id) => (
-                <DraggableShape key={id} id={id} shape={shapes[id]} />
-              ))}
-              {containers.sequence.length === 0 && (
-                <div className="text-blue-500 flex-1 text-center py-5">Drag shapes here to create your sequence</div>
-              )}
-            </div>
-          </SortableContext>
+          <div className="w-full h-full">
+            <SortableContext items={containers.sequence} strategy={horizontalListSortingStrategy}>
+              <div className="flex flex-wrap gap-3">
+                {containers.sequence.map((id) => (
+                  <DraggableShape key={id} id={id} shape={shapes[id]} />
+                ))}
+                {containers.sequence.length === 0 && (
+                  <div className={`flex-1 text-center py-5 ${isOver ? 'text-blue-700 font-medium' : 'text-blue-500'}`}>
+                    {isOver ? 'Drop here!' : 'Drag shapes here to create your sequence'}
+                  </div>
+                )}
+              </div>
+            </SortableContext>
+          </div>
         )}
       </DroppableArea>
 

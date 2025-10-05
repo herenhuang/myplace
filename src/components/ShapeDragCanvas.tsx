@@ -98,12 +98,14 @@ interface ShapeDragCanvasProps {
   onComplete?: (results: { [key: string]: ShapeData[] }) => void
   showLabels?: boolean
   initialState?: { [categoryId: string]: string[] }
+  isInteractive?: boolean
 }
 
 export default function ShapeDragCanvas({ 
   onComplete, 
   showLabels = true,
-  initialState
+  initialState,
+  isInteractive = true
 }: ShapeDragCanvasProps) {
   const [isMounted, setIsMounted] = useState(false)
   
@@ -283,6 +285,59 @@ export default function ShapeDragCanvas({
       <div className={styles.gameCanvas}>
         <div className="flex items-center justify-center min-h-[400px] text-gray-400">
           Loading...
+        </div>
+      </div>
+    )
+  }
+
+  // Render read-only version if not interactive
+  if (!isInteractive) {
+    return (
+      <div className={styles.gameCanvas}>
+        {/* Unsorted shapes area - read-only */}
+        {containers.unsorted.length > 0 && (
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-4 justify-center p-6 bg-gray-50 rounded-xl min-h-[112px]">
+              {containers.unsorted.map((id) => (
+                <div key={id} className="pointer-events-none">
+                  <DraggableShape id={id} shape={shapes[id]} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Category display zones - read-only */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          {CATEGORIES.map((category) => {
+            const categoryShapes = containers[category.id].map(id => shapes[id])
+            return (
+              <div key={category.id} className="flex flex-col items-center">
+                <div 
+                  className="w-32 h-64 rounded-lg border-2 border-gray-300 flex flex-col items-center justify-center p-4"
+                  style={{ backgroundColor: category.color + '40' }}
+                >
+                  <div className="flex flex-wrap gap-2 justify-center min-h-[100px] w-full">
+                    {categoryShapes.map((shape) => (
+                      <div key={shape.id} className="pointer-events-none">
+                        <DraggableShape id={shape.id} shape={shape} />
+                      </div>
+                    ))}
+                  </div>
+                  {categoryShapes.length === 0 && (
+                    <div className="text-gray-400 text-sm text-center">
+                      Empty category
+                    </div>
+                  )}
+                </div>
+                {showLabels && (
+                  <div className="text-center mt-2">
+                    <div className="text-sm font-medium text-gray-700">{category.label}</div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     )
