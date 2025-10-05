@@ -558,9 +558,6 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // Calculate progress
-  const progress = currentQuestionIndex / config.questions.length
-
   // Render content for inside the phone container
   const renderContent = () => {
     switch (screenState) {
@@ -621,18 +618,6 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   return (
     <PageContainer className="!max-w-none max-w-4xl">
       <div className={styles.quizContainer}>
-        {/* Progress Bar */}
-        {screenState === 'question' && (
-          <div className={styles.progressContainer}>
-            <div className={styles.progressBarTrack}>
-              <div
-                className={styles.progressBarFill}
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
-
         {/* Phone Container */}
         <div className={styles.stepContainer}>
           <div className={styles.stepContent}>
@@ -642,6 +627,21 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                 backgroundImage: `url(${config.theme.backgroundImage})`
               }}
             >
+              {/* Progress Bar - Inside phone container */}
+              {screenState === 'question' && (
+                <div className={styles.progressContainer}>
+                  {config.questions.map((_, index) => (
+                    <div key={index} className={styles.progressBarTrack}>
+                      <div
+                        className={styles.progressBarFill}
+                        style={{
+                          width: index <= currentQuestionIndex ? '100%' : '0%'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               {renderContent()}
             </div>
           </div>
