@@ -11,7 +11,7 @@ export const flirtingStyleQuiz: QuizConfig = {
     secondaryColor: '#fed7aa',
     backgroundColor: '#fff7ed',
     textColor: '#7c2d12',
-    backgroundImage: '/quiz/flirting-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #f97316 0%, #fed7aa 50%, #fff7ed 100%)'
   },
   
   questions: [
@@ -203,15 +203,15 @@ CRITICAL: Do NOT make up names like "Bold Flirt" or "Smooth Operator" unless tho
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a fun, insightful friend analyzing someone's flirting style. They're a "{{archetype}}" - {{tagline}}.
 
-Write an engaging, playful explanation with these sections:
+Write an engaging, playful explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 ## Your Flirting DNA
 
-Start with "As a {{archetype}}, you..." and write 2-3 sentences about how they show interest. Make sure it connects to their tagline: "{{tagline}}". Reference their actual quiz answers to show you get their specific vibe.
+Write 2-3 sentences about how they navigate the romantic landscape with their unique style. Use "you" language (not "As a {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
 
 ## What I'm Seeing In Action
 
-Highlight 3 specific patterns from their actual answers that reveal they're a {{archetype}}:
+Highlight 3 specific patterns from their actual answers that reveal their style:
 - When you said [specific answer], that's textbook {{archetype}} energy
 - Your approach to [specific situation] shows [characteristic of their style]
 - The fact that you [another specific answer] tells me [insight]
@@ -237,7 +237,7 @@ End with one empowering sentence about owning their {{archetype}} style and bein
 Their full answers:
 {{answers}}
 
-Use "{{archetype}}" consistently throughout (never shorten or modify it). Be fun, playful, specific to their answers, and encouraging. Use markdown with ## for headers. Make them feel seen and maybe laugh a little.`
+When referring to their style, use the exact term "{{archetype}}" (never shorten or modify it). Be fun, playful, specific to their answers, and encouraging. Use markdown with ## for section headers. Make them feel seen and maybe laugh a little.`
   }
 }
 

@@ -11,7 +11,7 @@ export const managerStyleQuiz: QuizConfig = {
     secondaryColor: '#a5b4fc',
     backgroundColor: '#fafafa',
     textColor: '#1e293b',
-    backgroundImage: '/quiz/manager-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #6366f1 0%, #a5b4fc 50%, #fafafa 100%)'
   },
   
   questions: [
@@ -202,24 +202,24 @@ IMPORTANT: Do NOT make up names like "Empowering Leader" or "Strategic Manager".
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a leadership expert analyzing someone's management style. They are a "{{archetype}}" - {{tagline}}.
 
-Write a warm, engaging explanation with these sections:
+Write a warm, engaging explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 ## Your Management DNA
-Start with "As {{archetype}}, you..." and write 2-3 sentences about their core leadership approach. Make sure the description aligns with their tagline: "{{tagline}}". Reference their actual quiz answers.
+Write 2-3 sentences about their core leadership approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
 
 ## What I Noticed
-Highlight 2-3 specific patterns from their actual answers that show they're {{archetype}}:
-- When they answered [specific answer], that shows [insight about {{archetype}}]
-- Their choice of [specific answer] reveals [trait]
+Highlight 2-3 specific patterns from their actual answers that show their management style:
+- When you answered [specific answer], that shows [insight about their style]
+- Your choice of [specific answer] reveals [trait]
 - [Another answer-to-trait connection]
 
 ## You Were Also Close To...
 {{alternatives}}
 
-Write 1 engaging sentence for each alternative style explaining why they showed hints of it.
+Write 1 engaging sentence for each alternative style explaining why they showed hints of it based on their answers.
 
-## Tips for Your Growth as {{archetype}}
-Give 2 practical tips tailored to {{archetype}}. Format: "As {{archetype}}, consider..."
+## Tips for Your Growth
+Give 2 practical tips using "you" language (not "As {{archetype}}..."). Be encouraging and specific.
 
 ## Your Leadership Impact
 End with an inspiring sentence about the unique value they bring as {{archetype}}.
@@ -227,7 +227,7 @@ End with an inspiring sentence about the unique value they bring as {{archetype}
 Their answers:
 {{answers}}
 
-Use "{{archetype}}" consistently throughout. Be personal, insightful, and specific. Use markdown with ## for headers.`
+When referring to their style, use the exact term "{{archetype}}" (never shorten or modify it). Be personal, insightful, and specific. Use markdown with ## for section headers.`
   }
 }
 

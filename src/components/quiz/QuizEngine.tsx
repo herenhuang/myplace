@@ -142,6 +142,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
       const sid = getOrCreateSessionId()
       setSessionId(sid)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.id])
 
   // Save state whenever it changes
@@ -260,19 +261,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     const newPath = [...questionPath, currentQuestion.id]
     setQuestionPath(newPath)
 
-    // Record response to database
-    try {
-      await fetch('/api/quiz/record', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: dbSessionId,
-          response
-        })
-      })
-    } catch (error) {
-      console.error('Error recording response:', error)
-    }
+    // NOTE: Responses are saved in state, not incrementally to DB
+    // Will save all responses at END via /api/quiz/complete
 
     // Determine next question
     let nextQuestionId: string | null = null
@@ -419,6 +409,26 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           explanation
         }
 
+        // Save complete session to database
+        try {
+          await fetch('/api/quiz/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              quizId: config.id,
+              sessionId: sessionId,
+              responses: quizResponses,
+              result: {
+                personalityId: topPersonalityId,
+                personalityName: matchedPersonality.name,
+                explanation
+              }
+            })
+          })
+        } catch (error) {
+          console.error('Error saving quiz completion:', error)
+        }
+
         setResult(finalResult)
         setScreenState('results')
       } else {
@@ -499,6 +509,29 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             },
             responses: quizResponses,
             explanation
+          }
+
+          // Save complete session to database
+          try {
+            await fetch('/api/quiz/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                quizId: config.id,
+                sessionId: sessionId,
+                responses: quizResponses,
+                result: {
+                  firstWord,
+                  secondWord,
+                  fullArchetype,
+                  tagline,
+                  explanation,
+                  alternatives: alternatives || []
+                }
+              })
+            })
+          } catch (error) {
+            console.error('Error saving quiz completion:', error)
           }
 
           setResult(finalResult)
