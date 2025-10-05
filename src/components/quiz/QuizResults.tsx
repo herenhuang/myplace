@@ -71,10 +71,12 @@ export default function QuizResults({ config, result, onRestart }: QuizResultsPr
   return (
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
-        <h1 className={styles.resultTitle}>{displayName}</h1>
-        {displayTagline && (
-          <p className={styles.resultTagline}>{displayTagline}</p>
-        )}
+        <div className={styles.explanationHeader}>
+          <h2 className={styles.resultNameSmall}>{displayName}</h2>
+          {displayTagline && (
+            <p className={styles.resultTaglineExplanation}>"{displayTagline}"</p>
+          )}
+        </div>
         <div className={styles.markdownContent}>
           <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
         </div>
