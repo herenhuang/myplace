@@ -51,21 +51,9 @@ export const managerStyleQuiz: QuizConfig = {
       allowCustomInput: true
     },
     
-    // Question 4 - Planning vs Adaptability (Structured vs Agile vs Visionary)
+    // Question 4 - Crisis Management (Calm vs Action vs Collaborative)
     {
       id: 'q4',
-      text: 'You\'re planning next quarter. What does your approach look like?',
-      options: [
-        { label: 'Detailed roadmap with milestones and owners', value: 'structured_planner' },
-        { label: 'Big goals with flexibility on execution', value: 'flexible_adaptive' },
-        { label: 'North star vision, team figures out the path', value: 'visionary_delegator' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 5 - Crisis Management (Calm vs Action vs Collaborative)
-    {
-      id: 'q5',
       text: 'Major issue drops Friday at 4pm. Customer is upset. Your first move?',
       options: [
         { label: 'Jump in and start solving it myself', value: 'hands_on_solver' },
@@ -74,10 +62,10 @@ export const managerStyleQuiz: QuizConfig = {
       ],
       allowCustomInput: true
     },
-    
-    // Question 6 - Development Focus (Coach vs Autonomy vs Performance)
+
+    // Question 5 - Development Focus (Coach vs Autonomy vs Performance)
     {
-      id: 'q6',
+      id: 'q5',
       text: 'Team member asks: "How should I approach this project?"',
       options: [
         { label: 'I walk them through my thinking process', value: 'teaching_coach' },
@@ -87,50 +75,38 @@ export const managerStyleQuiz: QuizConfig = {
       allowCustomInput: true
     },
     
-    // Question 7 - Feedback Style (Continuous vs Structured vs Balanced)
+    // Question 6 - Feedback Style (Continuous vs Structured vs Balanced)
+    {
+      id: 'q6',
+      text: 'Your teammate just wrapped a presentation that went sideways. They\'re walking back to their desk. You...',
+      options: [
+        { label: 'Pull them aside right now: "Hey, can we talk?"', value: 'continuous_real_time' },
+        { label: 'Add it to the agenda for your next 1:1', value: 'structured_formal' },
+        { label: 'Read the room - if they seem open, mention it now', value: 'balanced_contextual' }
+      ],
+      allowCustomInput: true
+    },
+
+    // Question 7 - Team Culture (Accountability vs Psychological Safety vs Achievement)
     {
       id: 'q7',
-      text: 'How do you typically give feedback to your team?',
+      text: 'Your team member asks to push a deadline to improve the quality. The client is waiting. You...',
       options: [
-        { label: 'In the moment when I notice something', value: 'continuous_real_time' },
-        { label: 'During scheduled 1:1s and reviews', value: 'structured_formal' },
-        { label: 'Mix of both depending on the situation', value: 'balanced_contextual' }
+        { label: 'No - we committed, we deliver on time', value: 'accountability_results' },
+        { label: 'Let\'s talk through what you need and find a way', value: 'psychological_safety' },
+        { label: 'What could you learn by trying something new here?', value: 'growth_development' }
       ],
       allowCustomInput: true
     },
     
-    // Question 8 - Team Culture (Accountability vs Psychological Safety vs Achievement)
+    // Question 8 - Conflict Resolution (Mediator vs Direct vs Process)
     {
       id: 'q8',
-      text: 'What would your team say is most important to you?',
-      options: [
-        { label: 'We hit our commitments and deliver', value: 'accountability_results' },
-        { label: 'Everyone feels safe to take risks', value: 'psychological_safety' },
-        { label: 'We\'re constantly learning and growing', value: 'growth_development' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 9 - Conflict Resolution (Mediator vs Direct vs Process)
-    {
-      id: 'q9',
       text: 'Two team members have an ongoing tension. You...',
       options: [
         { label: 'Bring them together to talk it through', value: 'mediating_facilitator' },
         { label: 'Talk to each separately, then address it', value: 'diplomatic_individual' },
         { label: 'Name the issue directly in team meeting', value: 'transparent_direct' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 10 - Success Definition (Team Growth vs Impact vs Innovation)
-    {
-      id: 'q10',
-      text: 'The quarter just ended. What makes you feel most successful?',
-      options: [
-        { label: 'Seeing my team members grow and excel', value: 'people_developer' },
-        { label: 'Knowing we delivered meaningful impact', value: 'impact_focused' },
-        { label: 'Finding a better way to do something', value: 'innovation_optimizer' }
       ],
       allowCustomInput: true
     }
@@ -153,14 +129,14 @@ export const managerStyleQuiz: QuizConfig = {
     secondWords: [
       'Coach',           // Develops people
       'Strategist',      // Focused on planning
-      'People-First Leader',    // Team wellbeing priority
-      'Results Driver',  // Outcomes focused
-      'Process Builder', // Systems & efficiency
+      'People Champion', // Team wellbeing priority
+      'Achiever',        // Outcomes focused
+      'Systematizer',    // Systems & efficiency
       'Innovator',       // New ideas & experiments
       'Facilitator',     // Enables team success
       'Mentor',          // Guides & teaches
-      'Accountability Partner', // High standards
-      'Culture Builder'  // Team dynamics focus
+      'Perfectionist',   // High standards
+      'Culture Architect' // Team dynamics focus
     ],
     selectionPrompt: `You are analyzing a manager's leadership style based on their quiz responses.
 

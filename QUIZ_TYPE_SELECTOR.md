@@ -249,6 +249,44 @@ All three are powerful! Choose based on your topic and how much time you have. �
 
 ## 📚 Next Steps
 
-1. **Archetype**: Read main QUIZ_TEMPLATE.md
-2. **Story-Matrix**: Read QUIZ_TEMPLATE.md + QUIZ_GENERATOR_PROMPT.md
-3. **Narrative**: Read **NARRATIVE_QUIZ_TEMPLATE.md** (full guide)
+### For Archetype Quizzes:
+1. Read **QUIZ_TEMPLATE.md** (Archetype section)
+2. Create your quiz config file
+3. Test it!
+
+### For Story-Matrix Quizzes:
+1. Read **QUIZ_GENERATOR_PROMPT.md** (Story-Matrix generator)
+2. Generate your quiz following the 7 steps
+3. **IMPORTANT**: Run **QUIZ_QUALITY_CHECKER.md** for validation
+4. Fix any issues until you get PASS (9/9)
+5. Quiz is ready!
+
+### For Narrative Quizzes:
+1. Read **NARRATIVE_QUIZ_TEMPLATE.md** (full narrative guide)
+2. Create your story arc and characters
+3. Build the quiz config
+4. Test the narrative flow
+
+---
+
+## ⚠️ Story-Matrix Quiz Quality Process
+
+**Story-Matrix quizzes require a TWO-PHASE process:**
+
+**Phase 1: Generate**
+- Use QUIZ_GENERATOR_PROMPT.md
+- Follow all 6 steps
+- Generate complete quiz config
+
+**Phase 2: Validate** ← **DO NOT SKIP**
+- Run QUIZ_QUALITY_CHECKER.md
+- Must achieve 9/9 criteria
+- Fix issues and re-validate until PASS
+
+**Why?** The quality checker ensures:
+- Questions are visceral (gut-feel, not academic)
+- Word matrices are grammatically correct
+- All 100 combinations make sense
+- Quiz is production-ready
+
+Only quizzes that pass 9/9 validation should go live!

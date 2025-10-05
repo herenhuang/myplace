@@ -1,10 +1,16 @@
 # Story-Matrix Quiz Generator Prompt
 
-*Use this prompt when creating a new story-matrix quiz from a user request*
+⚠️ **IMPORTANT: This prompt is ONLY for Story-Matrix quizzes!**
+
+**Not sure which quiz type to use?** Read [QUIZ_TYPE_SELECTOR.md](QUIZ_TYPE_SELECTOR.md) first.
+
+- **Archetype quizzes** (fixed personalities) → Use QUIZ_TEMPLATE.md
+- **Narrative quizzes** (continuous story) → Use NARRATIVE_QUIZ_TEMPLATE.md
+- **Story-Matrix quizzes** (100 combinations from independent scenarios) → Use this file
 
 ---
 
-## When User Requests: "Create a [TOPIC] quiz"
+## When User Requests: "Create a [TOPIC] story-matrix quiz"
 
 Follow this exact process:
 
@@ -21,25 +27,81 @@ Ask yourself:
 - Must be 10 DISTINCTLY different approaches
 - Each should be recognizable and clear
 - Should span a spectrum of possibilities
-- Test: "Could someone be BOTH X and Y?" If yes, they're too similar
+- **Distinctness Test**: "Could someone be BOTH X and Y?" If yes, they're too similar
+  - ❌ BAD: "Explorer" and "Adventurer" (too similar)
+  - ✅ GOOD: "Spontaneous" and "Structured" (clear opposites)
 
 **Second Words (WHAT they prioritize in the topic):**
 - Must be 10 DISTINCTLY different priorities
 - Each should represent a clear value/focus
 - Should cover diverse interests
-- Test: "Are these meaningfully different?" If not, refine
+- **Distinctness Test**: "Are these meaningfully different?" If not, refine
+- **Grammar Test**: Does [secondWord] grammatically complete the quiz title/question?
+  - ✅ "What's your feedback style?" → "Coach" (works naturally)
+  - ✅ "What's your feedback style?" → "Truth-Teller" (works naturally)
+  - ❌ "What's your feedback style?" → "Behavior-Focused" (awkward, doesn't answer the question)
+  - ❌ "What's your feedback style?" → "Growth-Pusher" (broken grammar)
 
-### Step 3: Design 8-10 Strategic Questions
+**Critical Rule for secondWords:**
+Each word must answer the implicit question in your quiz title when spoken aloud.
+- Quiz: "What's your manager style?" → secondWord should answer: "What's your style? [X]"
+- Quiz: "Do I have a crush?" → secondWord should answer: "What kind? [X]"
+- Quiz: "What's your vacation style?" → secondWord should answer: "What's your style? [X]"
+
+Avoid:
+- Adjective phrases ending in "-Focused" (e.g., "Detail-Focused")
+- Role titles (e.g., "Process Builder", "Culture Builder")
+- Made-up compound words (e.g., "Budgeteer")
+
+Use:
+- Clear nouns (e.g., "Coach", "Mentor", "Strategist")
+- Recognizable archetypes (e.g., "Perfectionist", "Innovator")
+- Natural descriptors (e.g., "Truth-Teller", "Problem-Solver")
+
+### Step 3: Design 8 Strategic Questions
 
 ⚠️ **MANDATORY FORMAT:**
+- **EXACTLY 8 questions** (no more, no less)
 - **EXACTLY 3 options per question** (no more, no less)
 - **ALWAYS set `allowCustomInput: true`** on every question
-- **8-10 total questions** (not more, not less)
 
-Each question must:
-1. **Map to specific dimensions** of your word matrix
-2. **Present a concrete scenario** showing what someone DOES
-3. **Reveal patterns through actions**, not self-assessment
+⚠️ **VISCERAL QUALITY REQUIREMENTS:**
+
+Each question MUST be visceral (gut-feel, not academic):
+
+1. **Immediate, Present-Tense Scenario**
+   - Use "You're at...", "Your teammate just...", "You see..."
+   - Happening RIGHT NOW, not hypothetical
+   - ❌ "What would you do if..." or "How do you approach..."
+   - ✅ "You're in a meeting. Your colleague just said..."
+
+2. **Specific, Engaging Details**
+   - Include vivid details that make it feel REAL
+   - "Show don't tell" approach
+   - ❌ "Someone asks for feedback"
+   - ✅ "Your teammate just presented work that completely missed the mark. They ask what you think."
+
+3. **Triggers Gut Reaction (Not Analytical Thinking)**
+   - Should create emotional response: pressure, discomfort, excitement
+   - Force instinctive choice, not logical analysis
+   - ❌ "What's your preferred approach?"
+   - ✅ "Your manager made a decision you think is wrong. You..."
+
+4. **Clear Conflict/Decision Point**
+   - Options represent genuinely different gut responses
+   - No "middle ground" cop-out options
+   - Each option shows distinct behavioral pattern
+
+5. **No "Should" Language**
+   - Use "do" language: "What do you do?", "You...", "Your response?"
+   - Focus on what they ACTUALLY do, not what they think they should do
+   - ❌ "How should you handle this?"
+   - ✅ "What happens next?"
+
+Each question must also:
+- **Map to specific dimensions** of your word matrix
+- **Reveal patterns through actions**, not self-assessment
+- Be **relatable** - situations people have experienced or can easily imagine
 
 **Example Question Structure:**
 
@@ -172,36 +234,69 @@ Their answers:
 ### Step 6: Generate Complete Config File
 
 Output the complete TypeScript config file with:
-- ✅ All 8-10 questions with unique IDs (q1, q2, q3, etc.)
-- ✅ EXACTLY 3 options per question (not 4!) + allowCustomInput: true on every question
-- ✅ Each question is a concrete SCENARIO with ACTION-based options
-- ✅ 10 distinct first words (approaches)
-- ✅ 10 distinct second words (priorities)
+- ✅ Exactly 8 questions with sequential IDs (q1, q2, q3, q4, q5, q6, q7, q8)
+- ✅ EXACTLY 3 options per question + allowCustomInput: true on every question
+- ✅ Each question is a VISCERAL scenario (immediate, present-tense, gut-feel)
+- ✅ Each question has ACTION-based options (what they DO, not what they think/prefer)
+- ✅ 10 distinct first words (approaches) that pass distinctness test
+- ✅ 10 distinct second words (priorities) that pass grammar test
 - ✅ Selection prompt with exact structure
 - ✅ Explanation prompt with ⚠️ warnings
 - ✅ Theme colors (default to neutral: #8b7355, #c9b8a3, #fafafa, #2c2c2c)
 - ✅ `type: 'story-matrix'`
 
+### Step 7: Run Quality Validation
+
+⚠️ **IMPORTANT: Quiz is NOT complete until it passes quality validation!**
+
+**Why Two Phases?**
+- **Phase 1 (This file)**: Generate quiz with strong initial quality
+- **Phase 2 (Quality Checker)**: Rigorous validation to catch any issues
+
+The quality checker validates that:
+- Questions meet ALL 5 visceral quality criteria
+- Word matrix secondWords grammatically complete the quiz title
+- All 100 combinations (10×10) make sense when spoken aloud
+- firstWords and secondWords are truly distinct
+- No edge cases or issues slipped through
+
+**Process:**
+1. **Run `QUIZ_QUALITY_CHECKER.md`** on the generated quiz
+2. **If PASS (9/9 criteria)** → Quiz is complete and ready to use ✅
+3. **If FAIL** → Review specific issues flagged, fix them, then re-validate
+4. **Repeat until PASS** → No exceptions
+
+**Do not skip this step.** A quiz that passes the quality checker:
+- Will engage users with gut-feel, visceral questions
+- Will generate grammatically correct, natural-sounding results
+- Will create 100 truly distinct and meaningful archetypes
+- Is production-ready
+
 ---
 
-## Quality Checklist
+## Quality Checklist (Before Running Quality Checker)
 
-Before finalizing, verify:
+Pre-validation checks:
 
-- [ ] All 10 first words are OBVIOUSLY different
-- [ ] All 10 second words are OBVIOUSLY different
+- [ ] Exactly 8 questions with IDs q1-q8
+- [ ] All 10 first words pass distinctness test (can't be BOTH)
+- [ ] All 10 second words pass distinctness test (meaningfully different)
+- [ ] All 10 second words pass grammar test (complete quiz title)
 - [ ] Each question targets a different dimension
 - [ ] All questions have EXACTLY 3 options (not 4!)
 - [ ] All questions have `allowCustomInput: true`
-- [ ] All questions have unique `id` values (q1, q2, q3, etc.)
-- [ ] **All questions are SCENARIO-BASED** (concrete situations, not vague preferences)
+- [ ] **All questions are VISCERAL** (immediate, present-tense, gut-feel)
+- [ ] **All questions trigger emotional response** (not analytical thinking)
 - [ ] **All options show ACTIONS** (what they DO, not what they think/prefer)
+- [ ] **No "should", "would", or "how do you" language** in questions
 - [ ] Questions feel REAL and relatable to the topic
 - [ ] Selection prompt includes "do NOT make up names"
-- [ ] Explanation prompt includes ⚠️ warnings
-- [ ] Explanation prompt has all 5 sections
+- [ ] Explanation prompt includes ⚠️ warnings about archetype naming
+- [ ] Explanation prompt has all required sections
 - [ ] Theme colors are appropriate for topic (default to neutral)
 - [ ] Quiz ID is lowercase with hyphens
+
+**Then proceed to Step 7: Run QUIZ_QUALITY_CHECKER.md**
 
 ---
 
@@ -235,29 +330,52 @@ Before finalizing, verify:
 
 ## Red Flags to Avoid
 
-❌ **"Explorer" and "Adventurer" in same list** → Too similar
-❌ **"Planner" and "Organizer" in same list** → Too similar
-❌ **Only 5 questions** → Not enough data (need 8-10)
+### Word Matrix Issues:
+❌ **Similar words in same list** → "Explorer" and "Adventurer" (both seek new experiences)
+❌ **Words that fail grammar test** → "Behavior-Focused" doesn't answer "What's your style?"
+❌ **Role titles as secondWords** → "Process Builder", "Culture Builder" (awkward)
+❌ **Made-up compounds** → "Budgeteer", "Growth-Pusher" (unnatural)
+❌ **Adjective phrases** → "Detail-Focused" (not a noun archetype)
+
+### Question Issues:
+❌ **Wrong number of questions** → Need EXACTLY 8 (not 6, not 10)
 ❌ **4 options per question** → Should be EXACTLY 3 + custom input
+❌ **Hypothetical scenarios** → "What would you do if..." (triggers analytical thinking)
+❌ **Abstract preferences** → "How do you work?" (not immediate/visceral)
+❌ **Self-assessment options** → "I'm very organized" (what they think, not what they DO)
+❌ **"Should" language** → "How should you handle this?" (not gut response)
+❌ **Vague scenarios** → "Someone asks for feedback" (lacks specificity)
+❌ **No emotional hook** → Questions that don't create pressure/discomfort/excitement
+
+### Structure Issues:
 ❌ **No warnings in explanation prompt** → AI will make up names
 ❌ **Questions don't map to dimensions** → Results won't be accurate
-❌ **Branching on every question** → Too complex
-❌ **No custom input** → Misses nuance
-❌ **Vague preference questions** → "How do you work?" instead of "It's Monday 9am, your inbox has 47 emails. What do you do first?"
-❌ **Self-assessment options** → "I'm very organized" instead of "Color-code my calendar by project"
-❌ **Hypothetical scenarios** → "What would you do if..." instead of "You're in [situation]. What happens?"
+❌ **Branching on every question** → Too complex for story-matrix
+❌ **No custom input enabled** → Misses nuance
+
+### Examples of Fixes:
+❌ → ✅
+- "How do you work?" → "It's Monday 9am. Your inbox has 47 emails. What do you do first?"
+- "I'm very organized" → "Color-code my calendar by project and set 3 alarms"
+- "What would you do if someone disagreed?" → "Your manager just said you're wrong in front of the team. You..."
+- "Growth-Pusher" → "Growth Catalyst" or "Developer"
+- "Behavior-Focused" → "Pragmatist" or "Analyst"
 
 ---
 
 ## Success Metrics
 
 A great story-matrix quiz should:
-1. Feel personalized (users say "this is so me!")
-2. Have distinct outcomes (100 truly different combinations)
-3. Ask engaging questions (storytelling, not abstract)
-4. Generate consistent names (no "Natural Explorer" confusion)
-5. Include alternatives (shows nuance)
-6. Be completable in 3-5 minutes (8 questions)
+1. **Trigger gut reactions** - Users respond instinctively, not analytically
+2. **Feel visceral** - Questions create immediate emotional responses
+3. **Feel personalized** - Users say "this is so me!" or "how did this know?"
+4. **Have 100 distinct outcomes** - Every combination makes sense when spoken aloud
+5. **Generate natural names** - "Direct Coach" sounds right, not forced
+6. **Include meaningful alternatives** - Shows nuance in results
+7. **Be completable in 3-4 minutes** - 8 questions, each takes 20-30 seconds
+8. **Pass quality validation** - Achieves 9/9 on QUIZ_QUALITY_CHECKER.md
+
+**If your quiz meets these metrics, it's ready for production!** 🎉
 
 ---
 
