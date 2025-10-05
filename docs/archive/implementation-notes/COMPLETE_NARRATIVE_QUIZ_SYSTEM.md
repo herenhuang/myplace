@@ -201,7 +201,7 @@ Result: "You've been dating Alex for 2+ years. You're living together..."
 
 ### Documentation:
 - `/PERSONALIZATION_TEMPLATE.md` - How to use personalization
-- `/NARRATIVE_QUIZ_TEMPLATE.md` - How to create narrative quizzes
+- `/NARRATIVE_QUIZ_CREATION.md` - How to create narrative quizzes
 - `/NARRATIVE_ADAPTATION_SYSTEM.md` - How adaptation works
 - `/QUIZ_SYSTEM_SUMMARY.md` - Overview of all quiz types
 

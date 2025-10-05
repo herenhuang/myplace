@@ -11,7 +11,7 @@ When a user says "Create a [TOPIC] quiz":
    - **Archetype Quiz**: Fixed personalities (4-8 results)
    - **Story-Matrix Quiz**: Dynamic combinations (100 results)
 2. **Read the relevant section** of this file for your chosen type
-3. **For Story-Matrix**: Also read `QUIZ_GENERATOR_PROMPT.md`
+3. **For Story-Matrix**: Also read `STORY_MATRIX_QUIZ_CREATION.md`
 4. **Create a new quiz config file** in `/src/lib/quizzes/[quiz-name].ts`
 5. **Add static images** (or generate them) in `/public/quiz/[quiz-name]/`
 6. **Register the quiz** in `/src/lib/quizzes/index.ts`

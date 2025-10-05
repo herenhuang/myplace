@@ -1,6 +1,12 @@
-# Quiz Quality Checker - Validation Prompt
+# Story-Matrix Quiz Validator
 
-*Run this AFTER generating a quiz with `QUIZ_GENERATOR_PROMPT.md` to ensure quality standards are met*
+⚠️ **IMPORTANT: This validator is ONLY for Story-Matrix quizzes!**
+
+*Run this AFTER generating a quiz with [STORY_MATRIX_QUIZ_CREATION.md](STORY_MATRIX_QUIZ_CREATION.md) to ensure quality standards are met*
+
+**For other quiz types:**
+- **Archetype quizzes** → No validator needed (use manual testing)
+- **Narrative quizzes** → See [NARRATIVE_QUIZ_CREATION.md](NARRATIVE_QUIZ_CREATION.md) for validation guidance
 
 ---
 

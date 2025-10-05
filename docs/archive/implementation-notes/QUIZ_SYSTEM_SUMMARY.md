@@ -8,7 +8,7 @@ A complete, reusable quiz template system that allows you to create personality 
 
 ### Documentation
 - ✅ `QUIZ_TEMPLATE.md` - Complete guide for both quiz types (AI-readable)
-- ✅ `QUIZ_GENERATOR_PROMPT.md` - Step-by-step generator for Story-Matrix quizzes
+- ✅ `STORY_MATRIX_QUIZ_CREATION.md` - Step-by-step generator for Story-Matrix quizzes
 - ✅ `QUIZ_TYPE_SELECTOR.md` - Decision guide: which quiz type to use
 - ✅ `QUIZ_SYSTEM_SUMMARY.md` - This file (implementation summary)
 
@@ -126,7 +126,7 @@ And the AI will:
 
 And the AI will:
 1. Read `QUIZ_TYPE_SELECTOR.md` → Choose Story-Matrix
-2. Read `QUIZ_GENERATOR_PROMPT.md` → Follow generation steps
+2. Read `STORY_MATRIX_QUIZ_CREATION.md` → Follow generation steps
 3. Create 10×10 word matrix with distinct dimensions
 4. Design 8 questions mapping to dimensions
 5. Write strict AI prompts (no name-making!)
@@ -311,7 +311,7 @@ Done! 🎉
 ### Documentation (Start Here!)
 - **`QUIZ_TYPE_SELECTOR.md`** - Which quiz type should you use?
 - **`QUIZ_TEMPLATE.md`** - Complete guide for both quiz types
-- **`QUIZ_GENERATOR_PROMPT.md`** - Story-Matrix generation walkthrough
+- **`STORY_MATRIX_QUIZ_CREATION.md`** - Story-Matrix generation walkthrough
 
 ### Code References
 - **`/src/lib/quizzes/types.ts`** - All TypeScript interfaces
@@ -321,7 +321,7 @@ Done! 🎉
 ### Reading Order for AI Systems:
 1. `QUIZ_TYPE_SELECTOR.md` → Decide type
 2. `QUIZ_TEMPLATE.md` → Learn structure
-3. `QUIZ_GENERATOR_PROMPT.md` → Generate (Story-Matrix only)
+3. `STORY_MATRIX_QUIZ_CREATION.md` → Generate (Story-Matrix only)
 4. Study relevant example quiz
 
 ---
