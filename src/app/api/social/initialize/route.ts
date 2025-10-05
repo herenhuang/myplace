@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { SOCIAL_INITIAL_PROMPT } from '@/lib/social-prompts'
+import { SOCIAL_INITIAL_PROMPT } from '@/lib/scenarios/social'
 
 export async function POST() {
   console.log('\n=== SOCIAL SIMULATION INITIALIZE ===')

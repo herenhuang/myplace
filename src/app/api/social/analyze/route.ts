@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { SOCIAL_BEHAVIOR_ANALYSIS, SOCIAL_ACTION_INSIGHTS } from '@/lib/social-prompts'
+import { SOCIAL_BEHAVIOR_ANALYSIS, SOCIAL_ACTION_INSIGHTS } from '@/lib/scenarios/social'
 
 interface AnalyzeRequest {
   userResponses: Array<{turn: number, response: string, choice?: string}>

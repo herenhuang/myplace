@@ -1,4 +1,10 @@
-# Narrative Quiz Template - Complete Guide
+# Narrative Quiz Creation Guide
+
+*Create immersive, story-driven quizzes where users live through a continuous narrative.*
+
+**Not sure if Narrative is right for your quiz?** See [QUIZ_TYPE_SELECTOR.md](QUIZ_TYPE_SELECTOR.md) - Narrative is for quizzes with natural timelines and recurring characters.
+
+---
 
 ## 🎬 What is a Narrative Quiz?
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { WORKPLACE_BEHAVIOR_ANALYSIS, WORKPLACE_ACTION_INSIGHTS } from '@/lib/workplace-prompts'
+import { WORKPLACE_BEHAVIOR_ANALYSIS, WORKPLACE_ACTION_INSIGHTS } from '@/lib/scenarios/workplace'
 
 interface AnalyzeBehaviorRequest {
   userActions: Array<{ type: string; text: string }>

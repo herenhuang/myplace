@@ -1,4 +1,4 @@
-import { Archetype } from '../types';
+import { Archetype } from './types';
 
 export const SCENARIO_CONTEXT = "The user's viral music remix has a potential copyright issue, and they are navigating the fallout and opportunities.";
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { WORKPLACE_CONTINUE_PROMPT, WORKPLACE_CONCLUSION_PROMPT, WORKPLACE_THINK_PROMPT } from '@/lib/workplace-prompts'
+import { WORKPLACE_CONTINUE_PROMPT, WORKPLACE_CONCLUSION_PROMPT, WORKPLACE_THINK_PROMPT } from '@/lib/scenarios/workplace'
 
 interface ContinueStoryRequest {
   actionType: string

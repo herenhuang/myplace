@@ -1,4 +1,4 @@
-import { Archetype } from '../types';
+import { Archetype } from './types';
 
 export const SCENARIO_CONTEXT = "The user's company is having a major product crisis on launch day, and customers cannot use the product.";
 

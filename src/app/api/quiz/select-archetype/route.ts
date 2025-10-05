@@ -7,7 +7,7 @@ const anthropic = new Anthropic({
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId: _sessionId, quizId, responses, wordMatrix } = await request.json()
+    const { quizId, responses, wordMatrix } = await request.json()
 
     if (!quizId || !responses || !wordMatrix) {
       return NextResponse.json(
@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
       } else {
         throw new Error('No JSON found in response')
       }
-    } catch (_parseError) {
-      console.error('Failed to parse AI response:', responseText)
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', responseText, parseError)
       return NextResponse.json(
         { error: 'Failed to parse AI response' },
         { status: 500 }

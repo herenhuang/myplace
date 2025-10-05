@@ -74,7 +74,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
   }
 
   // Fetch stats after selection
-  const [stats, setStats] = useState<Array<{value: string, percentage: number}> | null>(null)
+  const [stats, setStats] = useState<Array<{value: string, count: number, percentage: number}> | null>(null)
   const [animateStats, setAnimateStats] = useState(false) // Control animation trigger
 
   useEffect(() => {
@@ -101,18 +101,32 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     }
   }, [showComparison, config.id, questionIndex])
 
-  // Get percentage for an option
+  // Get percentage for an option (including user's current selection)
   const getPercentage = (value: string) => {
     if (!stats) return 0
-    const stat = stats.find(s => s.value === value)
-    return stat?.percentage || 0
-  }
 
-  // Calculate insight
-  const selectedPercentage = selectedValue ? getPercentage(selectedValue) : 0
-  const sortedStats = stats ? [...stats].sort((a, b) => b.percentage - a.percentage) : []
-  const userRank = sortedStats.findIndex(s => s.value === selectedValue) + 1
-  const moreUniqueThan = sortedStats.slice(userRank).reduce((sum, s) => sum + s.percentage, 0)
+    // For custom inputs, check the grouped 'custom_input' stat
+    const isThisCustom = value.startsWith('custom_') || (isCustomSelected && selectedValue === value)
+
+    if (isThisCustom) {
+      // Find the grouped custom_input stat
+      const customStat = stats.find(s => s.value === 'custom_input')
+      const historicalCount = customStat?.count || 0
+      const totalHistorical = stats.reduce((sum, s) => sum + s.count, 0)
+      const totalWithUser = totalHistorical + 1
+      const countWithUser = isCustomSelected ? historicalCount + 1 : historicalCount
+      return totalWithUser > 0 ? Math.round((countWithUser / totalWithUser) * 100) : 0
+    }
+
+    // For regular options
+    const stat = stats.find(s => s.value === value)
+    const historicalCount = stat?.count || 0
+    const totalHistorical = stats.reduce((sum, s) => sum + s.count, 0)
+    const totalWithUser = totalHistorical + 1
+    const countWithUser = (selectedValue === value) ? historicalCount + 1 : historicalCount
+
+    return totalWithUser > 0 ? Math.round((countWithUser / totalWithUser) * 100) : 0
+  }
 
   // Get question text based on quiz type
   // Priority: adaptedText (for narrative) > text (for story-matrix/archetype) > baseScenario.coreSetup (fallback)
@@ -130,12 +144,6 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         </div>
       </div>
       <div className={styles.choicesContainer}>
-        {/* Small tooltip about uniqueness - positioned right above answers */}
-        {showComparison && stats && moreUniqueThan > 0 && (
-          <div className={styles.questionInsight}>
-            ✨ Your choice is more unique than {moreUniqueThan}% of responses!
-          </div>
-        )}
         {question.options.map((option, index) => {
           const isVisible = visibleOptions.includes(index)
           const isSelected = selectedValue === option.value
@@ -176,35 +184,48 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         {/* Custom Input Field */}
         {question.allowCustomInput && (
           <div className={styles.customInputContainer}>
-            <input
-              type="text"
-              className={`${styles.customInput} ${isCustomSelected && showComparison ? styles.customInputSelected : ''}`}
-              placeholder="Or write your own answer..."
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleCustomSubmit()
-                }
-              }}
-              disabled={isLoading || selectedValue !== null}
-            />
-            {customInput.trim() && !selectedValue && (
-              <button
-                className={styles.customInputSubmit}
-                onClick={handleCustomSubmit}
-                disabled={isLoading}
-              >
-                →
-              </button>
-            )}
-            {isCustomSelected && showComparison && stats && (
-              <div className={styles.customInputStats}>
-                {getPercentage(selectedValue || '') > 0 
-                  ? `${getPercentage(selectedValue || '')}% of people said something similar`
-                  : 'You\'re the first to say this!'}
-              </div>
-            )}
+            <div className={styles.customInputWrapper}>
+              {/* Background fill for custom input when selected */}
+              {isCustomSelected && showComparison && stats && (
+                <div
+                  className={`${styles.customInputFill} ${styles.optionButtonFillUser}`}
+                  style={{ width: animateStats ? `${getPercentage(selectedValue || '')}%` : '0%' }}
+                />
+              )}
+
+              <input
+                type="text"
+                className={`${styles.customInput} ${isCustomSelected && showComparison ? styles.customInputSelected : ''}`}
+                placeholder="Or write your own answer..."
+                value={isCustomSelected && showComparison ? selectedLabel || customInput : customInput}
+                onChange={(e) => setCustomInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCustomSubmit()
+                  }
+                }}
+                disabled={isLoading || selectedValue !== null}
+                readOnly={isCustomSelected && showComparison}
+              />
+
+              {/* Show percentage when custom input is selected */}
+              {isCustomSelected && showComparison && stats && (
+                <span className={styles.customInputPercentage}>
+                  {getPercentage(selectedValue || '')}%
+                </span>
+              )}
+
+              {/* Submit arrow when typing */}
+              {customInput.trim() && !selectedValue && (
+                <button
+                  className={styles.customInputSubmit}
+                  onClick={handleCustomSubmit}
+                  disabled={isLoading}
+                >
+                  →
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -11,7 +11,7 @@ export const vacationStyleQuiz: QuizConfig = {
     secondaryColor: '#90e0ef',
     backgroundColor: '#f8f9fa',
     textColor: '#212529',
-    backgroundImage: '/quiz/vacation-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #00b4d8 0%, #90e0ef 50%, #f8f9fa 100%)'
   },
   
   questions: [
@@ -30,11 +30,11 @@ export const vacationStyleQuiz: QuizConfig = {
     // Question 2 - What you prioritize (Foodie, Culture, Nature, Photography, Comfort)
     {
       id: 'q2',
-      text: 'What is the highlight of any trip for you?',
+      text: 'You have one free day in a new city. No plans. You...',
       options: [
-        { label: 'Finding the best local food spots', value: 'foodie' },
-        { label: 'Hiking trails or beaches', value: 'nature' },
-        { label: 'Museums, history, and architecture', value: 'culture' }
+        { label: 'Find the best-rated local restaurant on my phone', value: 'foodie' },
+        { label: 'Head to the nearest trail or beach', value: 'nature' },
+        { label: 'Walk to the historic district or main museum', value: 'culture' }
       ],
       allowCustomInput: true
     },
@@ -66,11 +66,11 @@ export const vacationStyleQuiz: QuizConfig = {
     // Question 5 - Budget consciousness (Budgeteer)
     {
       id: 'q5',
-      text: 'When it comes to spending on vacation...',
+      text: 'You\'re at dinner. The menu is pricey but everything looks amazing. You...',
       options: [
-        { label: 'I splurge—treat yourself', value: 'comfort_spender' },
-        { label: 'Budget smart to travel longer/more', value: 'budgeteer' },
-        { label: 'Mix of cheap eats and nice hotels', value: 'balanced_spend' }
+        { label: 'Order what I want - I\'m on vacation', value: 'comfort_spender' },
+        { label: 'Find the affordable option so I can travel longer', value: 'budgeteer' },
+        { label: 'Get one nice thing + one budget thing', value: 'balanced_spend' }
       ],
       allowCustomInput: true
     },
@@ -102,11 +102,11 @@ export const vacationStyleQuiz: QuizConfig = {
     // Question 8 - What makes it successful (Photography, Comfort, etc.)
     {
       id: 'q8',
-      text: 'What would make this trip a total win?',
+      text: 'You\'re packing for the trip. What\'s the one thing you absolutely cannot forget?',
       options: [
-        { label: 'Amazing photos for the memories', value: 'photographer' },
-        { label: 'Feeling totally recharged and pampered', value: 'comfort_seeker' },
-        { label: 'Authentic local experiences', value: 'culture_authentic' }
+        { label: 'My camera - I need to capture everything', value: 'photographer' },
+        { label: 'Skincare/comfort items - I need to feel good', value: 'comfort_seeker' },
+        { label: 'Phrasebook or translation app - I want to connect', value: 'culture_authentic' }
       ],
       allowCustomInput: true
     }
@@ -133,10 +133,10 @@ export const vacationStyleQuiz: QuizConfig = {
       'Soloist',        // Happy alone
       'Foodie',         // All about eating
       'Culture Seeker', // Museums & history
-      'Nature Lover',   // Outdoors & hiking
-      'Comfort Seeker', // Nice hotels & spas
-      'Budgeteer',      // Frugal & savvy
-      'Photographer'    // Documenting everything
+      'Thrill Seeker',  // Extreme/adventurous activities
+      'Relaxer',        // Nice hotels & spas
+      'Saver',          // Frugal & savvy
+      'Documentarian'   // Capturing everything
     ],
     selectionPrompt: `You are analyzing a traveler's vacation style based on their quiz responses.
 
@@ -178,24 +178,24 @@ IMPORTANT: Do NOT make up names like "Natural Explorer" or "Adventurous Soul". O
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a travel expert analyzing someone's vacation style. They are a "{{archetype}}" - {{tagline}}.
 
-Write a warm, engaging explanation with these sections:
+Write a warm, engaging explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 ## Your Travel DNA
-Start with "As {{archetype}}, you..." and write 2-3 sentences about their core travel approach. Make sure the description aligns with their tagline: "{{tagline}}". Reference their actual quiz answers.
+Write 2-3 sentences about their core travel approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
 
 ## What I Noticed
-Highlight 2-3 specific patterns from their actual answers that show they're {{archetype}}:
-- When they answered [specific answer], that shows [insight about {{archetype}}]
-- Their choice of [specific answer] reveals [trait]
+Highlight 2-3 specific patterns from their actual answers that show their travel style:
+- When you answered [specific answer], that shows [insight about their style]
+- Your choice of [specific answer] reveals [trait]
 - [Another answer-to-trait connection]
 
 ## You Were Also Close To...
 {{alternatives}}
 
-Write 1 engaging sentence for each alternative style explaining why they showed hints of it.
+Write 1 engaging sentence for each alternative style explaining why they showed hints of it based on their answers.
 
 ## Tips for Your Next Trip
-Give 1-2 practical tips for {{archetype}}. Format: "As {{archetype}}, you should..."
+Give 1-2 practical tips using "you" language (not "As {{archetype}}..."). Be encouraging and specific.
 
 ## Where This Takes You
 End with an inspiring sentence about their next adventure as {{archetype}}.
@@ -203,6 +203,6 @@ End with an inspiring sentence about their next adventure as {{archetype}}.
 Their answers:
 {{answers}}
 
-Use "{{archetype}}" consistently throughout. Be personal and energetic. Use markdown with ## for headers.`
+When referring to their style, use the exact term "{{archetype}}" (never shorten or modify it). Be personal and energetic. Use markdown with ## for section headers.`
   }
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { SimulationState, ConscientiousnessScores } from '@/lib/types'
+import { SimulationState, ConscientiousnessScores } from '@/lib/scenarios/types'
 import { ArrowRight } from 'lucide-react'
 import { PageContainer } from '@/components/simulation/layout'
 

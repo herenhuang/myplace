@@ -11,37 +11,37 @@ export const flirtingStyleQuiz: QuizConfig = {
     secondaryColor: '#fed7aa',
     backgroundColor: '#fff7ed',
     textColor: '#7c2d12',
-    backgroundImage: '/quiz/flirting-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #f97316 0%, #fed7aa 50%, #fff7ed 100%)'
   },
   
   questions: [
     // Question 1 - Initial Approach
     {
-      id: 'q1-first-move',
-      text: 'You\'re interested in someone. How do you let them know?',
+      id: 'q1',
+      text: 'You\'re at a party. Someone across the room catches your eye. What happens next?',
       options: [
-        { label: 'Direct approach - "Hey, I think you\'re interesting"', value: 'bold_direct' },
-        { label: 'Strategic proximity - engineer reasons to be around them', value: 'subtle_strategic' },
-        { label: 'Wait and hope they notice me noticing them', value: 'passive_hopeful' }
+        { label: 'Walk over and start talking - "Hey, I had to come say hi"', value: 'bold_direct' },
+        { label: 'Casually position myself nearby and wait for a natural opening', value: 'subtle_strategic' },
+        { label: 'Make eye contact and smile, hoping they come to me', value: 'passive_hopeful' }
       ],
       allowCustomInput: true
     },
     
     // Question 2 - Conversation Style
     {
-      id: 'q2-conversation',
-      text: 'When talking to someone you like, your conversation style is...',
+      id: 'q2',
+      text: 'You\'re in the middle of a conversation with someone you\'re into. What are you doing?',
       options: [
-        { label: 'Playful teasing with lots of banter', value: 'teasing_playful' },
-        { label: 'Deep questions - I want to know who they really are', value: 'deep_genuine' },
-        { label: 'Light and fun - keep it easy and laugh a lot', value: 'light_humorous' }
+        { label: 'Teasing them playfully and keeping the banter going', value: 'teasing_playful' },
+        { label: 'Asking deep questions - "What\'s something you\'re passionate about?"', value: 'deep_genuine' },
+        { label: 'Making them laugh and keeping things light and easy', value: 'light_humorous' }
       ],
       allowCustomInput: true
     },
     
     // Question 3 - Physical Touch
     {
-      id: 'q3-touch',
+      id: 'q3',
       text: 'When it comes to physical touch while flirting, you...',
       options: [
         { label: 'Find reasons to touch - arm, shoulder, playful shove', value: 'tactile_toucher' },
@@ -53,7 +53,7 @@ export const flirtingStyleQuiz: QuizConfig = {
     
     // Question 4 - Compliment Style
     {
-      id: 'q4-compliments',
+      id: 'q4',
       text: 'Your compliment game looks like...',
       options: [
         { label: 'Specific and bold - "That smile is dangerous"', value: 'bold_flirty' },
@@ -65,7 +65,7 @@ export const flirtingStyleQuiz: QuizConfig = {
     
     // Question 5 - Text/Message Energy
     {
-      id: 'q5-texting',
+      id: 'q5',
       text: 'In your text conversations with someone you like, you...',
       options: [
         { label: 'Flirty emojis, playful innuendos, keep it spicy', value: 'flirty_texter' },
@@ -77,7 +77,7 @@ export const flirtingStyleQuiz: QuizConfig = {
     
     // Question 6 - Eye Contact
     {
-      id: 'q6-eye-contact',
+      id: 'q6',
       text: 'When making eye contact with someone you\'re attracted to...',
       options: [
         { label: 'Hold it with a little smile - let them know I see them', value: 'confident_holder' },
@@ -89,43 +89,19 @@ export const flirtingStyleQuiz: QuizConfig = {
     
     // Question 7 - Vulnerability Level
     {
-      id: 'q7-vulnerability',
-      text: 'How vulnerable do you get when you\'re flirting?',
+      id: 'q7',
+      text: 'They just shared something personal. How do you respond?',
       options: [
-        { label: 'I share real stuff early - let them see the real me', value: 'open_authentic' },
-        { label: 'Keep it surface level until I know they\'re interested', value: 'guarded_protective' },
-        { label: 'Mix of both - test the waters with small vulnerabilities', value: 'balanced_tester' }
+        { label: 'Match their vulnerability - share something real about myself', value: 'open_authentic' },
+        { label: 'Listen and empathize, but keep my own cards close for now', value: 'guarded_protective' },
+        { label: 'Test the waters with a small personal detail, see how it lands', value: 'balanced_tester' }
       ],
       allowCustomInput: true
     },
     
-    // Question 8 - Rejection Handling
+    // Question 8 - Escalation Style
     {
-      id: 'q8-rejection-risk',
-      text: 'When it comes to the risk of rejection, you...',
-      options: [
-        { label: 'Go for it anyway - rejection is part of the game', value: 'brave_shooter' },
-        { label: 'Need pretty clear signals before making a move', value: 'careful_reader' },
-        { label: 'Avoid putting myself in rejection territory at all', value: 'risk_avoider' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 9 - Group vs Solo
-    {
-      id: 'q9-social-context',
-      text: 'You flirt better when...',
-      options: [
-        { label: 'It\'s just the two of us - less pressure, more real', value: 'one_on_one' },
-        { label: 'In a group - I can be playful and show my social side', value: 'social_performer' },
-        { label: 'Doesn\'t matter - I adapt to the situation', value: 'flexible_adapter' }
-      ],
-      allowCustomInput: true
-    },
-    
-    // Question 10 - Escalation Style
-    {
-      id: 'q10-escalation',
+      id: 'q8',
       text: 'When it comes to escalating from flirting to something more, you...',
       options: [
         { label: 'Make it clear what I want - "Want to grab a drink?"', value: 'clear_initiator' },
@@ -158,9 +134,9 @@ export const flirtingStyleQuiz: QuizConfig = {
       'Flirt',             // Traditional flirty energy
       'Admirer',           // Appreciator from afar
       'Conversationalist', // Talk-focused
-      'Pursuer',           // Active chaser
-      'Eye Contact Master',// Non-verbal communicator
-      'Slow Burner'        // Takes time to warm up
+      'Initiator',         // Active first-mover
+      'Gazer',             // Non-verbal eye contact expert
+      'Builder'            // Takes time to develop connection
     ],
     selectionPrompt: `You are analyzing someone's flirting style based on their quiz responses.
 
@@ -203,15 +179,15 @@ CRITICAL: Do NOT make up names like "Bold Flirt" or "Smooth Operator" unless tho
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a fun, insightful friend analyzing someone's flirting style. They're a "{{archetype}}" - {{tagline}}.
 
-Write an engaging, playful explanation with these sections:
+Write an engaging, playful explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 ## Your Flirting DNA
 
-Start with "As a {{archetype}}, you..." and write 2-3 sentences about how they show interest. Make sure it connects to their tagline: "{{tagline}}". Reference their actual quiz answers to show you get their specific vibe.
+Write 2-3 sentences about how they navigate the romantic landscape with their unique style. Use "you" language (not "As a {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
 
 ## What I'm Seeing In Action
 
-Highlight 3 specific patterns from their actual answers that reveal they're a {{archetype}}:
+Highlight 3 specific patterns from their actual answers that reveal their style:
 - When you said [specific answer], that's textbook {{archetype}} energy
 - Your approach to [specific situation] shows [characteristic of their style]
 - The fact that you [another specific answer] tells me [insight]
@@ -237,7 +213,7 @@ End with one empowering sentence about owning their {{archetype}} style and bein
 Their full answers:
 {{answers}}
 
-Use "{{archetype}}" consistently throughout (never shorten or modify it). Be fun, playful, specific to their answers, and encouraging. Use markdown with ## for headers. Make them feel seen and maybe laugh a little.`
+When referring to their style, use the exact term "{{archetype}}" (never shorten or modify it). Be fun, playful, specific to their answers, and encouraging. Use markdown with ## for section headers. Make them feel seen and maybe laugh a little.`
   }
 }
 
