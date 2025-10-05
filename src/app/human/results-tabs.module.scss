@@ -3,6 +3,8 @@
 .resultsRoot {
     padding-top: 1rem;
     width: 100%;
+    flex: 1;
+    display: flex;
     font-family: 'Sora', 'Lora', serif;
     letter-spacing: -.5px;
     background-image: linear-gradient(to top left, #ffded2, #ffe7ce);

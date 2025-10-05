@@ -122,12 +122,20 @@ ${aiResponsesDisplay}
 `
   }).join('\n---\n')
 
-  return `You are an expert in computational linguistics, behavioral psychology, and human-AI interaction patterns. Your task is to analyze user responses by comparing them to actual AI-generated responses from 3 different AI models (ChatGPT, Gemini, Claude).
+  return `You are an expert computational linguist, behavioral psychologist, and human-AI interaction specialist with deep expertise in personality assessment and psychological profiling. Your dual role is to:
+
+1. **Humanness Detection**: Analyze user responses by comparing them to actual AI-generated responses from 3 different AI models (ChatGPT, Gemini, Claude) to determine authenticity and human-like qualities.
+
+2. **Personality Profiling**: Act as an expert psychologist analyzing your complete personality profile, behavioral patterns, cognitive styles, emotional expression, decision-making processes, and psychological traits based on their responses across all questions.
+
+3. **MBTI Assessment**: Based on the comprehensive personality profile, determine and return the user's 4-letter MBTI type (e.g., INFP, ESTJ).
 
 ## User Response Data with AI Comparisons:
 ${responseSummary}
 
 Average Response Time: ${averageResponseTime.toFixed(0)}ms
+
+**Note**: ${steps.length < 15 ? `This analysis is based on ${steps.length} completed questions out of 15 total. The remaining ${15 - steps.length} questions (${steps.length < 3 ? 'MBTI personality questions' : steps.length < 15 ? 'interactive game questions' : 'all questions'}) have not been completed yet.` : 'All 15 questions have been completed for comprehensive analysis.'}
 
 ## Analysis Framework:
 
@@ -152,7 +160,7 @@ For each response, assign:
 - **Percentile** (0-100): How rare/unusual compared to the 3 AI responses (0 = very similar to AIs, 100 = extremely different/unique)
 - **AI Likelihood** (0-100): How likely an AI would give this exact response based on the 3 examples
 - **Human Likelihood** (0-100): How likely a human would give this response
-- **Insight**: A detailed, meaningful analysis of what this response reveals about the user's personality, thinking patterns, and human-like qualities. This must be substantial (2-3 sentences minimum) and provide genuine psychological insight.
+- **Insight**: A detailed, meaningful psychological analysis of what this response reveals about the user's personality, thinking patterns, emotional expression, and behavioral tendencies. This must be substantial (2-3 sentences minimum) and provide genuine psychological insight about their personality profile.
 - **Was Unexpected**: Boolean - did the user response diverge significantly from all 3 AI patterns?
 
 **Individual Response Analysis:**
@@ -189,6 +197,38 @@ For each question, provide detailed individual scores:
    - **Relevance**: How well does it relate to the prompt?
    - **Personalization**: How much personal detail or experience is included?
    - **Authenticity**: How genuine and human does the response feel?
+
+### Comprehensive Personality Profiling:
+As an expert psychologist, analyze the user's complete personality profile across all responses:
+
+**Cognitive Style Analysis:**
+- **Processing Style**: How do they approach problems? (Systematic vs. Intuitive, Analytical vs. Creative)
+- **Decision Making**: What drives their choices? (Logic vs. Emotion, Data vs. Intuition)
+- **Information Processing**: How do they handle complexity? (Detail-oriented vs. Big-picture)
+
+**Emotional Intelligence:**
+- **Emotional Expression**: How openly do they express feelings?
+- **Empathy Levels**: How much do they consider others' perspectives?
+- **Stress Response**: How do they handle pressure and uncertainty?
+
+**Social & Behavioral Patterns:**
+- **Communication Style**: Direct vs. Diplomatic, Formal vs. Casual
+- **Leadership Tendencies**: Natural leader, supporter, or independent worker
+- **Risk Tolerance**: Conservative vs. Adventurous approaches
+- **Adaptability**: How well do they handle change and uncertainty?
+
+**Personality Dimensions:**
+- **Openness**: Creative, curious, open to new experiences
+- **Conscientiousness**: Organized, disciplined, goal-oriented
+- **Extraversion**: Social energy, assertiveness, enthusiasm
+- **Agreeableness**: Cooperation, trust, empathy
+- **Neuroticism**: Emotional stability, anxiety levels, resilience
+
+**Psychological Insights:**
+- **Core Motivations**: What drives their behavior and decisions?
+- **Values & Beliefs**: What principles guide their choices?
+- **Strengths & Growth Areas**: Key personality assets and development opportunities
+- **Behavioral Patterns**: Consistent themes across responses
 
 ##### Calibration Rules (CRITICAL - PREVENT INFLATION)
 **Core Principle**: Most human responses should score 30-60. Only truly exceptional responses deserve 70+.
@@ -257,11 +297,13 @@ Return ONLY valid JSON with no trailing commas, no comments, and no additional t
 5. IMPORTANT: Return ONLY the JSON object, no additional text, explanations, or markdown formatting.
 6. Ensure all arrays and objects are properly closed with ] and } respectively.
 7. Do not truncate the response - include ALL questions in the breakdown array.
+8. **LANGUAGE REQUIREMENT**: All insights, descriptions, and analysis MUST use second-person language ("you", "your", "you're") to address the user directly and personally.
 
 \`\`\`json
 {
   "metascore": 75,
   "humanessLevel": "human-like",
+  "mbtiType": "INFP",
   "subscores": {
     "creativity": 82,
     "spontaneity": 71,
@@ -276,16 +318,16 @@ Return ONLY valid JSON with no trailing commas, no comments, and no additional t
     "divergent_convergent": 74
   },
   "breakdown": [
-      {
+    {
         "questionId": "adaptability-schedule",
-        "stepNumber": 1,
-        "insight": "Response diverges significantly from all 3 AI models by being more specific and personal. The user's choice of personal items reveals authentic human experience and emotional connection to everyday objects, contrasting with the generic, functional approach typical of AI responses.",
-        "percentile": 85,
-        "wasUnexpected": true,
-        "highlight": "User mentioned unique personal items while all AIs listed generic items",
-        "aiLikelihood": 15,
-        "humanLikelihood": 85,
-        "aiSimilarity": 0.22,
+      "stepNumber": 1,
+        "insight": "Your response diverges significantly from all 3 AI models by being more specific and personal. Your choice of personal items reveals authentic human experience and emotional connection to everyday objects, contrasting with the generic, functional approach typical of AI responses.",
+      "percentile": 85,
+      "wasUnexpected": true,
+        "highlight": "You mentioned unique personal items while all AIs listed generic items",
+      "aiLikelihood": 15,
+      "humanLikelihood": 85,
+      "aiSimilarity": 0.22,
         "reasoning": "Introduces new personal concept not in any AI list; low lexical overlap",
         "individualScores": {
           "logicalCoherence": 95,
@@ -306,14 +348,14 @@ Return ONLY valid JSON with no trailing commas, no comments, and no additional t
             "authenticity": 88
           }
         }
-      }
+    }
   ],
   "primaryArchetype": {
     "name": "The Creative",
     "description": "You approach situations with originality and imagination, consistently diverging from typical AI response patterns.",
     "traits": ["Imaginative", "Original", "Unpredictable"]
   },
-  "overallAnalysis": "Your responses consistently diverge from AI patterns, showing authentic human spontaneity and creativity."
+  "overallAnalysis": "Your responses reveal a complex personality profile characterized by authentic human spontaneity and creativity. You demonstrate strong emotional intelligence with balanced analytical and intuitive thinking patterns. Your communication style shows genuine personal expression and thoughtful consideration of others' perspectives. You exhibit natural leadership tendencies with a collaborative approach, showing both independence and social awareness. Your decision-making reflects a healthy balance of logic and emotion, with a tendency toward creative problem-solving and adaptability to change. Your core values appear centered around authenticity, growth, and meaningful connections with others."
 }
 \`\`\`
 
@@ -349,7 +391,7 @@ function createFallbackAnalysis(steps: HumanStepData[]) {
       stepNumber: step.stepNumber,
       question: step.question,
       userResponse: step.userResponse,
-      insight: `Response analysis: "${step.userResponse}" - This response shows ${isDetailed ? 'detailed' : 'concise'} human communication patterns with ${hasEmotionalWords ? 'emotional expression' : 'practical focus'}. The ${isCreative ? 'creative' : 'conventional'} approach reveals authentic human decision-making processes.`,
+      insight: `Response analysis: "${step.userResponse}" - Your response shows ${isDetailed ? 'detailed' : 'concise'} communication patterns with ${hasEmotionalWords ? 'emotional expression' : 'practical focus'}. Your ${isCreative ? 'creative' : 'conventional'} approach reveals authentic decision-making processes and ${hasPersonalWords ? 'personal investment' : 'objective analysis'} in your thinking.`,
       percentile: Math.min(80, Math.max(20, 40 + (responseLength / 5))),
       wasUnexpected: isCreative || hasEmotionalWords,
       highlight: isCreative ? 'Shows creative thinking' : hasEmotionalWords ? 'Expresses emotions authentically' : null,
@@ -389,10 +431,27 @@ function createFallbackAnalysis(steps: HumanStepData[]) {
   
   const metascore = Math.round((avgCreativity + avgSpontaneity + avgAuthenticity) / 3)
   const humanessLevel = metascore >= 70 ? 'human-like' : metascore >= 40 ? 'borderline' : 'ai-like'
+
+  // Derive MBTI from fallback scores
+  const avgAnalyticalVsIntuitive = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.analyticalVsIntuitive, 0) / breakdown.length
+  const avgEmotionalExpression = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.emotionalExpression, 0) / breakdown.length
+  const avgSocialOrientation = breakdown.reduce((sum, item) => sum + item.individualScores.personalityTraits.socialOrientation, 0) / breakdown.length
+
+  const E = avgSocialOrientation > 55 ? 1 : 0
+  const I = avgSocialOrientation < 45 ? 1 : 0
+  const N = avgAnalyticalVsIntuitive > 55 ? 1 : 0
+  const S = avgAnalyticalVsIntuitive < 45 ? 1 : 0
+  const F = avgEmotionalExpression > 55 ? 1 : 0
+  const T = avgEmotionalExpression < 45 ? 1 : 0
+  const P = avgSpontaneity > 55 ? 1 : 0
+  const J = avgSpontaneity < 45 ? 1 : 0
+  
+  const mbtiType = `${I > E ? 'I' : 'E'}${S > N ? 'S' : 'N'}${T > F ? 'T' : 'F'}${J > P ? 'J' : 'P'}`
   
   return {
     metascore,
     humanessLevel: humanessLevel as 'human-like' | 'borderline' | 'ai-like',
+    mbtiType,
     subscores: {
       creativity: Math.round(avgCreativity),
       spontaneity: Math.round(avgSpontaneity),
@@ -409,14 +468,14 @@ function createFallbackAnalysis(steps: HumanStepData[]) {
     breakdown,
     primaryArchetype: {
       name: metascore >= 70 ? 'The Creative' : metascore >= 40 ? 'The Anchor' : 'The Pragmatist',
-      description: metascore >= 70 ? 'You demonstrate creative and authentic human responses with unique perspectives.' : 
-                  metascore >= 40 ? 'You show balanced human-like responses with consistent characteristics.' : 
-                  'You exhibit practical and analytical thinking patterns typical of structured approaches.',
+      description: metascore >= 70 ? 'You demonstrate creative and authentic responses with unique perspectives and imaginative thinking.' : 
+                  metascore >= 40 ? 'You show balanced responses with consistent characteristics and reliable decision-making.' : 
+                  'You exhibit practical and analytical thinking patterns with structured approaches to problem-solving.',
       traits: metascore >= 70 ? ['Creative', 'Authentic', 'Unique'] : 
               metascore >= 40 ? ['Balanced', 'Consistent', 'Human-like'] : 
               ['Practical', 'Analytical', 'Structured']
     },
-    overallAnalysis: `Based on your ${breakdown.length} responses, you show ${humanessLevel} interaction patterns with ${metascore >= 70 ? 'high creativity and authenticity' : metascore >= 40 ? 'balanced characteristics' : 'practical and analytical approaches'} across different dimensions.`
+    overallAnalysis: `Based on your ${breakdown.length} responses, you demonstrate ${humanessLevel} interaction patterns with ${metascore >= 70 ? 'high creativity and authenticity' : metascore >= 40 ? 'balanced characteristics' : 'practical and analytical approaches'}. Your personality profile shows ${metascore >= 70 ? 'creative thinking with strong emotional expression and intuitive decision-making' : metascore >= 40 ? 'balanced cognitive styles with both analytical and creative tendencies' : 'systematic thinking with practical problem-solving approaches'}. You exhibit ${metascore >= 70 ? 'natural leadership qualities and collaborative communication' : metascore >= 40 ? 'adaptable communication styles with balanced social tendencies' : 'structured communication with clear, direct expression'} across different dimensions.`
   }
 }
 
@@ -434,6 +493,11 @@ export async function POST(request: NextRequest) {
 
     console.log('\n🧠 [HUMANNESS ANALYSIS] Starting analysis...')
     console.log(`   Total steps: ${steps.length}`)
+    console.log(`   Expected questions: 15 (3 MBTI + 12 original)`)
+    console.log(`   Questions completed: ${steps.length}/15`)
+    if (steps.length < 15) {
+      console.log(`   ⚠️  Partial completion: ${15 - steps.length} questions remaining`)
+    }
     console.log(`   Average response time: ${averageResponseTime.toFixed(0)}ms`)
 
     // STEP 1: Generate AI responses from all 3 models FIRST
@@ -483,10 +547,10 @@ export async function POST(request: NextRequest) {
             questionText += `(${minLength}-${maxLength} characters) `
             if (questionDef.context) questionText += `${questionDef.context}\n`
             questionText += questionDef.question
-            
-            // Add minimum character requirement note for paragraph inputs
-            if (questionDef.type === 'scenario' || questionDef.type === 'open-ended') {
-              questionText += `\nNote: Provide a thoughtful response with at least 30 characters for meaningful analysis.`
+          
+          // Add minimum character requirement note for paragraph inputs
+          if (questionDef.type === 'scenario' || questionDef.type === 'open-ended') {
+            questionText += `\nNote: Provide a thoughtful response with at least 30 characters for meaningful analysis.`
             }
           }
           
@@ -678,8 +742,8 @@ ${questionsBlock}`
         
         if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
           jsonString = content.substring(jsonStart, jsonEnd + 1)
-        } else {
-          jsonString = content.trim()
+      } else {
+        jsonString = content.trim()
         }
       }
     }
@@ -771,6 +835,12 @@ ${questionsBlock}`
     const expectedStepNumbers = steps.map(s => s.stepNumber).sort((a, b) => a - b)
     const breakdownStepNumbers = (analysisResult.breakdown || []).map((b: any) => b.stepNumber).sort((a: number, b: number) => a - b)
     const missingSteps = expectedStepNumbers.filter(stepNum => !breakdownStepNumbers.includes(stepNum))
+    
+    console.log(`\n📊 [VALIDATION] Analysis coverage:`)
+    console.log(`   Questions analyzed: ${breakdownStepNumbers.length}/${expectedStepNumbers.length}`)
+    if (missingSteps.length > 0) {
+      console.log(`   ⚠️  Missing breakdown for questions: ${missingSteps.join(', ')}`)
+    }
     
     if (missingSteps.length > 0) {
       console.log(`⚠️ [VALIDATION] Missing breakdown for steps: ${missingSteps.join(', ')}`)

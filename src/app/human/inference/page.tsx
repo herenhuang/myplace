@@ -119,6 +119,50 @@ export default function HumanInferencePage() {
     }
   }, [])
 
+  // useEffect to save forced-choice answers to cache when they change
+  useEffect(() => {
+    const forcedChoiceQuestions = HUMAN_QUESTIONS.filter(q => q.type === 'forced-choice')
+    forcedChoiceQuestions.forEach(question => {
+      const response = responses[question.stepNumber]
+      if (response) {
+        // This is a simplified version of handleInputBlur for forced-choice
+        const sid = getOrCreateSessionId()
+        const stepData: HumanStepData = {
+          questionId: question.id,
+          stepNumber: question.stepNumber,
+          questionType: question.type,
+          question: question.question,
+          userResponse: response,
+          responseTimeMs: Date.now() - (focusTimes[question.stepNumber] || Date.now()),
+          timestamp: new Date().toISOString(),
+          aiBaseline: getBaselinesForQuestion(question.stepNumber),
+        }
+
+        const cached = loadLocalCache(sid) || { sessionId: sid, responses: [], updatedAt: Date.now() }
+        const existingIndex = cached.responses.findIndex(r => r.questionId === question.id)
+        if (existingIndex >= 0) {
+          cached.responses[existingIndex] = stepData
+        } else {
+          cached.responses.push(stepData)
+        }
+        cached.updatedAt = Date.now()
+        saveLocalCache(cached)
+
+        // Also update the analyzedSteps state to reflect the change
+        setAnalyzedSteps(prevSteps => {
+          const newSteps = [...prevSteps]
+          const existingStepIndex = newSteps.findIndex(s => s.questionId === question.id)
+          if (existingStepIndex >= 0) {
+            newSteps[existingStepIndex] = stepData
+          } else {
+            newSteps.push(stepData)
+          }
+          return newSteps.sort((a, b) => a.stepNumber - b.stepNumber)
+        })
+      }
+    })
+  }, [responses, focusTimes])
+
   const handleInputChange = useCallback((stepNumber: number, value: string) => {
     setResponses(prev => ({ ...prev, [stepNumber]: value }))
   }, [])
@@ -160,10 +204,24 @@ export default function HumanInferencePage() {
     }
     cached.updatedAt = Date.now()
     saveLocalCache(cached)
+
+    // Also update the analyzedSteps state to reflect the change for games
+    setAnalyzedSteps(prevSteps => {
+      const newSteps = [...prevSteps]
+      const existingStepIndex = newSteps.findIndex(s => s.questionId === question.id)
+      if (existingStepIndex >= 0) {
+        newSteps[existingStepIndex] = stepData
+      } else {
+        newSteps.push(stepData)
+      }
+      return newSteps.sort((a, b) => a.stepNumber - b.stepNumber)
+    })
   }, [focusTimes])
 
   const handleShapeSortComplete = useCallback((results: { [key: string]: ShapeData[] }) => {
-    const stepNumber = 10; // Shape sorting is always step 10
+    const question = HUMAN_QUESTIONS.find(q => q.type === 'shape-sorting')
+    if (!question) return
+    const stepNumber = question.stepNumber
     const convertedResults: { [categoryId: string]: string[] } = {}
     Object.entries(results).forEach(([categoryId, shapes]) => {
       convertedResults[categoryId] = shapes.map(shape => shape.id)
@@ -175,7 +233,9 @@ export default function HumanInferencePage() {
   }, [handleInputChange, saveGameResultToCache]);
 
   const handleShapeOrderChange = useCallback((orderedIds: string[]) => {
-    const stepNumber = 11; // Shape ordering is always step 11
+    const question = HUMAN_QUESTIONS.find(q => q.type === 'shape-ordering')
+    if (!question) return
+    const stepNumber = question.stepNumber
     setShapeOrderingResults(prev => ({ ...prev, [stepNumber]: orderedIds }));
     const jsonString = JSON.stringify(orderedIds)
     handleInputChange(stepNumber, jsonString);
@@ -183,7 +243,9 @@ export default function HumanInferencePage() {
   }, [handleInputChange, saveGameResultToCache]);
 
   const handleBubblePopperComplete = useCallback((results: any) => {
-    const stepNumber = 12; // Bubble popper is always step 12
+    const question = HUMAN_QUESTIONS.find(q => q.type === 'bubble-popper')
+    if (!question) return
+    const stepNumber = question.stepNumber
     setBubblePopperResults(prev => ({...prev, [stepNumber]: results}));
     const jsonString = JSON.stringify(results)
     handleInputChange(stepNumber, jsonString);
@@ -231,6 +293,18 @@ export default function HumanInferencePage() {
         }
         cached.updatedAt = Date.now()
         saveLocalCache(cached)
+
+        // Also update the analyzedSteps state to reflect the change
+        setAnalyzedSteps(prevSteps => {
+          const newSteps = [...prevSteps]
+          const existingStepIndex = newSteps.findIndex(s => s.questionId === question.id)
+          if (existingStepIndex >= 0) {
+            newSteps[existingStepIndex] = stepData
+          } else {
+            newSteps.push(stepData)
+          }
+          return newSteps.sort((a, b) => a.stepNumber - b.stepNumber)
+        })
       }
     }
   }
@@ -275,13 +349,21 @@ export default function HumanInferencePage() {
         setDbSessionId(sessionResult.sessionId!)
       }
 
-      // Build step data for all answered questions
+      // Build step data for all answered questions from the latest state
       const steps: HumanStepData[] = []
       const startTime = Date.now()
 
       for (const question of HUMAN_QUESTIONS) {
         const userResponse = responses[question.stepNumber]?.trim()
-        if (!userResponse) continue
+        
+        // Skip incomplete questions, but ensure we keep existing analyzedSteps data for them
+        if (!userResponse) {
+          const existingStep = analyzedSteps.find(s => s.questionId === question.id)
+          if (existingStep) {
+            steps.push(existingStep)
+          }
+          continue
+        }
 
         const stepData: HumanStepData = {
           questionId: question.id,

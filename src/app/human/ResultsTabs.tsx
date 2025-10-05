@@ -6,6 +6,7 @@ import { HumanAnalysisResult, HumanStepData } from '@/lib/human-types'
 import { getQAFromSources } from './utils'
 import WaveChart from './WaveChart'
 
+import Image from 'next/image'
 type ActiveTab = 'results-overview' | 'results-breakdown' | 'results-archetype'
 
 interface Props {
@@ -14,44 +15,6 @@ interface Props {
   responses: HumanStepData[]
   activeTab: ActiveTab
   onChangeTab: (tab: ActiveTab) => void
-}
-
-// MBTI calculation function
-const calculateMBTI = (responses: HumanStepData[]): string => {
-  const mbtiResponses = responses.filter(r => r.stepNumber >= 1 && r.stepNumber <= 3)
-  
-  if (mbtiResponses.length < 3) return 'Unknown'
-  
-  let E = 0, I = 0, S = 0, N = 0, T = 0, F = 0, J = 0, P = 0
-  
-  // Question 1: Adaptability (E/I preference)
-  const q1Response = mbtiResponses.find(r => r.questionId === 'adaptability-schedule')?.userResponse
-  if (q1Response?.includes('adapt quickly')) E += 2
-  else if (q1Response?.includes('feel stressed')) I += 1
-  else if (q1Response?.includes('stick to my original')) I += 2
-  else if (q1Response?.includes('seek advice')) E += 1
-  
-  // Question 2: Team role (E/I and T/F preference)
-  const q2Response = mbtiResponses.find(r => r.questionId === 'team-role-preference')?.userResponse
-  if (q2Response?.includes('Leader')) { E += 2; T += 2 }
-  else if (q2Response?.includes('Facilitator')) { E += 1; F += 2 }
-  else if (q2Response?.includes('Contributor')) { I += 1; T += 1 }
-  else if (q2Response?.includes('Observer')) { I += 2; F += 1 }
-  
-  // Question 3: Problem-solving (S/N and T/F preference)
-  const q3Response = mbtiResponses.find(r => r.questionId === 'problem-solving-approach')?.userResponse
-  if (q3Response?.includes('logical analysis')) { S += 2; T += 2 }
-  else if (q3Response?.includes('trust my intuition')) { N += 2; F += 1 }
-  else if (q3Response?.includes('brainstorm creatively')) { N += 2; T += 1 }
-  else if (q3Response?.includes('consult with others')) { S += 1; F += 2 }
-  
-  // Determine MBTI type
-  const extroversion = E > I ? 'E' : 'I'
-  const sensing = S > N ? 'S' : 'N'
-  const thinking = T > F ? 'T' : 'F'
-  const judging = J > P ? 'J' : 'P'
-  
-  return extroversion + sensing + thinking + judging
 }
 
 export default function ResultsTabs({ sessionId, analysisResult, responses, activeTab, onChangeTab }: Props) {
@@ -197,7 +160,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                 <h4 className="text-sm font-semibold text-gray-900 mb-2">MBTI Type</h4>
                                 <div className="flex items-center gap-3">
                                     <div className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-lg font-bold">
-                                        {calculateMBTI(responses)}
+                                        {data?.mbtiType || '...'}
                                     </div>
                                     <div className="text-sm text-gray-600">
                                         Based on your personality responses
@@ -252,7 +215,19 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
 
       {activeTab === 'results-breakdown' && data && (
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12 mt-8"><h2 className="text-4xl font-bold text-gray-900 tracking-tight mb-2">Breakdown</h2><p className="text-gray-600">Insights from each of your {questionBreakdown.length} responses</p></div>
+          <div className="text-center mb-12 mt-8">
+            <h2 className="text-4xl font-bold text-gray-900 tracking-tight mb-2">Breakdown</h2>
+            <p className="text-gray-600">Insights from each of your {questionBreakdown.length} responses</p>
+            {responses.length < 15 && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Partial Analysis:</strong> You've completed {responses.length} out of 15 questions. 
+                  {responses.length < 3 ? ' Complete the MBTI personality questions (1-3) for a more accurate personality assessment.' : 
+                   responses.length < 15 ? ' Complete the remaining interactive games for a comprehensive analysis.' : ''}
+                </p>
+              </div>
+            )}
+          </div>
 
           <div className={styles.waveVisualization}>
             <h3 className="text-sm font-medium text-gray-700 mb-4">Unexpectedness Journey</h3>
@@ -331,13 +306,18 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                    {item.aiExamples && (
                       <div className="mt-4 grid grid-cols-1 gap-3">
                                 {[
-                                { key: 'chatgpt', name: 'ChatGPT', iconClass: styles.iconGPT, response: item.aiExamples.chatgpt },
-                                { key: 'gemini', name: 'Gemini', iconClass: styles.iconGoogle, response: item.aiExamples.gemini },
-                                { key: 'claude', name: 'Claude', iconClass: styles.iconClaude, response: item.aiExamples.claude }
+                                { key: 'chatgpt', name: 'ChatGPT', iconClass: styles.iconGPT, iconUrl: '/openai.svg', response: item.aiExamples.chatgpt },
+                                { key: 'gemini', name: 'Gemini', iconClass: styles.iconGoogle, iconUrl: '/google.svg', response: item.aiExamples.gemini },
+                                { key: 'claude', name: 'Claude', iconClass: styles.iconClaude, iconUrl: '/claude.svg', response: item.aiExamples.claude }
                                 ].map((ai) => (
                                 <div key={ai.key} className="rounded-xl border border-gray-200 p-3 bg-white">
                                     <div className="flex items-center gap-1.5 border-1 border-gray-300 px-2 py-1.5 mb-2 rounded-full w-fit">
-                                    <div className={ai.iconClass}></div>
+                                    <Image
+                                      src={ai.iconUrl}
+                                      alt={ai.name}
+                                      width={15}
+                                      height={15}
+                                    />
                                     <div className="text-xs font-semibold text-gray-900">{ai.name}</div>
                                     </div>
                                     {(() => {
@@ -356,12 +336,12 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                             {stepData?.questionType === 'shape-sorting' && Array.isArray(jsonData) && (
                                                 <div className="mt-2 text-xs text-gray-600">
                                                 {jsonData.length} shapes sorted into categories
-                                                </div>
+                            </div>
                                             )}
                                             {stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData) && (
                                                 <div className="mt-2 text-xs text-gray-600">
                                                 {jsonData.length} shapes arranged in sequence
-                                                </div>
+                        </div>
                                             )}
                                             {stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object' && (
                                                 <div className="mt-2 text-xs text-gray-600">

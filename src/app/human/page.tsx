@@ -120,8 +120,17 @@ export default function HumanTestPage() {
   }
 
   const confirmStart = () => {
-    setScreenState('simulation')
+    // Reset state for a new run
+    setResponses([])
+    setAnalysisResult(null)
     setCurrentStepNumber(1)
+    setUserInput('')
+    setSelectedChoice(null)
+    setShapeSortingResults({})
+    setShapeOrderingResults([])
+    setBubblePopperResults(null)
+
+    setScreenState('simulation')
     setStepStartTime(Date.now())
   }
 
@@ -188,6 +197,7 @@ export default function HumanTestPage() {
       const aiBaseline = getBaselinesForQuestion(currentStepNumber)
 
       const stepData: HumanStepData = {
+        questionId: question.id,
         stepNumber: currentStepNumber,
         questionType: question.type,
         question: question.question,
@@ -224,6 +234,7 @@ export default function HumanTestPage() {
       setCurrentStepNumber(currentStepNumber + 1)
       setUserInput('')
       setSelectedChoice(null)
+      // Clear game-specific results for the next step
       setShapeSortingResults({})
       setShapeOrderingResults([])
       setBubblePopperResults(null)
@@ -241,11 +252,11 @@ export default function HumanTestPage() {
   }
 
   const startAnalysis = async (allResponses: HumanStepData[]) => {
-    // Keep the screen layout; only swap results area contents
+    // Clear previous results and enter analyzing state
+    setAnalysisResult(null)
     setAnalysisError('')
+    setScreenState('analyzing')
     setIsLoading(true)
-    // Immediately show the results container; ResultsTabs will render a loader if analysisResult is null
-    setScreenState('results-overview')
 
     try {
       const totalResponseTime = allResponses.reduce((sum, r) => sum + r.responseTimeMs, 0)
@@ -253,11 +264,14 @@ export default function HumanTestPage() {
 
       console.log('🧠 Starting humanness analysis...')
 
+      // Make sure we have the latest responses for the analysis
+      const currentResponses = responses.length > 0 ? responses : allResponses
+
       const response = await fetch('/api/human/analyze-humanness', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          steps: allResponses,
+          steps: currentResponses,
           averageResponseTime
         })
       })
@@ -267,11 +281,15 @@ export default function HumanTestPage() {
       if (result.success && result.analysis) {
         const analysis: HumanAnalysisResult = result.analysis
         setAnalysisResult(analysis)
+        
+        // Ensure the responses state is also up-to-date
+        setResponses(currentResponses)
+
         await saveHumanAnalysis(dbSessionId, analysis)
         // Persist analysis to cache
         saveLocalCache({
           sessionId: sessionId || '',
-          responses: allResponses,
+          responses: currentResponses,
           analysisResult: analysis,
           updatedAt: Date.now()
         })
@@ -410,7 +428,6 @@ export default function HumanTestPage() {
                 {/* Image if present */}
                 {question.imageUrl && (
                   <div className={styles.imageBox}>
-                    <span className="text-white text-lg">[Image: {question.imageUrl}]</span>
                     <img src={question.imageUrl} alt="Question Image" className="w-full h-full object-cover" />
                   </div>
                 )}

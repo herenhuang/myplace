@@ -44,6 +44,8 @@ export interface HumanSessionData {
 
 export interface HumanAnalysisResult {
   metascore: number // 0-100
+  humanessLevel: 'ai-like' | 'borderline' | 'human-like' | 'very-human'
+  mbtiType?: string
   subscores: {
     creativity: number // 0-100
     spontaneity: number // 0-100
