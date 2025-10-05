@@ -11,7 +11,7 @@ export const flirtingStyleQuiz: QuizConfig = {
     secondaryColor: '#fed7aa',
     backgroundColor: '#fff7ed',
     textColor: '#7c2d12',
-    backgroundImage: '/quiz/flirting-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #f97316 0%, #fed7aa 50%, #fff7ed 100%)'
   },
   
   questions: [

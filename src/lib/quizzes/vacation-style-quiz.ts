@@ -11,7 +11,7 @@ export const vacationStyleQuiz: QuizConfig = {
     secondaryColor: '#90e0ef',
     backgroundColor: '#f8f9fa',
     textColor: '#212529',
-    backgroundImage: '/quiz/vacation-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #00b4d8 0%, #90e0ef 50%, #f8f9fa 100%)'
   },
   
   questions: [

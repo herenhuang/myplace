@@ -11,7 +11,7 @@ export const feedbackStyleQuiz: QuizConfig = {
     secondaryColor: '#c9b8a3',
     backgroundColor: '#fafafa',
     textColor: '#2c2c2c',
-    backgroundImage: '/quiz/feedback-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #8b7355 0%, #c9b8a3 50%, #fafafa 100%)'
   },
   
   questions: [

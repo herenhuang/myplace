@@ -11,7 +11,7 @@ export const managerStyleQuiz: QuizConfig = {
     secondaryColor: '#a5b4fc',
     backgroundColor: '#fafafa',
     textColor: '#1e293b',
-    backgroundImage: '/quiz/manager-style/background.png'
+    backgroundImage: 'linear-gradient(135deg, #6366f1 0%, #a5b4fc 50%, #fafafa 100%)'
   },
   
   questions: [

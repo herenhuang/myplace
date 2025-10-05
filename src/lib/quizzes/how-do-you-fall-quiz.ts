@@ -11,7 +11,7 @@ export const howDoYouFallQuiz: QuizConfig = {
     secondaryColor: '#fda4af',
     backgroundColor: '#fff1f2',
     textColor: '#881337',
-    backgroundImage: '/quiz/how-do-you-fall/background.png'
+    backgroundImage: 'linear-gradient(135deg, #be123c 0%, #fda4af 50%, #fff1f2 100%)'
   },
   
   // STORY SETUP - Shows before the quiz starts

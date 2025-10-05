@@ -11,7 +11,7 @@ export const aiModelQuiz: QuizConfig = {
     secondaryColor: '#ffa500',
     backgroundColor: '#ffffff',
     textColor: '#1a1a1a',
-    backgroundImage: '/elevate/orange.png'
+    backgroundImage: 'linear-gradient(135deg, #ff6b35 0%, #ffa500 50%, #ffffff 100%)'
   },
   
   questions: [
