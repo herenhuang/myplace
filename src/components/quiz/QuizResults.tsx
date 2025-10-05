@@ -153,7 +153,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 cursor: 'pointer'
               }}
             >
-              See What's Next →
+              See What&apos;s Next →
             </button>
           </div>
         )}
