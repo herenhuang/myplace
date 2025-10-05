@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { WORKPLACE_INITIAL_PROMPT } from '@/lib/workplace-prompts'
+import { WORKPLACE_INITIAL_PROMPT } from '@/lib/scenarios/workplace'
 
 interface GenerateScenarioRequest {
   jobTitle: string

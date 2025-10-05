@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, MotionValue } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import styles from './quiz-recommendation-footer.module.scss'
 
@@ -19,15 +19,18 @@ interface RecommendationData {
 
 interface Props {
   sessionId: string
+  onBackToCard: () => void
+  onRestart: () => void
+  recommendationRef: React.RefObject<HTMLDivElement>
 }
 
-export default function QuizRecommendationFooter({ sessionId }: Props) {
+export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRestart, recommendationRef }: Props) {
   const [loading, setLoading] = useState(true)
   const [recommendation, setRecommendation] = useState<RecommendationData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
   const [hasViewed, setHasViewed] = useState(false)
-  const footerRef = useRef<HTMLDivElement>(null)
+  const [isInView, setIsInView] = useState(false)
   const router = useRouter()
 
   const loadingMessages = [
@@ -57,29 +60,34 @@ export default function QuizRecommendationFooter({ sessionId }: Props) {
     fetchRecommendation()
   }, [sessionId])
 
-  // Track when user scrolls into view
+  // Track when user scrolls into view and trigger animation
   useEffect(() => {
-    if (!recommendation) return
+    if (!recommendationRef.current) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasViewed && recommendation.id) {
-          setHasViewed(true)
-          trackRecommendationView(recommendation.id)
+        // Only trigger when the top 20% enters the viewport from below
+        if (entry.isIntersecting && entry.boundingClientRect.top < window.innerHeight * 0.8) {
+          setIsInView(true)
+          if (!hasViewed && recommendation?.id) {
+            setHasViewed(true)
+            trackRecommendationView(recommendation.id)
+          }
         }
       },
-      { threshold: 0.5 }
+      {
+        threshold: 0,
+        rootMargin: '0px 0px -20% 0px'
+      }
     )
 
-    if (footerRef.current) {
-      observer.observe(footerRef.current)
-    }
-
+    observer.observe(recommendationRef.current)
     return () => observer.disconnect()
-  }, [recommendation, hasViewed])
+  }, [recommendation, hasViewed, recommendationRef])
 
   const fetchRecommendation = async () => {
     try {
+      console.log('Fetching recommendation with sessionId:', sessionId)
       const res = await fetch('/api/quiz/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,6 +95,7 @@ export default function QuizRecommendationFooter({ sessionId }: Props) {
       })
 
       const data = await res.json()
+      console.log('Recommendation response:', data)
 
       if (!res.ok) {
         // If user completed all quizzes, don't show error
@@ -151,63 +160,81 @@ export default function QuizRecommendationFooter({ sessionId }: Props) {
 
   return (
     <motion.div
-      ref={footerRef}
+      ref={recommendationRef}
       className={styles.recommendationFooter}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
+      initial={{ scale: 0.85, rotate: 3, opacity: 0 }}
+      animate={isInView ? { scale: 1, rotate: 0, opacity: 1 } : { scale: 0.85, rotate: 3, opacity: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className={styles.psHeader}>ps.</div>
+      <div className={styles.contentWrapper}>
+        <div className={styles.psHeader}>ps.</div>
 
-      {loading ? (
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={currentMessageIndex}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.3 }}
-            className={styles.loadingMessage}
-          >
-            {loadingMessages[currentMessageIndex]}
-          </motion.p>
-        </AnimatePresence>
-      ) : recommendation ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className={styles.reasoning}>
-            {recommendation.reasoning}
-          </p>
-
-          <div className={styles.quizCard}>
-            <h4>{recommendation.quiz.title}</h4>
-            {recommendation.quiz.description && (
-              <p className={styles.quizDescription}>
-                {recommendation.quiz.description}
-              </p>
-            )}
-            <motion.button
-              onClick={handleClick}
-              className={styles.ctaButton}
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        {loading ? (
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentMessageIndex}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.3 }}
+              className={styles.loadingMessage}
             >
-              {recommendation.cta}
-            </motion.button>
-          </div>
-
-          <a
-            href="/quizzes"
-            className={styles.altLink}
+              {loadingMessages[currentMessageIndex]}
+            </motion.p>
+          </AnimatePresence>
+        ) : recommendation ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
-            or see all quizzes
-          </a>
-        </motion.div>
-      ) : null}
+            <p className={styles.reasoning}>
+              {recommendation.reasoning}
+            </p>
+
+            <div className={styles.quizCard}>
+              <h4>{recommendation.quiz.title}</h4>
+              {recommendation.quiz.description && (
+                <p className={styles.quizDescription}>
+                  {recommendation.quiz.description}
+                </p>
+              )}
+              <motion.button
+                onClick={handleClick}
+                className={styles.ctaButton}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              >
+                {recommendation.cta}
+              </motion.button>
+            </div>
+
+            <a
+              href="/quizzes"
+              className={styles.altLink}
+            >
+              or see all quizzes
+            </a>
+
+            {/* Action buttons inside the recommendation card */}
+            <div className={styles.actionButtons}>
+              <button
+                className={`${styles.actionButton} ${styles.secondary}`}
+                onClick={onBackToCard}
+              >
+                <span>← Back to Card</span>
+              </button>
+              <button
+                className={`${styles.actionButton} ${styles.outline}`}
+                onClick={onRestart}
+              >
+                <span>Take Again</span>
+              </button>
+            </div>
+          </motion.div>
+        ) : null}
+      </div>
     </motion.div>
   )
 }

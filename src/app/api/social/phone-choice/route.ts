@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { SOCIAL_PHONE_CONSEQUENCE_PROMPT } from '@/lib/social-prompts'
+import { SOCIAL_PHONE_CONSEQUENCE_PROMPT } from '@/lib/scenarios/social'
 
 interface PhoneChoiceRequest {
   choice: string

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { SimulationState, HandleTurnResponse, Archetype } from '@/lib/types'
+import { SimulationState, HandleTurnResponse, Archetype } from '@/lib/scenarios/types'
 import { QUESTIONS, INITIAL_SCENE, getArchetypeFromPath } from '@/lib/scenarios/crisis'
 
 export default function CrisisSimulationPage() {

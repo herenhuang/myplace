@@ -8,13 +8,14 @@ import QuizWelcome from './QuizWelcome'
 import QuizPersonalization from './QuizPersonalization'
 import QuizQuestion from './QuizQuestion'
 import QuizResults from './QuizResults'
+import QuizRecommendationFooter from './QuizRecommendationFooter'
 import styles from './quiz.module.scss'
 
 interface QuizEngineProps {
   config: QuizConfig
 }
 
-type ScreenState = 'welcome' | 'personalization' | 'question' | 'analyzing' | 'results'
+type ScreenState = 'welcome' | 'personalization' | 'question' | 'analyzing' | 'results' | 'recommendation'
 
 export default function QuizEngine({ config }: QuizEngineProps) {
   const [screenState, setScreenState] = useState<ScreenState>('welcome')
@@ -411,7 +412,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
         // Save complete session to database
         try {
-          await fetch('/api/quiz/complete', {
+          const completeResponse = await fetch('/api/quiz/complete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -425,6 +426,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
               }
             })
           })
+          const completeData = await completeResponse.json()
+          if (completeData.success && completeData.sessionId) {
+            setDbSessionId(completeData.sessionId)
+          }
         } catch (error) {
           console.error('Error saving quiz completion:', error)
         }
@@ -513,7 +518,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
           // Save complete session to database
           try {
-            await fetch('/api/quiz/complete', {
+            const completeResponse = await fetch('/api/quiz/complete', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -530,6 +535,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                 }
               })
             })
+            const completeData = await completeResponse.json()
+            if (completeData.success && completeData.sessionId) {
+              setDbSessionId(completeData.sessionId)
+            }
           } catch (error) {
             console.error('Error saving quiz completion:', error)
           }
@@ -557,9 +566,6 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     setSessionId(sid)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
-  // Calculate progress
-  const progress = currentQuestionIndex / config.questions.length
 
   // Render content for inside the phone container
   const renderContent = () => {
@@ -609,7 +615,17 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             config={config}
             result={result}
             onRestart={handleRestart}
-            sessionId={dbSessionId}
+            onShowRecommendation={sessionId ? () => setScreenState('recommendation') : undefined}
+          />
+        ) : null
+
+      case 'recommendation':
+        return sessionId ? (
+          <QuizRecommendationFooter
+            sessionId={sessionId}
+            onBackToCard={() => setScreenState('results')}
+            onRestart={handleRestart}
+            recommendationRef={{ current: null }}
           />
         ) : null
 
@@ -621,18 +637,6 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   return (
     <PageContainer className="!max-w-none max-w-4xl">
       <div className={styles.quizContainer}>
-        {/* Progress Bar */}
-        {screenState === 'question' && (
-          <div className={styles.progressContainer}>
-            <div className={styles.progressBarTrack}>
-              <div
-                className={styles.progressBarFill}
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
-
         {/* Phone Container */}
         <div className={styles.stepContainer}>
           <div className={styles.stepContent}>
@@ -642,6 +646,21 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                 backgroundImage: `url(${config.theme.backgroundImage})`
               }}
             >
+              {/* Progress Bar - Inside phone container */}
+              {screenState === 'question' && (
+                <div className={styles.progressContainer}>
+                  {config.questions.map((_, index) => (
+                    <div key={index} className={styles.progressBarTrack}>
+                      <div
+                        className={styles.progressBarFill}
+                        style={{
+                          width: index <= currentQuestionIndex ? '100%' : '0%'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               {renderContent()}
             </div>
           </div>

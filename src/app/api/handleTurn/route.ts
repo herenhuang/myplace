@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { HandleTurnRequest, HandleTurnResponse } from '@/lib/types';
+import { HandleTurnRequest, HandleTurnResponse } from '@/lib/scenarios/types';
 import { QUESTIONS as CRISIS_QUESTIONS, GUARD_RAIL_PROMPT as CRISIS_GUARD_RAIL, ENGINE_PROMPT as CRISIS_ENGINE } from '@/lib/scenarios/crisis';
 import { STORY_PROMPT_TURN_1, STORY_PROMPT_TURN_2, STORY_PROMPT_TURN_3, STORY_PROMPT_TURN_4, QUESTIONS as REMIX_QUESTIONS, GUARD_RAIL_PROMPT as REMIX_GUARD_RAIL, INTENT_CLASSIFIER_PROMPT as REMIX_CLASSIFICATION } from '@/lib/scenarios/remix';
 
