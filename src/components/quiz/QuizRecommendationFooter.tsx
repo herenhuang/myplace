@@ -227,7 +227,7 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
                 <div>Back to Card</div>
               </button>
               <button
-                className={styles.actionButton}
+                className={styles.actionButtonAlt}
                 onClick={onRestart}
               >
                 <div>↻</div>

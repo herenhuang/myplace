@@ -7,11 +7,11 @@ export const howDoYouFallQuiz: QuizConfig = {
   type: 'narrative',  // This makes it an immersive story that adapts!
   
   theme: {
-    primaryColor: '#be123c',
+    primaryColor: '#FF3D95',
     secondaryColor: '#fda4af',
     backgroundColor: '#fff1f2',
     textColor: '#881337',
-    backgroundImage: 'linear-gradient(135deg, #be123c 0%, #fda4af 50%, #fff1f2 100%)'
+    backgroundImage: 'linear-gradient(135deg,rgb(217, 46, 131) 0%, #fda4af 50%, #fff1f2 100%)'
   },
   
   // STORY SETUP - Shows before the quiz starts

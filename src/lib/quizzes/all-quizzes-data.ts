@@ -36,7 +36,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover your patterns in falling for someone',
     category: 'love',
     route: '/quiz/how-do-you-fall',
-    backgroundImage: 'url(/quiz/how-do-you-fall/background.jpg), linear-gradient(135deg, #fa709a 0%, #fee140 50%, #ffa07a 100%)'
+    backgroundImage: 'url(/quiz/how-do-you-fall/background.jpg), linear-gradient(135deg,rgb(255, 164, 216) 0%,rgb(255, 236, 125) 50%,rgb(255, 199, 177) 100%)'
   },
   {
     id: 'dating-texting-style',

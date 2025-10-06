@@ -1,5 +1,4 @@
-// Quiz Template System - Beautiful Phone Container Design
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Oswald:wght@200..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 // Mixins
 @mixin transition-all($duration: 200ms) {
@@ -30,7 +29,7 @@
 
 .progressBarTrack {
   flex: 1;
-  background-color: rgba(209, 213, 219, 0.4);
+  background-color: rgba(white, .5);
   border-radius: 9999px;
   height: 4px;
   overflow: hidden;
@@ -39,7 +38,7 @@
 .progressBarFill {
   background: var(--quiz-primary-color, #ff6b35);
   height: 100%;
-  border-radius: 9999px;
+  border-radius: 18px;
   @include transition-all(300ms);
 }
 
@@ -452,9 +451,7 @@
 }
 
 // When showing stats (no longer needed since always full width)
-.optionButtonWithStats {
-  // Already full width
-}
+// .optionButtonWithStats rule removed as it was empty
 
 // Fill background for stats
 .optionButtonFill {
@@ -583,18 +580,20 @@
 }
 
 .resultName {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 32px;
+  font-weight: 600;
+  width: 90%;
   font-family: var(--font-instrument-serif);
-  line-height: 1.1;
+  line-height: 1;
   letter-spacing: -0.025em;
-  color: rgb(130, 44, 44);
+  color: rgb(110, 18, 18);
   text-align: center;
+  text-transform: uppercase;
   animation: fadeUp 0.6s ease-in-out 0.2s both;
 }
 
 .resultTagline {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   font-family: var(--font-lora);
   line-height: 1.1;
@@ -610,6 +609,11 @@
   display: flex;
   justify-content: center;
   animation: fadeUp 0.6s ease-in-out 0.4s both;
+  
+  // Special animation for explanation view
+  .explanationContainer & {
+    animation: fadeUpExplanation 0.6s ease-in-out 0.4s both;
+  }
 }
 
 // Explanation View
@@ -624,6 +628,7 @@
 .explanationHeader {
   margin-bottom: 24px;
   text-align: left;
+  animation: fadeUpExplanation 0.6s ease-in-out 0.1s both;
 }
 
 .resultNameSmall {
@@ -652,14 +657,16 @@
   line-height: 1.4;
   letter-spacing: -0.025em;
   color: black;
+  animation: fadeUpExplanation 0.6s ease-in-out 0.2s both;
 
   h1 {
-    font-size: 22px !important;
-    font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    color: rgb(130, 44, 44);
-    font-family: var(--font-instrument-serif);
+    font-size: 28px !important;
+    font-weight: 900;
+    margin: 24px 0 16px 0;
+    color: black;
+    font-family: 'Libre Baskerville', serif;
+    letter-spacing: -1px !important;
+    line-height: 1.05;
     text-align: left;
 
     &:first-child {
@@ -668,12 +675,13 @@
   }
 
   h2 {
-    font-size: 22px !important;
-    font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    color: rgb(130, 44, 44);
-    font-family: var(--font-instrument-serif);
+    font-size: 20px !important;
+    font-weight: 600;
+    margin: 24px 0 16px 0;
+    color: black;
+    line-height: 1.1;
+    letter-spacing: -1px !important;
+    font-family: 'Libre Baskerville', serif;
     text-align: left;
 
     &:first-child {
@@ -684,8 +692,8 @@
   p {
     font-size: 14px;
     font-weight: 500;
-    line-height: 1.5;
-    letter-spacing: -0.025em;
+    line-height: 1.2;
+    letter-spacing: -.5px;
     color: black;
     margin-bottom: 1rem;
   }
@@ -703,7 +711,7 @@
       margin-bottom: 0.5rem;
 
       &::marker {
-        color: rgb(130, 44, 44);
+        color: black;
       }
     }
   }
@@ -718,7 +726,7 @@
 
   strong {
     font-weight: 700;
-    color: rgb(130, 44, 44);
+    color: black;
   }
 }
 
@@ -733,20 +741,20 @@
 
 .cardButton {
   padding: 12px 48px;
-  border-radius: 12px;
-  border: 3px solid rgb(130, 44, 44);
-  background: transparent;
-  color: rgb(130, 44, 44);
-  font-size: 22px;
-  font-weight: 700;
-  font-family: var(--font-instrument-serif);
+  border-radius: 24px;
+  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.05);
+  background: var(--quiz-primary-color, #ff6b35);
+  color: white;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+  font-weight: 600;
+  font-family: 'Lora', serif;
   cursor: pointer;
   @include transition-all(200ms);
   white-space: nowrap;
 
   &:hover {
-    background: rgba(130, 44, 44, 0.05);
-    transform: translateY(-2px);
+    opacity: .8;
   }
 
   &:active {
@@ -764,43 +772,6 @@
 }
 
 .explanationButton {
-  padding: 12px 24px;
-  border-radius: 12px;
-  border: 3px solid rgb(130, 44, 44);
-  background: transparent;
-  color: rgb(130, 44, 44);
-  font-size: 22px;
-  font-weight: 700;
-  font-family: var(--font-instrument-serif);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  @include transition-all(200ms);
-
-  &:hover {
-    background: rgba(130, 44, 44, 0.05);
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-// Action Buttons
-.actionButtons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 24px;
-  z-index: 3;
-  margin-top: 16px;
-}
-
-.actionButton {
   padding: 12px 16px;
   border-radius: 22px;
   border: 2px solid rgba(255,255,255, 0.25);
@@ -822,6 +793,112 @@
     font-size: 16px;
     font-weight: 600;
     color: white;
+    letter-spacing: -0.36px;
+  }
+
+  &.outline {
+    background-color: transparent;
+    border-color: var(--quiz-primary-color, #ff6b35);
+    
+    span {
+      color: var(--quiz-primary-color, #ff6b35);
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  &.secondary {
+    background-color: var(--quiz-secondary-color, #ffa500);
+    
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+
+// Action Buttons
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 24px 0;
+  z-index: 3;
+  margin-top: 16px;
+  animation: fadeUpExplanation 0.6s ease-in-out 0.3s both;
+}
+
+.actionButton {
+  padding: 12px 16px;
+  border-radius: 32px;
+  border: 2px solid rgba(255,255,255, 0.25);
+  @include transition-all(200ms);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  background-color: var(--quiz-primary-color, #ff6b35);
+  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: var(--quiz-primary-color-dark, #ea580c);
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.36px;
+  }
+
+  &.outline {
+    background-color: transparent;
+    border-color: var(--quiz-primary-color, #ff6b35);
+    
+    span {
+      color: var(--quiz-primary-color, #ff6b35);
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  &.secondary {
+    background-color: var(--quiz-secondary-color, #ffa500);
+    
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+
+.actionButtonAlt {
+  padding: 12px 16px;
+  border-radius: 32px;
+  @include transition-all(200ms);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  background: rgba(white, 0.5);
+  border: 2px solid var(--quiz-primary-color, #ff6b35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: var(--quiz-primary-color-dark, #ea580c);
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--quiz-primary-color, #ff6b35);
     letter-spacing: -0.36px;
   }
 
@@ -924,6 +1001,17 @@
   from {
     opacity: 0;
     transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUpExplanation {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
   to {
     opacity: 1;

@@ -101,7 +101,9 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 className={styles.cardButton}
                 onClick={() => setShowExplanation(true)}
               >
-                See Why →
+                <h2>
+                  See Why →
+                </h2>
               </button>
             )}
           </div>
@@ -116,29 +118,25 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
   return (
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
-        <div className={styles.explanationHeader}>
-          <h1 className={styles.resultNameSmall}>{displayName}</h1>
-        </div>
+
         <div className={styles.markdownContent}>
           <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
         </div>
 
         {/* Action Buttons */}
-        <div className={styles.explanationButtons}>
+        <div className={styles.actionButtons}>
           <button
-            className={styles.explanationButton}
+            className={styles.actionButton}
             onClick={() => setShowExplanation(false)}
           >
-            <div>←</div>
-            <div>Back to Card</div>
+            <h2>Back to Card</h2>
           </button>
           {onShowRecommendation && (
             <button
-              className={styles.explanationButton}
+              className={styles.actionButtonAlt}
               onClick={onShowRecommendation}
             >
-              <div>→</div>
-              <div>What&apos;s Next</div>
+              <h2>What&apos;s Next</h2>
             </button>
           )}
         </div>
