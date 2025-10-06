@@ -1051,13 +1051,14 @@
   z-index: 3;
   margin-top: 16px;
   opacity: 0;
+  width: 90%;
   animation: fadeUpExplanation 0.7s ease-in-out both;
 }
 
 .actionButton {
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: 32px;
-  border: 2px solid rgba(255,255,255, 0.25);
+  border: 2px solid var(--quiz-primary-color, #ff6b35);
   @include transition-all(200ms);
   cursor: pointer;
   backdrop-filter: blur(10px);
@@ -1101,8 +1102,14 @@
   }
 }
 
+.shareIcon{
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--quiz-primary-color, #ff6b35);
+}
+
 .actionButtonAlt {
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: 32px;
   @include transition-all(200ms);
   cursor: pointer;

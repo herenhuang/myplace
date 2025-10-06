@@ -305,17 +305,11 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             />
           )}
 
-          <div className={styles.cardButtons}>
-            <button
-              className={styles.shareButton}
-              onClick={handleShare}
-              title="Share your result"
-            >
-              <h2>Share</h2>
-            </button>
+          <div className={styles.actionButtons}>
+            
             {result.explanation && (
               <button
-                className={styles.cardButton}
+                className={styles.actionButton}
                 onClick={() => setShowExplanation(true)}
               >
                 <h2>
@@ -323,6 +317,17 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 </h2>
               </button>
             )}
+
+            <button
+              className={styles.actionButtonAlt}
+              onClick={handleShare}
+              title="Share your result"
+            >
+              <span className={styles.shareIcon + ' material-symbols-outlined'}>
+                share
+              </span>
+              <h2>Share</h2>
+            </button>
           </div>
         </div>
       </div>
