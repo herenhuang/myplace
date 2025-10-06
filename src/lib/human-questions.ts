@@ -13,9 +13,86 @@ export interface HumanQuestion {
 }
 
 export const HUMAN_QUESTIONS: HumanQuestion[] = [
+  
+  {
+    id: 'bag-contents-scenario',
+    stepNumber: 1,
+    type: 'scenario',
+    context: "You reach for your phone to snap a photo of the impressive installation ahead. As you back up to frame the perfect shot, you suddenly trip, dropping your bag and scattering its contents everywhere!",
+    question: "What ends up falling out?",
+    placeholder: "Your Response...",
+  },
+  {
+    id: 'word-association-simultaneous',
+    stepNumber: 2,
+    type: 'word-association',
+    question: "What's the first word that comes to mind?",
+    context: "Simultaneous",
+    placeholder: "Type one word...",
+    characterLimit: 30
+  },
+  {
+    id: 'word-association-randomly',
+    stepNumber: 3,
+    type: 'word-association',
+    question: "What's the first word that comes to mind?",
+    context: "Randomly",
+    placeholder: "Type one word...",
+    characterLimit: 30
+  },
+  {
+    id: 'word-association-ostentatious',
+    stepNumber: 4,
+    type: 'word-association',
+    question: "What's the first word that comes to mind?",
+    context: "Ostentatious",
+    placeholder: "Type one word...",
+    characterLimit: 30
+  },
+  /*
+  {
+    id: 'image-description-clouds',
+    stepNumber: 8,
+    type: 'image-description',
+    question: "Describe the following image in < 150 characters.",
+    imageUrl: '/clouds.png', // You'll need to add these images
+    characterLimit: 150,
+    placeholder: "Your Response...",
+  },
+  */
+
+ 
+  {
+    id: 'word-combination-telescope-sandwich-melancholy',
+    stepNumber: 5,
+    type: 'word-combination',
+    question: "Create a sentence using all three words:",
+    requiredWords: ['telescope', 'sandwich', 'melancholy'],
+    placeholder: "Write a sentence using all three words...",
+    characterLimit: 200
+  },
+  {
+    id: 'word-combination-bicycle-thunderstorm-nostalgia',
+    stepNumber: 6,
+    type: 'word-combination',
+    question: "Create a sentence using all three words:",
+    requiredWords: ['bicycle', 'thunderstorm', 'nostalgia'],
+    placeholder: "Write a sentence using all three words...",
+    characterLimit: 200
+  },
+  {
+    id: 'word-combination-library-clockwork-whimsical',
+    stepNumber: 7,
+    type: 'word-combination',
+    question: "Create a sentence using all three words:",
+    requiredWords: ['library', 'clockwork', 'whimsical'],
+    placeholder: "Write a sentence using all three words...",
+    characterLimit: 200
+  },
+
   {
     id: 'adaptability-schedule',
-    stepNumber: 1,
+    stepNumber: 8,
     type: 'forced-choice',
     question: "How do you typically handle unexpected changes in your schedule?",
     choices: [
@@ -27,7 +104,7 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
   },
   {
     id: 'team-role-preference',
-    stepNumber: 2,
+    stepNumber: 9,
     type: 'forced-choice',
     question: "When working in a team, what role do you naturally assume?",
     choices: [
@@ -39,7 +116,7 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
   },
   {
     id: 'problem-solving-approach',
-    stepNumber: 3,
+    stepNumber: 10,
     type: 'forced-choice',
     question: "Which statement best describes your approach to problem-solving?",
     choices: [
@@ -50,79 +127,8 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
     ]
   },
   {
-    id: 'bag-contents-scenario',
-    stepNumber: 4,
-    type: 'scenario',
-    context: "You reach for your phone to snap a photo of the impressive installation ahead. As you back up to frame the perfect shot, you suddenly trip, dropping your bag and scattering its contents everywhere!",
-    question: "What ends up falling out?",
-    placeholder: "Your Response...",
-  },
-  {
-    id: 'word-association-simultaneous',
-    stepNumber: 5,
-    type: 'word-association',
-    question: "What's the first word that comes to mind?",
-    context: "Simultaneous",
-    placeholder: "Type one word...",
-    characterLimit: 30
-  },
-  {
-    id: 'word-association-randomly',
-    stepNumber: 6,
-    type: 'word-association',
-    question: "What's the first word that comes to mind?",
-    context: "Randomly",
-    placeholder: "Type one word...",
-    characterLimit: 30
-  },
-  {
-    id: 'word-association-ostentatious',
-    stepNumber: 7,
-    type: 'word-association',
-    question: "What's the first word that comes to mind?",
-    context: "Ostentatious",
-    placeholder: "Type one word...",
-    characterLimit: 30
-  },
-  {
-    id: 'image-description-clouds',
-    stepNumber: 8,
-    type: 'image-description',
-    question: "Describe the following image in < 150 characters.",
-    imageUrl: '/clouds.png', // You'll need to add these images
-    characterLimit: 150,
-    placeholder: "Your Response...",
-  },
-  {
-    id: 'word-combination-telescope-sandwich-melancholy',
-    stepNumber: 9,
-    type: 'word-combination',
-    question: "Create a sentence using all three words:",
-    requiredWords: ['telescope', 'sandwich', 'melancholy'],
-    placeholder: "Write a sentence using all three words...",
-    characterLimit: 200
-  },
-  {
-    id: 'word-combination-bicycle-thunderstorm-nostalgia',
-    stepNumber: 10,
-    type: 'word-combination',
-    question: "Create a sentence using all three words:",
-    requiredWords: ['bicycle', 'thunderstorm', 'nostalgia'],
-    placeholder: "Write a sentence using all three words...",
-    characterLimit: 200
-  },
-  {
-    id: 'word-combination-library-clockwork-whimsical',
-    stepNumber: 11,
-    type: 'word-combination',
-    question: "Create a sentence using all three words:",
-    requiredWords: ['library', 'clockwork', 'whimsical'],
-    placeholder: "Write a sentence using all three words...",
-    characterLimit: 200
-  },
-  {
     id: 'coffee-shop-scenario',
-    stepNumber: 12,
+    stepNumber: 11,
     type: 'scenario',
     question: "How would you handle this?",
     context: "You're at a coffee shop and overhear someone loudly discussing very personal details on their phone. Everyone around looks uncomfortable.",
@@ -132,21 +138,21 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
   },
   {
     id: 'shape-sorting-task',
-    stepNumber: 13,
+    stepNumber: 12,
     type: 'shape-sorting',
     question: "Sort the shapes into 3 categories",
     context: "Drag and drop the 9 shapes below into the 3 categories. Each shape has different properties: color (red, blue, green), shape (circle, square, triangle), and border (with or without border). Organize them however makes sense to you.",
   },
   {
     id: 'shape-ordering-task',
-    stepNumber: 14,
+    stepNumber: 13,
     type: 'shape-ordering',
     question: "Order these shapes",
     context: "You are presented with 9 unique shapes. Drag them into the sequence row below in whatever order you believe is best. There is no right or wrong answer.",
   },
   {
     id: 'bubble-popper-task',
-    stepNumber: 15,
+    stepNumber: 14,
     type: 'bubble-popper',
     question: "Pop the bubbles",
     context: "Take as much or as little time as you'd like. There is no goal. End the game when you're ready.",

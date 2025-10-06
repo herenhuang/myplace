@@ -177,7 +177,9 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       </svg>
 
       <section className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 w-fit items-center justify-center gap-x-4 gap-y-4 md:gap-x-16 md:gap-y-12 p-4 max-w-6xl'>
-        <div className={`${styles.gameCard} transform rotate-2`}>
+        
+        <div className={`${styles.gameCard} transform rotate-2 hidden`}>
+
           <div className={styles.wiggle}>
             <a href="https://yellow-gypsum.netlify.app/story/francis1" target="_blank" rel="noopener noreferrer" className="block group">
               <div className={styles.gameCardInner}>
@@ -212,6 +214,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             </button>
           </div>
         </div>
+
         <div className={`${styles.gameCard} transform rotate-2`}>
           <div className={styles.wiggle}>
             <a href="/remix-simulation/intro" target="_blank" rel="noopener noreferrer" className="block group">
