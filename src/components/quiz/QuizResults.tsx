@@ -71,7 +71,7 @@ function parsePersonalityPredictions(section: string) {
     const mbtiConfidence = mbtiMatch ? parseInt(mbtiMatch[2]) : 0
 
     // Extract MBTI explanation (text between MBTI line and Big Five)
-    const mbtiExplMatch = section.match(/\*\*MBTI Type:.*?\*\*\s*(.*?)\s*\*\*Big Five/s)
+    const mbtiExplMatch = section.match(/\*\*MBTI Type:.*?\*\*\s*([\s\S]*?)\s*\*\*Big Five/)
     const mbtiExplanation = mbtiExplMatch ? mbtiExplMatch[1].trim() : ''
 
     // Extract Big Five scores
@@ -90,7 +90,7 @@ function parsePersonalityPredictions(section: string) {
     }
 
     // Extract OCEAN explanation (text after the scores list)
-    const oceanExplMatch = section.match(/Neuroticism:\s*\d+\s*(.*?)$/s)
+    const oceanExplMatch = section.match(/Neuroticism:\s*\d+\s*([\s\S]*?)$/)
     const oceanExplanation = oceanExplMatch ? oceanExplMatch[1].trim() : ''
 
     return {
