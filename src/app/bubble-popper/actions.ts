@@ -189,7 +189,12 @@ STRICT RULES:
           ...gameData,
           meta: { clientIp, userAgent }
         },
-        result: { analysis, personalAnalysis }
+        result: { analysis, personalAnalysis },
+        completed: gameData.completed,
+        steps_completed: gameData.bubblesPopped,
+        steps_total: 100,
+        last_active_at: new Date().toISOString(),
+        abandoned_at_step: gameData.completed ? null : gameData.bubblesPopped.toString()
       };
 
       const { error } = await supabase.from('sessions').insert([sessionData]);

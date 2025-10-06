@@ -4,11 +4,11 @@ import { headers } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    const { quizId, sessionId } = await request.json()
+    const { quizId, sessionId, stepsTotal } = await request.json()
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     const hdrs = await headers()
     const ipHeader = hdrs.get('x-forwarded-for') || hdrs.get('x-real-ip') || null
     const clientIp = ipHeader ? ipHeader.split(',')[0]?.trim() || null : null
@@ -22,7 +22,11 @@ export async function POST(request: NextRequest) {
         responses: [],
         meta: { clientIp, userAgent }
       },
-      result: null
+      result: null,
+      steps_total: stepsTotal || null,
+      steps_completed: 0,
+      last_active_at: new Date().toISOString(),
+      completed: false
     }
 
     const { data, error } = await supabase
