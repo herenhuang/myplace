@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
+import QuizRating from './QuizRating'
 import styles from './quiz.module.scss'
 
 interface QuizResultsProps {
@@ -84,6 +85,11 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             {displayTagline && (
               <p className={styles.resultTagline}>{displayTagline}</p>
             )}
+
+            {/* Quiz Rating */}
+            <div className={styles.ratingContainer}>
+              <QuizRating quizId={config.id} />
+            </div>
           </div>
 
           {/* Show personality distribution comparison - only for archetype type */}
