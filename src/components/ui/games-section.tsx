@@ -10,6 +10,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
     const [votes, setVotes] = useState<Record<string, number>>({});
     const [loading, setLoading] = useState<Record<string, boolean>>({});
     const [votedCards, setVotedCards] = useState<Set<string>>(new Set());
+    const [animate, setAnimate] = useState(false);
 
     useEffect(() => {
       // Load voted cards from localStorage
@@ -51,6 +52,13 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
             'card-7': 0
           });
         });
+
+      // Trigger card animations after a short delay
+      const timer = setTimeout(() => {
+        setAnimate(true);
+      }, 300);
+
+      return () => clearTimeout(timer);
     }, []);
 
     const handleVote = async (cardId: string) => {
@@ -250,8 +258,13 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       </svg>
 
       <section className='flex flex-wrap w-full md:w-fit items-center justify-center gap-6 md:gap-3 p-4 max-w-7xl mx-auto'>
-        {games.filter(game => !game.hidden).map((game) => (
-          <div key={game.id} className="relative group w-full md:w-fit">
+        {games.filter(game => !game.hidden).map((game, index) => {
+          // Calculate staggered animation delay
+          const animationDelays = ['', 'float-up-delay-1', 'float-up-delay-2', 'float-up-delay-3'];
+          const animationClass = animationDelays[index % 4] || '';
+          
+          return (
+          <div key={game.id} className={`relative group w-full md:w-fit ${animate ? (animationClass || 'float-up') : 'opacity-0'}`}>
             <a 
               href={game.href} 
               target="_blank" 
@@ -330,9 +343,10 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               </div>
             </a>
           </div>
-        ))}
+        );
+        })}
 
-        <Link href="/all-quizzes">
+        <Link href="/all-quizzes" className={`${animate ? 'float-up-delay-3' : 'opacity-0'}`}>
           <div className="relative h-85 w-[90vw] md:w-60 rounded-2xl overflow-hidden transition-all duration-300 group-hover:scale-105 flex flex-col justify-center items-center cursor-pointer bg-orange-500/20 hover:bg-orange-500/30">
             <h2 className='font-[Instrument_Serif] text-black text-2xl font-bold'> More Games</h2>
             <span className="material-symbols-outlined text-black text-2xl mt-2">arrow_forward</span>

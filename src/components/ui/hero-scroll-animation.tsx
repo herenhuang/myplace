@@ -16,12 +16,22 @@ interface SectionProps {
 
 const Section1 = forwardRef<HTMLElement, Omit<SectionProps, 'user'> & { user: User | null; firstSlideHeight: number }>(({ scrollYProgress, user, firstSlideHeight }, ref) => {
   const [isMobile, setIsMobile] = React.useState(false);
+  const [animate, setAnimate] = React.useState(false);
 
   React.useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  React.useEffect(() => {
+    // Trigger animations after component mounts
+    const timer = setTimeout(() => {
+      setAnimate(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Calculate progress based on actual first slide height
@@ -33,7 +43,7 @@ const Section1 = forwardRef<HTMLElement, Omit<SectionProps, 'user'> & { user: Us
     <motion.section
       ref={ref}
       style={isMobile ? {} : { scale, rotate }}
-      className='md:sticky font-semibold md:top-0 h-auto bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-start text-gray-900 rounded-xl'
+      className='md:sticky font-semibold md:top-0 h-auto min-h-[100dvh] bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-start text-gray-900 rounded-xl'
     >
       <div className='absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle,#e2e8f0_1px,transparent_1px)] bg-[size:20px_20px]'></div>
       
@@ -55,14 +65,15 @@ const Section1 = forwardRef<HTMLElement, Omit<SectionProps, 'user'> & { user: Us
 
       <div className='flex flex-col items-center justify-start gap-0 md:flex-col md:justify-start w-full h-fit pb-8 md:pb-0 mx-auto'>
 
-        <div className='flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-12 md:pb-0 gap-4 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)]'>
-          <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={160} height={160} className='w-36 h-auto object-contain' />
-          <h1 className='font-[Instrument_Serif] text-7xl font-medium text-center tracking-tighter leading-[90%] mb-4'>
+        <div className={`flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-16 md:pb-0 gap-4 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)] ${animate ? 'float-up' : 'opacity-0'}`}>
+           <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={160} height={160} className='w-40 h-auto object-contain' />
+          <h1 className='font-[Instrument_Serif] text-7xl font-medium text-center tracking-tighter leading-[90%] mb-4 -mt-4'>
             Personality Quizzes You Can <i>Play</i>
           </h1>
+          
         </div>
        
-        <div className='mt-5 md:mt-0 w-fit pt-10 pb-10'>
+        <div className={`mt-5 md:mt-0 w-fit pt-10 pb-10 ${animate ? 'float-up-delay-2' : 'opacity-0'}`}>
             <GamesSection />
         </div>
       </div>

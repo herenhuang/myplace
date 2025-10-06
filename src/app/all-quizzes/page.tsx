@@ -13,12 +13,20 @@ import type { User } from '@supabase/supabase-js'
 export default function AllQuizzesPage() {
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory>('all')
   const [user, setUser] = useState<User | null>(null)
+  const [animate, setAnimate] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
     })
+
+    // Trigger animations after component mounts
+    const timer = setTimeout(() => {
+      setAnimate(true)
+    }, 50)
+
+    return () => clearTimeout(timer)
   }, [])
 
   return (
@@ -46,7 +54,7 @@ export default function AllQuizzesPage() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-12 mt-12">
+        <div className={`text-center mb-12 mt-12 ${animate ? 'float-up' : 'opacity-0'}`}>
           <h1 className="font-[Instrument_Serif] text-7xl font-medium tracking-tighter text-gray-900 mb-4">
             All Games
           </h1>
@@ -56,7 +64,7 @@ export default function AllQuizzesPage() {
         </div>
 
         {/* Category Filter */}
-        <div className="flex justify-center mb-12">
+        <div className={`flex justify-center mb-12 ${animate ? 'float-up-delay-1' : 'opacity-0'}`}>
           <ToggleGroup
             type="single"
             className=""
@@ -79,7 +87,7 @@ export default function AllQuizzesPage() {
 
         {/* Quiz Grid with FlipReveal Animation */}
         <FlipReveal
-          className="flex flex-wrap gap-6 justify-center"
+          className={`flex flex-wrap gap-6 justify-center ${animate ? 'float-up-delay-2' : 'opacity-0'}`}
           keys={[selectedCategory]}
           showClass="block"
           hideClass="hidden"
