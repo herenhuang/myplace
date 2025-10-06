@@ -1,0 +1,127 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mbtiSection {
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Libre Baskerville', serif;
+    color: black;
+    margin: 0 0 16px 0;
+    text-align: left;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+}
+
+.mbtiCard {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 165, 0, 0.08));
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.mbtiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mbtiType {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'Instrument Serif', serif;
+  color: var(--quiz-primary-color, #ff6b35);
+  letter-spacing: 2px;
+}
+
+.mbtiConfidence {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--quiz-primary-color, #ff6b35);
+  background: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.mbtiExplanation {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+  color: black;
+  margin: 0;
+}
+
+.oceanSection {
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Libre Baskerville', serif;
+    color: black;
+    margin: 0 0 16px 0;
+    text-align: left;
+  }
+}
+
+.oceanBars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.traitRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.traitLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: black;
+  min-width: 140px;
+  text-align: left;
+}
+
+.barContainer {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.barFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--quiz-primary-color, #ff6b35), var(--quiz-secondary-color, #ffa500));
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.traitScore {
+  font-size: 13px;
+  font-weight: 700;
+  color: black;
+  min-width: 30px;
+  text-align: right;
+}
+
+.oceanExplanation {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+  color: black;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
