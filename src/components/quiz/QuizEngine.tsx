@@ -214,7 +214,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           quizId: config.id,
-          sessionId: sessionId
+          sessionId: sessionId,
+          stepsTotal: config.questions.length
         })
       })
 
@@ -264,8 +265,24 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     const newPath = [...questionPath, currentQuestion.id]
     setQuestionPath(newPath)
 
-    // NOTE: Responses are saved in state, not incrementally to DB
-    // Will save all responses at END via /api/quiz/complete
+    // Save progress incrementally to DB (for drop-off tracking)
+    if (dbSessionId) {
+      try {
+        await fetch('/api/quiz/save-step', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: dbSessionId,
+            responses: newResponses,
+            stepNumber: newResponses.length,
+            totalSteps: config.questions.length
+          })
+        })
+      } catch (error) {
+        console.error('Error saving step progress:', error)
+        // Non-fatal - continue even if save fails
+      }
+    }
 
     // Determine next question
     let nextQuestionId: string | null = null

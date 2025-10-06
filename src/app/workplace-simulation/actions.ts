@@ -68,7 +68,11 @@ Be insightful and creative.
             storyChunks: [{ type: 'narrative', content: initialScenario }],
             currentTurn: 1,
             userActions: []
-        }
+        },
+        steps_total: 5, // Approximate number of expected turns
+        steps_completed: 0,
+        last_active_at: new Date().toISOString(),
+        completed: false
       }
 
       const { data, error } = await supabase

@@ -27,7 +27,11 @@ export async function startHumanSession(clientSessionId?: string) {
           user_id: user?.id ?? null,
           session_id: clientSessionId ?? null,
           data: sessionData,
-          result: null
+          result: null,
+          steps_total: 15, // Human test has 15 questions
+          steps_completed: 0,
+          last_active_at: new Date().toISOString(),
+          completed: false
         }
       ])
       .select()
@@ -150,7 +154,12 @@ async function processBatch() {
         // Single database update per session
         const { error: updateError } = await supabase
           .from('sessions')
-          .update({ data: updatedData })
+          .update({
+            data: updatedData,
+            steps_completed: allSteps.length,
+            last_active_at: new Date().toISOString(),
+            abandoned_at_step: null // Clear if they came back
+          })
           .eq('id', sessionId)
 
         if (updateError) {
@@ -217,9 +226,12 @@ export async function saveHumanAnalysis(
     // Save analysis result
     const { error: updateError } = await supabase
       .from('sessions')
-      .update({ 
+      .update({
         result: analysisResult,
-        data: updatedData
+        data: updatedData,
+        completed: true,
+        steps_completed: 15, // Human test has 15 questions
+        last_active_at: new Date().toISOString()
       })
       .eq('id', sessionId)
 

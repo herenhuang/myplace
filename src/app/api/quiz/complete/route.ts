@@ -24,7 +24,10 @@ export async function POST(request: NextRequest) {
         completedAt: new Date().toISOString(),
         meta: { clientIp, userAgent }
       },
-      result
+      result,
+      completed: true,
+      steps_completed: responses?.length || 0,
+      last_active_at: new Date().toISOString()
     }
 
     // Insert the complete session (like bubble-popper pattern)
