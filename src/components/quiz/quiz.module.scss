@@ -891,10 +891,6 @@
   justify-content: center;
   gap: 8px;
 
-  &:hover {
-    background-color: var(--quiz-primary-color-dark, #ea580c);
-  }
-
   h2 {
     font-size: 16px;
     font-weight: 600;
@@ -902,25 +898,8 @@
     letter-spacing: -0.36px;
   }
 
-  &.outline {
-    background-color: transparent;
-    border-color: var(--quiz-primary-color, #ff6b35);
-    
-    span {
-      color: var(--quiz-primary-color, #ff6b35);
-    }
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.5);
-    }
-  }
-
-  &.secondary {
-    background-color: var(--quiz-secondary-color, #ffa500);
-    
-    &:hover {
-      opacity: 0.9;
-    }
+  &:hover{
+    opacity: .8;
   }
 }
 
