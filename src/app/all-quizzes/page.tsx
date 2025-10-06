@@ -46,11 +46,11 @@ export default function AllQuizzesPage() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-12 mt-20">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 mt-12">
+          <h1 className="font-[Instrument_Serif] text-7xl font-medium tracking-tighter text-gray-900 mb-4">
             All Games
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-base tracking-tight text-gray-600">
           Every play adds to your living map of judgment, taste, and instinct
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function AllQuizzesPage() {
 
         {/* Quiz Grid with FlipReveal Animation */}
         <FlipReveal
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="flex flex-wrap gap-6 justify-center"
           keys={[selectedCategory]}
           showClass="block"
           hideClass="hidden"
@@ -93,9 +93,9 @@ export default function AllQuizzesPage() {
                 key={quiz.id}
                 flipKey={shouldShow ? selectedCategory : 'hidden'}
               >
-                <Link href={quiz.route} className="group block h-full">
+                <Link href={quiz.route} className="group block h-fit w-fit">
                   <div
-                    className="relative h-64 rounded-xl overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                    className="relative h-80 w-60 rounded-2xl overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-102"
                     style={{
                       background: quiz.backgroundImage,
                       backgroundSize: 'cover',
@@ -106,11 +106,11 @@ export default function AllQuizzesPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
                     {/* Quiz Title */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-xl font-bold mb-2 line-clamp-2">
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white overflow-visible">
+                      <h3 className="font-[Instrument_Serif] text-3xl leading-7 font-bold mb-2">
                         {quiz.title}
                       </h3>
-                      <p className="text-sm text-white/90 line-clamp-2">
+                      <p className="text-sm text-white/60 font-medium tracking-tight leading-4 line-clamp-2">
                         {quiz.description}
                       </p>
                     </div>
@@ -123,7 +123,7 @@ export default function AllQuizzesPage() {
                     </div>
 
                     {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/0 transition-colors duration-300" />
                   </div>
                 </Link>
               </FlipRevealItem>
