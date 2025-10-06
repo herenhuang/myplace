@@ -313,7 +313,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A deeply personal subtitle that captures their specific falling pattern (use 'you' language, make it feel like you understand them completely)",
+  "tagline": "A deeply personal subtitle that captures their specific falling pattern. Must be a complete sentence ending with punctuation. Use 'you' language, make it feel like you understand them completely.",
   "reasoning": "2-3 sentences explaining why this combination fits their journey through the month. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Why this was close based on their choices"},
@@ -329,7 +329,7 @@ CRITICAL: Do NOT make up names. Only use exact words from the lists provided. Th
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a perceptive friend who understands love and relationships deeply. This person is a "{{archetype}}" - {{tagline}}.
 
-You just watched them navigate their first month with someone new. Write a warm, insightful analysis:
+You just watched them navigate their first month with someone new. Write a warm, insightful analysis with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Love Blueprint

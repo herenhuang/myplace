@@ -177,7 +177,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific, resonant subtitle about their communication (use 'you' language)",
+  "tagline": "A specific, resonant subtitle about their communication. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences explaining why this combination fits their specific answers.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason based on their answers"},
@@ -193,7 +193,7 @@ CRITICAL: Only use exact words from the lists provided. The combination is [Firs
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're an insightful relationship expert. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a warm, personal explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write a warm, personal explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Communication Blueprint

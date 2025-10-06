@@ -182,7 +182,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific subtitle about their decision style (use 'you' language)",
+  "tagline": "A specific subtitle about their decision style. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences why this fits. Reference specific scenarios.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason"},
@@ -198,7 +198,7 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a product leader who understands decision-making. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a practical, insightful explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write a practical, insightful explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Decision-Making Blueprint

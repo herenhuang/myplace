@@ -168,6 +168,12 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
 
+        {/* Archetype Name Title */}
+        <div className={styles.explanationTitle}>
+          <h1>{displayName}</h1>
+          {displayTagline && <p className={styles.explanationTagline}>{displayTagline}</p>}
+        </div>
+
         {/* Render each section with cascaded animation */}
         {sections.map((section, index) => (
           <div 

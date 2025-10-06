@@ -162,7 +162,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A punchy, evocative subtitle that makes them feel SEEN (e.g., 'Your team knows exactly where they stand—and they respect it' or 'People leave your 1:1s feeling like they can conquer anything')",
+  "tagline": "A punchy, evocative subtitle that makes them feel SEEN. Must be a complete sentence ending with punctuation (e.g., 'Your team knows exactly where they stand—and they respect it.' or 'People leave your 1:1s feeling like they can conquer anything.')",
   "reasoning": "2-3 sentence explanation. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason why this was close"},

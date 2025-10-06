@@ -163,7 +163,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A fun, punchy subtitle that captures their flirting vibe (use 'you' language, be playful and honest)",
+  "tagline": "A fun, punchy subtitle that captures their flirting vibe. Must be a complete sentence ending with punctuation. Use 'you' language, be playful and honest.",
   "reasoning": "2-3 sentences explaining why this combination fits their answers. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names or terms.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason why this was close based on their answers"},

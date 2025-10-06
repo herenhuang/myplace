@@ -182,7 +182,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific, relatable subtitle about their texting (use 'you' language)",
+  "tagline": "A specific, relatable subtitle about their texting. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences why this fits their texting patterns. Reference specific behaviors.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Why this was close"},
@@ -198,7 +198,7 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a texting behavior expert. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a fun, honest take. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write a fun, honest take with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Texting Blueprint

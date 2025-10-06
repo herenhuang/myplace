@@ -182,7 +182,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific, relatable subtitle about their dating energy (use 'you' language)",
+  "tagline": "A specific, relatable subtitle about their dating energy. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences why this fits their date journey. Reference specific moments.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Why this was close based on their answers"},
@@ -198,7 +198,7 @@ CRITICAL: Only use exact words from the lists. Combination is [FirstWord] + [Sec
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a dating coach who gets it. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a fun, honest explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write a fun, honest explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Dating Blueprint

@@ -163,7 +163,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A punchy, deeply personal subtitle that captures their specific situation (use 'you' language, make it feel like you're reading their mind)",
+  "tagline": "A punchy, deeply personal subtitle that captures their specific situation. Must be a complete sentence ending with punctuation. Use 'you' language, make it feel like you're reading their mind.",
   "reasoning": "2-3 sentences explaining why this combination fits their answers. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names or terms.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason why this was close based on their answers"},
@@ -179,7 +179,7 @@ CRITICAL: Do NOT make up names like "Real Crush" or "True Love" or "Strong Feeli
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a warm, insightful friend helping someone understand their feelings. They're experiencing "{{archetype}}" - {{tagline}}.
 
-Write an honest, personal explanation with these sections:
+Write an honest, personal explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Feelings Blueprint

@@ -182,7 +182,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific subtitle about their pressure style (use 'you' language)",
+  "tagline": "A specific subtitle about their pressure style. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences explaining why this fits their patterns. Reference specific scenarios.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason based on their answers"},
@@ -198,7 +198,7 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a seasoned PM coach who's seen it all. This person is a "{{archetype}}" - {{tagline}}.
 
-Write an insightful, practical explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write an insightful, practical explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Pressure Blueprint

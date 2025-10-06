@@ -181,7 +181,7 @@ Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific subtitle revealing their priorities (use 'you' language)",
+  "tagline": "A specific subtitle revealing their priorities. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences why this fits. Reference specific trade-offs.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason"},
@@ -197,7 +197,7 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a product veteran who knows trade-offs are everything. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a clear, honest explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write a clear, honest explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
 ## Your Trade-off Blueprint
