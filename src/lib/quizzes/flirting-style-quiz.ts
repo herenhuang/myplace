@@ -181,34 +181,46 @@ CRITICAL: Do NOT make up names like "Bold Flirt" or "Smooth Operator" unless tho
 
 Write an engaging, playful explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
+<section>
 ## Your Flirting DNA
 
 Write 2-3 sentences about how they navigate the romantic landscape with their unique style. Use "you" language (not "As a {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
+</section>
 
+<section>
 ## What I'm Seeing In Action
 
 Highlight 3 specific patterns from their actual answers that reveal their style:
 - When you said [specific answer], that's textbook {{archetype}} energy
 - Your approach to [specific situation] shows [characteristic of their style]
 - The fact that you [another specific answer] tells me [insight]
+</section>
 
+<section>
 ## You Were Also Close To...
 
 {{alternatives}}
 
 Write 1-2 sentences for each alternative explaining why they showed hints of that style based on their answers.
+</section>
 
+<section>
 ## What Works For You
 
 Give 2-3 strengths of being a {{archetype}}. What makes this style effective? Be encouraging and specific.
+</section>
 
+<section>
 ## Your Growth Edge
 
 Offer 1-2 gentle suggestions for how a {{archetype}} could expand their range or avoid common pitfalls. Be supportive, not critical.
+</section>
 
+<section>
 ## Bottom Line
 
 End with one empowering sentence about owning their {{archetype}} style and being confident in how they show interest.
+</section>
 
 Their full answers:
 {{answers}}

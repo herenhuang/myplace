@@ -200,44 +200,58 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 
 Write a practical, insightful explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
+<section>
 ## How You Make Product Decisions
 
 2-3 sentences about their natural decision-making style. Use "you" and reference actual choices.
+</section>
 
+<section>
 ## I See It In Your Decisions
 
 Highlight 3 specific patterns:
 - When [specific scenario], you [their choice] - classic {{archetype}}
 - Your approach to [specific situation] shows you [insight]
 - The way you handled [specific decision] reveals [pattern]
+</section>
 
+<section>
 ## You Also Lean Toward...
 
 {{alternatives}}
 
 1-2 sentences each about when these other styles appear.
+</section>
 
+<section>
 ## Your Decision-Making Strengths
 
 2-3 strengths of being a {{archetype}}:
 - What your style brings to product decisions
 - When your approach creates great outcomes
 - What makes you effective
+</section>
 
+<section>
 ## Watch Out For...
 
 1-2 honest observations about pitfalls:
 - Common mistakes for your style
 - When your approach can backfire
 - Blind spots to monitor
+</section>
 
+<section>
 ## Better Decisions As A {{archetype}}
 
 2-3 specific, actionable tips for improving your decision-making.
+</section>
 
+<section>
 ## Bottom Line
 
 One empowering sentence about owning your {{archetype}} style.
+</section>
 
 Their full decision patterns:
 {{answers}}

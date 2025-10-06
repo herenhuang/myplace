@@ -180,25 +180,35 @@ IMPORTANT: Do NOT make up names like "Direct Communicator" or "Honest Coach". On
 
 Write a warm, engaging explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
+<section>
 ## Your Feedback DNA
 Write 2-3 sentences about their core feedback approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
+</section>
 
+<section>
 ## What I Noticed
 Highlight 2-3 specific patterns from their actual answers that show their feedback style:
 - When you answered [specific answer], that shows [insight about their style]
 - Your choice of [specific answer] reveals [trait]
 - [Another answer-to-trait connection]
+</section>
 
+<section>
 ## You Were Also Close To...
 {{alternatives}}
 
 Write 1 engaging sentence for each alternative style explaining why they showed hints of it based on their answers.
+</section>
 
+<section>
 ## Tips for Your Growth
 Give 2 practical tips using "you" language (not "As {{archetype}}..."). Be encouraging and specific.
+</section>
 
+<section>
 ## Your Feedback Superpower
 End with an inspiring sentence about the unique value they bring as {{archetype}} when giving and receiving feedback.
+</section>
 
 Their answers:
 {{answers}}

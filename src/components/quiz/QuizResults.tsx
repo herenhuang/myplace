@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
@@ -21,9 +21,58 @@ interface AnalyticsData {
   secondWordStats: Record<string, { count: number; percentage: number }>
 }
 
+// Parse markdown content into sections
+function parseSections(markdown: string): string[] {
+  if (!markdown) return ['']
+  
+  // Try multiple regex patterns to handle different formatting
+  const patterns = [
+    /<section>\s*([\s\S]*?)\s*<\/section>/gi,  // Case insensitive with optional whitespace
+    /\<section\>([\s\S]*?)\<\/section\>/g,      // Standard pattern
+    /&lt;section&gt;([\s\S]*?)&lt;\/section&gt;/gi  // HTML encoded tags
+  ]
+  
+  let sections: string[] = []
+  
+  // Try each pattern
+  for (const pattern of patterns) {
+    const matches = markdown.matchAll(pattern)
+    sections = Array.from(matches, match => match[1].trim()).filter(s => s.length > 0)
+    
+    if (sections.length > 0) {
+      console.log(`✅ Parsed ${sections.length} sections using pattern:`, pattern)
+      break
+    }
+  }
+
+  // If no sections found, try splitting by ## headers as fallback
+  if (sections.length === 0) {
+    console.log('⚠️ No <section> tags found, falling back to header-based splitting')
+    const headerSplit = markdown.split(/(?=^## )/m).filter(s => s.trim().length > 0)
+    if (headerSplit.length > 1) {
+      sections = headerSplit
+      console.log(`📝 Split into ${sections.length} sections by headers`)
+    } else {
+      sections = [markdown]
+      console.log('📄 Using entire content as one section')
+    }
+  }
+
+  return sections
+}
+
 export default function QuizResults({ config, result, onRestart, onShowRecommendation }: QuizResultsProps) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+
+  // Parse sections from explanation
+  const sections = useMemo(() => {
+    const explanation = result.explanation || ''
+    console.log('📋 Raw explanation length:', explanation.length)
+    console.log('📋 First 500 chars:', explanation.substring(0, 500))
+    console.log('📋 Contains <section> tags:', explanation.includes('<section>'))
+    return parseSections(explanation)
+  }, [result.explanation])
 
   // Get display name - either from personality or word matrix
   const displayName = result.personality?.name || result.wordMatrixResult?.fullArchetype || 'Your Result'
@@ -119,30 +168,43 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
 
-        <div className={styles.markdownContent}>
-          <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
-        </div>
+        {/* Render each section with cascaded animation */}
+        {sections.map((section, index) => (
+          <div 
+            key={index} 
+            className={styles.explanationSection}
+            style={{ animationDelay: `${0.1 + index * 0.15}s` }}
+          >
+            <ReactMarkdown>{section}</ReactMarkdown>
+          </div>
+        ))}
 
         {/* Action Buttons */}
-        <div className={styles.actionButtons}>
-          <button
-            className={styles.actionButton}
-            onClick={() => setShowExplanation(false)}
-          >
-            <h2>Back to Card</h2>
-          </button>
+        <div 
+          className={styles.actionButtons}
+          style={{ animationDelay: `${0.1 + sections.length * 0.15}s` }}
+        >
           {onShowRecommendation && (
             <button
-              className={styles.actionButtonAlt}
+              className={styles.actionButton}
               onClick={onShowRecommendation}
             >
               <h2>What&apos;s Next</h2>
             </button>
           )}
+          <button
+            className={styles.actionButtonAlt}
+            onClick={() => setShowExplanation(false)}
+          >
+            <h2>Back to Card</h2>
+          </button>
         </div>
 
         {/* Quiz Rating */}
-        <div className={styles.ratingContainer}>
+        <div 
+          className={styles.ratingContainer}
+          style={{ animationDelay: `${0.1 + (sections.length + 1) * 0.15}s` }}
+        >
           <QuizRating quizId={config.id} />
         </div>
       </div>

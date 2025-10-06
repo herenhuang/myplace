@@ -10,6 +10,7 @@ import QuizQuestion from './QuizQuestion'
 import QuizResults from './QuizResults'
 import QuizRecommendationFooter from './QuizRecommendationFooter'
 import AnalyzingScreen from './AnalyzingScreen'
+import QuizBackground from './QuizBackground'
 import styles from './quiz.module.scss'
 
 interface QuizEngineProps {
@@ -643,6 +644,9 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                 backgroundImage: `url(${config.theme.backgroundImage})`
               }}
             >
+              {/* Animated blob background */}
+              <QuizBackground />
+              
               {/* Progress Bar - Inside phone container */}
               {screenState === 'question' && (
                 <div className={styles.progressContainer}>

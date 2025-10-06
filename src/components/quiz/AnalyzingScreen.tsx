@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import styles from './quiz.module.scss'
+import Image from 'next/image'
 
 const messages = [
   "Calibrating your answers",
@@ -27,6 +28,7 @@ export default function AnalyzingScreen() {
 
   return (
     <div className={styles.analyzingScreen}>
+      <Image src="/elevate/blobbert.png" alt="Analyzing" width={100} height={100} />
       <p className={`${styles.analyzingText} ${fadeClass}`}>
         {messages[currentIndex]}
       </p>

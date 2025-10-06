@@ -195,44 +195,58 @@ CRITICAL: Only use exact words from the lists provided. The combination is [Firs
 
 Write a warm, personal explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
+<section>
 ## How You Communicate
 
 Write 2-3 sentences about their natural communication approach. Use "you" language and reference their actual answers to make it feel personal.
+</section>
 
+<section>
 ## I See It In Your Answers
 
 Highlight 3 specific patterns from their responses:
 - When [specific situation], you [their choice] - that's {{archetype}} energy
 - Your response to [specific moment] shows you're someone who [insight]
 - The way you handled [specific scenario] tells me [understanding]
+</section>
 
+<section>
 ## You Also Have Hints Of...
 
 {{alternatives}}
 
 Write 1-2 sentences for each alternative explaining when these other modes show up.
+</section>
 
+<section>
 ## Your Communication Superpowers
 
 2-3 strengths of being a {{archetype}}:
 - What your style brings to relationships
 - When your approach shines
 - What partners appreciate
+</section>
 
+<section>
 ## Where It Gets Tricky
 
 1-2 gentle observations about challenges:
 - Common misunderstandings
 - When your style might not land well
 - Growth edges
+</section>
 
+<section>
 ## How To Communicate With You
 
 2-3 specific things partners should know. Be actionable.
+</section>
 
+<section>
 ## Bottom Line
 
 One empowering sentence about owning their {{archetype}} style.
+</section>
 
 Their full answers:
 {{answers}}

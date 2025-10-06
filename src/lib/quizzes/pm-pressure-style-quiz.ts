@@ -200,44 +200,58 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 
 Write an insightful, practical explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
+<section>
 ## How You Handle Pressure
 
 2-3 sentences about their natural approach under pressure. Use "you" and reference their actual decisions. Be specific.
+</section>
 
+<section>
 ## I Saw It In Your Choices
 
 Highlight 3 specific patterns:
 - When [specific scenario], you [their choice] - that's {{archetype}} in action
 - Your response to [specific pressure point] shows you're someone who [insight]
 - The way you handled [specific situation] reveals [pattern]
+</section>
 
+<section>
 ## You Also Have Shades Of...
 
 {{alternatives}}
 
 1-2 sentences each about when these other styles emerge.
+</section>
 
+<section>
 ## Your PM Superpowers Under Pressure
 
 2-3 strengths of being a {{archetype}}:
 - What your style brings to high-stakes situations
 - When your approach really shines
 - What teams appreciate about you
+</section>
 
+<section>
 ## Where It Can Backfire
 
 1-2 honest observations about challenges:
 - Common pitfalls for your style
 - When your approach might create problems
 - Growth edges to watch
+</section>
 
+<section>
 ## Advice For You
 
 2-3 specific, actionable tips for thriving under pressure as a {{archetype}}.
+</section>
 
+<section>
 ## Bottom Line
 
 One empowering sentence about owning their {{archetype}} style.
+</section>
 
 Their full pressure scenarios:
 {{answers}}
