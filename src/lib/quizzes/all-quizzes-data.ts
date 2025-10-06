@@ -20,7 +20,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'The most honest 8 minutes of your feelings',
     category: 'love',
     route: '/quiz/crush-quiz',
-    backgroundImage: 'url(/quiz/crush-quiz/background.jpg)'
+    backgroundImage: 'url(/quiz/crush-quiz/background.jpg), linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%)'
   },
   {
     id: 'flirting-style',
@@ -28,7 +28,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Find out how you really show interest when you\'re into someone',
     category: 'love',
     route: '/quiz/flirting-style',
-    backgroundImage: 'url(/quiz/flirting-style/background.jpg)'
+    backgroundImage: 'url(/quiz/flirting-style/background.jpg), linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #fa709a 100%)'
   },
   {
     id: 'how-do-you-fall',
@@ -36,7 +36,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover your patterns in falling for someone',
     category: 'love',
     route: '/quiz/how-do-you-fall',
-    backgroundImage: 'url(/quiz/how-do-you-fall/background.jpg)'
+    backgroundImage: 'url(/quiz/how-do-you-fall/background.jpg), linear-gradient(135deg, #fa709a 0%, #fee140 50%, #ffa07a 100%)'
   },
   {
     id: 'dating-texting-style',
@@ -44,7 +44,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover how you communicate when you\'re interested',
     category: 'love',
     route: '/quiz/dating-texting-style',
-    backgroundImage: 'url(/quiz/dating-texting-style/background.jpg)'
+    backgroundImage: 'url(/quiz/dating-texting-style/background.jpg), linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #ff9a9e 100%)'
   },
   {
     id: 'first-date-energy',
@@ -52,7 +52,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Find out what vibe you bring to first dates',
     category: 'love',
     route: '/quiz/first-date-energy',
-    backgroundImage: 'url(/quiz/first-date-energy/background.jpg)'
+    backgroundImage: 'url(/quiz/first-date-energy/background.jpg), linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%)'
   },
   {
     id: 'relationship-communication',
@@ -60,7 +60,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Understand how you express yourself in relationships',
     category: 'love',
     route: '/quiz/relationship-communication',
-    backgroundImage: 'url(/quiz/relationship-communication/background.jpg)'
+    backgroundImage: 'url(/quiz/relationship-communication/background.jpg), linear-gradient(135deg, #ffd1ff 0%, #ff9a9e 50%, #fecfef 100%)'
   },
 
   // WORK QUIZZES
@@ -70,7 +70,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover how you really give and receive feedback at work',
     category: 'work',
     route: '/quiz/feedback-style',
-    backgroundImage: 'url(/quiz/feedback-style/background.jpg)'
+    backgroundImage: 'url(/quiz/feedback-style/background.jpg), linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
   },
   {
     id: 'manager-style',
@@ -78,7 +78,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover how you really lead and what makes you effective',
     category: 'work',
     route: '/quiz/manager-style',
-    backgroundImage: 'url(/quiz/manager-style/background.jpg)'
+    backgroundImage: 'url(/quiz/manager-style/background.jpg), linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%)'
   },
   {
     id: 'ai-model',
@@ -86,7 +86,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover your work personality through AI model archetypes',
     category: 'work',
     route: '/quiz/ai-model',
-    backgroundImage: 'url(/quiz/ai-model/background.jpg)'
+    backgroundImage: 'url(/quiz/ai-model/background.jpg), linear-gradient(135deg, #ff6b35 0%, #ffa500 50%, #ffcc70 100%)'
   },
   {
     id: 'pm-pressure-style',
@@ -94,7 +94,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'How do you handle high-stakes product decisions?',
     category: 'work',
     route: '/quiz/pm-pressure-style',
-    backgroundImage: 'url(/quiz/pm-pressure-style/background.jpg)'
+    backgroundImage: 'url(/quiz/pm-pressure-style/background.jpg), linear-gradient(135deg, #fa8bff 0%, #2bd2ff 50%, #2bff88 100%)'
   },
   {
     id: 'pm-tradeoff-style',
@@ -102,7 +102,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover how you navigate product tradeoffs',
     category: 'work',
     route: '/quiz/pm-tradeoff-style',
-    backgroundImage: 'url(/quiz/pm-tradeoff-style/background.jpg)'
+    backgroundImage: 'url(/quiz/pm-tradeoff-style/background.jpg), linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #fbc2eb 100%)'
   },
   {
     id: 'product-decision-style',
@@ -110,7 +110,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'How do you make product choices?',
     category: 'work',
     route: '/quiz/product-decision-style',
-    backgroundImage: 'url(/quiz/product-decision-style/background.jpg)'
+    backgroundImage: 'url(/quiz/product-decision-style/background.jpg), linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #a8edea 100%)'
   },
   {
     id: 'elevate',
@@ -128,7 +128,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'Discover how you really like to travel and recharge',
     category: 'life',
     route: '/quiz/vacation-style',
-    backgroundImage: 'url(/quiz/vacation-style/background.jpg)'
+    backgroundImage: 'url(/quiz/vacation-style/background.jpg), linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 50%, #c2e9fb 100%)'
   },
   {
     id: 'genshin',
