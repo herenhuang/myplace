@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './games-section.module.scss';
+import Link from 'next/link';
 
 type ComponentProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -257,7 +258,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               className="block"
             >
               <div 
-                className="relative h-90 w-60 rounded-3xl overflow-hidden shadow-lg transition-transform duration-300"
+                className="relative h-85 w-60 rounded-2xl overflow-hidden shadow-lg transition-transform duration-300"
                 
               >
                 {/* Background gradient */}
@@ -267,7 +268,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
                   className="absolute inset-0 z-3 hover:scale-105 transition-transform duration-300"
                   style={{
                     backgroundImage: `url(${game.image})`,
-                    backgroundSize: '90%',
+                    backgroundSize: '85%',
                     backgroundPosition: 'top center',
                     backgroundRepeat: 'no-repeat',
                   }}
@@ -277,7 +278,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
              
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-5">
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-5">
                
                   <div className="flex flex-wrap gap-2 mt-3 hidden">
                     {game.tags.map((tag, idx) => (
@@ -338,10 +339,13 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
           </div>
         ))}
 
-        <div className="relative h-90 w-60 rounded-3xl overflow-hidden transition-all duration-300 group-hover:scale-105 flex flex-col justify-center items-center cursor-pointer bg-orange-500/20 hover:bg-orange-500/30">
-          <h2 className='font-[Instrument_Serif] text-black text-2xl font-bold'> More Games</h2>
-          <span className="material-symbols-outlined text-black text-2xl mt-2">arrow_forward</span>
-        </div>
+        <Link href="/all-quizzes">
+          <div className="relative h-85 w-60 rounded-2xl overflow-hidden transition-all duration-300 group-hover:scale-105 flex flex-col justify-center items-center cursor-pointer bg-orange-500/20 hover:bg-orange-500/30">
+            <h2 className='font-[Instrument_Serif] text-black text-2xl font-bold'> More Games</h2>
+            <span className="material-symbols-outlined text-black text-2xl mt-2">arrow_forward</span>
+          </div>
+        </Link>
+
       </section>
     </div>
     );
