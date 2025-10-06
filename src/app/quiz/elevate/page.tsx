@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import ElevateCard from '@/components/ElevateCard'
+import AnalyzingScreen from './AnalyzingScreen'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
@@ -325,8 +326,15 @@ export default function ElevateSimulation() {
         // Note: imageUrl intentionally excluded - it's only needed for display, not storage
       }
 
-      await recordStep(dbSessionId, stepData)
-      
+      console.log('📝 Recording step:', { dbSessionId, stepNumber: stepData.stepNumber, response: stepData.userResponse })
+      const recordResult = await recordStep(dbSessionId, stepData)
+
+      if (recordResult.error) {
+        console.error('❌ Failed to record step:', recordResult.error)
+      } else {
+        console.log('✅ Step recorded successfully:', stepData.stepNumber)
+      }
+
       // Update previous responses
       const newResponses = [...previousResponses, responseText]
       setPreviousResponses(newResponses)
@@ -803,7 +811,7 @@ export default function ElevateSimulation() {
         return (
           <div className={styles.welcomeContainer}>
             <div className={styles.welcomeHeader}>
-              <h1 className={styles.welcomeTitle}> What Kind of Elevate Attendee Are You? </h1>
+              <h1 className={styles.welcomeTitle}>What Kind of Conference Attendee Are You?</h1>
               
 
               <button
@@ -945,17 +953,7 @@ export default function ElevateSimulation() {
       case 'analyzing':
         return (
           <div className={styles.textContainer}>
-                <div className="flex flex-col h-full items-center justify-center py-12">
-                  <div 
-                    className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full z-100 animate-spin mb-6 cursor-pointer hover:scale-110 transition-transform"
-                    onClick={() => {
-                      clearSavedState()
-                      resetSimulation()
-                    }}
-                    title="Click to reset"
-                  ></div>
-                </div>
-  
+            <AnalyzingScreen />
           </div>
         )
 

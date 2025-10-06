@@ -42,7 +42,11 @@ export async function startSession(clientSessionId?: string) {
         steps: [],
         meta: { clientIp, userAgent }
       },
-      result: null
+      result: null,
+      steps_total: 7,
+      steps_completed: 0,
+      last_active_at: new Date().toISOString(),
+      completed: false
     }
 
     const { data, error } = await supabase
@@ -103,10 +107,14 @@ export async function recordStep(
       steps: [...(sessionData.data?.steps || []), stepData]
     }
 
-    // Update session
+    // Update session with steps data AND tracking fields
     const { error: updateError } = await supabase
       .from('sessions')
-      .update({ data: updatedData })
+      .update({
+        data: updatedData,
+        steps_completed: updatedData.steps.length,
+        last_active_at: new Date().toISOString()
+      })
       .eq('id', sessionId)
 
     if (updateError) {
@@ -697,11 +705,13 @@ Return ONLY the JSON - no other text.`
     // Save analysis to session
     const { error: updateError } = await supabase
       .from('sessions')
-      .update({ 
+      .update({
         result: {
           archetype: analysis.archetype,
           explanation: analysis.explanation
-        }
+        },
+        completed: true,
+        last_active_at: new Date().toISOString()
       })
       .eq('id', sessionId)
 
