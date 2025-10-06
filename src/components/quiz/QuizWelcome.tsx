@@ -46,18 +46,11 @@ export default function QuizWelcome({ config, onStart, isLoading, personalizatio
         )}
         
         <button
-          className={styles.appButton}
+          className={styles.welcomeButton}
           onClick={onStart}
           disabled={isLoading}
         >
-          {isLoading ? (
-            <div className={styles.loadingSpinner}>
-              <div className={styles.spinner}></div>
-              <span>Starting...</span>
-            </div>
-          ) : (
-            <span>{showStorySetup ? 'Begin Story →' : 'Start Quiz'}</span>
-          )}
+          {isLoading ? 'Starting...' : (showStorySetup ? 'Begin Story →' : 'Start Quiz')}
         </button>
       </div>
     </div>

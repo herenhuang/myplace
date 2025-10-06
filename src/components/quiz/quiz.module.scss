@@ -141,6 +141,35 @@
   color: #374151;
 }
 
+.welcomeButton {
+  padding: 12px 48px;
+  border-radius: 12px;
+  border: 3px solid rgb(130, 44, 44);
+  background: transparent;
+  color: rgb(130, 44, 44);
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-instrument-serif);
+  cursor: pointer;
+  @include transition-all(200ms);
+  white-space: nowrap;
+  margin: 24px auto;
+
+  &:hover {
+    background: rgba(130, 44, 44, 0.05);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .appButton {
   width: 80%;
   max-width: 320px;
@@ -400,13 +429,13 @@
 
   .optionLabel {
     flex: 1;
-    font-size: 12px; // Reduced from 14px
-    font-weight: 400; // Reduced from 500 - lighter weight
+    font-size: 14px;
+    font-weight: 500;
     letter-spacing: -0.24px;
-    line-height: 1.2 !important;
+    line-height: 1.3 !important;
     position: relative;
     z-index: 2;
-    opacity: 0.85; // Slightly faded
+    opacity: 0.95;
   }
 
   .optionArrow {
@@ -575,6 +604,14 @@
   animation: fadeUp 0.6s ease-in-out 0.3s both;
 }
 
+.ratingContainer {
+  margin-top: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  animation: fadeUp 0.6s ease-in-out 0.4s both;
+}
+
 // Explanation View
 .explanationContainer {
   padding: 28px;
@@ -595,26 +632,18 @@
   line-height: 1.1;
   font-family: var(--font-instrument-serif);
   letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: rgb(130, 44, 44);
 }
 
-.resultTaglineExplanation {
-  font-size: 14px;
-  font-weight: 500;
-  font-style: italic;
-  line-height: 1.4;
-  color: rgba(130, 44, 44, 0.7);
-  margin-bottom: 0;
-}
-
-.totalPlaysText {
-  font-size: 12px;
+.explanationSubheading {
+  font-size: 18px;
   font-weight: 600;
-  color: rgba(130, 44, 44, 0.6);
-  margin-top: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  line-height: 1.3;
+  font-family: var(--font-instrument-serif);
+  letter-spacing: -0.02em;
+  color: rgb(130, 44, 44);
+  margin-bottom: 0;
 }
 
 .markdownContent {
@@ -693,6 +722,73 @@
   }
 }
 
+// Card View Buttons
+.cardButtons {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding: 24px;
+  z-index: 3;
+}
+
+.cardButton {
+  padding: 12px 48px;
+  border-radius: 12px;
+  border: 3px solid rgb(130, 44, 44);
+  background: transparent;
+  color: rgb(130, 44, 44);
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-instrument-serif);
+  cursor: pointer;
+  @include transition-all(200ms);
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(130, 44, 44, 0.05);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Explanation View Buttons
+.explanationButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+
+.explanationButton {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 3px solid rgb(130, 44, 44);
+  background: transparent;
+  color: rgb(130, 44, 44);
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-instrument-serif);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  @include transition-all(200ms);
+
+  &:hover {
+    background: rgba(130, 44, 44, 0.05);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 // Action Buttons
 .actionButtons {
   display: flex;
@@ -759,23 +855,46 @@
   justify-content: center;
   height: 100vh;
   z-index: 10;
-  animation: fadeIn 0.5s ease;
-}
-
-.spinner {
-  width: 64px;
-  height: 64px;
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top-color: var(--quiz-primary-color, #ff6b35);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 2rem;
 }
 
 .analyzingText {
-  font-size: 18px;
-  font-weight: 300;
-  color: #374151;
+  font-size: 28px;
+  font-weight: 600;
+  color: #000000;
+  text-align: center;
+  font-family: var(--font-instrument-serif);
+  letter-spacing: -0.02em;
+}
+
+.fadeIn {
+  animation: fadeInUp 0.5s ease-in-out forwards;
+}
+
+.fadeOut {
+  animation: fadeOutUp 0.3s ease-in-out forwards;
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 }
 
 // Animations

@@ -96,7 +96,11 @@ export default function AllQuizzesPage() {
                 <Link href={quiz.route} className="group block h-full">
                   <div
                     className="relative h-64 rounded-xl overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl"
-                    style={{ background: quiz.backgroundImage }}
+                    style={{
+                      background: quiz.backgroundImage,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
                   >
                     {/* Overlay gradient for better text readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

@@ -19,6 +19,7 @@ import { datingTextingStyleQuiz } from './dating-texting-style-quiz'
 import { pmPressureStyleQuiz } from './pm-pressure-style-quiz'
 import { productDecisionStyleQuiz } from './product-decision-style-quiz'
 import { pmTradeoffStyleQuiz } from './pm-tradeoff-style-quiz'
+import { ALL_QUIZZES } from './all-quizzes-data'
 
 // Registry of all available quizzes
 export const quizRegistry: Record<string, QuizConfig> = {
@@ -41,7 +42,24 @@ export const quizRegistry: Record<string, QuizConfig> = {
 
 // Helper function to get a quiz by ID
 export function getQuiz(quizId: string): QuizConfig | null {
-  return quizRegistry[quizId] || null
+  const quiz = quizRegistry[quizId]
+  if (!quiz) return null
+
+  // Find the background image from all-quizzes-data
+  const quizData = ALL_QUIZZES.find(q => q.id === quizId)
+
+  // Override the quiz's theme background image with the one from all-quizzes-data
+  if (quizData?.backgroundImage) {
+    return {
+      ...quiz,
+      theme: {
+        ...quiz.theme,
+        backgroundImage: quizData.backgroundImage
+      }
+    }
+  }
+
+  return quiz
 }
 
 // Helper function to get all quiz IDs
