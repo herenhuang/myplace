@@ -85,11 +85,6 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             {displayTagline && (
               <p className={styles.resultTagline}>{displayTagline}</p>
             )}
-
-            {/* Quiz Rating */}
-            <div className={styles.ratingContainer}>
-              <QuizRating quizId={config.id} />
-            </div>
           </div>
 
           {/* Show personality distribution comparison - only for archetype type */}
@@ -143,26 +138,30 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>
         </div>
 
-        {/* Scroll down CTA */}
-        {onShowRecommendation && (
-          <div style={{ textAlign: 'center', marginTop: '3rem', padding: '2rem' }}>
+        {/* Action Buttons */}
+        <div className={styles.explanationButtons}>
+          <button
+            className={styles.explanationButton}
+            onClick={() => setShowExplanation(false)}
+          >
+            <div>←</div>
+            <div>Back to Card</div>
+          </button>
+          {onShowRecommendation && (
             <button
+              className={styles.explanationButton}
               onClick={onShowRecommendation}
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '1rem 2rem',
-                borderRadius: '12px',
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
             >
-              See What&apos;s Next →
+              <div>→</div>
+              <div>What&apos;s Next</div>
             </button>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Quiz Rating */}
+        <div className={styles.ratingContainer}>
+          <QuizRating quizId={config.id} />
+        </div>
       </div>
     </div>
   )

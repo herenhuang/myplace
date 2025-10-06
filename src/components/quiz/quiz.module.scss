@@ -577,6 +577,7 @@
 
 .ratingContainer {
   margin-top: 16px;
+  margin-bottom: 24px;
   display: flex;
   justify-content: center;
   animation: fadeUp 0.6s ease-in-out 0.4s both;
@@ -697,6 +698,41 @@
   strong {
     font-weight: 700;
     color: rgb(130, 44, 44);
+  }
+}
+
+// Explanation View Buttons
+.explanationButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+
+.explanationButton {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 3px solid rgb(130, 44, 44);
+  background: transparent;
+  color: rgb(130, 44, 44);
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-instrument-serif);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  @include transition-all(200ms);
+
+  &:hover {
+    background: rgba(130, 44, 44, 0.05);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
