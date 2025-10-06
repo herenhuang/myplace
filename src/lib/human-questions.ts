@@ -108,10 +108,10 @@ export const HUMAN_QUESTIONS: HumanQuestion[] = [
     type: 'forced-choice',
     question: "When working in a team, what role do you naturally assume?",
     choices: [
-      "Leader: I take charge and guide the team towards goals",
-      "Facilitator: I ensure smooth communication and collaboration",
-      "Contributor: I focus on completing my assigned tasks efficiently",
-      "Observer: I prefer to stay in the background and support when needed"
+      "I take charge and guide the team towards goals",
+      "I ensure smooth communication and collaboration",
+      "I focus on completing my assigned tasks efficiently",
+      "I prefer to stay in the background and support when needed"
     ]
   },
   {
