@@ -14,7 +14,7 @@ interface SectionProps {
   user: User | null;
 }
 
-const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = ({ scrollYProgress, user }) => {
+const Section1 = forwardRef<HTMLElement, Omit<SectionProps, 'user'> & { user: User | null; firstSlideHeight: number }>(({ scrollYProgress, user, firstSlideHeight }, ref) => {
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
@@ -24,13 +24,16 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, -5]);
+  // Calculate progress based on actual first slide height
+  const firstSlideProgress = useTransform(scrollYProgress, [0, firstSlideHeight / (firstSlideHeight + window.innerHeight)], [0, 1]);
+  const scale = useTransform(firstSlideProgress, [0, 1], [1, 0.8]);
+  const rotate = useTransform(firstSlideProgress, [0, 1], [0, -5]);
   
   return (
     <motion.section
+      ref={ref}
       style={isMobile ? {} : { scale, rotate }}
-      className='md:sticky font-semibold md:top-0 min-h-screen h-auto md:h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-start md:justify-center text-gray-900 rounded-xl'
+      className='md:sticky font-semibold md:top-0 h-auto bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-start text-gray-900 rounded-xl'
     >
       <div className='absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle,#e2e8f0_1px,transparent_1px)] bg-[size:20px_20px]'></div>
       
@@ -50,25 +53,16 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
 				<UserButton user={user} />
 			</div>
 
-      <div className='flex flex-col items-center justify-start gap-12 md:flex-row md:justify-center w-full pb-8 md:pb-0 mx-auto'>
+      <div className='flex flex-col items-center justify-start gap-0 md:flex-col md:justify-start w-full h-fit pb-8 md:pb-0 mx-auto'>
 
         <div className='flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-12 md:pb-0 gap-4 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)]'>
-          <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={500} height={300} className='w-40 h-auto object-contain' />
-          <h1 className='text-5xl font-bold text-center tracking-tight leading-[90%] w-[360px] mb-4'>
-            Real, Interactive Simulations.
+          <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={160} height={160} className='w-36 h-auto object-contain' />
+          <h1 className='font-[Instrument_Serif] text-7xl font-medium text-center tracking-tighter leading-[90%] mb-4'>
+            Personality Quizzes You Can <i>Play</i>
           </h1>
-          <Link
-            href="/all-quizzes"
-            className="mb-4 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300"
-          >
-            View All Quizzes
-          </Link>
-          <div className="">
-            <UserButton user={user} />
-          </div>
         </div>
        
-        <div className='mt-5 md:mt-10 w-fit'>
+        <div className='mt-5 md:mt-0 w-fit pt-10 pb-10'>
             <GamesSection />
         </div>
       </div>
@@ -76,9 +70,11 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
 
     </motion.section>
   );
-};
+});
 
-const Section2: React.FC<Omit<SectionProps, 'user'>> = ({ scrollYProgress }) => {
+Section1.displayName = 'Section1';
+
+const Section2: React.FC<Omit<SectionProps, 'user'> & { firstSlideHeight: number }> = ({ scrollYProgress, firstSlideHeight }) => {
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
@@ -88,8 +84,10 @@ const Section2: React.FC<Omit<SectionProps, 'user'>> = ({ scrollYProgress }) => 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
+  // Calculate progress based on actual first slide height
+  const secondSlideProgress = useTransform(scrollYProgress, [firstSlideHeight / (firstSlideHeight + window.innerHeight), 1], [0, 1]);
+  const scale = useTransform(secondSlideProgress, [0, 1], [0.8, 1]);
+  const rotate = useTransform(secondSlideProgress, [0, 1], [5, 0]);
   
 
   return (
@@ -151,8 +149,29 @@ interface ComponentProps {
 
 const Component = forwardRef<HTMLElement, ComponentProps>(({ user }, ref) => {
   const container = useRef<HTMLDivElement>(null);
+  const firstSlideRef = useRef<HTMLElement>(null);
+  const [firstSlideHeight, setFirstSlideHeight] = React.useState(0);
   
   React.useImperativeHandle(ref, () => container.current as HTMLElement);
+
+  React.useEffect(() => {
+    const measureFirstSlide = () => {
+      if (firstSlideRef.current) {
+        setFirstSlideHeight(firstSlideRef.current.offsetHeight);
+      }
+    };
+
+    measureFirstSlide();
+    window.addEventListener('resize', measureFirstSlide);
+    measureFirstSlide(); // Call again after a brief delay to ensure content is loaded
+
+    const timeoutId = setTimeout(measureFirstSlide, 100);
+
+    return () => {
+      window.removeEventListener('resize', measureFirstSlide);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: container,
@@ -162,8 +181,8 @@ const Component = forwardRef<HTMLElement, ComponentProps>(({ user }, ref) => {
   return (
     <>
       <main ref={container} className='relative md:h-[200vh] bg-black'>
-        <Section1 scrollYProgress={scrollYProgress} user={user} />
-        <Section2 scrollYProgress={scrollYProgress} />
+        <Section1 ref={firstSlideRef} scrollYProgress={scrollYProgress} user={user} firstSlideHeight={firstSlideHeight} />
+        <Section2 scrollYProgress={scrollYProgress} firstSlideHeight={firstSlideHeight} />
       </main>
     </>
   );
