@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { signOut } from '@/app/auth/actions';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { User } from '@supabase/supabase-js';
 import PentagonChart from '@/components/word-association/PentagonChart';
+import ElevateCard from '@/components/ElevateCard';
+import styles from './page.module.scss'
 
 type Session = {
 	id: string;
@@ -26,11 +28,6 @@ type ElevateSession = {
 		explanation: string;
 	};
 	created_at: string;
-};
-
-// Helper function to format archetype name for icon file
-const formatArchetypeForIcon = (archetype: string): string => {
-	return `icon_${archetype.toLowerCase().replace(/[\s-]/g, '_').replace(/^the_/, '')}`;
 };
 
 const ARCHETYPE_DESCRIPTIONS: Record<string, { tagline: string; emoji: string }> = {
@@ -75,8 +72,12 @@ const ARCHETYPE_DESCRIPTIONS: Record<string, { tagline: string; emoji: string }>
 export default function ProfilePage() {
 	const [user, setUser] = useState<User | null>(null);
 	const [sessions, setSessions] = useState<Session[]>([]);
-	const [elevateSession, setElevateSession] = useState<ElevateSession | null>(null);
+	const [elevateSessions, setElevateSessions] = useState<ElevateSession[]>([]);
 	const [loading, setLoading] = useState(true);
+
+	// Get latest session for each game type
+	const latestElevateSession = useMemo(() => elevateSessions[0], [elevateSessions]);
+	const latestWordAssocSession = useMemo(() => sessions[0], [sessions]);
 
 	useEffect(() => {
 		const getData = async () => {
@@ -88,25 +89,28 @@ export default function ProfilePage() {
 
 			if (user) {
 				// Fetch word-association sessions
-				const { data: sessionsData } = await supabase.from('sessions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+				const { data: wordAssocData } = await supabase
+					.from('sessions')
+					.select('*')
+					.eq('user_id', user.id)
+					.eq('game_id', 'word-association')
+					.order('created_at', { ascending: false });
 
-				if (sessionsData) {
-					setSessions(sessionsData as Session[]);
+				if (wordAssocData) {
+					setSessions(wordAssocData as Session[]);
 				}
 
-				// Fetch latest elevate-simulation session with results
+				// Fetch all elevate-simulation sessions with results
 				const { data: elevateData } = await supabase
 					.from('sessions')
 					.select('*')
 					.eq('user_id', user.id)
 					.eq('game_id', 'elevate-simulation')
 					.not('result', 'is', null)
-					.order('created_at', { ascending: false })
-					.limit(1)
-					.single();
+					.order('created_at', { ascending: false });
 
 				if (elevateData) {
-					setElevateSession(elevateData as ElevateSession);
+					setElevateSessions(elevateData as ElevateSession[]);
 				}
 			}
 
@@ -138,184 +142,113 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="min-h-screen">
+		<div className={styles.profilePage}>
 			{/* Profile Content */}
-			<main className="max-w-[1400px]mx-auto px-4 sm:px-6 lg:px-8 py-12">
-				<div className="bg-white rounded-2xl overflow-hidden">
+			<main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 h-full">
+		
 					{/* Profile Header */}
-					<div className="bg-gradient-to-r px-8 py-8">
-						<div className="flex items-center justify-between w-full space-x-6">
+					
+			{/* Latest Results Grid */}
+			<div className="flex items-center justify-center px-6 h-full gap-16">
 
-              <div className="flex items-center space-x-5">
-                  {user.user_metadata.avatar_url && (
-                      <div className="p-0 m-0 mr-3">
-                        <Image
-                          src={user.user_metadata.avatar_url}
-                          alt="Profile Picture"
-                          width={60}
-                          height={60}
-                          className="rounded-full"
-                        />
-                      </div>
-                  )}
+				<div className={styles.profileCard}>
 
-                  {!user.user_metadata.avatar_url && (
-                    <span className="text-3xl font-bold text-black">
-                      {user.user_metadata.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
-                    </span>
-                  )}
-                  
-                <div>
-                  <h1 className="text-xl tracking-tight font-bold text-black">
-                    {user.user_metadata.full_name || 'User Profile'}
-                  </h1>
-                  <p className="text-gray-500 tracking-tight font-medium text-md">
-                    {user.email}
-                  </p>
-                </div>
-              </div>
+					<div className="bg-gradient-to-r px-8 py-4">
+						<div className="flex flex-col items-center justify-between w-full">
 
-              <form action={signOut} className="">
-									<button
-										type="submit"
-										className="w-fit cursor-pointer px-4 py-2 bg-red-600 hover:bg-red-700 tracking-tight text-sm text-white font-semibold rounded-full shadow-md transition-colors duration-200"
-									>
-										Sign Out
-									</button>
-								</form>
+						<div className="flex flex-col items-center mb-6">
 
+							<div className="pfp flex items-center justify-center">
+								{user.user_metadata.avatar_url && (
+									<div className="p-0 m-0">
+										<Image
+										src={user.user_metadata.avatar_url}
+										alt="Profile Picture"
+										width={120}
+										height={120}
+										className="rounded-full"
+										/>
+									</div>
+								)}
 
-						</div>
-					</div>
-
-					{/* Profile Information */}
-					<div className="px-8 py-8 flex gap-12">
-
-						{/* Scrapbook Section */}
-						<div className="mb-12 flex-1">
-							<h2 className="text-2xl font-semibold text-gray-900 mb-6">Your Scrapbook</h2>
+								{!user.user_metadata.avatar_url && (
+									<span className="text-3xl font-bold text-black">
+									{user.user_metadata.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
+									</span>
+								)}
+							</div>
 							
-							{/* Elevate Simulation Result */}
-							{elevateSession && elevateSession.result ? (
-								<div className="bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl p-8">
-									<div className="flex flex-col items-center">
-										<h3 className="text-lg font-semibold text-gray-800 mb-4">Elevate Simulation</h3>
-										<p className="text-sm text-gray-500 mb-6">
-											{new Date(elevateSession.created_at).toLocaleDateString('en-US', {
-												year: 'numeric',
-												month: 'long',
-												day: 'numeric'
-											})}
-										</p>
-										
-										{/* Result Card */}
-										<div 
-											className="relative w-[280px] max-w-[80vw] rounded-lg shadow-2xl overflow-hidden mb-6"
-											style={{
-												aspectRatio: '4/5.5',
-												backgroundImage: 'url(/elevate/card.png)',
-												backgroundSize: 'cover',
-												backgroundPosition: 'center',
-												backgroundRepeat: 'no-repeat'
-											}}
-										>
-											<div className="flex flex-col justify-center items-center h-full p-4">
-												<Image
-													src={`/elevate/${formatArchetypeForIcon(elevateSession.result.archetype)}.png`}
-													alt={`${elevateSession.result.archetype} icon`}
-													width={200}
-													height={200}
-													className="rounded-lg mb-4"
-													priority
-												/>
-											<h1 
-												className="text-4xl font-semibold leading-tight mb-2 text-center"
-												style={{ 
-													fontFamily: 'var(--font-instrument-serif)',
-													color: 'rgb(130, 44, 44)',
-													letterSpacing: '-0.1px'
-												}}
-											>
-												{elevateSession.result.archetype}
-											</h1>
-											<p 
-												className="text-base font-medium leading-tight text-center w-4/5"
-												style={{ 
-													fontFamily: 'var(--font-lora)',
-													color: 'rgba(130, 44, 44, 0.6)',
-													letterSpacing: '-0.025em'
-												}}
-											>
-												{ARCHETYPE_DESCRIPTIONS[elevateSession.result.archetype]?.tagline || ''}
-											</p>
-											</div>
-										</div>
-
-										<Link 
-											href="/elevate" 
-											className="text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200"
-										>
-											Play again →
-										</Link>
-									</div>
-								</div>
-							) : (
-								<div className="bg-gray-50 rounded-2xl p-12 text-center border-2 border-dashed border-gray-200">
-									<div className="max-w-md mx-auto">
-										<div className="w-20 h-20 mx-auto mb-4 rounded-full bg-orange-100 flex items-center justify-center">
-											<span className="text-4xl">📸</span>
-										</div>
-										<h3 className="text-lg font-semibold text-gray-900 mb-2">No Memories Yet</h3>
-										<p className="text-gray-600 mb-6">
-											Complete the Elevate Simulation to discover your conference archetype and add it to your scrapbook!
-										</p>
-										<Link 
-											href="/elevate" 
-											className="inline-block px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-md transition-colors duration-200"
-										>
-											Start Elevate Simulation
-										</Link>
-									</div>
-								</div>
-							)}
+							<div>
+							<h1 className="text-3xl font-[Instrument_Serif] font-bold text-black text-center mt-4">
+								{user.user_metadata.full_name || 'User Profile'}
+							</h1>
+							<p className="text-gray-500 tracking-tight font-medium text-md text-center">
+								{user.email}
+							</p>
+							</div>
 						</div>
 
-						{/* Game Sessions */}
-						<div className="width-[240px]">
-							<h2 className="text-2xl font-semibold text-gray-900 mb-6">Your Game Sessions</h2>
-							{sessions.length > 0 ? (
-								<div className="grid grid-cols-1 gap-6">
-									{sessions.map(session => (
-										<div key={session.id} className="bg-gray-50 rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
-											<div className="flex-shrink-0">
-												<PentagonChart scores={session.result.scores} size={200} />
-											</div>
-											<div className="flex-grow">
-												<h3 className="text-lg font-bold text-gray-900 capitalize">{session.game_id.replace('-', ' ')}</h3>
-												<p className="text-sm text-gray-500 mb-2">
-													{new Date(session.created_at).toLocaleDateString('en-US', {
-														year: 'numeric',
-														month: 'long',
-														day: 'numeric'
-													})}
-												</p>
-												<p className="text-sm text-gray-700 tracking-tight leading-5">{session.result.summary}</p>
-											</div>
-										</div>
-									))}
-								</div>
-							) : (
-								<div className="text-center py-8 bg-gray-50 rounded-lg">
-									<p className="text-gray-600">You haven&apos;t played any games yet.</p>
-									<Link href="/" className="text-orange-500 hover:text-orange-600 font-medium mt-2 inline-block">
-										Play a game
-									</Link>
-								</div>
-							)}
-						</div>
+              			<form action={signOut} className="">
+							<button
+								type="submit"
+								className="w-fit cursor-pointer px-4 py-2 bg-red-600 hover:bg-red-700 tracking-tight text-sm text-white font-semibold rounded-full shadow-md transition-colors duration-200"
+							>
+								Sign Out
+							</button>
+						</form>
 
+						</div>
 					</div>
+
+					{(sessions.length > 0 || elevateSessions.length > 0) && (
+						<Link 
+							href="/profile/sessions"
+							className="inline-flex items-center gap-2 px-5 py-2.5 bg-black/10 hover:bg-black/20 text-black font-medium rounded-full transition-all duration-200"
+						>
+							<span className="text-black text-sm tracking-tight font-semibold">View All Sessions</span>
+						</Link>
+					)}
 				</div>
+				
+				<div className={styles.artifactGrid}>
+			
+					<div className={`${styles.artifactCard} ${latestElevateSession?.result ? styles.hasContent : ''}`}>
+						{latestElevateSession && latestElevateSession.result && (
+							<Link href="/elevate" className="group block w-full h-full">
+								<div className="flex items-center justify-center w-full h-full p-2">
+									<ElevateCard
+										archetype={latestElevateSession.result.archetype}
+										tagline={ARCHETYPE_DESCRIPTIONS[latestElevateSession.result.archetype]?.tagline || ''}
+										dimension={145}
+									/>
+								</div>
+							</Link>
+						)}
+					</div>
+					<div className={`${styles.artifactCard} ${latestWordAssocSession?.result ? styles.hasContent : ''}`}>
+						{latestWordAssocSession && latestWordAssocSession.result && (
+							<Link href="/word-association" className="group block w-full h-full">
+								<div className="flex items-center justify-center w-full h-full p-3">
+									<div className="flex items-center justify-center" style={{ width: '180px', height: '180px' }}>
+										<PentagonChart scores={latestWordAssocSession.result.scores} size={170} />
+									</div>
+								</div>
+							</Link>
+						)}
+					</div>
+					<div className={styles.artifactCard}></div>
+
+					<div className={styles.artifactCard}></div>
+					<div className={styles.artifactCard}></div>
+					<div className={styles.artifactCard}></div>
+
+					<div className={styles.artifactCard}></div>
+					<div className={styles.artifactCard}></div>
+					<div className={styles.artifactCard}></div>
+				</div>
+
+				</div>
+		
 			</main>
 		</div>
 	);

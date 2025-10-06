@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useTransition, useCallback } from 'react';
-import { getInterleavedWords } from '../../lib/word_bank';
+import { getInterleavedWords } from '../../lib/scenarios/word_bank';
 import StartScreen from '../../components/word-association/StartScreen';
 import ResultsScreen from '../../components/word-association/ResultsScreen';
 import { analyze } from './actions';
