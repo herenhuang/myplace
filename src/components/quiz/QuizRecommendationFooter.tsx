@@ -220,16 +220,18 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
             {/* Action buttons inside the recommendation card */}
             <div className={styles.actionButtons}>
               <button
-                className={`${styles.actionButton} ${styles.secondary}`}
+                className={styles.actionButton}
                 onClick={onBackToCard}
               >
-                <span>← Back to Card</span>
+                <div>←</div>
+                <div>Back to Card</div>
               </button>
               <button
-                className={`${styles.actionButton} ${styles.outline}`}
+                className={styles.actionButton}
                 onClick={onRestart}
               >
-                <span>Take Again</span>
+                <div>↻</div>
+                <div>Take Again</div>
               </button>
             </div>
           </motion.div>

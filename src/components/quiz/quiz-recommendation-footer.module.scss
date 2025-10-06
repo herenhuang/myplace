@@ -142,46 +142,36 @@
 
   .actionButtons {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
+    justify-content: space-between;
     margin-top: 2rem;
     padding-top: 2rem;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .actionButton {
-    flex: 1;
-    padding: 0.875rem 1.25rem;
+    padding: 12px 24px;
     border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
+    border: 3px solid rgb(130, 44, 44);
+    background: transparent;
+    color: rgb(130, 44, 44);
+    font-size: 22px;
+    font-weight: 700;
+    font-family: var(--font-instrument-serif);
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     transition: all 0.2s ease;
-    border: none;
 
-    &.secondary {
-      background: rgba(0, 0, 0, 0.05);
-      color: #374151;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-
-      &:hover {
-        background: rgba(0, 0, 0, 0.08);
-        border-color: rgba(0, 0, 0, 0.15);
-      }
+    &:hover {
+      background: rgba(130, 44, 44, 0.05);
+      transform: translateY(-2px);
     }
 
-    &.outline {
-      background: transparent;
-      color: #667eea;
-      border: 2px solid #667eea;
-
-      &:hover {
-        background: #667eea;
-        color: white;
-      }
-    }
-
-    span {
-      display: inline-block;
+    &:active {
+      transform: translateY(0);
     }
   }
 

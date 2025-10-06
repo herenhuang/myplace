@@ -141,6 +141,35 @@
   color: #374151;
 }
 
+.welcomeButton {
+  padding: 12px 48px;
+  border-radius: 12px;
+  border: 3px solid rgb(130, 44, 44);
+  background: transparent;
+  color: rgb(130, 44, 44);
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-instrument-serif);
+  cursor: pointer;
+  @include transition-all(200ms);
+  white-space: nowrap;
+  margin: 24px auto;
+
+  &:hover {
+    background: rgba(130, 44, 44, 0.05);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .appButton {
   width: 80%;
   max-width: 320px;
