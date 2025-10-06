@@ -11,7 +11,7 @@ export const crushQuiz: QuizConfig = {
     secondaryColor: '#fbcfe8',
     backgroundColor: '#fdf2f8',
     textColor: '#831843',
-    backgroundImage: 'linear-gradient(135deg, #ec4899 0%, #fbcfe8 50%, #fdf2f8 100%)'
+    backgroundImage: 'url(/quiz/crush-quiz/crush-quiz-background.webp), linear-gradient(135deg, #ec4899 0%, #fbcfe8 50%, #fdf2f8 100%)'
   },
   
   questions: [

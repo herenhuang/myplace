@@ -20,7 +20,7 @@ export const ALL_QUIZZES: QuizItem[] = [
     description: 'The most honest 8 minutes of your feelings',
     category: 'love',
     route: '/quiz/crush-quiz',
-    backgroundImage: 'url(/quiz/crush-quiz/background.jpg), linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%)'
+    backgroundImage: 'url(/quiz/crush-quiz/crush-quiz-background.webp), linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%)'
   },
   {
     id: 'flirting-style',
