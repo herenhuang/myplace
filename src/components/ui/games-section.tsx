@@ -103,6 +103,77 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
       }
     };
 
+    const games = [
+      {
+        id: 'card-1',
+        title: 'A First Date',
+        href: 'https://yellow-gypsum.netlify.app/story/francis1',
+        image: '/landing/sim-thumbnail-work.png',
+        gradient: 'from-orange-300 to-red-500',
+        clipPath: 'clip-pattern5',
+        tags: ['Interactive Fiction', 'Text', 'Personality'],
+        isNew: true,
+        hidden: true
+      },
+      {
+        id: 'card-2',
+        title: 'Music Crisis Sim',
+        href: '/remix-simulation/intro',
+        image: '/landing/sim-thumbnail-music.png',
+        gradient: 'from-orange-300 to-yellow-500',
+        clipPath: 'clip-pattern',
+        tags: ['Interactive Fiction', 'Text', 'Personality']
+      },
+      {
+        id: 'card-3',
+        title: 'Word Association',
+        href: '/word-association',
+        image: '/landing/sim-thumbnail-word.png',
+        gradient: 'from-red-300 to-red-500',
+        clipPath: 'clip-pattern1',
+        tags: ['Word', 'Quick', 'Personality']
+      },
+      {
+        id: 'card-4',
+        title: 'Bill Splitting',
+        href: 'https://yellow-gypsum.netlify.app/story/dinner-helen-2',
+        image: '/landing/sim-thumbnail-work.png',
+        gradient: 'from-green-300 to-green-500',
+        clipPath: 'clip-pattern2',
+        tags: ['MBTI', 'Text', 'Interactive Fiction'],
+        hidden: true
+      },
+      {
+        id: 'card-5',
+        title: 'Workplace Crisis',
+        href: '/workplace-simulation',
+        image: '/landing/sim-thumbnail-work.png',
+        gradient: 'from-teal-300 to-green-400',
+        clipPath: 'clip-pattern7',
+        tags: ['Open Input', 'Text', 'Personality']
+      },
+      /*
+      {
+        id: 'card-6',
+        title: 'Block Game',
+        href: 'https://tryorange.vercel.app/block',
+        gradient: 'from-yellow-300 to-yellow-600',
+        clipPath: 'clip-pattern8',
+        tags: ['Shapes', 'Quick', 'Personality']
+      },
+      */
+      {
+        id: 'card-7',
+        title: 'Bubble Popper',
+        href: '/bubble-popper',
+        image: '/landing/sim-thumbnail-bubble.png',
+        gradient: 'from-purple-400 to-blue-400',
+        clipPath: 'clip-pattern9',
+        tags: ['Game', 'Quick', 'Personality'],
+        isNew: true
+      }
+    ];
+
     return (
     <div ref={ref} className={className} {...props} style={{ width: 'fit-content' }}>
       <svg className='clipppy absolute -top-[999px] -left-[999px] w-0 h-0'>
@@ -176,251 +247,101 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </defs>
       </svg>
 
-      <section className='flex w-fit items-center justify-center gap-x-4 gap-y-4 md:gap-x-16 md:gap-y-12 p-4 max-w-6xl'>
-        
-        <div className={`${styles.gameCard} transform rotate-2 hidden`}>
+      <section className='flex flex-wrap w-fit items-center justify-center gap-3 p-4 max-w-7xl mx-auto'>
+        {games.filter(game => !game.hidden).map((game) => (
+          <div key={game.id} className="relative group">
+            <a 
+              href={game.href} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="block"
+            >
+              <div 
+                className="relative h-90 w-60 rounded-3xl overflow-hidden shadow-lg transition-transform duration-300"
+                
+              >
+                {/* Background gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br z-2 ${game.gradient}`} />
+                {/* Image overlay on top of gradient */}
+                <div
+                  className="absolute inset-0 z-3 hover:scale-105 transition-transform duration-300"
+                  style={{
+                    backgroundImage: `url(${game.image})`,
+                    backgroundSize: '90%',
+                    backgroundPosition: 'top center',
+                    backgroundRepeat: 'no-repeat',
+                  }}
+                />
+                
+                {/* Overlay gradient for better text readability */}
+             
 
-          <div className={styles.wiggle}>
-            <a href="https://yellow-gypsum.netlify.app/story/francis1" target="_blank" rel="noopener noreferrer" className="block group">
-              <div className={styles.gameCardInner}>
-                <figure style={{ clipPath: 'url(#clip-pattern5)' }}>
-                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-orange-400 to-red-500 group-hover:scale-110 w-full cursor-pointer' />
-                </figure>
-                <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>A First Date</h3>
-                  <div className={styles.tagContainer}>
-                    <span className={styles.tag}>Interactive Fiction</span>
-                    <span className={styles.tag}>Text</span>
-                    <span className={styles.tag}>Personality</span>
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-5">
+               
+                  <div className="flex flex-wrap gap-2 mt-3 hidden">
+                    {game.tags.map((tag, idx) => (
+                      <span 
+                        key={idx}
+                        className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-semibold text-white"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div className={styles.newBadge}>NEW</div>
-          <div className={styles.voteButtonContainer}>
-            <button 
-              onClick={() => handleVote('card-1')}
-              disabled={loading['card-1'] || votedCards.has('card-1')}
-              className={`${styles.voteButton} ${
-                votedCards.has('card-1') 
-                  ? styles.voted
-                  : loading['card-1'] 
-                    ? styles.loading 
-                    : styles.default
-              }`}
-            >
-              {votedCards.has('card-1') ? '✅' : '👍'} {loading['card-1'] ? '...' : (votes['card-1'] || 0)}
-            </button>
-          </div>
-        </div>
 
-        <div className={`${styles.gameCard} transform rotate-2`}>
-          <div className={styles.wiggle}>
-            <a href="/remix-simulation/intro" target="_blank" rel="noopener noreferrer" className="block group">
-              <div className={styles.gameCardInner}>
-                <figure style={{ clipPath: 'url(#clip-pattern)' }}>
-                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-blue-400 to-blue-600 group-hover:scale-110 w-full cursor-pointer' />
-                </figure>
-                <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>Music Crisis Sim</h3>
-                  <div className={styles.tagContainer}>
-                    <span className={styles.tag}>Interactive Fiction</span>
-                    <span className={styles.tag}>Text</span>
-                    <span className={styles.tag}>Personality</span>
+                  <div className="flex items-center gap-2 mb-2">
+                    
+                    <h3 className="font-[Instrument_Serif] text-4xl leading-7 tracking-tight font-medium text-shadow-3xl">
+                      {game.title}
+                    </h3>
                   </div>
+                  {/* Small SVG icon */}
+                 
                 </div>
-              </div>
-            </a>
-          </div>
-          <div className={styles.voteButtonContainer}>
-            <button 
-              onClick={() => handleVote('card-2')}
-              disabled={loading['card-2'] || votedCards.has('card-2')}
-              className={`${styles.voteButton} ${
-                votedCards.has('card-2') 
-                  ? styles.voted
-                  : loading['card-2'] 
-                    ? styles.loading 
-                    : styles.default
-              }`}
-            >
-              {votedCards.has('card-2') ? '✅' : '👍'} {loading['card-2'] ? '...' : (votes['card-2'] || 0)}
-            </button>
-          </div>
-        </div>
-        <div className={`${styles.gameCard} transform -rotate-1`}>
-          <div className={styles.wiggle}>
-            <a href="/word-association" target="_blank" rel="noopener noreferrer" className="block group">
-              <div className={styles.gameCardInner}>
-                <figure style={{ clipPath: 'url(#clip-pattern1)' }}>
-                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-purple-400 to-purple-600 group-hover:scale-110 w-full cursor-pointer' />
-                </figure>
-                <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>Word Association</h3>
-                  <div className={styles.tagContainer}>
-                    <span className={styles.tag}>Word</span>
-                    <span className={styles.tag}>Quick</span>
-                    <span className={styles.tag}>Personality</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div className={styles.voteButtonContainer}>
-            <button 
-              onClick={() => handleVote('card-3')}
-              disabled={loading['card-3'] || votedCards.has('card-3')}
-              className={`${styles.voteButton} ${
-                votedCards.has('card-3') 
-                  ? styles.voted
-                  : loading['card-3'] 
-                    ? styles.loading 
-                    : styles.default
-              }`}
-            >
-              {votedCards.has('card-3') ? '✅' : '👍'} {loading['card-3'] ? '...' : (votes['card-3'] || 0)}
-            </button>
-          </div>
-        </div>
-        <div className={`${styles.gameCard} transform rotate-1 hidden`}>
-          <div className={styles.wiggle}>
-            <a href="https://yellow-gypsum.netlify.app/story/dinner-helen-2" target="_blank" rel="noopener noreferrer" className="block group">
-              <div className={styles.gameCardInner}>
-                <figure style={{ clipPath: 'url(#clip-pattern2)' }}>
-                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-green-400 to-green-600 group-hover:scale-110 w-full cursor-pointer' />
-                </figure>
-                <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>Bill Splitting</h3>
-                  <div className={styles.tagContainer}>
-                    <span className={styles.tag}>MBTI</span>
-                    <span className={styles.tag}>Text</span>
-                    <span className={styles.tag}>Interactive Fiction</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div className={styles.voteButtonContainer}>
-            <button 
-              onClick={() => handleVote('card-4')}
-              disabled={loading['card-4'] || votedCards.has('card-4')}
-              className={`${styles.voteButton} ${
-                votedCards.has('card-4') 
-                  ? styles.voted
-                  : loading['card-4'] 
-                    ? styles.loading 
-                    : styles.default
-              }`}
-            >
-              {votedCards.has('card-4') ? '✅' : '👍'} {loading['card-4'] ? '...' : (votes['card-4'] || 0)}
-            </button>
-          </div>
-        </div>
-        <div className={`${styles.gameCard} transform -rotate-2`}>
-          <div className={styles.wiggle}>
-            <a href="/workplace-simulation" target="_blank" rel="noopener noreferrer" className="block group">
-              <div className={styles.gameCardInner}>
-                <figure style={{ clipPath: 'url(#clip-pattern7)' }}>
-                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-red-400 to-red-600 group-hover:scale-110 w-full cursor-pointer' />
-                </figure>
-                <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>Workplace Crisis</h3>
-                  <div className={styles.tagContainer}>
-                    <span className={styles.tag}>Open Input</span>
-                    <span className={styles.tag}>Text</span>
-                    <span className={styles.tag}>Personality</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div className={styles.voteButtonContainer}>
-            <button 
-              onClick={() => handleVote('card-5')}
-              disabled={loading['card-5'] || votedCards.has('card-5')}
-              className={`${styles.voteButton} ${
-                votedCards.has('card-5') 
-                  ? styles.voted
-                  : loading['card-5'] 
-                    ? styles.loading 
-                    : styles.default
-              }`}
-            >
-              {votedCards.has('card-5') ? '✅' : '👍'} {loading['card-5'] ? '...' : (votes['card-5'] || 0)}
-            </button>
-          </div>
-        </div>
-        <div className={`${styles.gameCard} transform rotate-3`}>
-          <div className={styles.wiggle}>
-            <a href="https://tryorange.vercel.app/block" target="_blank" rel="noopener noreferrer" className="block group">
-              <div className={styles.gameCardInner}>
-                <figure style={{ clipPath: 'url(#clip-pattern8)' }}>
-                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-yellow-400 to-yellow-600 group-hover:scale-110 w-full cursor-pointer' />
-                </figure>
-                <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>Block Game</h3>
-                  <div className={styles.tagContainer}>
-                    <span className={styles.tag}>Shapes</span>
-                    <span className={styles.tag}>Quick</span>
-                    <span className={styles.tag}>Personality</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div className={styles.voteButtonContainer}>
-            <button 
-              onClick={() => handleVote('card-6')}
-              disabled={loading['card-6'] || votedCards.has('card-6')}
-              className={`${styles.voteButton} ${
-                votedCards.has('card-6') 
-                  ? styles.voted
-                  : loading['card-6'] 
-                    ? styles.loading 
-                    : styles.default
-              }`}
-            >
-              {votedCards.has('card-6') ? '✅' : '👍'} {loading['card-6'] ? '...' : (votes['card-6'] || 0)}
-            </button>
-          </div>
-        </div>
-        <div className={`${styles.gameCard} transform -rotate-1`}>
-          <div className={styles.wiggle}>
-            <a href="/bubble-popper" rel="noopener noreferrer" className="block group">
-              <div className={styles.gameCardInner}>
-                <figure style={{ clipPath: 'url(#clip-pattern9)' }}>
-                  <div className='transition-all duration-300 aspect-[3/4] align-bottom bg-gradient-to-br from-purple-500 to-pink-500 group-hover:scale-110 w-full cursor-pointer' />
-                </figure>
-                <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>Bubble Popper</h3>
-                  <div className={styles.tagContainer}>
-                    <span className={styles.tag}>Game</span>
-                    <span className={styles.tag}>Quick</span>
-                    <span className={styles.tag}>Personality</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div className={styles.newBadge}>NEW</div>
-          <div className={styles.voteButtonContainer}>
-            <button 
-              onClick={() => handleVote('card-7')}
-              disabled={loading['card-7'] || votedCards.has('card-7')}
-              className={`${styles.voteButton} ${
-                votedCards.has('card-7') 
-                  ? styles.voted
-                  : loading['card-7'] 
-                    ? styles.loading 
-                    : styles.default
-              }`}
-            >
-              {votedCards.has('card-7') ? '✅' : '👍'} {loading['card-7'] ? '...' : (votes['card-7'] || 0)}
-            </button>
-          </div>
-        </div>
 
+                <div 
+                      className={`absolute top-4 left-4 w-8 h-8 bg-white/90 flex-shrink-0`}
+                      style={{ clipPath: `url(#${game.clipPath})` }}
+                    />
+
+                {/* Vote Button - top right */}
+                <div className="absolute top-4 right-4 z-10 hidden">
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleVote(game.id);
+                    }}
+                    disabled={loading[game.id] || votedCards.has(game.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all shadow-md ${
+                      votedCards.has(game.id) 
+                        ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                        : loading[game.id] 
+                          ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                          : 'bg-white/90 text-gray-800 hover:bg-white cursor-pointer'
+                    }`}
+                  >
+                    {votedCards.has(game.id) ? '✅' : '👍'} {loading[game.id] ? '...' : (votes[game.id] || 0)}
+                  </button>
+                </div>
+
+                {/* NEW Badge */}
+                {game.isNew && (
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse">
+                      NEW
+                    </span>
+                  </div>
+                )}
+              </div>
+            </a>
+          </div>
+        ))}
+
+        <div className="relative h-90 w-60 rounded-3xl overflow-hidden transition-all duration-300 group-hover:scale-105 flex flex-col justify-center items-center cursor-pointer bg-orange-500/20 hover:bg-orange-500/30">
+          <h2 className='font-[Instrument_Serif] text-black text-2xl font-bold'> More Games</h2>
+          <span className="material-symbols-outlined text-black text-2xl mt-2">arrow_forward</span>
+        </div>
       </section>
     </div>
     );
