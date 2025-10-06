@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
 import QuizRating from './QuizRating'
+import PersonalityPredictions from './PersonalityPredictions'
 import styles from './quiz.module.scss'
 
 interface QuizResultsProps {
@@ -59,6 +60,50 @@ function parseSections(markdown: string): string[] {
   }
 
   return sections
+}
+
+// Parse personality predictions from the personality section
+function parsePersonalityPredictions(section: string) {
+  try {
+    // Extract MBTI type and confidence
+    const mbtiMatch = section.match(/\*\*MBTI Type:\s*([A-Z]{4})\s*\((\d+)%\s*confident\)\*\*/i)
+    const mbtiType = mbtiMatch ? mbtiMatch[1] : 'Unknown'
+    const mbtiConfidence = mbtiMatch ? parseInt(mbtiMatch[2]) : 0
+
+    // Extract MBTI explanation (text between MBTI line and Big Five)
+    const mbtiExplMatch = section.match(/\*\*MBTI Type:.*?\*\*\s*(.*?)\s*\*\*Big Five/s)
+    const mbtiExplanation = mbtiExplMatch ? mbtiExplMatch[1].trim() : ''
+
+    // Extract Big Five scores
+    const opennessMatch = section.match(/Openness:\s*(\d+)/i)
+    const conscientiousnessMatch = section.match(/Conscientiousness:\s*(\d+)/i)
+    const extraversionMatch = section.match(/Extraversion:\s*(\d+)/i)
+    const agreeablenessMatch = section.match(/Agreeableness:\s*(\d+)/i)
+    const neuroticismMatch = section.match(/Neuroticism:\s*(\d+)/i)
+
+    const oceanScores = {
+      openness: opennessMatch ? parseInt(opennessMatch[1]) : 50,
+      conscientiousness: conscientiousnessMatch ? parseInt(conscientiousnessMatch[1]) : 50,
+      extraversion: extraversionMatch ? parseInt(extraversionMatch[1]) : 50,
+      agreeableness: agreeablenessMatch ? parseInt(agreeablenessMatch[1]) : 50,
+      neuroticism: neuroticismMatch ? parseInt(neuroticismMatch[1]) : 50
+    }
+
+    // Extract OCEAN explanation (text after the scores list)
+    const oceanExplMatch = section.match(/Neuroticism:\s*\d+\s*(.*?)$/s)
+    const oceanExplanation = oceanExplMatch ? oceanExplMatch[1].trim() : ''
+
+    return {
+      mbtiType,
+      mbtiConfidence,
+      mbtiExplanation,
+      oceanScores,
+      oceanExplanation
+    }
+  } catch (error) {
+    console.error('Error parsing personality predictions:', error)
+    return null
+  }
 }
 
 export default function QuizResults({ config, result, onRestart, onShowRecommendation }: QuizResultsProps) {
@@ -230,13 +275,29 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
     if (currentPage === 3) {
       // Page 3: MBTI/OCEAN + You're Also Close To
+      // For header-based parsing: section 7 is Personality Predictions (if exists)
+      const personalitySection = sections[7] // Section 7 should be "## Personality Predictions"
+      const personalityData = personalitySection ? parsePersonalityPredictions(personalitySection) : null
+
       return (
         <>
-          {/* Placeholder for personality assessments */}
-          <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
-            <h2>Personality Predictions</h2>
-            <p><em>MBTI and OCEAN model predictions coming soon...</em></p>
-          </div>
+          {/* Personality Predictions Component */}
+          {personalityData ? (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <PersonalityPredictions
+                mbtiType={personalityData.mbtiType}
+                mbtiConfidence={personalityData.mbtiConfidence}
+                mbtiExplanation={personalityData.mbtiExplanation}
+                oceanScores={personalityData.oceanScores}
+                oceanExplanation={personalityData.oceanExplanation}
+              />
+            </div>
+          ) : (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <h2>Personality Predictions</h2>
+              <p><em>Take a quiz to see your personality predictions!</em></p>
+            </div>
+          )}
 
           {/* You're Also Close To section */}
           {sections[3] && (
