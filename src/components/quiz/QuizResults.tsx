@@ -161,52 +161,142 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     )
   }
 
-  // Explanation view
+  // Explanation view with pagination
   const uniqueness = getUserUniqueness()
+  const [currentPage, setCurrentPage] = useState(1)
+  const totalPages = 3
+
+  // Page 1: Section 0 (title + blueprint) + Section 1 (What I Noticed)
+  // Page 2: Section 3 (What Works) + Section 4 (Where It Gets Messy) + Section 5 (Tips/Advice)
+  // Page 3: MBTI/OCEAN (placeholder) + Section 2 (You're Also Close To)
+
+  const renderPage = () => {
+    if (currentPage === 1) {
+      // Page 1: Header + Blueprint + What I Noticed
+      return (
+        <>
+          {sections[0] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <ReactMarkdown>{sections[0]}</ReactMarkdown>
+            </div>
+          )}
+          {sections[1] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
+              <ReactMarkdown>{sections[1]}</ReactMarkdown>
+            </div>
+          )}
+        </>
+      )
+    }
+
+    if (currentPage === 2) {
+      // Page 2: What Works + Where It Gets Messy + Tips For Growth
+      // Section indices: 3, 4, 5 (skipping section 2 which is "You're Also Close To")
+      return (
+        <>
+          {sections[3] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <ReactMarkdown>{sections[3]}</ReactMarkdown>
+            </div>
+          )}
+          {sections[4] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
+              <ReactMarkdown>{sections[4]}</ReactMarkdown>
+            </div>
+          )}
+          {sections[5] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.4s' }}>
+              <ReactMarkdown>{sections[5]}</ReactMarkdown>
+            </div>
+          )}
+        </>
+      )
+    }
+
+    if (currentPage === 3) {
+      // Page 3: MBTI/OCEAN (placeholder) + You're Also Close To
+      return (
+        <>
+          {/* Placeholder for personality assessments */}
+          <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+            <h2>Personality Predictions</h2>
+            <p><em>MBTI and OCEAN model predictions coming soon...</em></p>
+          </div>
+
+          {/* You're Also Close To section */}
+          {sections[2] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
+              <ReactMarkdown>{sections[2]}</ReactMarkdown>
+            </div>
+          )}
+        </>
+      )
+    }
+
+    return null
+  }
 
   return (
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
 
-        {/* Render each section with cascaded animation */}
-        {sections.map((section, index) => (
-          <div 
-            key={index} 
-            className={styles.explanationSection}
-            style={{ animationDelay: `${0.1 + index * 0.15}s` }}
-          >
-            <ReactMarkdown>{section}</ReactMarkdown>
-          </div>
-        ))}
+        {/* Sticky header - always visible */}
+        <div className={styles.stickyHeader}>
+          <h1>{displayName}</h1>
+          {displayTagline && <p>{displayTagline}</p>}
+        </div>
 
-        {/* Action Buttons */}
-        <div 
-          className={styles.actionButtons}
-          style={{ animationDelay: `${0.1 + sections.length * 0.15}s` }}
-        >
-          {onShowRecommendation && (
+        {/* Render current page content */}
+        {renderPage()}
+
+        {/* Pagination Controls */}
+        <div className={styles.paginationControls}>
+          <button
+            className={styles.paginationButton}
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            ← Back
+          </button>
+
+          <div className={styles.pageIndicator}>
+            {currentPage} / {totalPages}
+          </div>
+
+          {currentPage < totalPages && (
             <button
-              className={styles.actionButton}
-              onClick={onShowRecommendation}
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage(prev => prev + 1)}
             >
-              <h2>What&apos;s Next</h2>
+              Next →
             </button>
           )}
-          <button
-            className={styles.actionButtonAlt}
-            onClick={() => setShowExplanation(false)}
-          >
-            <h2>Back to Card</h2>
-          </button>
+
+          {currentPage === totalPages && onShowRecommendation && (
+            <button
+              className={styles.paginationButton}
+              onClick={onShowRecommendation}
+            >
+              What's Next →
+            </button>
+          )}
         </div>
 
-        {/* Quiz Rating */}
-        <div 
-          className={styles.ratingContainer}
-          style={{ animationDelay: `${0.1 + (sections.length + 1) * 0.15}s` }}
+        {/* Back to Card button */}
+        <button
+          className={styles.actionButtonAlt}
+          onClick={() => setShowExplanation(false)}
+          style={{ marginTop: '24px' }}
         >
-          <QuizRating quizId={config.id} />
-        </div>
+          <h2>Back to Card</h2>
+        </button>
+
+        {/* Quiz Rating - only on last page */}
+        {currentPage === totalPages && (
+          <div className={styles.ratingContainer} style={{ marginTop: '24px' }}>
+            <QuizRating quizId={config.id} />
+          </div>
+        )}
       </div>
     </div>
   )
