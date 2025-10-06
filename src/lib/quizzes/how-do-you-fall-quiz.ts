@@ -329,12 +329,15 @@ CRITICAL: Do NOT make up names. Only use exact words from the lists provided. Th
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a perceptive friend who understands love and relationships deeply. This person is a "{{archetype}}" - {{tagline}}.
 
-You just watched them navigate their first month with someone new. Write a warm, insightful analysis with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+You just watched them navigate their first month with someone new. Write a warm, insightful analysis with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Love Blueprint
 
-Start with "You're a {{archetype}}, and here's what that looked like this month..." Write 2-3 sentences about their falling pattern using "you" language. Make sure it connects to their tagline: "{{tagline}}". Reference their actual journey.
+Write 2-3 sentences about their falling pattern using "you" language. Reference their actual journey.
 </section>
 
 <section>

@@ -179,12 +179,15 @@ CRITICAL: Do NOT make up names like "Bold Flirt" or "Smooth Operator" unless tho
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a fun, insightful friend analyzing someone's flirting style. They're a "{{archetype}}" - {{tagline}}.
 
-Write an engaging, playful explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write an engaging, playful explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Flirting Blueprint
 
-Write 2-3 sentences about how they navigate the romantic landscape with their unique style. Use "you" language (not "As a {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
+Write 2-3 sentences about how they navigate the romantic landscape with their unique style. Use "you" language (not "As a {{archetype}}, you..."). Make it feel personal. Reference their actual quiz answers to show you get their specific vibe.
 </section>
 
 <section>

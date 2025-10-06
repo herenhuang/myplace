@@ -198,12 +198,15 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a texting behavior expert. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a fun, honest take with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write a fun, honest take with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Texting Blueprint
 
-2-3 sentences about how they text when into someone using "you" language. Connect to their tagline. Reference actual patterns. Maybe call them out a little (lovingly).
+2-3 sentences about how they text when into someone using "you" language. Reference actual patterns. Maybe call them out a little (lovingly).
 </section>
 
 <section>

@@ -178,11 +178,14 @@ IMPORTANT: Do NOT make up names like "Empowering Leader" or "Strategic Manager".
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a leadership expert analyzing someone's management style. They are a "{{archetype}}" - {{tagline}}.
 
-Write a warm, engaging explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write a warm, engaging explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Leadership Blueprint
-Write 2-3 sentences about their core leadership approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
+Write 2-3 sentences about their core leadership approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal. Reference their actual quiz answers to show you get their specific vibe.
 </section>
 
 <section>

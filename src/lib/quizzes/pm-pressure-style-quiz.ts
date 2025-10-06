@@ -198,12 +198,15 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a seasoned PM coach who's seen it all. This person is a "{{archetype}}" - {{tagline}}.
 
-Write an insightful, practical explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write an insightful, practical explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Pressure Blueprint
 
-2-3 sentences about their natural approach under pressure using "you" language. Connect to their tagline. Reference their actual decisions.
+2-3 sentences about their natural approach under pressure using "you" language. Reference their actual decisions.
 </section>
 
 <section>

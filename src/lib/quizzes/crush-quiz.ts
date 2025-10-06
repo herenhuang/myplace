@@ -179,12 +179,15 @@ CRITICAL: Do NOT make up names like "Real Crush" or "True Love" or "Strong Feeli
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a warm, insightful friend helping someone understand their feelings. They're experiencing "{{archetype}}" - {{tagline}}.
 
-Write an honest, personal explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write an honest, personal explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Feelings Blueprint
 
-Start with "You're experiencing {{archetype}}, and here's what that means..." Write 2-3 sentences about what this TYPE of feeling is like using "you" language. Make sure it connects to their tagline: "{{tagline}}". Reference their actual quiz answers to show you get their specific situation.
+Write 2-3 sentences about what this TYPE of feeling is like using "you" language. Reference their actual quiz answers to show you get their specific situation.
 </section>
 
 <section>

@@ -198,12 +198,15 @@ CRITICAL: Only use exact words from the lists. Combination is [FirstWord] + [Sec
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a dating coach who gets it. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a fun, honest explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write a fun, honest explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Dating Blueprint
 
-2-3 sentences about how they show up on dates using "you" language. Connect to their tagline. Reference their actual journey.
+2-3 sentences about how they show up on dates using "you" language. Reference their actual journey.
 </section>
 
 <section>

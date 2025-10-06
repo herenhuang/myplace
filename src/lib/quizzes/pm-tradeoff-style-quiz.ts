@@ -197,12 +197,15 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a product veteran who knows trade-offs are everything. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a clear, honest explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write a clear, honest explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Trade-off Blueprint
 
-2-3 sentences about their priorities and approach using "you" language. Connect to their tagline. Reference their actual choices.
+2-3 sentences about their priorities and approach using "you" language. Reference their actual choices.
 </section>
 
 <section>

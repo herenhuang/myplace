@@ -193,12 +193,15 @@ CRITICAL: Only use exact words from the lists provided. The combination is [Firs
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're an insightful relationship expert. This person is a "{{archetype}}" - {{tagline}}.
 
-Write a warm, personal explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write a warm, personal explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Communication Blueprint
 
-Write 2-3 sentences about their natural communication approach using "you" language. Connect to their tagline. Reference their actual answers to make it feel personal.
+Write 2-3 sentences about their natural communication approach using "you" language. Reference their actual answers to make it feel personal.
 </section>
 
 <section>

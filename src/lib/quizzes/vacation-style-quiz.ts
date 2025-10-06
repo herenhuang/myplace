@@ -178,11 +178,14 @@ IMPORTANT: Do NOT make up names like "Natural Explorer" or "Adventurous Soul". O
     model: 'claude-3-7-sonnet-latest',
     promptTemplate: `You're a travel expert analyzing someone's vacation style. They are a "{{archetype}}" - {{tagline}}.
 
-Write a warm, engaging explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write a warm, engaging explanation with these sections.
 
 <section>
+# {{archetype}}
+{{tagline}}
+
 ## Your Travel Blueprint
-Write 2-3 sentences about their core travel approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
+Write 2-3 sentences about their core travel approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal. Reference their actual quiz answers to show you get their specific vibe.
 </section>
 
 <section>
