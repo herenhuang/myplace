@@ -597,10 +597,13 @@ export async function analyzeArchetype(sessionId: string) {
 
     // Check if analysis already exists
     if (sessionData.result?.archetype) {
-      return { 
-        success: true, 
+      return {
+        success: true,
         archetype: sessionData.result.archetype,
-        explanation: sessionData.result.explanation 
+        firstWord: sessionData.result.firstWord,
+        secondWord: sessionData.result.secondWord,
+        tagline: sessionData.result.tagline,
+        explanation: sessionData.result.explanation
       }
     }
 
@@ -611,51 +614,68 @@ export async function analyzeArchetype(sessionId: string) {
       .map((s: StepData) => `Step ${s.stepNumber}: ${s.question}\nUser chose: ${s.userResponse}\nTime taken: ${s.timeMs}ms`)
       .join('\n\n')
 
-    const analysisPrompt = `You are a behavioral analyst specializing in personality archetypes at professional conferences.
+    const analysisPrompt = `You are analyzing how someone moved through a full day at the Elevate art x tech conference.
 
-Based on the user's responses throughout their Elevate conference simulation, assign them ONE of these archetypes:
-
-1. The Icebreaker → You thrive in groups and make others feel at ease.
-2. The Planner → You prepare well and others can count on you.
-3. The Floater → You embrace spontaneity and find unexpected gems.
-4. The Note-Taker → You're detail-oriented and curious to understand fully.
-5. The Action-Taker → You move quickly from ideas to action and bring energy with you.
-6. The Observer → You notice what others miss and reflect before acting.
-7. The Poster → You capture the vibe and make it memorable for others.
-8. The Big-Idea Person → You think in possibilities and spark expansive conversations.
-9. The Anchor → You're steady, grounding, and people naturally orbit you.
+WORD MATRIX SELECTION:
+Based on their journey, select ONE combination of words that best captures their conference style.
 
 # User's Journey:
 ${responseContext}
 
-# Behavioral Rubric (use these rules strictly)
-Signals and mappings (examples, not exhaustive):
-- Proactive social initiation (joins/initiates networking, chooses to meet new people, walks up to others) → Strongly favors Icebreaker; secondarily Action-Taker. DO NOT classify as Observer.
-- Skips lunch to network or optimizes for engagement → Action-Taker or Icebreaker depending on tone; prefer Icebreaker when it's social initiation; Action-Taker when it's decisiveness/efficiency-focused.
-- Detailed note-taking, front-row, structured capture → Note-Taker.
-- Observing room energy, quietly scanning, hanging back → Observer (unless overridden by proactive social initiation).
-- Snapping a photo to post later, crafting shareable moments → Poster.
-- Brainstorming/"ideas to discuss after," connecting dots, future-leaning → Big-Idea Person.
-- Schedule adherence/efficiency (quick bite to stay on track) → Planner.
-- Wanders/explores spontaneously (e.g., food trucks, roaming) → Floater.
-- Repeatedly references existing friends/people orbiting them → Anchor.
+WORD MATRIX:
 
-Precedence and tie-breaking:
-- If signals conflict, prioritize proactive social initiation over reflective/observational signals.
-- Use multiple signals; avoid letting a single reflective answer override earlier proactive actions.
-- Steps 1–9 have equal weight. Consider consistency across steps.
+First Words (HOW they showed up):
+• Proactive - Takes initiative, makes things happen, actively creates opportunities
+• Structured - Organized, plans ahead, sticks to strategy
+• Spontaneous - Goes with the flow, embraces uncertainty, follows energy
+• Observant - Notices details, watches patterns, reflects before acting
+• Social - Prioritizes connections, energized by people, natural networker
+• Intentional - Purposeful choices, clear about goals, selective engagement
+• Dynamic - High energy, moves quickly, embraces action
+• Reflective - Processes deeply, thinks before responding, values understanding
+• Enthusiastic - Brings energy, shows genuine excitement, inspires others
+• Grounded - Steady presence, calming influence, reliable anchor
+
+Second Words (WHAT they prioritized):
+• Connector - Building relationships, making introductions, bringing people together
+• Organizer - Planning, preparation, strategic thinking
+• Explorer - Discovery, new experiences, following curiosity
+• Learner - Understanding deeply, taking notes, absorbing knowledge
+• Catalyst - Making things happen, sparking action, driving momentum
+• Observer - Watching dynamics, noticing patterns, understanding context
+• Storyteller - Capturing moments, sharing experiences, creating narrative
+• Visionary - Big ideas, future possibilities, expansive thinking
+• Anchor - Steady presence, grounding others, being a reliable constant
+• Synthesizer - Connecting concepts, integrating ideas, seeing relationships
+
+BEHAVIORAL SIGNALS:
+- Proactive social initiation (networking, meeting new people) → Proactive, Social + Connector
+- Detailed planning/schedules → Structured, Intentional + Organizer
+- Wandering, following curiosity → Spontaneous + Explorer
+- Note-taking, front-row engagement → Observant, Reflective + Learner
+- Quick action, high energy → Dynamic + Catalyst
+- Watching room dynamics, hanging back → Observant, Reflective + Observer
+- Photo-taking, documenting moments → Enthusiastic + Storyteller
+- Big picture thinking, future-focused → Enthusiastic + Visionary
+- Steady, others orbit them → Grounded + Anchor
+- Connecting ideas and people → any first word + Synthesizer
 
 Special interpretation:
-- Step 2 "bag contents" should be treated as what they brought and what that implies (preparedness, note-taking, distraction), not the fact of dropping them. The bag drop itself is part of the hardcoded narrative and should NOT be analyzed as user behavior.
+- Step 2 "bag contents" should be treated as what they brought (preparedness, note-taking focus, etc.), not the fact of dropping it. The bag drop is narrative setup only.
 
-Guardrails:
-- If the user initiates networking with new people, DO NOT assign Observer.
-- Do NOT reference specific step numbers in the explanation (avoid "Step 1", "Step 2", etc.).
-- Focus on behavioral patterns rather than individual actions.
-- Ignore hardcoded narrative elements like the bag drop - only analyze user choices.
+SELECTION RULES:
+1. Look at their FULL journey—not just one choice
+2. The first word describes HOW they moved through the day
+3. The second word describes WHAT they prioritized most
+4. Consider their actual behaviors across all 9 steps
+5. Both words must work together naturally
+6. If signals conflict, prioritize patterns shown across multiple steps
+7. Do NOT reference specific step numbers in the explanation
 
 # Your Task:
-Analyze their choices and response patterns using the rubric above. Write like you're a wise, observant friend who's been watching them at this conference. Be warm but not gushy, insightful but not clinical. Avoid corporate-speak, therapy jargon, and AI-sounding phrases. Use this structure (250 words max total):
+Analyze their choices and select the best word combination. Write like you're a wise, observant friend who watched them all day. Be warm but not gushy, insightful but not clinical. Avoid corporate-speak, therapy jargon, and AI-sounding phrases.
+
+Use this structure (250 words max total):
 
 # Uniquely You
 
@@ -663,46 +683,41 @@ Analyze their choices and response patterns using the rubric above. Write like y
 
 ## Your Approach
 - You [specific thing they chose] when others might have [different behavior]. [Natural insight in conversational language]
-- You [another choice] while someone else might have [alternative]. [Another insight, casual but meaningful]  
+- You [another choice] while someone else might have [alternative]. [Another insight, casual but meaningful]
 - You [third choice] when others were [different approach]. [Final insight that feels like a friend's observation]
 
 ## What This Actually Means
-[2-3 sentences that sound like an insightful friend explaining what these choices reveal. Use "you" throughout. Keep it grounded and real, not flowery or abstract. Connect their choices to who they are, not generic personality traits.]
+[2-3 sentences that sound like an insightful friend explaining what these choices reveal. Use "you" throughout. Keep it grounded and real, not flowery or abstract. Connect their choices to who they are.]
 
 ## You May Also Be
-**[Second archetype]** - [1 sentence about which of their choices pointed toward this archetype and what would have tipped them over]
-**[Third archetype]** - [1 sentence about another close call, if applicable]
-
-INSTRUCTIONS FOR "YOU MAY ALSO BE":
-- Pick 1-2 other archetypes that had some evidence in their choices
-- Explain what they did that pointed toward that archetype
-- Mention what would have "tipped them over" into that category
-- Be specific about the gap: "Your LinkedIn mention showed Poster instincts, but you'd need more content creation moments"
-- Make it feel validating, not like they "failed" to get those archetypes
+**[Alternative combination]** - [1 sentence about which choices pointed this way and what would have tipped them over]
+**[Another alternative if applicable]** - [1 sentence about another close call]
 
 TONE GUIDELINES:
-- Write like you're chatting with a friend over coffee who just watched them at this conference
+- Write like you're chatting with a friend over coffee who watched them at this conference
 - React to their choices with humor and understanding, not clinical analysis
-- If they say something funny like "free food" - acknowledge the humor! ("honestly, who doesn't love free food?")
-- Interpret the SPIRIT of their choices, not just the literal words
-- Use natural speech: "you went straight for..." "while others were stressing about..." "you figured..."
-- Be playful when appropriate: "because let's be real..." "which honestly makes sense..."
-- Sound like you GET them and their choices make perfect sense
+- If they say something funny like "free food" - acknowledge it!
+- Interpret the SPIRIT of their choices, not just literal words
+- Use natural speech: "you went straight for..." "while others were stressing about..."
+- Be playful when appropriate: "because let's be real..."
+- Sound like you GET them
 
 EXAMPLES OF GOOD TONE:
 - "You went for the food trucks because honestly, practical priorities win"
 - "While others were color-coding their schedules, you figured good conversations would find you"
-- "You chose to sit with strangers, which is either brave or you just really wanted to avoid small talk with people you already know"
 
 AVOID:
-- "This demonstrates your preference for..." 
+- "This demonstrates your preference for..."
 - "You prioritize X while others Y"
-- Any sentence that sounds like it came from a personality test
+- Any sentence that sounds like a personality test
 
 Return a JSON object with:
 {
-  "archetype": "The [Archetype Name]",
-  "explanation": "[The full formatted explanation following the structure above, using markdown headers and formatting]"
+  "firstWord": "chosen first word",
+  "secondWord": "chosen second word",
+  "archetype": "[FirstWord] [SecondWord]",
+  "tagline": "A punchy, memorable phrase (e.g., 'You turn coffee breaks into brainstorming sessions')",
+  "explanation": "[The full formatted explanation following the structure above, using markdown headers]"
 }
 
 Return ONLY the JSON - no other text.`
@@ -742,12 +757,15 @@ Return ONLY the JSON - no other text.`
       timestamp: new Date().toISOString()
     }).catch(err => console.error('Debug log append error (analysis):', err))
 
-    // Save analysis to session
+    // Save analysis to session with word matrix format
     const { error: updateError } = await supabase
       .from('sessions')
-      .update({ 
+      .update({
         result: {
           archetype: analysis.archetype,
+          firstWord: analysis.firstWord,
+          secondWord: analysis.secondWord,
+          tagline: analysis.tagline,
           explanation: analysis.explanation
         }
       })
@@ -758,9 +776,12 @@ Return ONLY the JSON - no other text.`
       return { error: 'Failed to save analysis.' }
     }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       archetype: analysis.archetype,
+      firstWord: analysis.firstWord,
+      secondWord: analysis.secondWord,
+      tagline: analysis.tagline,
       explanation: analysis.explanation
     }
   } catch (error) {
