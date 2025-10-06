@@ -59,7 +59,7 @@ export default function AllQuizzesPage() {
         <div className="flex justify-center mb-12">
           <ToggleGroup
             type="single"
-            className="bg-white rounded-lg border border-gray-200 p-1 shadow-sm"
+            className=""
             value={selectedCategory}
             onValueChange={(value) => {
               if (value) setSelectedCategory(value as QuizCategory)
@@ -69,7 +69,7 @@ export default function AllQuizzesPage() {
               <ToggleGroupItem
                 key={category.value}
                 value={category.value}
-                className="px-6 py-2 text-sm font-medium"
+                className="px-3 py-2 font-medium cursor-pointer"
               >
                 {category.label}
               </ToggleGroupItem>
@@ -132,7 +132,7 @@ export default function AllQuizzesPage() {
         </FlipReveal>
 
         {/* Back to Home Link */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-12 hidden">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -143,7 +143,7 @@ export default function AllQuizzesPage() {
         </div>
 
         {/* Footer */}
-        <div className='mt-20 text-center border-t border-gray-300 pt-12'>
+        <div className='mt-20 text-center border-t border-gray-300 pt-12 hidden'>
           <a href="https://tally.so/r/mR91yP" target="_blank" rel="noopener noreferrer" className="hover:underline mx-auto w-fit block">
             <p className='text-gray-900 mb-8 bg-gray-900/10 rounded-full w-fit text-base font-semibold tracking-tight px-5 py-3'>
                 Contact
