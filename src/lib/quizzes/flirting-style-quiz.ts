@@ -182,22 +182,22 @@ CRITICAL: Do NOT make up names like "Bold Flirt" or "Smooth Operator" unless tho
 Write an engaging, playful explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
-## Your Flirting DNA
+## Your Flirting Blueprint
 
 Write 2-3 sentences about how they navigate the romantic landscape with their unique style. Use "you" language (not "As a {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
 </section>
 
 <section>
-## What I'm Seeing In Action
+## What I Noticed
 
 Highlight 3 specific patterns from their actual answers that reveal their style:
-- When you said [specific answer], that's textbook {{archetype}} energy
-- Your approach to [specific situation] shows [characteristic of their style]
-- The fact that you [another specific answer] tells me [insight]
+- When you answered [specific answer], that shows [insight about their flirting style]
+- Your approach to [specific situation] reveals [trait]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Were Also Close To...
+## You're Also Close To...
 
 {{alternatives}}
 
@@ -207,13 +207,19 @@ Write 1-2 sentences for each alternative explaining why they showed hints of tha
 <section>
 ## What Works For You
 
-Give 2-3 strengths of being a {{archetype}}. What makes this style effective? Be encouraging and specific.
+Give 2-3 strengths of being a {{archetype}}. What makes this flirting style effective? Be encouraging and specific.
 </section>
 
 <section>
-## Your Growth Edge
+## Where It Gets Messy
 
-Offer 1-2 gentle suggestions for how a {{archetype}} could expand their range or avoid common pitfalls. Be supportive, not critical.
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
+</section>
+
+<section>
+## Dating Advice For You
+
+Give 2-3 practical tips for showing interest using "you" language. Be encouraging and actionable.
 </section>
 
 <section>

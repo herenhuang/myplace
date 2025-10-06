@@ -200,56 +200,50 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 Write a clear, honest explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
 <section>
-## How You Make Trade-offs
+## Your Trade-off Blueprint
 
-2-3 sentences about their priorities and approach. Use "you" and reference actual choices.
+2-3 sentences about their priorities and approach using "you" language. Connect to their tagline. Reference their actual choices.
 </section>
 
 <section>
-## I See Your Priorities In Action
+## What I Noticed
 
-Highlight 3 specific patterns:
-- When choosing between [scenario], you picked [choice] - that's {{archetype}} priorities
-- Your approach to [specific trade-off] shows you value [what they prioritize]
-- The way you handled [specific conflict] reveals [pattern]
+Highlight 3 specific patterns from their actual answers:
+- When you answered [specific scenario], that shows [insight about their priorities]
+- Your choice in [specific trade-off] reveals [trait]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Also Show Signs Of...
+## You're Also Close To...
 
 {{alternatives}}
 
-1-2 sentences each about when these other priorities emerge.
+Write 1-2 sentences for each alternative style explaining why they showed hints of it based on their answers.
 </section>
 
 <section>
-## Your Trade-off Superpowers
+## What Works For You
 
-2-3 strengths of being a {{archetype}}:
-- What your priorities create
-- When your approach wins
-- What you optimize for
+Give 2-3 strengths of being a {{archetype}}. What makes this trade-off style effective? Be encouraging and specific.
 </section>
 
 <section>
-## The Downside Of Your Style
+## Where It Gets Messy
 
-1-2 honest observations about costs:
-- What you might sacrifice
-- When your priorities backfire
-- Blind spots to watch
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
 </section>
 
 <section>
-## Making Better Trade-offs
+## Tips For Your Growth
 
-2-3 specific tips for improving as a {{archetype}}.
+Give 2-3 practical tips for making better trade-offs using "you" language. Be encouraging and actionable.
 </section>
 
 <section>
 ## Bottom Line
 
-One empowering sentence about owning your {{archetype}} priorities.
+End with one empowering sentence about owning their {{archetype}} priorities and approach.
 </section>
 
 Their full trade-off patterns:

@@ -182,22 +182,22 @@ CRITICAL: Do NOT make up names like "Real Crush" or "True Love" or "Strong Feeli
 Write an honest, personal explanation with these sections:
 
 <section>
-## What's Actually Happening Here
+## Your Feelings Blueprint
 
-Start with "You're experiencing {{archetype}}, and here's what that means..." Write 2-3 sentences about what this TYPE of feeling is like. Make sure it connects to their tagline: "{{tagline}}". Reference their actual quiz answers to show you get their specific situation.
+Start with "You're experiencing {{archetype}}, and here's what that means..." Write 2-3 sentences about what this TYPE of feeling is like using "you" language. Make sure it connects to their tagline: "{{tagline}}". Reference their actual quiz answers to show you get their specific situation.
 </section>
 
 <section>
-## The Signs I'm Seeing
+## What I Noticed
 
 Highlight 3 specific patterns from their actual answers that reveal they're experiencing {{archetype}}:
-- When you said [specific answer], that tells me [insight about their feelings]
-- Your response about [specific answer] shows [what's really going on]
-- The fact that [another specific answer] is classic {{archetype}}
+- When you answered [specific answer], that shows [insight about their feelings]
+- Your response about [specific answer] reveals [what's really going on]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Were Also Close To...
+## You're Also Close To...
 
 {{alternatives}}
 
@@ -211,15 +211,27 @@ Give them a direct, honest answer about whether this is a crush, based on {{arch
 </section>
 
 <section>
-## What to Do With This
+## What Works For You
 
-Offer 2-3 practical suggestions tailored to {{archetype}}. Could be: sit with the feelings, talk to them, give it time, explore it, be careful, enjoy it, etc. Be specific to their situation.
+Give 2-3 strengths or positive aspects of experiencing {{archetype}}. What's beautiful or natural about these feelings? Be encouraging and specific.
 </section>
 
 <section>
-## The Real Question
+## Where It Gets Messy
 
-End with a reflective question or insight that helps them think about what they actually WANT here, given that they're experiencing {{archetype}}.
+Share 1-2 honest observations about challenges or complications with {{archetype}}. Be supportive, not critical.
+</section>
+
+<section>
+## Dating Advice For You
+
+Offer 2-3 practical suggestions tailored to {{archetype}} using "you" language. Could be: sit with the feelings, talk to them, give it time, explore it, be careful, enjoy it, etc. Be specific to their situation.
+</section>
+
+<section>
+## Bottom Line
+
+End with a reflective question or empowering insight that helps them think about what they actually WANT here, given that they're experiencing {{archetype}}.
 </section>
 
 Their full answers:

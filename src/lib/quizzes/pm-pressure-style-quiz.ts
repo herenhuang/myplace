@@ -201,56 +201,50 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 Write an insightful, practical explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
 <section>
-## How You Handle Pressure
+## Your Pressure Blueprint
 
-2-3 sentences about their natural approach under pressure. Use "you" and reference their actual decisions. Be specific.
+2-3 sentences about their natural approach under pressure using "you" language. Connect to their tagline. Reference their actual decisions.
 </section>
 
 <section>
-## I Saw It In Your Choices
+## What I Noticed
 
-Highlight 3 specific patterns:
-- When [specific scenario], you [their choice] - that's {{archetype}} in action
-- Your response to [specific pressure point] shows you're someone who [insight]
-- The way you handled [specific situation] reveals [pattern]
+Highlight 3 specific patterns from their actual answers:
+- When you answered [specific scenario], that shows [insight about their style]
+- Your response to [specific pressure point] reveals [trait]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Also Have Shades Of...
+## You're Also Close To...
 
 {{alternatives}}
 
-1-2 sentences each about when these other styles emerge.
+Write 1-2 sentences for each alternative style explaining why they showed hints of it based on their answers.
 </section>
 
 <section>
-## Your PM Superpowers Under Pressure
+## What Works For You
 
-2-3 strengths of being a {{archetype}}:
-- What your style brings to high-stakes situations
-- When your approach really shines
-- What teams appreciate about you
+Give 2-3 strengths of being a {{archetype}} under pressure. What makes this style effective? Be encouraging and specific.
 </section>
 
 <section>
-## Where It Can Backfire
+## Where It Gets Messy
 
-1-2 honest observations about challenges:
-- Common pitfalls for your style
-- When your approach might create problems
-- Growth edges to watch
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}} under pressure. Be supportive, not critical.
 </section>
 
 <section>
-## Advice For You
+## Tips For Your Growth
 
-2-3 specific, actionable tips for thriving under pressure as a {{archetype}}.
+Give 2-3 practical tips for thriving under pressure using "you" language. Be encouraging and actionable.
 </section>
 
 <section>
 ## Bottom Line
 
-One empowering sentence about owning their {{archetype}} style.
+End with one empowering sentence about owning their {{archetype}} style under pressure.
 </section>
 
 Their full pressure scenarios:

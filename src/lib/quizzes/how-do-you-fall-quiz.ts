@@ -332,44 +332,57 @@ CRITICAL: Do NOT make up names. Only use exact words from the lists provided. Th
 You just watched them navigate their first month with someone new. Write a warm, insightful analysis:
 
 <section>
-## How You Fall: {{archetype}}
+## Your Love Blueprint
 
-Start with "You're a {{archetype}}, and here's what that looked like this month..." Write 2-3 sentences about their falling pattern. Make sure it connects to their tagline: "{{tagline}}". Reference their actual journey.
+Start with "You're a {{archetype}}, and here's what that looked like this month..." Write 2-3 sentences about their falling pattern using "you" language. Make sure it connects to their tagline: "{{tagline}}". Reference their actual journey.
 </section>
 
 <section>
-## What I Watched You Do
+## What I Noticed
 
-Highlight 3-4 specific moments from their journey that reveal they're a {{archetype}}:
-- **Day 1**: When you [specific choice], that showed [insight about how they fall]
-- **Week 2**: Your choice to [specific action] revealed [pattern]
-- **Week 3**: The way you handled [specific situation] is classic {{archetype}}
-- **Week 4**: When you [specific choice], it confirmed [their pattern]
+Highlight 3 specific patterns from their actual answers across the month:
+- When you answered [specific moment/choice], that shows [insight about how they fall]
+- Your choice in [specific situation] reveals [trait]
+- [Another answer-to-trait connection from their journey]
 </section>
 
 <section>
-## You Were Also Close To...
+## You're Also Close To...
 
 {{alternatives}}
 
-Write 1-2 sentences for each alternative explaining why they showed hints of that pattern based on their journey.
+Write 1-2 sentences for each alternative explaining why they showed hints of that pattern based on their answers.
 </section>
 
 <section>
 ## The Pattern Behind The Pattern
 
-Explain what's REALLY driving their {{archetype}} pattern. What are they protecting? What do they need? What scares them? Be compassionate and insightful.
-
-## What This Means For You
-
-Give 2-3 pieces of wisdom about being a {{archetype}}:
-- What to watch out for
-- What to embrace about this pattern
-- How to grow while honoring who they are
+Explain what's REALLY driving their {{archetype}} pattern. What are they protecting? What do they need? What scares them? Be compassionate and insightful. 2-3 sentences.
 </section>
 
 <section>
-## The Truth About {{archetype}}
+## What Works For You
+
+Give 2-3 strengths or beautiful aspects of being a {{archetype}}. What's powerful about this way of falling? Be encouraging and specific.
+</section>
+
+<section>
+## Where It Gets Messy
+
+Share 1-2 honest observations about challenges for a {{archetype}}. What to watch out for. Be supportive, not critical.
+</section>
+
+<section>
+## Dating Advice For You
+
+Give 2-3 pieces of wisdom about being a {{archetype}} using "you" language:
+- What to embrace about this pattern
+- How to grow while honoring who they are
+- Practical tips for healthier falling
+</section>
+
+<section>
+## Bottom Line
 
 End with one powerful, affirming truth about their way of falling in love. Make them feel seen and accepted.
 </section>

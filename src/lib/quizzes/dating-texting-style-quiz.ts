@@ -201,56 +201,50 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 Write a fun, honest take. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
 <section>
-## Your Texting Signature
+## Your Texting Blueprint
 
-2-3 sentences about how they text when into someone. Use "you" and reference actual patterns. Maybe call them out a little (lovingly).
+2-3 sentences about how they text when into someone using "you" language. Connect to their tagline. Reference actual patterns. Maybe call them out a little (lovingly).
 </section>
 
 <section>
-## I Saw It In Your Texts
+## What I Noticed
 
-Highlight 3 specific moments:
-- When you [their timing/first text behavior] - that's {{archetype}} behavior
-- When they didn't respond and you [their reaction] - I see you
-- The way you [emoji/ending/flirting style] tells me everything
+Highlight 3 specific patterns from their actual answers:
+- When you answered [specific answer], that shows [insight about their texting style]
+- Your response to [specific scenario] reveals [trait]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Also Sometimes...
+## You're Also Close To...
 
 {{alternatives}}
 
-1-2 sentences each about when these modes appear.
+Write 1-2 sentences for each alternative explaining why they showed hints of it based on their answers.
 </section>
 
 <section>
-## What Your Texting Says About You
+## What Works For You
 
-2-3 strengths of being a {{archetype}}:
-- What your style brings
-- What people like about texting you
-- When it creates chemistry
+Give 2-3 strengths of being a {{archetype}}. What makes this texting style effective? Be encouraging and specific.
 </section>
 
 <section>
-## Where You Might Sabotage Yourself
+## Where It Gets Messy
 
-1-2 brutally honest observations:
-- Common texting mistakes
-- What comes off wrong
-- Loops you get stuck in
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
 </section>
 
 <section>
-## Texting Tips For You
+## Dating Advice For You
 
-2-3 specific, actionable tips for better chemistry.
+Give 2-3 practical texting tips using "you" language. Be encouraging and actionable.
 </section>
 
 <section>
 ## Bottom Line
 
-One empowering (or playfully calling out) sentence about owning their {{archetype}} style.
+End with one empowering (or playfully calling out) sentence about owning their {{archetype}} style.
 </section>
 
 Their full texting patterns:

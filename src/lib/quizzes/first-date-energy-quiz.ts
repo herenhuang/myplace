@@ -201,56 +201,50 @@ CRITICAL: Only use exact words from the lists. Combination is [FirstWord] + [Sec
 Write a fun, honest explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
 <section>
-## Your Dating Vibe
+## Your Dating Blueprint
 
-2-3 sentences about how they show up on dates. Use "you" and reference their actual journey. Make it specific.
+2-3 sentences about how they show up on dates using "you" language. Connect to their tagline. Reference their actual journey.
 </section>
 
 <section>
-## I Watched You Throughout The Date
+## What I Noticed
 
-Highlight 3 specific moments:
-- Before you left: you were [their energy] - that's {{archetype}} in action
-- When [specific moment], you [their response] - totally tracks
-- The way you [specific behavior] shows you're someone who [insight]
+Highlight 3 specific patterns from their actual answers:
+- When you answered [specific answer], that shows [insight about their dating energy]
+- Your response to [specific moment] reveals [trait]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## Sometimes You're Also...
+## You're Also Close To...
 
 {{alternatives}}
 
-1-2 sentences each about when these other energies appear.
+Write 1-2 sentences for each alternative explaining why they showed hints of it based on their answers.
 </section>
 
 <section>
-## What Makes You Great On Dates
+## What Works For You
 
-2-3 strengths of being a {{archetype}}:
-- What your energy brings
-- What dates appreciate
-- When it works
+Give 2-3 strengths of being a {{archetype}} on dates. What makes this energy effective? Be encouraging and specific.
 </section>
 
 <section>
 ## Where It Gets Messy
 
-1-2 honest observations about pitfalls:
-- Common dating mistakes
-- What might come across wrong
-- Growth edges
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
 </section>
 
 <section>
 ## Dating Advice For You
 
-2-3 specific, actionable tips for better dates.
+Give 2-3 practical tips for better dates using "you" language. Be encouraging and actionable.
 </section>
 
 <section>
 ## Bottom Line
 
-One empowering sentence about owning their {{archetype}} energy.
+End with one empowering sentence about owning their {{archetype}} energy on dates.
 </section>
 
 Their full date:

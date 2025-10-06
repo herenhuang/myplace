@@ -181,33 +181,43 @@ IMPORTANT: Do NOT make up names like "Direct Communicator" or "Honest Coach". On
 Write a warm, engaging explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
 <section>
-## Your Feedback DNA
+## Your Feedback Blueprint
 Write 2-3 sentences about their core feedback approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
 </section>
 
 <section>
 ## What I Noticed
-Highlight 2-3 specific patterns from their actual answers that show their feedback style:
+Highlight 3 specific patterns from their actual answers that show their feedback style:
 - When you answered [specific answer], that shows [insight about their style]
 - Your choice of [specific answer] reveals [trait]
 - [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Were Also Close To...
+## You're Also Close To...
 {{alternatives}}
 
-Write 1 engaging sentence for each alternative style explaining why they showed hints of it based on their answers.
+Write 1-2 sentences for each alternative style explaining why they showed hints of it based on their answers.
 </section>
 
 <section>
-## Tips for Your Growth
-Give 2 practical tips using "you" language (not "As {{archetype}}..."). Be encouraging and specific.
+## What Works For You
+Give 2-3 strengths of being a {{archetype}}. What makes this style effective? Be encouraging and specific.
 </section>
 
 <section>
-## Your Feedback Superpower
-End with an inspiring sentence about the unique value they bring as {{archetype}} when giving and receiving feedback.
+## Where It Gets Messy
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
+</section>
+
+<section>
+## Tips For Your Growth
+Give 2-3 practical tips for growth using "you" language. Be encouraging and actionable.
+</section>
+
+<section>
+## Bottom Line
+End with one empowering sentence about owning their {{archetype}} style and the unique value they bring to feedback conversations.
 </section>
 
 Their answers:

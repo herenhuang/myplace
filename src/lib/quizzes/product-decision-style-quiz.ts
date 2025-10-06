@@ -201,56 +201,50 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 Write a practical, insightful explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
 <section>
-## How You Make Product Decisions
+## Your Decision-Making Blueprint
 
-2-3 sentences about their natural decision-making style. Use "you" and reference actual choices.
+2-3 sentences about their natural decision-making style using "you" language. Connect to their tagline. Reference their actual choices.
 </section>
 
 <section>
-## I See It In Your Decisions
+## What I Noticed
 
-Highlight 3 specific patterns:
-- When [specific scenario], you [their choice] - classic {{archetype}}
-- Your approach to [specific situation] shows you [insight]
-- The way you handled [specific decision] reveals [pattern]
+Highlight 3 specific patterns from their actual answers:
+- When you answered [specific scenario], that shows [insight about their decision style]
+- Your choice in [specific situation] reveals [trait]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Also Lean Toward...
+## You're Also Close To...
 
 {{alternatives}}
 
-1-2 sentences each about when these other styles appear.
+Write 1-2 sentences for each alternative style explaining why they showed hints of it based on their answers.
 </section>
 
 <section>
-## Your Decision-Making Strengths
+## What Works For You
 
-2-3 strengths of being a {{archetype}}:
-- What your style brings to product decisions
-- When your approach creates great outcomes
-- What makes you effective
+Give 2-3 strengths of being a {{archetype}}. What makes this decision-making style effective? Be encouraging and specific.
 </section>
 
 <section>
-## Watch Out For...
+## Where It Gets Messy
 
-1-2 honest observations about pitfalls:
-- Common mistakes for your style
-- When your approach can backfire
-- Blind spots to monitor
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
 </section>
 
 <section>
-## Better Decisions As A {{archetype}}
+## Tips For Your Growth
 
-2-3 specific, actionable tips for improving your decision-making.
+Give 2-3 practical tips for improving your decision-making using "you" language. Be encouraging and actionable.
 </section>
 
 <section>
 ## Bottom Line
 
-One empowering sentence about owning your {{archetype}} style.
+End with one empowering sentence about owning their {{archetype}} decision-making style.
 </section>
 
 Their full decision patterns:

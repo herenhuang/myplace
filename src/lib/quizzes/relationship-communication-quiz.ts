@@ -196,56 +196,50 @@ CRITICAL: Only use exact words from the lists provided. The combination is [Firs
 Write a warm, personal explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
 <section>
-## How You Communicate
+## Your Communication Blueprint
 
-Write 2-3 sentences about their natural communication approach. Use "you" language and reference their actual answers to make it feel personal.
+Write 2-3 sentences about their natural communication approach using "you" language. Connect to their tagline. Reference their actual answers to make it feel personal.
 </section>
 
 <section>
-## I See It In Your Answers
+## What I Noticed
 
-Highlight 3 specific patterns from their responses:
-- When [specific situation], you [their choice] - that's {{archetype}} energy
-- Your response to [specific moment] shows you're someone who [insight]
-- The way you handled [specific scenario] tells me [understanding]
+Highlight 3 specific patterns from their actual answers:
+- When you answered [specific answer], that shows [insight about their communication style]
+- Your response to [specific situation] reveals [trait]
+- [Another answer-to-trait connection]
 </section>
 
 <section>
-## You Also Have Hints Of...
+## You're Also Close To...
 
 {{alternatives}}
 
-Write 1-2 sentences for each alternative explaining when these other modes show up.
+Write 1-2 sentences for each alternative explaining why they showed hints of it based on their answers.
 </section>
 
 <section>
-## Your Communication Superpowers
+## What Works For You
 
-2-3 strengths of being a {{archetype}}:
-- What your style brings to relationships
-- When your approach shines
-- What partners appreciate
+Give 2-3 strengths of being a {{archetype}}. What makes this communication style effective? Be encouraging and specific.
 </section>
 
 <section>
-## Where It Gets Tricky
+## Where It Gets Messy
 
-1-2 gentle observations about challenges:
-- Common misunderstandings
-- When your style might not land well
-- Growth edges
+Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
 </section>
 
 <section>
-## How To Communicate With You
+## Dating Advice For You
 
-2-3 specific things partners should know. Be actionable.
+Give 2-3 practical tips for better communication using "you" language. Be encouraging and actionable.
 </section>
 
 <section>
 ## Bottom Line
 
-One empowering sentence about owning their {{archetype}} style.
+End with one empowering sentence about owning their {{archetype}} communication style.
 </section>
 
 Their full answers:
