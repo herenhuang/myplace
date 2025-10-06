@@ -50,12 +50,12 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
 				<UserButton user={user} />
 			</div>
 
-      <div className='flex flex-col items-center justify-start gap-12 md:flex-row md:justify-center w-full pb-8 md:pb-0 mx-auto'>
+      <div className='flex flex-col items-center justify-start gap-12 md:flex-col md:justify-start w-full h-fit pb-8 md:pb-0 mx-auto'>
 
         <div className='flex flex-col box-border w-full md:w-fit items-center justify-center rounded-xl p-12 pt-36 md:pt-12 md:pb-0 gap-4 z-10 shadow-[0_0_10px_rgba(0,0,0,0.0)]'>
-          <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={500} height={300} className='w-40 h-auto object-contain' />
-          <h1 className='text-5xl font-bold text-center tracking-tight leading-[90%] w-[360px] mb-4'>
-            Real, Interactive Simulations.
+          <Image src={'/elevate/blobbert.png'} alt='MyPlace Logo' width={160} height={160} className='w-36 h-auto object-contain' />
+          <h1 className='font-[Instrument_Serif] text-7xl font-medium text-center tracking-tighter leading-[90%] mb-4'>
+            Personality Quizzes You Can <i>Play</i>
           </h1>
           <Link
             href="/all-quizzes"
@@ -63,12 +63,9 @@ const Section1: React.FC<Omit<SectionProps, 'user'> & { user: User | null }> = (
           >
             View All Quizzes
           </Link>
-          <div className="">
-            <UserButton user={user} />
-          </div>
         </div>
        
-        <div className='mt-5 md:mt-10 w-fit'>
+        <div className='mt-5 md:mt-0 w-fit'>
             <GamesSection />
         </div>
       </div>
