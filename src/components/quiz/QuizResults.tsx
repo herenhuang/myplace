@@ -95,21 +95,15 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             />
           )}
 
-          <div className={styles.actionButtons}>
+          <div className={styles.cardButtons}>
             {result.explanation && (
               <button
-                className={styles.actionButton}
+                className={styles.cardButton}
                 onClick={() => setShowExplanation(true)}
               >
-                <span>See Why →</span>
+                See Why →
               </button>
             )}
-            <button
-              className={`${styles.actionButton} ${styles.outline}`}
-              onClick={onRestart}
-            >
-              <span>Take Again</span>
-            </button>
           </div>
         </div>
       </div>
@@ -123,16 +117,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
         <div className={styles.explanationHeader}>
-          <h2 className={styles.resultNameSmall}>{displayName}</h2>
-          {displayTagline && (
-            <p className={styles.resultTaglineExplanation}>&ldquo;{displayTagline}&rdquo;</p>
-          )}
-          {analytics && analytics.totalPlays > 0 && (
-            <p className={styles.totalPlaysText}>
-              Based on {analytics.totalPlays} {analytics.totalPlays === 1 ? 'play' : 'plays'}
-              {uniqueness && ` · ${uniqueness}`}
-            </p>
-          )}
+          <h1 className={styles.resultNameSmall}>{displayName}</h1>
         </div>
         <div className={styles.markdownContent}>
           <ReactMarkdown>{result.explanation || ''}</ReactMarkdown>

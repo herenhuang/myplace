@@ -9,6 +9,7 @@ import QuizPersonalization from './QuizPersonalization'
 import QuizQuestion from './QuizQuestion'
 import QuizResults from './QuizResults'
 import QuizRecommendationFooter from './QuizRecommendationFooter'
+import AnalyzingScreen from './AnalyzingScreen'
 import styles from './quiz.module.scss'
 
 interface QuizEngineProps {
@@ -603,12 +604,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
         )
 
       case 'analyzing':
-        return (
-          <div className={styles.analyzingScreen}>
-            <div className={styles.spinner}></div>
-            <p className={styles.analyzingText}>Analyzing your responses...</p>
-          </div>
-        )
+        return <AnalyzingScreen />
 
       case 'results':
         return result ? (
