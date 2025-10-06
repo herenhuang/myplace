@@ -64,6 +64,7 @@ function parseSections(markdown: string): string[] {
 export default function QuizResults({ config, result, onRestart, onShowRecommendation }: QuizResultsProps) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Parse sections from explanation
   const sections = useMemo(() => {
@@ -71,7 +72,13 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     console.log('📋 Raw explanation length:', explanation.length)
     console.log('📋 First 500 chars:', explanation.substring(0, 500))
     console.log('📋 Contains <section> tags:', explanation.includes('<section>'))
-    return parseSections(explanation)
+    const parsed = parseSections(explanation)
+    console.log('📋 PARSED SECTIONS:', parsed.length)
+    parsed.forEach((section, index) => {
+      const firstLine = section.split('\n')[0]
+      console.log(`  Section ${index}:`, firstLine.substring(0, 80))
+    })
+    return parsed
   }, [result.explanation])
 
   // Get display name - either from personality or word matrix
@@ -163,26 +170,35 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
   // Explanation view with pagination
   const uniqueness = getUserUniqueness()
-  const [currentPage, setCurrentPage] = useState(1)
   const totalPages = 3
 
-  // Page 1: Section 0 (title + blueprint) + Section 1 (What I Noticed)
-  // Page 2: Section 3 (What Works) + Section 4 (Where It Gets Messy) + Section 5 (Tips/Advice)
-  // Page 3: MBTI/OCEAN (placeholder) + Section 2 (You're Also Close To)
+  // ACTUAL PARSED STRUCTURE (header-based split when no <section> tags):
+  // Section 0: # Title
+  // Section 1: ## Blueprint
+  // Section 2: ## What I Noticed
+  // Section 3: ## You're Also Close To
+  // Section 4: ## What Works For You
+  // Section 5: ## Where It Gets Messy
+  // Section 6: ## Dating Advice/Tips
+  // Section 7: ## Bottom Line
+
+  // Page 1: Blueprint + What I Noticed
+  // Page 2: What Works + Where It Gets Messy + Tips
+  // Page 3: MBTI/OCEAN + You're Also Close To
 
   const renderPage = () => {
     if (currentPage === 1) {
-      // Page 1: Header + Blueprint + What I Noticed
+      // Page 1: Blueprint + What I Noticed
       return (
         <>
-          {sections[0] && (
+          {sections[1] && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
-              <ReactMarkdown>{sections[0]}</ReactMarkdown>
+              <ReactMarkdown>{sections[1]}</ReactMarkdown>
             </div>
           )}
-          {sections[1] && (
+          {sections[2] && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
-              <ReactMarkdown>{sections[1]}</ReactMarkdown>
+              <ReactMarkdown>{sections[2]}</ReactMarkdown>
             </div>
           )}
         </>
@@ -190,23 +206,22 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     }
 
     if (currentPage === 2) {
-      // Page 2: What Works + Where It Gets Messy + Tips For Growth
-      // Section indices: 3, 4, 5 (skipping section 2 which is "You're Also Close To")
+      // Page 2: What Works + Where It Gets Messy + Tips
       return (
         <>
-          {sections[3] && (
-            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
-              <ReactMarkdown>{sections[3]}</ReactMarkdown>
-            </div>
-          )}
           {sections[4] && (
-            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
               <ReactMarkdown>{sections[4]}</ReactMarkdown>
             </div>
           )}
           {sections[5] && (
-            <div className={styles.explanationSection} style={{ animationDelay: '0.4s' }}>
+            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
               <ReactMarkdown>{sections[5]}</ReactMarkdown>
+            </div>
+          )}
+          {sections[6] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.4s' }}>
+              <ReactMarkdown>{sections[6]}</ReactMarkdown>
             </div>
           )}
         </>
@@ -214,7 +229,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     }
 
     if (currentPage === 3) {
-      // Page 3: MBTI/OCEAN (placeholder) + You're Also Close To
+      // Page 3: MBTI/OCEAN + You're Also Close To
       return (
         <>
           {/* Placeholder for personality assessments */}
@@ -224,9 +239,9 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           </div>
 
           {/* You're Also Close To section */}
-          {sections[2] && (
+          {sections[3] && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
-              <ReactMarkdown>{sections[2]}</ReactMarkdown>
+              <ReactMarkdown>{sections[3]}</ReactMarkdown>
             </div>
           )}
         </>

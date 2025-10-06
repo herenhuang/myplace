@@ -624,19 +624,18 @@
 
 // Explanation View
 .explanationContainer {
-  padding: 28px;
+  padding: 0 28px 120px 28px;
   z-index: 3;
   overflow-y: auto;
   flex: 1;
-  padding-bottom: 120px;
 }
 
 .stickyHeader {
   position: sticky;
   top: 0;
   background: white;
-  padding: 16px 24px;
-  margin: -28px -28px 24px -28px;
+  padding: 20px 24px 16px 24px;
+  margin: 0 -28px 24px -28px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 10;
   backdrop-filter: blur(10px);
