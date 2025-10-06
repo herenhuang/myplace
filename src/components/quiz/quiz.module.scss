@@ -955,15 +955,32 @@
   font-weight: 600;
   font-family: 'Lora', serif;
   cursor: pointer;
-  @include transition-all(200ms);
+}
+
+.shareButton {
+  padding: 12px 24px;
+  border-radius: 24px;
+  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.05);
+  background: #6b7280;
+  color: white;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+  font-weight: 600;
+  font-family: 'Lora', serif;
+  cursor: pointer;
+  margin-right: 12px;
   white-space: nowrap;
+  @include transition-all(200ms);
 
   &:hover {
-    opacity: .8;
+    background: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: -4px 16px 32px rgba(0, 0, 0, 0.1);
   }
 
   &:active {
     transform: translateY(0);
+    box-shadow: -4px 8px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
