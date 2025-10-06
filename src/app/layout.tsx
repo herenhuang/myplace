@@ -37,6 +37,9 @@ export const metadata: Metadata = {
     initialScale: 1,
     interactiveWidget: "resizes-content",
   },
+  icons: {
+    icon: "/elevate/blobbert.png",
+  },
 };
 
 
