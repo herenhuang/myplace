@@ -369,6 +369,25 @@ Give 2-3 practical, doable tips. Talk like you're giving actual advice to a frie
 </section>
 
 <section>
+## Personality Predictions
+
+Based on how they fall in love and quiz answers, here's your read on their personality:
+
+**MBTI Type: [4-LETTER TYPE] ([XX]% confident)**
+In 1-2 conversational sentences, explain why this MBTI type fits based on how they answered. Reference specific behaviors they showed. Be honest about confidence - if it's their first quiz or answers were mixed, use lower percentages (15-40%). If patterns are clear, go higher (60-85%).
+
+**Big Five Traits:**
+Output EXACTLY in this format (just the numbers, 0-100 scale):
+- Openness: [0-100]
+- Conscientiousness: [0-100]
+- Extraversion: [0-100]
+- Agreeableness: [0-100]
+- Neuroticism: [0-100]
+
+Then add 1-2 conversational sentences about what stands out in their Big Five profile.
+</section>
+
+<section>
 ## Bottom Line
 One real, affirming truth about how they fall in love. No fluff - just something that makes them feel seen and accepted.
 </section>
