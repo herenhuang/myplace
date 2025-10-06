@@ -125,21 +125,22 @@ Pick THE BEST next quiz for them based on:
 3. Natural progression (what question does their result raise?)
 4. Cross-domain insights (would a different theme give them surprising self-awareness?)
 
-Write a SHORT personalized note (MAX 100 characters including spaces) that:
+Write a personalized note (2-3 sentences, around 150-200 characters) that:
+- MUST start with "Based on your answers just now..." or similar connecting phrase
+- References something specific from their quiz result or answer patterns
+- Creates a clear bridge from what they just learned to what they'll discover next
 - Notices a pattern they might not see themselves
-- Creates curiosity about what they'll discover
-- Feels like a "ps." from a friend who gets them
 - Uses "you" language, conversational and warm
 - NO emojis
 
-CRITICAL: The reasoning text MUST be 100 characters or less. Count carefully.
+The text should feel like a natural continuation of their quiz journey, not a random suggestion.
 
 Also suggest compelling CTA button text (be creative but clear - default is "Take This Quiz →" but you can improve it).
 
 Return ONLY valid JSON, no markdown formatting:
 {
   "quizId": "the-quiz-id",
-  "reasoning": "Your personal note text (2-4 sentences)",
+  "reasoning": "Your personal note text starting with 'Based on your answers just now...'",
   "cta": "Button text"
 }`
 
