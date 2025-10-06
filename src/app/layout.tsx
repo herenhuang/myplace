@@ -39,6 +39,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/elevate/blobbert.png",
+    shortcut: "/elevate/blobbert.png",
+    apple: "/elevate/blobbert.png",
   },
 };
 
