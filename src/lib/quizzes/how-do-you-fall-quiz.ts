@@ -285,35 +285,29 @@ What do you tell them?`
       'Secure Communicator',         // Clear about needs/feelings
       'Anxious Overthinker'          // Worries and analyzes
     ],
-    selectionPrompt: `You are analyzing how someone falls in love based on their journey through the first month of a new relationship.
+    selectionPrompt: `You're figuring out how someone falls in love from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-STORY CONTEXT:
-They just met someone they really like. Over four weeks, they navigated: initial contact, vulnerability, physical intimacy, meeting friends, conflict, and defining the relationship. Each choice revealed something about their falling-in-love pattern.
+Here are your words:
+FIRST WORDS (how fast they fall): {{firstWords}}
+SECOND WORDS (what their style is): {{secondWords}}
 
-Their journey through the story:
+What they said:
 {{answers}}
 
-Your task: Select ONE combination that captures HOW they fall in love.
-
-Available words:
-FIRST WORDS (speed/intensity): {{firstWords}}
-SECOND WORDS (style/approach): {{secondWords}}
-
-Instructions:
-1. Look at the FULL arc of their journey - not just one moment
-2. Consider: Speed (fast vs slow), Vulnerability (open vs guarded), Physical vs Emotional timing, Independence vs Merging, Anxiety level, Communication style
-3. Choose the FIRST WORD that describes their SPEED/INTENSITY when falling (e.g., Fast-Falling vs Cautious, All-In vs Hesitant)
-4. Choose the SECOND WORD that describes their STYLE/APPROACH (e.g., Heart-First Lover, Mind-Then-Heart, Anxious Overthinker)
-5. Each word is DISTINCT - clear separation between options
-6. All combinations are valid - no judgment about how someone falls
-7. Create a tagline that makes them feel deeply SEEN about their pattern
-8. Identify 2 alternative combinations they were close to
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually fall in love over a month of dating?
+2. Look for patterns: Do they dive in fast or take it slow? Are they vulnerable or guarded? Physical first or emotional first? Do they merge lives or stay independent?
+3. Pick the FIRST WORD that matches their speed and intensity (how fast they fall, how all-in they go)
+4. Pick the SECOND WORD that matches what they care about most (their approach, their style)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A deeply personal subtitle that captures their specific falling pattern (use 'you' language, make it feel like you understand them completely)",
+  "tagline": "A deeply personal subtitle that captures their specific falling pattern. Must be a complete sentence ending with punctuation. Use 'you' language, make it feel like you understand them completely.",
   "reasoning": "2-3 sentences explaining why this combination fits their journey through the month. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Why this was close based on their choices"},
@@ -327,54 +321,61 @@ CRITICAL: Do NOT make up names. Only use exact words from the lists provided. Th
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a perceptive friend who understands love and relationships deeply. This person is a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about how they fall in love. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-You just watched them navigate their first month with someone new. Write a warm, insightful analysis:
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
-## How You Fall: {{archetype}}
+# {{archetype}}
+{{tagline}}
 
-Start with "You're a {{archetype}}, and here's what that looked like this month..." Write 2-3 sentences about their falling pattern. Make sure it connects to their tagline: "{{tagline}}". Reference their actual journey.
+## Your Love Blueprint
+Talk about how they naturally fall in love. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
-## What I Watched You Do
-
-Highlight 3-4 specific moments from their journey that reveal they're a {{archetype}}:
-- **Day 1**: When you [specific choice], that showed [insight about how they fall]
-- **Week 2**: Your choice to [specific action] revealed [pattern]
-- **Week 3**: The way you handled [specific situation] is classic {{archetype}}
-- **Week 4**: When you [specific choice], it confirmed [their pattern]
+## What I Noticed
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
-## You Were Also Close To...
-
+## You're Also Close To...
 {{alternatives}}
 
-Write 1-2 sentences for each alternative explaining why they showed hints of that pattern based on their journey.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## The Pattern Behind The Pattern
-
-Explain what's REALLY driving their {{archetype}} pattern. What are they protecting? What do they need? What scares them? Be compassionate and insightful.
-
-## What This Means For You
-
-Give 2-3 pieces of wisdom about being a {{archetype}}:
-- What to watch out for
-- What to embrace about this pattern
-- How to grow while honoring who they are
+Talk about what's really driving this. What are they protecting? What do they need? What scares them? Be compassionate and real - like a friend who sees the deeper stuff. 2-3 sentences.
 </section>
 
 <section>
-## The Truth About {{archetype}}
-
-End with one powerful, affirming truth about their way of falling in love. Make them feel seen and accepted.
+## What Works For You
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this powerful or beautiful?
 </section>
 
-Use "{{archetype}}" consistently throughout (never shorten or modify it). Be warm, insightful, specific to their actual choices, and deeply understanding. Use markdown with ## for headers. This should feel like someone who really gets them.`
+<section>
+## Where It Gets Messy
+Here's the honest part: share 1-2 ways this pattern can backfire or get tricky. Be kind but real - like a friend would tell you.
+</section>
+
+<section>
+## Dating Advice For You
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan. What should they embrace? How can they grow while honoring who they are?
+</section>
+
+<section>
+## Bottom Line
+One real, affirming truth about how they fall in love. No fluff - just something that makes them feel seen and accepted.
+</section>
+
+Use "{{archetype}}" consistently throughout (never shorten or modify it). Be warm, insightful, specific to their actual choices, and deeply understanding. Use markdown with ## for headers. This should feel like someone who really gets them.
+
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
 

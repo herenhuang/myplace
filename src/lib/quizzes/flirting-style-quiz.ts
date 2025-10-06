@@ -138,32 +138,29 @@ export const flirtingStyleQuiz: QuizConfig = {
       'Gazer',             // Non-verbal eye contact expert
       'Builder'            // Takes time to develop connection
     ],
-    selectionPrompt: `You are analyzing someone's flirting style based on their quiz responses.
+    selectionPrompt: `You're figuring out someone's flirting style from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that best captures how this person flirts and shows romantic interest.
+Here are your words:
+FIRST WORDS (their natural energy when flirting): {{firstWords}}
+SECOND WORDS (what they actually do): {{secondWords}}
 
-Available words:
-FIRST WORDS (approach/energy): {{firstWords}}
-SECOND WORDS (method/style): {{secondWords}}
-
-User's flirting patterns:
+What they said:
 {{answers}}
 
-Instructions:
-1. Consider their full flirting personality - approach (bold vs subtle), communication style, physical vs verbal, confidence level, vulnerability, risk tolerance
-2. Look for patterns across answers: Are they direct or indirect? Verbal or physical? Confident or cautious? Playful or serious?
-3. Choose the FIRST WORD that describes their overall APPROACH/ENERGY when flirting (e.g., Bold vs Shy, Playful vs Intense)
-4. Choose the SECOND WORD that describes their primary METHOD/STYLE (e.g., Charmer, Teaser, Connector)
-5. Each word is DISTINCT - there's clear separation between them
-6. All combinations are valid flirting styles - no judgment
-7. Create a tagline that makes them feel SEEN and maybe laugh (e.g., "You're not subtle, but that's kind of your thing" or "They'll wonder if you like them or just really love eye contact")
-8. Identify 2 alternative combinations they showed hints of (not 3, just 2)
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually flirt when they like someone?
+2. Look for patterns: Are they bold or shy? Physical or verbal? Do they go for it or drop hints? What's their actual move?
+3. Pick the FIRST WORD that matches their natural flirting energy (their vibe, their confidence level)
+4. Pick the SECOND WORD that matches what they're really about (their method, their signature move)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A fun, punchy subtitle that captures their flirting vibe (use 'you' language, be playful and honest)",
+  "tagline": "A fun, punchy subtitle that captures their flirting vibe. Must be a complete sentence ending with punctuation. Use 'you' language, be playful and honest.",
   "reasoning": "2-3 sentences explaining why this combination fits their answers. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names or terms.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason why this was close based on their answers"},
@@ -177,55 +174,57 @@ CRITICAL: Do NOT make up names like "Bold Flirt" or "Smooth Operator" unless tho
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a fun, insightful friend analyzing someone's flirting style. They're a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their flirting style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write an engaging, playful explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
-## Your Flirting DNA
+# {{archetype}}
+{{tagline}}
 
-Write 2-3 sentences about how they navigate the romantic landscape with their unique style. Use "you" language (not "As a {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
+## Your Flirting Blueprint
+Talk about how they naturally flirt and show interest. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
-## What I'm Seeing In Action
-
-Highlight 3 specific patterns from their actual answers that reveal their style:
-- When you said [specific answer], that's textbook {{archetype}} energy
-- Your approach to [specific situation] shows [characteristic of their style]
-- The fact that you [another specific answer] tells me [insight]
+## What I Noticed
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
-## You Were Also Close To...
-
+## You're Also Close To...
 {{alternatives}}
 
-Write 1-2 sentences for each alternative explaining why they showed hints of that style based on their answers.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## What Works For You
-
-Give 2-3 strengths of being a {{archetype}}. What makes this style effective? Be encouraging and specific.
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
-## Your Growth Edge
+## Where It Gets Messy
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
+</section>
 
-Offer 1-2 gentle suggestions for how a {{archetype}} could expand their range or avoid common pitfalls. Be supportive, not critical.
+<section>
+## Dating Advice For You
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-
-End with one empowering sentence about owning their {{archetype}} style and being confident in how they show interest.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their full answers:
 {{answers}}
 
-When referring to their style, use the exact term "{{archetype}}" (never shorten or modify it). Be fun, playful, specific to their answers, and encouraging. Use markdown with ## for section headers. Make them feel seen and maybe laugh a little.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
 

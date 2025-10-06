@@ -11,7 +11,7 @@ export const crushQuiz: QuizConfig = {
     secondaryColor: '#fbcfe8',
     backgroundColor: '#fdf2f8',
     textColor: '#831843',
-    backgroundImage: 'linear-gradient(135deg, #ec4899 0%, #fbcfe8 50%, #fdf2f8 100%)'
+    backgroundImage: 'url(/quiz/crush-quiz/crush-quiz-background.webp), linear-gradient(135deg, #ec4899 0%, #fbcfe8 50%, #fdf2f8 100%)'
   },
   
   questions: [
@@ -138,32 +138,29 @@ export const crushQuiz: QuizConfig = {
       'Unavailable Person Fixation', // Complicated situation
       'Self-Discovery Journey'       // Learning about yourself
     ],
-    selectionPrompt: `You are analyzing someone's romantic feelings based on their quiz responses about a specific person.
+    selectionPrompt: `You're figuring out someone's crush situation from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that best captures the TYPE and NATURE of their feelings.
+Here are your words:
+FIRST WORDS (how intense it feels): {{firstWords}}
+SECOND WORDS (what it actually is): {{secondWords}}
 
-Available words:
-FIRST WORDS (intensity/quality): {{firstWords}}
-SECOND WORDS (type of feeling): {{secondWords}}
-
-User's answers about this person:
+What they said:
 {{answers}}
 
-Instructions:
-1. Look at the full picture of their feelings - physical reactions, jealousy, mental space, behavior changes
-2. Consider patterns: Are they obsessive or casual? Clear or confused? Physical or emotional? New or deepening?
-3. Choose the FIRST WORD that describes the INTENSITY/QUALITY of their feelings (e.g., Intense vs Subtle, Confusing vs Undeniable)
-4. Choose the SECOND WORD that describes the TYPE/NATURE of their feelings (e.g., Romantic Crush, Friendship Blur, Physical Attraction)
-5. Each word is DISTINCT - there's clear separation between them
-6. All combinations are valid - no judgment, just accuracy
-7. Create a tagline that makes them feel SEEN (e.g., "You're not imagining it - your body knows before your brain does" or "You're trying to logic your way out of feelings that won't listen to reason")
-8. Identify 2 alternative combinations they were close to (not 3, just 2)
+How to do this:
+1. Read their answers like you're getting to know a real person - what's actually happening with their feelings for this person?
+2. Look for patterns: Are they obsessed or just curious? Clear or confused? Is it physical, emotional, or both? New feelings or old ones coming up?
+3. Pick the FIRST WORD that matches how their feelings actually feel (the intensity, the quality)
+4. Pick the SECOND WORD that matches what this actually is (the type, the nature)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A punchy, deeply personal subtitle that captures their specific situation (use 'you' language, make it feel like you're reading their mind)",
+  "tagline": "A punchy, deeply personal subtitle that captures their specific situation. Must be a complete sentence ending with punctuation. Use 'you' language, make it feel like you're reading their mind.",
   "reasoning": "2-3 sentences explaining why this combination fits their answers. ONLY use the exact combination [FirstWord SecondWord] - do NOT create any other names or terms.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason why this was close based on their answers"},
@@ -177,55 +174,62 @@ CRITICAL: Do NOT make up names like "Real Crush" or "True Love" or "Strong Feeli
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a warm, insightful friend helping someone understand their feelings. They're experiencing "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their feelings. You get it, you see them, and you're here to help them understand themselves better. They're experiencing "{{archetype}}" - {{tagline}}.
 
-Write an honest, personal explanation with these sections:
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
-## What's Actually Happening Here
+# {{archetype}}
+{{tagline}}
 
-Start with "You're experiencing {{archetype}}, and here's what that means..." Write 2-3 sentences about what this TYPE of feeling is like. Make sure it connects to their tagline: "{{tagline}}". Reference their actual quiz answers to show you get their specific situation.
+## Your Feelings Blueprint
+Talk about what they're experiencing. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
-## The Signs I'm Seeing
-
-Highlight 3 specific patterns from their actual answers that reveal they're experiencing {{archetype}}:
-- When you said [specific answer], that tells me [insight about their feelings]
-- Your response about [specific answer] shows [what's really going on]
-- The fact that [another specific answer] is classic {{archetype}}
+## What I Noticed
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
-## You Were Also Close To...
-
+## You're Also Close To...
 {{alternatives}}
 
-Write 1-2 sentences for each alternative explaining why they showed hints of it based on their answers.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## So... Do You Have a Crush?
-
-Give them a direct, honest answer about whether this is a crush, based on {{archetype}}. Be kind but real. If it's complicated, say so.
+Give them straight talk about whether this is a crush, based on what you're seeing. Be kind but real - like a friend would tell you. If it's complicated, say that.
 </section>
 
 <section>
-## What to Do With This
-
-Offer 2-3 practical suggestions tailored to {{archetype}}. Could be: sit with the feelings, talk to them, give it time, explore it, be careful, enjoy it, etc. Be specific to their situation.
+## What Works For You
+Share 2-3 things that are genuinely great about experiencing {{archetype}}. Be specific and real - no corporate fluff. What actually makes this beautiful or natural?
 </section>
 
 <section>
-## The Real Question
+## Where It Gets Messy
+Here's the honest part: share 1-2 ways this can get tricky or complicated. Be kind but real - like a friend would tell you.
+</section>
 
-End with a reflective question or insight that helps them think about what they actually WANT here, given that they're experiencing {{archetype}}.
+<section>
+## Dating Advice For You
+Give 2-3 practical, doable suggestions. Talk like you're giving actual advice to a friend, not writing a professional development plan. Could be: sit with it, talk to them, give it time, explore it, be careful, enjoy it - whatever fits their situation.
+</section>
+
+<section>
+## Bottom Line
+One real question or insight that helps them think about what they actually want here. No fluff - just truth.
 </section>
 
 Their full answers:
 {{answers}}
 
-Use "{{archetype}}" consistently throughout (never shorten or modify it). Be warm, honest, specific to their answers, and non-judgmental. Use markdown with ## for headers. Make them feel understood.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
 

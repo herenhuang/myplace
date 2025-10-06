@@ -631,6 +631,38 @@
   padding-bottom: 120px;
 }
 
+.explanationTitle {
+  box-shadow: -4px 12px 48px rgba(0, 0, 0, 0.1);
+  border-radius: 18px;
+  padding: 24px;
+  background-color: white;
+  backdrop-filter: blur(10px);
+  margin-bottom: 16px;
+  text-align: left;
+  animation: fadeUpExplanation 0.6s ease-in-out 0.1s both;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 600;
+    font-family: var(--font-instrument-serif);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: black;
+    text-transform: uppercase;
+    margin: 0;
+  }
+}
+
+.explanationTagline {
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-lora);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: black;
+  margin-top: 12px;
+}
+
 .explanationHeader {
   margin-bottom: 24px;
   text-align: left;
@@ -791,7 +823,7 @@
 
   p {
     font-size: 14px;
-    font-weight: 450;
+    font-weight: 500;
     line-height: 1.2;
     letter-spacing: -.4px;
     color: black;

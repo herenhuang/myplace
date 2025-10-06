@@ -137,52 +137,29 @@ export const datingTextingStyleQuiz: QuizConfig = {
       'Player',           // Cool, mysterious
       'Analyzer'          // Reads into things
     ],
-    selectionPrompt: `You are analyzing someone's texting chemistry based on how they text someone they like.
+    selectionPrompt: `You're figuring out someone's dating texting style from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that captures how this person texts romantically.
+Here are your words:
+FIRST WORDS (their texting energy): {{firstWords}}
+SECOND WORDS (what they actually do): {{secondWords}}
 
-Available words:
-FIRST WORDS (texting energy): {{firstWords}}
-SECOND WORDS (texting behavior): {{secondWords}}
-
-User's texting patterns:
+What they said:
 {{answers}}
 
-IMPORTANT WARNINGS:
-⚠️ DO NOT use quiz title to create obvious combinations like "Eager Texter"
-⚠️ AVOID boring combinations - be specific to their actual behavior
-⚠️ SECOND WORD must grammatically complete "What's Your Dating Texting Style?" → "What's Your [SecondWord]?" must sound natural
-⚠️ CREATE UNEXPECTED, SPECIFIC COMBINATIONS
-
-Instructions:
-1. Analyze their texting across 8 scenarios:
-   - First text timing (immediate vs measured vs strategic)
-   - Response style (quick vs brief vs thoughtful)
-   - No-response handling (secure vs anxious vs persistent)
-   - Conversation content (flirty vs substantive vs casual)
-   - Late night response (open vs bold vs analytical)
-   - Emoji usage (heavy vs selective vs minimal)
-   - Planning approach (decisive vs eager vs casual)
-   - Day ending (sweet vs organic vs strategic)
-
-2. Identify PRIMARY patterns:
-   - Speed: eager/immediate OR strategic/patient OR chill/natural
-   - Anxiety: secure/unbothered OR anxious/monitoring OR overthinking
-   - Expression: expressive/emoji-heavy OR careful/crafted OR minimal/restrained
-   - Confidence: bold/playful OR casual/cool OR anxious/cautious
-   - Approach: initiating OR responding OR double-texting OR analyzing
-
-3. Choose FIRST WORD for core TEXTING ENERGY
-4. Choose SECOND WORD for primary BEHAVIOR/PATTERN
-5. Test grammar: "What's Your [SecondWord]?" - natural?
-6. Tagline must be specific (e.g., "You check your phone more than you'd admit" NOT "You text well")
-7. Find 2 alternatives
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually text when they like someone?
+2. Look for patterns: Are they quick or slow? Anxious or chill? Do they double-text? What's their emoji situation? How do they handle silence?
+3. Pick the FIRST WORD that matches their natural texting energy (their vibe, their speed)
+4. Pick the SECOND WORD that matches what they care about most (their behavior, their pattern)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific, relatable subtitle about their texting (use 'you' language)",
+  "tagline": "A specific, relatable subtitle about their texting. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences why this fits their texting patterns. Reference specific behaviors.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Why this was close"},
@@ -196,66 +173,56 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a texting behavior expert. This person is a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their dating texting style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write a fun, honest take. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
-## Your Texting Signature
+# {{archetype}}
+{{tagline}}
 
-2-3 sentences about how they text when into someone. Use "you" and reference actual patterns. Maybe call them out a little (lovingly).
+## Your Texting Blueprint
+Talk about how they naturally text when they like someone. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
-## I Saw It In Your Texts
-
-Highlight 3 specific moments:
-- When you [their timing/first text behavior] - that's {{archetype}} behavior
-- When they didn't respond and you [their reaction] - I see you
-- The way you [emoji/ending/flirting style] tells me everything
+## What I Noticed
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
-## You Also Sometimes...
-
+## You're Also Close To...
 {{alternatives}}
 
-1-2 sentences each about when these modes appear.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
-## What Your Texting Says About You
-
-2-3 strengths of being a {{archetype}}:
-- What your style brings
-- What people like about texting you
-- When it creates chemistry
+## What Works For You
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
-## Where You Might Sabotage Yourself
-
-1-2 brutally honest observations:
-- Common texting mistakes
-- What comes off wrong
-- Loops you get stuck in
+## Where It Gets Messy
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
 </section>
 
 <section>
-## Texting Tips For You
-
-2-3 specific, actionable tips for better chemistry.
+## Dating Advice For You
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-
-One empowering (or playfully calling out) sentence about owning their {{archetype}} style.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their full texting patterns:
 {{answers}}
 
-Use "{{archetype}}" throughout. Be playful, a bit cheeky, specific. Make them laugh at themselves. Use markdown ## for headers.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }

@@ -137,52 +137,29 @@ export const pmPressureStyleQuiz: QuizConfig = {
       'Juggler',          // Manages multiple things
       'Protector'         // Shields team/scope
     ],
-    selectionPrompt: `You are analyzing a PM's pressure style based on how they handle high-stakes situations.
+    selectionPrompt: `You're figuring out someone's PM pressure style from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that captures how this PM operates under pressure.
+Here are your words:
+FIRST WORDS (how they handle pressure): {{firstWords}}
+SECOND WORDS (what they actually do): {{secondWords}}
 
-Available words:
-FIRST WORDS (approach/energy): {{firstWords}}
-SECOND WORDS (method/role): {{secondWords}}
-
-PM's behavior under pressure:
+What they said:
 {{answers}}
 
-IMPORTANT WARNINGS:
-⚠️ DO NOT use quiz title to create obvious combinations like "Pressure Handler"
-⚠️ AVOID generic combinations - be specific to their actual patterns
-⚠️ SECOND WORD must grammatically complete "What's Your PM Pressure Style?" → "What's Your [SecondWord]?" must sound natural
-⚠️ CREATE UNEXPECTED COMBINATIONS that reveal insight
-
-Instructions:
-1. Analyze their patterns across 8 high-pressure scenarios:
-   - Conflicting stakeholders (mediate vs decide vs escalate)
-   - Impossible deadlines (push back vs cut scope vs hustle)
-   - Quality vs speed tradeoffs (quality first vs pragmatic vs analytical)
-   - Last-minute changes (firm vs collaborative vs flexible)
-   - Data vs intuition (data-driven vs user-driven vs experimental)
-   - Executive demands (educate vs accommodate vs negotiate)
-   - Team disagreements (decide vs consensus vs test)
-   - Crisis management (composed vs cautious vs hands-on)
-
-2. Identify PRIMARY patterns:
-   - Decision style: decisive/autonomous OR collaborative OR analytical
-   - Boundary setting: firm/assertive OR flexible/adaptive
-   - Stakeholder handling: diplomatic OR direct OR escalating
-   - Problem solving: pragmatic OR quality-focused OR experimental
-   - Crisis response: calm leader OR cautious protector OR hands-on firefighter
-
-3. Choose FIRST WORD for their APPROACH/ENERGY under pressure
-4. Choose SECOND WORD for their primary ROLE/METHOD
-5. Test grammar: "What's Your [SecondWord]?" - natural?
-6. Tagline must be specific (e.g., "You hold the line when everyone's pushing" NOT "You handle pressure well")
-7. Find 2 alternatives
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually handle it when things get intense at work?
+2. Look for patterns: Do they stay calm or jump in? Make calls fast or build consensus? Push back or accommodate? What's their move when it's all on fire?
+3. Pick the FIRST WORD that matches their natural approach under pressure (their energy, their style)
+4. Pick the SECOND WORD that matches what they care about most (their role, their method)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A specific subtitle about their pressure style (use 'you' language)",
+  "tagline": "A specific subtitle about their pressure style. Must be a complete sentence ending with punctuation. Use 'you' language.",
   "reasoning": "2-3 sentences explaining why this fits their patterns. Reference specific scenarios.",
   "alternatives": [
     {"firstWord": "word1", "secondWord": "word1", "reason": "Brief reason based on their answers"},
@@ -196,66 +173,56 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a seasoned PM coach who's seen it all. This person is a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their PM pressure style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write an insightful, practical explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
-## How You Handle Pressure
+# {{archetype}}
+{{tagline}}
 
-2-3 sentences about their natural approach under pressure. Use "you" and reference their actual decisions. Be specific.
+## Your Pressure Blueprint
+Talk about how they naturally handle pressure. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
-## I Saw It In Your Choices
-
-Highlight 3 specific patterns:
-- When [specific scenario], you [their choice] - that's {{archetype}} in action
-- Your response to [specific pressure point] shows you're someone who [insight]
-- The way you handled [specific situation] reveals [pattern]
+## What I Noticed
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
-## You Also Have Shades Of...
-
+## You're Also Close To...
 {{alternatives}}
 
-1-2 sentences each about when these other styles emerge.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
-## Your PM Superpowers Under Pressure
-
-2-3 strengths of being a {{archetype}}:
-- What your style brings to high-stakes situations
-- When your approach really shines
-- What teams appreciate about you
+## What Works For You
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
-## Where It Can Backfire
-
-1-2 honest observations about challenges:
-- Common pitfalls for your style
-- When your approach might create problems
-- Growth edges to watch
+## Where It Gets Messy
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
 </section>
 
 <section>
-## Advice For You
-
-2-3 specific, actionable tips for thriving under pressure as a {{archetype}}.
+## Tips For Your Growth
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-
-One empowering sentence about owning their {{archetype}} style.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their full pressure scenarios:
 {{answers}}
 
-Use "{{archetype}}" throughout. Be practical, honest, specific. Use markdown ## for headers.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
