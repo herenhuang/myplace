@@ -137,46 +137,23 @@ export const productDecisionStyleQuiz: QuizConfig = {
       'Pragmatist',       // Practical solutions
       'Visionary'         // Big picture thinker
     ],
-    selectionPrompt: `You are analyzing a PM's product decision-making style.
+    selectionPrompt: `You're figuring out someone's product decision style from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that captures how this PM makes product calls.
+Here are your words:
+FIRST WORDS (how they make decisions): {{firstWords}}
+SECOND WORDS (what they're really about): {{secondWords}}
 
-Available words:
-FIRST WORDS (decision approach): {{firstWords}}
-SECOND WORDS (decision role): {{secondWords}}
-
-PM's decision patterns:
+What they said:
 {{answers}}
 
-IMPORTANT WARNINGS:
-⚠️ DO NOT use quiz title to create obvious combinations
-⚠️ AVOID generic combinations - be specific to their patterns
-⚠️ SECOND WORD must grammatically complete "What's Your Product Decision Style?" → "What's Your [SecondWord]?" must sound natural
-⚠️ CREATE UNEXPECTED COMBINATIONS that reveal their true style
-
-Instructions:
-1. Analyze their decision patterns across 8 scenarios:
-   - Customer requests (vision vs customer-driven vs problem-focused)
-   - Unclear data (intuition vs iterate vs research more)
-   - Competition (strategic vs reactive vs user-focused)
-   - Technical constraints (MVP vs quality vs collaborative)
-   - New opportunities (explore vs stay focused vs validate)
-   - Conflicting feedback (majority vs power users vs data)
-   - Roadmap changes (commitment vs adaptive vs cautious)
-   - Data vs gut conflicts (data vs instinct vs experimental)
-
-2. Identify PRIMARY patterns:
-   - Input preference: data-driven OR intuitive OR user-obsessed
-   - Decision speed: bold/fast OR cautious/careful OR experimental/testing
-   - Strategy adherence: disciplined/focused OR adaptive/flexible
-   - Quality vs speed: ships fast OR waits for quality OR collaborative middle
-   - Vision: strategic protector OR pragmatic builder OR opportunistic explorer
-
-3. Choose FIRST WORD for their DECISION APPROACH
-4. Choose SECOND WORD for their DECISION ROLE/TYPE
-5. Test grammar: "What's Your [SecondWord]?" - natural?
-6. Tagline must be specific (e.g., "You trust the numbers over your gut, every time" NOT "You make good decisions")
-7. Find 2 alternatives
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually make product calls when it matters?
+2. Look for patterns: Do they follow data or gut? Do they ship fast or wait? Do they protect the vision or adapt? What do they trust most?
+3. Pick the FIRST WORD that matches their natural decision approach (their style, their instinct)
+4. Pick the SECOND WORD that matches what they care about most (their role, their priority)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
@@ -196,63 +173,56 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a product leader who understands decision-making. This person is a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their product decision style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write a practical, insightful explanation with these sections.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
 # {{archetype}}
 {{tagline}}
 
 ## Your Decision-Making Blueprint
-
-2-3 sentences about their natural decision-making style using "you" language. Reference their actual choices.
+Talk about how they naturally make product decisions. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
 ## What I Noticed
-
-Highlight 3 specific patterns from their actual answers:
-- When you answered [specific scenario], that shows [insight about their decision style]
-- Your choice in [specific situation] reveals [trait]
-- [Another answer-to-trait connection]
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
 ## You're Also Close To...
-
 {{alternatives}}
 
-Write 1-2 sentences for each alternative style explaining why they showed hints of it based on their answers.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## What Works For You
-
-Give 2-3 strengths of being a {{archetype}}. What makes this decision-making style effective? Be encouraging and specific.
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
 ## Where It Gets Messy
-
-Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
 </section>
 
 <section>
 ## Tips For Your Growth
-
-Give 2-3 practical tips for improving your decision-making using "you" language. Be encouraging and actionable.
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-
-End with one empowering sentence about owning their {{archetype}} decision-making style.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their full decision patterns:
 {{answers}}
 
-Use "{{archetype}}" throughout. Be practical and specific. Use markdown ## for headers.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }

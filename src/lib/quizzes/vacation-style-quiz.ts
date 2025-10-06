@@ -138,25 +138,23 @@ export const vacationStyleQuiz: QuizConfig = {
       'Saver',          // Frugal & savvy
       'Documentarian'   // Capturing everything
     ],
-    selectionPrompt: `You are analyzing a traveler's vacation style based on their quiz responses.
+    selectionPrompt: `You're figuring out someone's vacation style from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination of words that best captures this person's travel personality.
+Here are your words:
+FIRST WORDS (how they travel): {{firstWords}}
+SECOND WORDS (what they're really about): {{secondWords}}
 
-Available words:
-FIRST WORDS (descriptors): {{firstWords}}
-SECOND WORDS (archetypes): {{secondWords}}
-
-User's answers:
+What they said:
 {{answers}}
 
-Instructions:
-1. Consider the full story their answers tell - what they DO, how they adapt, what they value
-2. Look for patterns in planning style, social preferences, flexibility, and what makes travel meaningful to them
-3. Choose the FIRST WORD that describes their approach (e.g., Spontaneous vs Structured, Social vs Independent)
-4. Choose the SECOND WORD that describes what they prioritize in travel (e.g., Foodie, Nature Lover, Culture Seeker)
-5. Each word is DISTINCT - there's clear daylight between them
-6. All words are positive - find the best match, not the perfect one
-7. Also identify 2 alternative combinations they were close to (not 3, just 2)
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually travel when they're on vacation?
+2. Look for patterns: Are they planners or spontaneous? Social or solo? What makes a trip feel good to them?
+3. Pick the FIRST WORD that matches their natural travel approach (their style, their energy)
+4. Pick the SECOND WORD that matches what they care about most (their priority, what makes it meaningful)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
@@ -176,56 +174,56 @@ IMPORTANT: Do NOT make up names like "Natural Explorer" or "Adventurous Soul". O
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a travel expert analyzing someone's vacation style. They are a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their vacation style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write a warm, engaging explanation with these sections.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
 # {{archetype}}
 {{tagline}}
 
 ## Your Travel Blueprint
-Write 2-3 sentences about their core travel approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal. Reference their actual quiz answers to show you get their specific vibe.
+Talk about how they naturally travel. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
 ## What I Noticed
-Highlight 3 specific patterns from their actual answers that show their travel style:
-- When you answered [specific answer], that shows [insight about their style]
-- Your choice of [specific answer] reveals [trait]
-- [Another answer-to-trait connection]
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
 ## You're Also Close To...
 {{alternatives}}
 
-Write 1-2 sentences for each alternative style explaining why they showed hints of it based on their answers.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## What Works For You
-Give 2-3 strengths of being a {{archetype}} traveler. What makes this style effective? Be encouraging and specific.
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
 ## Where It Gets Messy
-Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
 </section>
 
 <section>
 ## Tips For Your Next Trip
-Give 2-3 practical tips using "you" language. Be encouraging and actionable.
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-End with one empowering sentence about owning their {{archetype}} travel style and embracing their next adventure.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their answers:
 {{answers}}
 
-When referring to their style, use the exact term "{{archetype}}" (never shorten or modify it). Be personal and energetic. Use markdown with ## for section headers.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }

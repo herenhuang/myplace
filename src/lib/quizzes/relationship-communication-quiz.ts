@@ -137,41 +137,23 @@ export const relationshipCommunicationQuiz: QuizConfig = {
       'Initiator',        // Starts conversations
       'Responder'         // Reacts to others
     ],
-    selectionPrompt: `You are analyzing someone's communication style in relationships based on their quiz responses.
+    selectionPrompt: `You're figuring out someone's relationship communication style from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that best captures how this person communicates.
+Here are your words:
+FIRST WORDS (how they communicate): {{firstWords}}
+SECOND WORDS (what they're really about): {{secondWords}}
 
-Available words:
-FIRST WORDS (approach/energy): {{firstWords}}
-SECOND WORDS (method/role): {{secondWords}}
-
-User's communication patterns:
+What they said:
 {{answers}}
 
-IMPORTANT WARNINGS:
-⚠️ DO NOT use the quiz title to create obvious combinations like "Direct Communicator"
-⚠️ AVOID generic/boring combinations - be specific to their actual patterns
-⚠️ SECOND WORD must grammatically complete the quiz title: "What's Your Relationship Communication Style?" → "What's Your [SecondWord]?" must make sense
-⚠️ CREATE UNEXPECTED COMBINATIONS that feel fresh and insightful
-
-Instructions:
-1. Analyze their patterns across ALL 8 scenarios:
-   - How they share about themselves (open vs private, detailed vs brief)
-   - How they respond to others' emotions (fix vs listen, engage vs withdraw)
-   - How they handle conflict (direct vs avoidant, emotional vs logical)
-   - How they navigate vulnerability (eager vs cautious, reciprocal vs holding space)
-
-2. Look for their PRIMARY pattern (not just one answer):
-   - Energy: direct/blunt OR gentle/diplomatic OR guarded/cautious
-   - Emotion: feelings-first OR thoughtful/analytical
-   - Role: initiator OR responder OR listener OR resolver
-   - Intensity: intense/deep OR playful/light OR quiet/subtle
-
-3. Choose FIRST WORD for their core ENERGY/APPROACH
-4. Choose SECOND WORD for their primary ROLE/METHOD
-5. Test: Does "What's Your [SecondWord]?" sound natural? If no, pick different word
-6. Tagline must be specific and resonant (e.g., "You feel everything before you find the words" NOT "You communicate well")
-7. Identify 2 alternatives they showed hints of
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually communicate when they're in a relationship?
+2. Look for patterns: Are they direct or gentle? Do they open up or hold back? How do they handle conflict? What happens when things get vulnerable?
+3. Pick the FIRST WORD that matches their natural communication approach (their style, their energy)
+4. Pick the SECOND WORD that matches what they care about most (their role, their priority)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
@@ -191,63 +173,56 @@ CRITICAL: Only use exact words from the lists provided. The combination is [Firs
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're an insightful relationship expert. This person is a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their relationship communication style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write a warm, personal explanation with these sections.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
 # {{archetype}}
 {{tagline}}
 
 ## Your Communication Blueprint
-
-Write 2-3 sentences about their natural communication approach using "you" language. Reference their actual answers to make it feel personal.
+Talk about how they naturally communicate in relationships. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
 ## What I Noticed
-
-Highlight 3 specific patterns from their actual answers:
-- When you answered [specific answer], that shows [insight about their communication style]
-- Your response to [specific situation] reveals [trait]
-- [Another answer-to-trait connection]
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
 ## You're Also Close To...
-
 {{alternatives}}
 
-Write 1-2 sentences for each alternative explaining why they showed hints of it based on their answers.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## What Works For You
-
-Give 2-3 strengths of being a {{archetype}}. What makes this communication style effective? Be encouraging and specific.
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
 ## Where It Gets Messy
-
-Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
 </section>
 
 <section>
 ## Dating Advice For You
-
-Give 2-3 practical tips for better communication using "you" language. Be encouraging and actionable.
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-
-End with one empowering sentence about owning their {{archetype}} communication style.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their full answers:
 {{answers}}
 
-Use "{{archetype}}" throughout. Be warm, insightful, specific. Use markdown with ## for headers.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }

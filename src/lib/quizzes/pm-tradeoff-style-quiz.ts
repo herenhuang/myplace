@@ -137,45 +137,23 @@ export const pmTradeoffStyleQuiz: QuizConfig = {
       'Integrator',       // Brings together
       'Strategist'        // Thinks ahead
     ],
-    selectionPrompt: `You are analyzing a PM's trade-off style based on impossible choices they make.
+    selectionPrompt: `You're figuring out someone's PM trade-off style from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that captures how this PM navigates trade-offs.
+Here are your words:
+FIRST WORDS (what they value most): {{firstWords}}
+SECOND WORDS (how they make the call): {{secondWords}}
 
-Available words:
-FIRST WORDS (value/priority): {{firstWords}}
-SECOND WORDS (method/approach): {{secondWords}}
-
-PM's trade-off patterns:
+What they said:
 {{answers}}
 
-IMPORTANT WARNINGS:
-⚠️ DO NOT use quiz title to create obvious combinations
-⚠️ AVOID generic combinations - be specific to their patterns
-⚠️ SECOND WORD must grammatically complete "What's Your PM Trade-off Style?" → "What's Your [SecondWord]?" must sound natural
-⚠️ CREATE UNEXPECTED COMBINATIONS that reveal priorities
-
-Instructions:
-1. Analyze their trade-off patterns across 8 scenarios:
-   - Speed vs Quality (fast scrappy vs slow polished vs scope cut)
-   - Breadth vs Depth (many features vs few great ones)
-   - New users vs Power users (growth vs retention vs both)
-   - Tech debt vs Features (foundation vs value vs split)
-   - Scope vs Deadline (cut scope vs push deadline vs negotiate)
-   - Revenue vs UX (protect UX vs reconcile vs business first)
-   - Build vs Buy (ownership vs speed vs pragmatic)
-   - Stakeholder conflicts (user advocate vs business optimizer vs political balancer)
-
-2. Identify PRIMARY patterns:
-   - Core value: speed OR quality OR users OR business OR balance
-   - Decision style: bold/decisive OR flexible/negotiating OR protective
-   - Optimization: maximizes one thing OR balances multiple OR finds creative solutions
-   - Stakeholder approach: user advocate OR business-minded OR political balancer
-
-3. Choose FIRST WORD for their PRIMARY VALUE/PRIORITY
-4. Choose SECOND WORD for their APPROACH/METHOD
-5. Test grammar: "What's Your [SecondWord]?" - natural?
-6. Tagline must reveal priorities (e.g., "You'll cut scope before you cut quality" NOT "You make trade-offs")
-7. Find 2 alternatives
+How to do this:
+1. Read their answers like you're getting to know a real person - when they have to choose between impossible options, what wins?
+2. Look for patterns: Do they pick speed or quality? Users or business? Do they cut scope or push deadlines? What do they protect?
+3. Pick the FIRST WORD that matches what they actually value most (their priority, their north star)
+4. Pick the SECOND WORD that matches what they care about most (their method, their approach)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
@@ -195,63 +173,56 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a product veteran who knows trade-offs are everything. This person is a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their PM trade-off style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write a clear, honest explanation with these sections.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
 # {{archetype}}
 {{tagline}}
 
 ## Your Trade-off Blueprint
-
-2-3 sentences about their priorities and approach using "you" language. Reference their actual choices.
+Talk about how they naturally make trade-offs. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
 ## What I Noticed
-
-Highlight 3 specific patterns from their actual answers:
-- When you answered [specific scenario], that shows [insight about their priorities]
-- Your choice in [specific trade-off] reveals [trait]
-- [Another answer-to-trait connection]
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
 ## You're Also Close To...
-
 {{alternatives}}
 
-Write 1-2 sentences for each alternative style explaining why they showed hints of it based on their answers.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## What Works For You
-
-Give 2-3 strengths of being a {{archetype}}. What makes this trade-off style effective? Be encouraging and specific.
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
 ## Where It Gets Messy
-
-Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
 </section>
 
 <section>
 ## Tips For Your Growth
-
-Give 2-3 practical tips for making better trade-offs using "you" language. Be encouraging and actionable.
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-
-End with one empowering sentence about owning their {{archetype}} priorities and approach.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their full trade-off patterns:
 {{answers}}
 
-Use "{{archetype}}" throughout. Be honest about priorities. Use markdown ## for headers.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }

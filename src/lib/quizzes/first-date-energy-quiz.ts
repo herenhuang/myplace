@@ -137,46 +137,23 @@ export const firstDateEnergyQuiz: QuizConfig = {
       'Initiator',        // Takes the lead
       'Matcher'           // Mirrors energy
     ],
-    selectionPrompt: `You are analyzing someone's dating energy based on their first date behavior.
+    selectionPrompt: `You're figuring out someone's first date energy from their quiz answers. Your job: pick ONE combination that actually fits them.
 
-Your task: Select ONE combination that captures how this person shows up on dates.
+Here are your words:
+FIRST WORDS (their natural energy on dates): {{firstWords}}
+SECOND WORDS (what they're really doing): {{secondWords}}
 
-Available words:
-FIRST WORDS (core energy): {{firstWords}}
-SECOND WORDS (dating approach): {{secondWords}}
-
-User's dating patterns across the date:
+What they said:
 {{answers}}
 
-IMPORTANT WARNINGS:
-⚠️ DO NOT use quiz title to create obvious combinations like "Confident Dater"
-⚠️ AVOID boring combinations - be specific to their actual patterns
-⚠️ SECOND WORD must grammatically complete "What's Your First Date Energy?" → "What's Your [SecondWord]?" must sound natural
-⚠️ CREATE UNEXPECTED, INSIGHTFUL COMBINATIONS
-
-Instructions:
-1. Analyze their full date arc (8 moments):
-   - Pre-date mindset (confident vs anxious vs curious)
-   - Arrival behavior (composed vs nervous vs natural)
-   - First impression (warm vs guarded vs awkward)
-   - Conversation style (questioner vs performer vs matcher)
-   - Awkward moment handling (rescuer vs deflector vs comfortable)
-   - Connection expression (animated vs intimate vs playful)
-   - Future thinking (eager vs cautious vs guarded)
-   - Goodbye approach (initiator vs casual vs passive)
-
-2. Identify PRIMARY patterns:
-   - Confidence: self-assured OR anxious OR playing it cool
-   - Authenticity: genuine/real OR performing OR guarded
-   - Energy: high/enthusiastic OR chill/relaxed OR intense
-   - Approach: initiating OR responding OR questioning OR performing
-   - Emotional state: curious/open OR nervous/overthinking OR strategic/calculating
-
-3. Choose FIRST WORD for core DATING ENERGY
-4. Choose SECOND WORD for primary APPROACH/ROLE
-5. Test grammar: "What's Your [SecondWord]?" - must sound natural
-6. Tagline must be specific (e.g., "You overthink before but relax once you're there" NOT "You're good at dates")
-7. Find 2 alternatives they showed hints of
+How to do this:
+1. Read their answers like you're getting to know a real person - how do they actually show up when they're on a first date?
+2. Look for patterns: Are they confident or nervous? Performing or genuine? Do they ask questions or tell stories? What are they trying to create?
+3. Pick the FIRST WORD that matches their natural dating energy (their vibe, how they feel inside)
+4. Pick the SECOND WORD that matches what they care about most (their approach, their role)
+5. Each word means something specific - don't blur them together
+6. All options are valid - just find the best fit
+7. Find 2 alternatives they were close to (just 2, not more)
 
 Respond in JSON:
 {
@@ -196,63 +173,56 @@ CRITICAL: Only use exact words from the lists. Combination is [FirstWord] + [Sec
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're a dating coach who gets it. This person is a "{{archetype}}" - {{tagline}}.
+    promptTemplate: `You're talking to a friend about their first date energy. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
 
-Write a fun, honest explanation with these sections.
+Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
 <section>
 # {{archetype}}
 {{tagline}}
 
 ## Your Dating Blueprint
-
-2-3 sentences about how they show up on dates using "you" language. Reference their actual journey.
+Talk about how they naturally show up on dates. Keep it real and conversational - like you're explaining something you noticed about them over coffee. Reference specific things they said in the quiz.
 </section>
 
 <section>
 ## What I Noticed
-
-Highlight 3 specific patterns from their actual answers:
-- When you answered [specific answer], that shows [insight about their dating energy]
-- Your response to [specific moment] reveals [trait]
-- [Another answer-to-trait connection]
+Point out 3 specific patterns from their actual answers. Be direct and warm:
+- When you said [specific answer], I saw [what this means about them]
+- The way you approached [specific scenario] tells me [insight]
+- [Another connection between what they said and who they are]
 </section>
 
 <section>
 ## You're Also Close To...
-
 {{alternatives}}
 
-Write 1-2 sentences for each alternative explaining why they showed hints of it based on their answers.
+For each alternative, explain in 1-2 sentences why they've got some of this energy too. Keep it conversational - "You've also got some [style] in you when..."
 </section>
 
 <section>
 ## What Works For You
-
-Give 2-3 strengths of being a {{archetype}} on dates. What makes this energy effective? Be encouraging and specific.
+Share 2-3 things that are genuinely great about being a {{archetype}}. Be specific and real - no corporate fluff. What actually makes this work?
 </section>
 
 <section>
 ## Where It Gets Messy
-
-Share 1-2 honest observations about common pitfalls or challenges for a {{archetype}}. Be supportive, not critical.
+Here's the honest part: share 1-2 ways this style can backfire or get tricky. Be kind but real - like a friend would tell you.
 </section>
 
 <section>
 ## Dating Advice For You
-
-Give 2-3 practical tips for better dates using "you" language. Be encouraging and actionable.
+Give 2-3 practical, doable tips. Talk like you're giving actual advice to a friend, not writing a professional development plan.
 </section>
 
 <section>
 ## Bottom Line
-
-End with one empowering sentence about owning their {{archetype}} energy on dates.
+One real, empowering sentence about what makes their {{archetype}} style valuable. No fluff - just truth.
 </section>
 
 Their full date:
 {{answers}}
 
-Use "{{archetype}}" throughout. Be playful, honest, specific. Use markdown ## for headers.`
+IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
