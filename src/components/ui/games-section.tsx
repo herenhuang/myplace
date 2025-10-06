@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './games-section.module.scss';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type ComponentProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -248,9 +249,9 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         </defs>
       </svg>
 
-      <section className='flex flex-wrap w-fit items-center justify-center gap-3 p-4 max-w-7xl mx-auto'>
+      <section className='flex flex-wrap w-full md:w-fit items-center justify-center gap-6 md:gap-3 p-4 max-w-7xl mx-auto'>
         {games.filter(game => !game.hidden).map((game) => (
-          <div key={game.id} className="relative group">
+          <div key={game.id} className="relative group w-full md:w-fit">
             <a 
               href={game.href} 
               target="_blank" 
@@ -258,27 +259,19 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
               className="block"
             >
               <div 
-                className="relative h-85 w-60 rounded-2xl overflow-hidden shadow-lg transition-transform duration-300"
+                className="relative h-85 w-[90vw] md:w-60 rounded-2xl overflow-hidden shadow-lg transition-transform duration-300 mx-auto flex flex-row-reverse justify-center items-center md:flex-col"
                 
               >
                 {/* Background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br z-2 ${game.gradient}`} />
                 {/* Image overlay on top of gradient */}
-                <div
-                  className="absolute inset-0 z-3 hover:scale-105 transition-transform duration-300"
-                  style={{
-                    backgroundImage: `url(${game.image})`,
-                    backgroundSize: '85%',
-                    backgroundPosition: 'top center',
-                    backgroundRepeat: 'no-repeat',
-                  }}
-                />
-                
-                {/* Overlay gradient for better text readability */}
-             
+
+
+                <Image className={`block md:h-auto md:w-[85%] w-fit h-[85%] -mb-3 mx-auto z-3 hover:scale-105 transition-transform duration-300`} src={game.image} alt={game.title} width={480} height={480} />
+              
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-5">
+                <div className="bottom-0 left-0 right-0 p-5 text-white z-5">
                
                   <div className="flex flex-wrap gap-2 mt-3 hidden">
                     {game.tags.map((tag, idx) => (
@@ -340,7 +333,7 @@ const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
         ))}
 
         <Link href="/all-quizzes">
-          <div className="relative h-85 w-60 rounded-2xl overflow-hidden transition-all duration-300 group-hover:scale-105 flex flex-col justify-center items-center cursor-pointer bg-orange-500/20 hover:bg-orange-500/30">
+          <div className="relative h-85 w-[90vw] md:w-60 rounded-2xl overflow-hidden transition-all duration-300 group-hover:scale-105 flex flex-col justify-center items-center cursor-pointer bg-orange-500/20 hover:bg-orange-500/30">
             <h2 className='font-[Instrument_Serif] text-black text-2xl font-bold'> More Games</h2>
             <span className="material-symbols-outlined text-black text-2xl mt-2">arrow_forward</span>
           </div>
