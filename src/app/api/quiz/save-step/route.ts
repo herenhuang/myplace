@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     // Get current session data
     const { data: session, error: fetchError } = await supabase
       .from('sessions')
-      .select('data')
+      .select('data, steps_total')
       .eq('id', sessionId)
       .single()
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
           responses: responses
         },
         steps_completed: stepNumber,
-        steps_total: totalSteps || session.steps_total,
+        steps_total: totalSteps || session.steps_total || null,
         last_active_at: new Date().toISOString(),
         abandoned_at_step: null // Clear abandonment flag if they came back
       })
