@@ -181,34 +181,46 @@ CRITICAL: Do NOT make up names like "Real Crush" or "True Love" or "Strong Feeli
 
 Write an honest, personal explanation with these sections:
 
+<section>
 ## What's Actually Happening Here
 
 Start with "You're experiencing {{archetype}}, and here's what that means..." Write 2-3 sentences about what this TYPE of feeling is like. Make sure it connects to their tagline: "{{tagline}}". Reference their actual quiz answers to show you get their specific situation.
+</section>
 
+<section>
 ## The Signs I'm Seeing
 
 Highlight 3 specific patterns from their actual answers that reveal they're experiencing {{archetype}}:
 - When you said [specific answer], that tells me [insight about their feelings]
 - Your response about [specific answer] shows [what's really going on]
 - The fact that [another specific answer] is classic {{archetype}}
+</section>
 
+<section>
 ## You Were Also Close To...
 
 {{alternatives}}
 
 Write 1-2 sentences for each alternative explaining why they showed hints of it based on their answers.
+</section>
 
+<section>
 ## So... Do You Have a Crush?
 
 Give them a direct, honest answer about whether this is a crush, based on {{archetype}}. Be kind but real. If it's complicated, say so.
+</section>
 
+<section>
 ## What to Do With This
 
 Offer 2-3 practical suggestions tailored to {{archetype}}. Could be: sit with the feelings, talk to them, give it time, explore it, be careful, enjoy it, etc. Be specific to their situation.
+</section>
 
+<section>
 ## The Real Question
 
 End with a reflective question or insight that helps them think about what they actually WANT here, given that they're experiencing {{archetype}}.
+</section>
 
 Their full answers:
 {{answers}}

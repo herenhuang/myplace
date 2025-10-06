@@ -200,44 +200,58 @@ CRITICAL: Only use exact words from the lists. Combination is [FirstWord] + [Sec
 
 Write a fun, honest explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
+<section>
 ## Your Dating Vibe
 
 2-3 sentences about how they show up on dates. Use "you" and reference their actual journey. Make it specific.
+</section>
 
+<section>
 ## I Watched You Throughout The Date
 
 Highlight 3 specific moments:
 - Before you left: you were [their energy] - that's {{archetype}} in action
 - When [specific moment], you [their response] - totally tracks
 - The way you [specific behavior] shows you're someone who [insight]
+</section>
 
+<section>
 ## Sometimes You're Also...
 
 {{alternatives}}
 
 1-2 sentences each about when these other energies appear.
+</section>
 
+<section>
 ## What Makes You Great On Dates
 
 2-3 strengths of being a {{archetype}}:
 - What your energy brings
 - What dates appreciate
 - When it works
+</section>
 
+<section>
 ## Where It Gets Messy
 
 1-2 honest observations about pitfalls:
 - Common dating mistakes
 - What might come across wrong
 - Growth edges
+</section>
 
+<section>
 ## Dating Advice For You
 
 2-3 specific, actionable tips for better dates.
+</section>
 
+<section>
 ## Bottom Line
 
 One empowering sentence about owning their {{archetype}} energy.
+</section>
 
 Their full date:
 {{answers}}

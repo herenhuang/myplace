@@ -239,21 +239,27 @@ export const aiModelQuiz: QuizConfig = {
 Write a 200-300 word explanation connecting their specific choices to {{personality}}'s personality and characteristics.
 
 Structure:
+<section>
 # Why You're {{personality}}
 
 [2-3 sentences connecting their choices to {{personality}}'s core traits]
+</section>
 
+<section>
 ## Your Style Matches {{personality}}
 
 - When you [specific choice they made], that's {{personality}} energy because [why]
 - You [another specific choice], which matches how {{personality}} works: [insight]
 - [Another choice-to-model connection]
+</section>
 
+<section>
 ## What This Means
 
 [2-3 sentences about what this reveals - positive and insightful]
 
 **Fun Fact**: [One interesting {{personality}} trait that matches their answers]
+</section>
 
 Make it personal, playful, and specific to their actual choices!`
   }

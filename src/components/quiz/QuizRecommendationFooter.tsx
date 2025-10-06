@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, MotionValue } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import styles from './quiz-recommendation-footer.module.scss'
+import AnalyzingScreen from './AnalyzingScreen'
+import Image from 'next/image'
 
 interface RecommendationData {
   id: string
@@ -167,21 +169,10 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className={styles.contentWrapper}>
-        <div className={styles.psHeader}>ps.</div>
+        <Image src="/elevate/blobbert.png" alt="Analyzing" width={64} height={64} />
 
         {loading ? (
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={currentMessageIndex}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.3 }}
-              className={styles.loadingMessage}
-            >
-              {loadingMessages[currentMessageIndex]}
-            </motion.p>
-          </AnimatePresence>
+          <AnalyzingScreen />
         ) : recommendation ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -223,15 +214,13 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
                 className={styles.actionButton}
                 onClick={onBackToCard}
               >
-                <div>←</div>
-                <div>Back to Card</div>
+                <h2>Back to Card</h2>
               </button>
               <button
                 className={styles.actionButtonAlt}
                 onClick={onRestart}
               >
-                <div>↻</div>
-                <div>Take Again</div>
+                <h2>Take Again</h2>
               </button>
             </div>
           </motion.div>

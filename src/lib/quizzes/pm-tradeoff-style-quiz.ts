@@ -199,44 +199,58 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 
 Write a clear, honest explanation. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
+<section>
 ## How You Make Trade-offs
 
 2-3 sentences about their priorities and approach. Use "you" and reference actual choices.
+</section>
 
+<section>
 ## I See Your Priorities In Action
 
 Highlight 3 specific patterns:
 - When choosing between [scenario], you picked [choice] - that's {{archetype}} priorities
 - Your approach to [specific trade-off] shows you value [what they prioritize]
 - The way you handled [specific conflict] reveals [pattern]
+</section>
 
+<section>
 ## You Also Show Signs Of...
 
 {{alternatives}}
 
 1-2 sentences each about when these other priorities emerge.
+</section>
 
+<section>
 ## Your Trade-off Superpowers
 
 2-3 strengths of being a {{archetype}}:
 - What your priorities create
 - When your approach wins
 - What you optimize for
+</section>
 
+<section>
 ## The Downside Of Your Style
 
 1-2 honest observations about costs:
 - What you might sacrifice
 - When your priorities backfire
 - Blind spots to watch
+</section>
 
+<section>
 ## Making Better Trade-offs
 
 2-3 specific tips for improving as a {{archetype}}.
+</section>
 
+<section>
 ## Bottom Line
 
 One empowering sentence about owning your {{archetype}} priorities.
+</section>
 
 Their full trade-off patterns:
 {{answers}}

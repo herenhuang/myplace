@@ -200,44 +200,58 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 
 Write a fun, honest take. IMPORTANT: Do NOT use "{{archetype}}" as a header.
 
+<section>
 ## Your Texting Signature
 
 2-3 sentences about how they text when into someone. Use "you" and reference actual patterns. Maybe call them out a little (lovingly).
+</section>
 
+<section>
 ## I Saw It In Your Texts
 
 Highlight 3 specific moments:
 - When you [their timing/first text behavior] - that's {{archetype}} behavior
 - When they didn't respond and you [their reaction] - I see you
 - The way you [emoji/ending/flirting style] tells me everything
+</section>
 
+<section>
 ## You Also Sometimes...
 
 {{alternatives}}
 
 1-2 sentences each about when these modes appear.
+</section>
 
+<section>
 ## What Your Texting Says About You
 
 2-3 strengths of being a {{archetype}}:
 - What your style brings
 - What people like about texting you
 - When it creates chemistry
+</section>
 
+<section>
 ## Where You Might Sabotage Yourself
 
 1-2 brutally honest observations:
 - Common texting mistakes
 - What comes off wrong
 - Loops you get stuck in
+</section>
 
+<section>
 ## Texting Tips For You
 
 2-3 specific, actionable tips for better chemistry.
+</section>
 
+<section>
 ## Bottom Line
 
 One empowering (or playfully calling out) sentence about owning their {{archetype}} style.
+</section>
 
 Their full texting patterns:
 {{answers}}

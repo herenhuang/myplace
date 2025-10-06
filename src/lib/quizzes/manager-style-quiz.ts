@@ -180,25 +180,35 @@ IMPORTANT: Do NOT make up names like "Empowering Leader" or "Strategic Manager".
 
 Write a warm, engaging explanation with these sections. IMPORTANT: Do NOT include "{{archetype}}" or "The {{archetype}}" as a header - the name is already displayed above.
 
+<section>
 ## Your Management DNA
 Write 2-3 sentences about their core leadership approach using "you" language (not "As {{archetype}}, you..."). Make it feel personal and connect to their tagline. Reference their actual quiz answers to show you get their specific vibe.
+</section>
 
+<section>
 ## What I Noticed
 Highlight 2-3 specific patterns from their actual answers that show their management style:
 - When you answered [specific answer], that shows [insight about their style]
 - Your choice of [specific answer] reveals [trait]
 - [Another answer-to-trait connection]
+</section>
 
+<section>
 ## You Were Also Close To...
 {{alternatives}}
 
 Write 1 engaging sentence for each alternative style explaining why they showed hints of it based on their answers.
+</section>
 
+<section>
 ## Tips for Your Growth
 Give 2 practical tips using "you" language (not "As {{archetype}}..."). Be encouraging and specific.
+</section>
 
+<section>
 ## Your Leadership Impact
 End with an inspiring sentence about the unique value they bring as {{archetype}}.
+</section>
 
 Their answers:
 {{answers}}
