@@ -114,11 +114,11 @@ export const ALL_QUIZZES: QuizItem[] = [
   },
   {
     id: 'elevate',
-    title: 'What Kind of Elevate Attendee Are You?',
-    description: 'Discover your conference style',
+    title: 'What Kind of Conference Attendee Are You?',
+    description: 'Navigate a day at Elevate and discover your style',
     category: 'work',
-    route: '/elevate',
-    backgroundImage: 'linear-gradient(135deg, #ff9a56 0%, #ffcc33 50%, #ff6b35 100%)'
+    route: '/quiz/elevate',
+    backgroundImage: 'url(/elevate/orange.png), linear-gradient(135deg, #ff9a56 0%, #ffcc33 50%, #ff6b35 100%)'
   },
 
   // LIFE QUIZZES
