@@ -400,13 +400,13 @@
 
   .optionLabel {
     flex: 1;
-    font-size: 12px; // Reduced from 14px
-    font-weight: 400; // Reduced from 500 - lighter weight
+    font-size: 14px;
+    font-weight: 500;
     letter-spacing: -0.24px;
-    line-height: 1.2 !important;
+    line-height: 1.3 !important;
     position: relative;
     z-index: 2;
-    opacity: 0.85; // Slightly faded
+    opacity: 0.95;
   }
 
   .optionArrow {

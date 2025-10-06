@@ -196,7 +196,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
               <input
                 type="text"
                 className={`${styles.customInput} ${isCustomSelected && showComparison ? styles.customInputSelected : ''}`}
-                placeholder="Or write your own answer..."
+                placeholder="📝 Write your own answer"
                 value={isCustomSelected && showComparison ? selectedLabel || customInput : customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 onKeyDown={(e) => {
