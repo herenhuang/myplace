@@ -17,12 +17,22 @@ interface SectionProps {
 const Section1 = forwardRef<HTMLElement, Omit<SectionProps, 'user'> & { user: User | null; firstSlideHeight: number }>(({ scrollYProgress, user, firstSlideHeight }, ref) => {
   const [isMobile, setIsMobile] = React.useState(false);
   const [animate, setAnimate] = React.useState(false);
+  const [windowHeight, setWindowHeight] = React.useState(0);
 
   React.useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const updateWindowHeight = () => setWindowHeight(window.innerHeight);
+
     checkMobile();
+    updateWindowHeight();
+
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener('resize', updateWindowHeight);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('resize', updateWindowHeight);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -35,7 +45,7 @@ const Section1 = forwardRef<HTMLElement, Omit<SectionProps, 'user'> & { user: Us
   }, []);
 
   // Calculate progress based on actual first slide height
-  const firstSlideProgress = useTransform(scrollYProgress, [0, firstSlideHeight / (firstSlideHeight + window.innerHeight)], [0, 1]);
+  const firstSlideProgress = useTransform(scrollYProgress, [0, windowHeight > 0 ? firstSlideHeight / (firstSlideHeight + windowHeight) : 0], [0, 1]);
   const scale = useTransform(firstSlideProgress, [0, 1], [1, 0.8]);
   const rotate = useTransform(firstSlideProgress, [0, 1], [0, -5]);
   
