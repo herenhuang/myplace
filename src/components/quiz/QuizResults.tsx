@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
+import html2canvas from 'html2canvas'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
 import QuizRating from './QuizRating'
+import PersonalityPredictions from './PersonalityPredictions'
 import styles from './quiz.module.scss'
 
 interface QuizResultsProps {
@@ -61,9 +63,55 @@ function parseSections(markdown: string): string[] {
   return sections
 }
 
+// Parse personality predictions from the personality section
+function parsePersonalityPredictions(section: string) {
+  try {
+    // Extract MBTI type and confidence
+    const mbtiMatch = section.match(/\*\*MBTI Type:\s*([A-Z]{4})\s*\((\d+)%\s*confident\)\*\*/i)
+    const mbtiType = mbtiMatch ? mbtiMatch[1] : 'Unknown'
+    const mbtiConfidence = mbtiMatch ? parseInt(mbtiMatch[2]) : 0
+
+    // Extract MBTI explanation (text between MBTI line and Big Five)
+    const mbtiExplMatch = section.match(/\*\*MBTI Type:.*?\*\*\s*([\s\S]*?)\s*\*\*Big Five/)
+    const mbtiExplanation = mbtiExplMatch ? mbtiExplMatch[1].trim() : ''
+
+    // Extract Big Five scores
+    const opennessMatch = section.match(/Openness:\s*(\d+)/i)
+    const conscientiousnessMatch = section.match(/Conscientiousness:\s*(\d+)/i)
+    const extraversionMatch = section.match(/Extraversion:\s*(\d+)/i)
+    const agreeablenessMatch = section.match(/Agreeableness:\s*(\d+)/i)
+    const neuroticismMatch = section.match(/Neuroticism:\s*(\d+)/i)
+
+    const oceanScores = {
+      openness: opennessMatch ? parseInt(opennessMatch[1]) : 50,
+      conscientiousness: conscientiousnessMatch ? parseInt(conscientiousnessMatch[1]) : 50,
+      extraversion: extraversionMatch ? parseInt(extraversionMatch[1]) : 50,
+      agreeableness: agreeablenessMatch ? parseInt(agreeablenessMatch[1]) : 50,
+      neuroticism: neuroticismMatch ? parseInt(neuroticismMatch[1]) : 50
+    }
+
+    // Extract OCEAN explanation (text after the scores list)
+    const oceanExplMatch = section.match(/Neuroticism:\s*\d+\s*([\s\S]*?)$/)
+    const oceanExplanation = oceanExplMatch ? oceanExplMatch[1].trim() : ''
+
+    return {
+      mbtiType,
+      mbtiConfidence,
+      mbtiExplanation,
+      oceanScores,
+      oceanExplanation
+    }
+  } catch (error) {
+    console.error('Error parsing personality predictions:', error)
+    return null
+  }
+}
+
 export default function QuizResults({ config, result, onRestart, onShowRecommendation }: QuizResultsProps) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   // Parse sections from explanation
   const sections = useMemo(() => {
@@ -71,7 +119,13 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     console.log('📋 Raw explanation length:', explanation.length)
     console.log('📋 First 500 chars:', explanation.substring(0, 500))
     console.log('📋 Contains <section> tags:', explanation.includes('<section>'))
-    return parseSections(explanation)
+    const parsed = parseSections(explanation)
+    console.log('📋 PARSED SECTIONS:', parsed.length)
+    parsed.forEach((section, index) => {
+      const firstLine = section.split('\n')[0]
+      console.log(`  Section ${index}:`, firstLine.substring(0, 80))
+    })
+    return parsed
   }, [result.explanation])
 
   // Get display name - either from personality or word matrix
@@ -118,12 +172,119 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     return null
   }
 
+  const handleShare = async () => {
+    if (!cardRef.current) return
+
+    try {
+      // Ensure fonts and layout are fully ready
+      if (document.fonts && 'ready' in document.fonts) {
+        try {
+          await (document.fonts as any).ready
+        } catch {}
+      }
+      await new Promise(resolve => requestAnimationFrame(() => resolve(undefined)))
+
+      // Capture the card as an image with a sanitized clone to avoid animation/transition issues
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        onclone: (doc) => {
+          const root = doc.querySelector('[data-share-root="result-card"]') as HTMLElement | null
+          if (!root) return
+
+          // Disable animations/transforms that can cause invisible text in foreignObject/SVG rendering
+          const disableAnimations = (el: HTMLElement) => {
+            el.style.animation = 'none'
+            el.style.transition = 'none'
+            el.style.transform = 'none'
+            el.style.opacity = el.style.opacity || '1'
+          }
+          disableAnimations(root)
+          root.querySelectorAll('*').forEach(child => disableAnimations(child as HTMLElement))
+
+          // Inline resolved font-family and color for key text nodes to avoid CSS var issues
+          const originalRoot = cardRef.current as HTMLElement
+          const nameOrig = originalRoot.querySelector('.' + styles.resultName) as HTMLElement | null
+          const tagOrig = originalRoot.querySelector('.' + styles.resultTagline) as HTMLElement | null
+          const nameClone = root.querySelector('.' + styles.resultName) as HTMLElement | null
+          const tagClone = root.querySelector('.' + styles.resultTagline) as HTMLElement | null
+          if (nameOrig && nameClone) {
+            const cs = window.getComputedStyle(nameOrig)
+            nameClone.style.fontFamily = cs.fontFamily
+            nameClone.style.color = cs.color
+            nameClone.style.letterSpacing = cs.letterSpacing
+            nameClone.style.textTransform = cs.textTransform
+          }
+          if (tagOrig && tagClone) {
+            const cs = window.getComputedStyle(tagOrig)
+            tagClone.style.fontFamily = cs.fontFamily
+            tagClone.style.color = cs.color
+            tagClone.style.letterSpacing = cs.letterSpacing
+          }
+        }
+      })
+
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+        }, 'image/png')
+      })
+
+      // Create a file from the blob
+      const file = new File([blob], 'quiz-result.png', { type: 'image/png' })
+
+      // Check if Web Share API is supported and can share files
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `${displayName} - Quiz Result`,
+          text: `Check out my quiz result: ${displayName}!`,
+        })
+      } else {
+        // Fallback: download the image
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'quiz-result.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error sharing the image:', error)
+      // Fallback: try to download the image
+      try {
+        const canvas = await html2canvas(cardRef.current, {
+          backgroundColor: null,
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          logging: false
+        })
+        const url = canvas.toDataURL('image/png')
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'quiz-result.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      } catch (fallbackError) {
+        console.error('Fallback share also failed:', fallbackError)
+      }
+    }
+  }
+
   if (!showExplanation) {
     // Card view
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultsScreen}>
-          <div className={styles.resultCard}>
+          <div ref={cardRef} className={styles.resultCard} data-share-root="result-card">
             {displayImage && (
               <div
                 className={styles.resultImage}
@@ -144,10 +305,11 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             />
           )}
 
-          <div className={styles.cardButtons}>
+          <div className={styles.actionButtons}>
+            
             {result.explanation && (
               <button
-                className={styles.cardButton}
+                className={styles.actionButton}
                 onClick={() => setShowExplanation(true)}
               >
                 <h2>
@@ -155,58 +317,178 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 </h2>
               </button>
             )}
+
+            <button
+              className={styles.actionButtonAlt}
+              onClick={handleShare}
+              title="Share your result"
+            >
+              <span className={styles.shareIcon + ' material-symbols-outlined'}>
+                share
+              </span>
+              <h2>Share</h2>
+            </button>
           </div>
         </div>
       </div>
     )
   }
 
-  // Explanation view
+  // Explanation view with pagination
   const uniqueness = getUserUniqueness()
+  const totalPages = 3
+
+  // ACTUAL PARSED STRUCTURE (header-based split when no <section> tags):
+  // Section 0: # Title
+  // Section 1: ## Blueprint
+  // Section 2: ## What I Noticed
+  // Section 3: ## You're Also Close To
+  // Section 4: ## What Works For You
+  // Section 5: ## Where It Gets Messy
+  // Section 6: ## Dating Advice/Tips
+  // Section 7: ## Bottom Line
+
+  // Page 1: Blueprint + What I Noticed
+  // Page 2: What Works + Where It Gets Messy + Tips
+  // Page 3: MBTI/OCEAN + You're Also Close To
+
+  const renderPage = () => {
+    if (currentPage === 1) {
+      // Page 1: Blueprint + What I Noticed
+      return (
+        <>
+          {sections[1] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <ReactMarkdown>{sections[1]}</ReactMarkdown>
+            </div>
+          )}
+          {sections[2] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
+              <ReactMarkdown>{sections[2]}</ReactMarkdown>
+            </div>
+          )}
+        </>
+      )
+    }
+
+    if (currentPage === 2) {
+      // Page 2: What Works + Where It Gets Messy + Tips
+      return (
+        <>
+          {sections[4] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <ReactMarkdown>{sections[4]}</ReactMarkdown>
+            </div>
+          )}
+          {sections[5] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
+              <ReactMarkdown>{sections[5]}</ReactMarkdown>
+            </div>
+          )}
+          {sections[6] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.4s' }}>
+              <ReactMarkdown>{sections[6]}</ReactMarkdown>
+            </div>
+          )}
+        </>
+      )
+    }
+
+    if (currentPage === 3) {
+      // Page 3: MBTI/OCEAN + You're Also Close To
+      // For header-based parsing: section 7 is Personality Predictions (if exists)
+      const personalitySection = sections[7] // Section 7 should be "## Personality Predictions"
+      const personalityData = personalitySection ? parsePersonalityPredictions(personalitySection) : null
+
+      return (
+        <>
+          {/* Personality Predictions Component */}
+          {personalityData ? (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <PersonalityPredictions
+                mbtiType={personalityData.mbtiType}
+                mbtiConfidence={personalityData.mbtiConfidence}
+                mbtiExplanation={personalityData.mbtiExplanation}
+                oceanScores={personalityData.oceanScores}
+                oceanExplanation={personalityData.oceanExplanation}
+              />
+            </div>
+          ) : (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
+              <h2>Personality Predictions</h2>
+              <p><em>Take a quiz to see your personality predictions!</em></p>
+            </div>
+          )}
+
+          {/* You're Also Close To section */}
+          {sections[3] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
+              <ReactMarkdown>{sections[3]}</ReactMarkdown>
+            </div>
+          )}
+        </>
+      )
+    }
+
+    return null
+  }
 
   return (
     <div className={styles.textContainer}>
       <div className={styles.explanationContainer}>
 
-        {/* Render each section with cascaded animation */}
-        {sections.map((section, index) => (
-          <div 
-            key={index} 
-            className={styles.explanationSection}
-            style={{ animationDelay: `${0.1 + index * 0.15}s` }}
-          >
-            <ReactMarkdown>{section}</ReactMarkdown>
-          </div>
-        ))}
+        {/* Sticky header - always visible */}
+        <div className={styles.stickyHeader}>
+          <h1>{displayName}</h1>
+          {displayTagline && <p>{displayTagline}</p>}
+        </div>
 
-        {/* Action Buttons */}
-        <div 
-          className={styles.actionButtons}
-          style={{ animationDelay: `${0.1 + sections.length * 0.15}s` }}
-        >
-          {onShowRecommendation && (
+        {/* Render current page content */}
+        {renderPage()}
+
+        {/* Pagination Controls */}
+        <div className={styles.paginationControls}>
+          {currentPage > 1 ? (
             <button
-              className={styles.actionButton}
-              onClick={onShowRecommendation}
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             >
-              <h2>What&apos;s Next</h2>
+              ← Back
+            </button>
+          ) : (
+            <button
+              className={styles.paginationButton}
+              onClick={() => setShowExplanation(false)}
+            >
+              ← Back
             </button>
           )}
-          <button
-            className={styles.actionButtonAlt}
-            onClick={() => setShowExplanation(false)}
-          >
-            <h2>Back to Card</h2>
-          </button>
+
+          {currentPage < totalPages && (
+            <button
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+            >
+              Next →
+            </button>
+          )}
+
+          {currentPage === totalPages && onShowRecommendation && (
+            <button
+              className={styles.paginationButton}
+              onClick={onShowRecommendation}
+            >
+              What's Next →
+            </button>
+          )}
         </div>
 
-        {/* Quiz Rating */}
-        <div 
-          className={styles.ratingContainer}
-          style={{ animationDelay: `${0.1 + (sections.length + 1) * 0.15}s` }}
-        >
-          <QuizRating quizId={config.id} />
-        </div>
+        {/* Quiz Rating - only on last page */}
+        {currentPage === totalPages && (
+          <div className={styles.ratingContainer} style={{ marginTop: '24px' }}>
+            <QuizRating quizId={config.id} />
+          </div>
+        )}
       </div>
     </div>
   )

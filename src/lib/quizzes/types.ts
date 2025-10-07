@@ -167,6 +167,8 @@ export interface QuizConfig {
   wordMatrix?: WordMatrix
   /** Optional AI-generated explanation settings */
   aiExplanation?: AIExplanationConfig
+  /** Whether to show per-question answer comparison/stats (default: false for speed) */
+  showQuestionComparison?: boolean
 }
 
 export interface QuizResponse {

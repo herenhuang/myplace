@@ -32,8 +32,8 @@ const StartScreen = ({
 				<UserButton user={user} />
 			</div>
 			<div className="mast">
-				<h1 className="title">{title}</h1>
-				<p className="hint">{subtitle}</p>
+				<h1 className="font-[Instrument_Serif] text-6xl font-medium text-center tracking-[-1.5px] leading-[90%] mb-4 -mt-4">{title}</h1>
+				<p className="hint text-center">{subtitle}</p>
 			</div>
 
 			<div className="controls">

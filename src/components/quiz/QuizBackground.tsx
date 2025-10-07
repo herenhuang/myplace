@@ -168,6 +168,7 @@ export default function QuizBackground() {
         left: 0,
         width: '100%',
         height: '100%',
+        background: 'white',
         zIndex: 0,
         pointerEvents: 'none',
       }}
