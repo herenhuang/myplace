@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, MotionValue } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import styles from './quiz-recommendation-footer.module.scss'
 import AnalyzingScreen from './AnalyzingScreen'
 import Image from 'next/image'
@@ -197,32 +198,23 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
-                {recommendation.cta}
+                Play Now →
               </motion.button>
             </div>
 
-            <a
-              href="/quizzes"
+            <button
+              onClick={onBackToCard}
+              className={styles.backToAssessment}
+            >
+              Back to Assessment
+            </button>
+
+            <Link
+              href="/quiz"
               className={styles.altLink}
             >
-              or see all quizzes
-            </a>
-
-            {/* Action buttons inside the recommendation card */}
-            <div className={styles.actionButtons}>
-              <button
-                className={styles.actionButton}
-                onClick={onBackToCard}
-              >
-                <h2>Back to Card</h2>
-              </button>
-              <button
-                className={styles.actionButtonAlt}
-                onClick={onRestart}
-              >
-                <h2>Take Again</h2>
-              </button>
-            </div>
+              See all quizzes
+            </Link>
           </motion.div>
         ) : null}
       </div>

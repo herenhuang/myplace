@@ -675,6 +675,7 @@
 }
 
 .paginationButton {
+  flex: 1;
   padding: 12px 24px;
   border-radius: 24px;
   border: 2px solid rgba(0, 0, 0, 0.1);
@@ -682,6 +683,7 @@
   color: black;
   font-size: 15px;
   font-weight: 600;
+  font-family: var(--font-instrument-serif);
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -694,14 +696,6 @@
     opacity: 0.3;
     cursor: not-allowed;
   }
-}
-
-.pageIndicator {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.5);
-  min-width: 60px;
-  text-align: center;
 }
 
 .explanationTitle {
@@ -947,13 +941,13 @@
 .cardButton {
   padding: 12px 48px;
   border-radius: 24px;
-  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.05);
-  background: var(--quiz-primary-color, #ff6b35);
-  color: white;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  color: black;
   font-size: 18px;
   letter-spacing: -0.3px;
   font-weight: 600;
-  font-family: 'Lora', serif;
+  font-family: var(--font-instrument-serif);
   cursor: pointer;
 }
 
