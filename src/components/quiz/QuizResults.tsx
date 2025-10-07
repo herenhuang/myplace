@@ -327,17 +327,21 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
         {/* Pagination Controls */}
         <div className={styles.paginationControls}>
-          <button
-            className={styles.paginationButton}
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-          >
-            ← Back
-          </button>
-
-          <div className={styles.pageIndicator}>
-            {currentPage} / {totalPages}
-          </div>
+          {currentPage > 1 ? (
+            <button
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            >
+              ← Back
+            </button>
+          ) : (
+            <button
+              className={styles.paginationButton}
+              onClick={() => setShowExplanation(false)}
+            >
+              ← Back
+            </button>
+          )}
 
           {currentPage < totalPages && (
             <button
@@ -357,15 +361,6 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             </button>
           )}
         </div>
-
-        {/* Back to Card button */}
-        <button
-          className={styles.actionButtonAlt}
-          onClick={() => setShowExplanation(false)}
-          style={{ marginTop: '24px' }}
-        >
-          <h2>Back to Card</h2>
-        </button>
 
         {/* Quiz Rating - only on last page */}
         {currentPage === totalPages && (
