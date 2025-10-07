@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, MotionValue } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import styles from './quiz-recommendation-footer.module.scss'
 import AnalyzingScreen from './AnalyzingScreen'
 import Image from 'next/image'
@@ -208,12 +209,12 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
               Back to Assessment
             </button>
 
-            <a
+            <Link
               href="/quiz"
               className={styles.altLink}
             >
               See all quizzes
-            </a>
+            </Link>
           </motion.div>
         ) : null}
       </div>
