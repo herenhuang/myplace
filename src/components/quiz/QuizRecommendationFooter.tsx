@@ -197,7 +197,7 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               >
-                {recommendation.cta}
+                Play Now →
               </motion.button>
             </div>
 

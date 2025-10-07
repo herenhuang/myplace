@@ -52,17 +52,25 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
 
   const handleSelect = (value: string, label: string, isCustom: boolean = false) => {
     if (isLoading || selectedValue) return
-    
-    // Show comparison first
-    setSelectedValue(value)
-    setSelectedLabel(label)
-    setIsCustomSelected(isCustom)
-    setShowComparison(true)
-    
-    // Then proceed to next question after delay
-    setTimeout(() => {
+
+    // Check if comparison feature is enabled for this quiz
+    const comparisonEnabled = config.showQuestionComparison === true
+
+    if (comparisonEnabled) {
+      // Show comparison first
+      setSelectedValue(value)
+      setSelectedLabel(label)
+      setIsCustomSelected(isCustom)
+      setShowComparison(true)
+
+      // Then proceed to next question after delay
+      setTimeout(() => {
+        onSelect(value, label, isCustom)
+      }, 3200) // Give time to see tooltip + animation (500ms stats load + 1000ms animation + 1700ms to appreciate)
+    } else {
+      // Instant response - no comparison, no delay
       onSelect(value, label, isCustom)
-    }, 3200) // Give time to see tooltip + animation (500ms stats load + 1000ms animation + 1700ms to appreciate)
+    }
   }
 
   const handleCustomSubmit = () => {
@@ -73,12 +81,14 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     handleSelect(customValue, customInput.trim(), true)
   }
 
-  // Fetch stats after selection
+  // Fetch stats after selection (only if comparison is enabled)
   const [stats, setStats] = useState<Array<{value: string, count: number, percentage: number}> | null>(null)
   const [animateStats, setAnimateStats] = useState(false) // Control animation trigger
 
   useEffect(() => {
-    if (showComparison) {
+    const comparisonEnabled = config.showQuestionComparison === true
+
+    if (showComparison && comparisonEnabled) {
       async function fetchStats() {
         try {
           const response = await fetch(
@@ -99,7 +109,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
       const timeout = setTimeout(fetchStats, 500)
       return () => clearTimeout(timeout)
     }
-  }, [showComparison, config.id, questionIndex])
+  }, [showComparison, config.id, config.showQuestionComparison, questionIndex])
 
   // Get percentage for an option (including user's current selection)
   const getPercentage = (value: string) => {
@@ -147,8 +157,9 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         {question.options.map((option, index) => {
           const isVisible = visibleOptions.includes(index)
           const isSelected = selectedValue === option.value
+          const comparisonEnabled = config.showQuestionComparison === true
           const percentage = getPercentage(option.value)
-          const showStats = showComparison && stats !== null
+          const showStats = showComparison && stats !== null && comparisonEnabled
 
           return (
             <button
@@ -164,16 +175,16 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
               }}
               title={option.hint}
             >
-              {/* Background fill showing percentage - animates from 0 to percentage */}
+              {/* Background fill showing percentage - animates from 0 to percentage (only if comparison enabled) */}
               {showStats && (
-                <div 
+                <div
                   className={`${styles.optionButtonFill} ${isSelected ? styles.optionButtonFillUser : ''}`}
                   style={{ width: animateStats ? `${percentage}%` : '0%' }}
                 />
               )}
-              
+
               <span className={styles.optionLabel}>{option.label}</span>
-              
+
               <span className={showStats ? styles.optionPercentage : styles.optionArrow}>
                 {showStats ? `${percentage}%` : '→'}
               </span>
@@ -185,8 +196,8 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         {question.allowCustomInput && (
           <div className={styles.customInputContainer}>
             <div className={styles.customInputWrapper}>
-              {/* Background fill for custom input when selected */}
-              {isCustomSelected && showComparison && stats && (
+              {/* Background fill for custom input when selected (only if comparison enabled) */}
+              {isCustomSelected && showComparison && stats && config.showQuestionComparison && (
                 <div
                   className={`${styles.customInputFill} ${styles.optionButtonFillUser}`}
                   style={{ width: animateStats ? `${getPercentage(selectedValue || '')}%` : '0%' }}
@@ -195,9 +206,9 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
 
               <input
                 type="text"
-                className={`${styles.customInput} ${isCustomSelected && showComparison ? styles.customInputSelected : ''}`}
+                className={`${styles.customInput} ${isCustomSelected && showComparison && config.showQuestionComparison ? styles.customInputSelected : ''}`}
                 placeholder="📝 Write your own answer"
-                value={isCustomSelected && showComparison ? selectedLabel || customInput : customInput}
+                value={isCustomSelected && showComparison && config.showQuestionComparison ? selectedLabel || customInput : customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -205,11 +216,11 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
                   }
                 }}
                 disabled={isLoading || selectedValue !== null}
-                readOnly={isCustomSelected && showComparison}
+                readOnly={isCustomSelected && showComparison && config.showQuestionComparison}
               />
 
-              {/* Show percentage when custom input is selected */}
-              {isCustomSelected && showComparison && stats && (
+              {/* Show percentage when custom input is selected (only if comparison enabled) */}
+              {isCustomSelected && showComparison && stats && config.showQuestionComparison && (
                 <span className={styles.customInputPercentage}>
                   {getPercentage(selectedValue || '')}%
                 </span>
