@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
+import html2canvas from 'html2canvas'
 import { QuizConfig, QuizResult } from '@/lib/quizzes/types'
 import ResultsComparison from './ResultsComparison'
 import QuizRating from './QuizRating'
@@ -110,6 +111,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
   const [showExplanation, setShowExplanation] = useState(false)
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   // Parse sections from explanation
   const sections = useMemo(() => {
@@ -170,12 +172,119 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     return null
   }
 
+  const handleShare = async () => {
+    if (!cardRef.current) return
+
+    try {
+      // Ensure fonts and layout are fully ready
+      if (document.fonts && 'ready' in document.fonts) {
+        try {
+          await (document.fonts as any).ready
+        } catch {}
+      }
+      await new Promise(resolve => requestAnimationFrame(() => resolve(undefined)))
+
+      // Capture the card as an image with a sanitized clone to avoid animation/transition issues
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        onclone: (doc) => {
+          const root = doc.querySelector('[data-share-root="result-card"]') as HTMLElement | null
+          if (!root) return
+
+          // Disable animations/transforms that can cause invisible text in foreignObject/SVG rendering
+          const disableAnimations = (el: HTMLElement) => {
+            el.style.animation = 'none'
+            el.style.transition = 'none'
+            el.style.transform = 'none'
+            el.style.opacity = el.style.opacity || '1'
+          }
+          disableAnimations(root)
+          root.querySelectorAll('*').forEach(child => disableAnimations(child as HTMLElement))
+
+          // Inline resolved font-family and color for key text nodes to avoid CSS var issues
+          const originalRoot = cardRef.current as HTMLElement
+          const nameOrig = originalRoot.querySelector('.' + styles.resultName) as HTMLElement | null
+          const tagOrig = originalRoot.querySelector('.' + styles.resultTagline) as HTMLElement | null
+          const nameClone = root.querySelector('.' + styles.resultName) as HTMLElement | null
+          const tagClone = root.querySelector('.' + styles.resultTagline) as HTMLElement | null
+          if (nameOrig && nameClone) {
+            const cs = window.getComputedStyle(nameOrig)
+            nameClone.style.fontFamily = cs.fontFamily
+            nameClone.style.color = cs.color
+            nameClone.style.letterSpacing = cs.letterSpacing
+            nameClone.style.textTransform = cs.textTransform
+          }
+          if (tagOrig && tagClone) {
+            const cs = window.getComputedStyle(tagOrig)
+            tagClone.style.fontFamily = cs.fontFamily
+            tagClone.style.color = cs.color
+            tagClone.style.letterSpacing = cs.letterSpacing
+          }
+        }
+      })
+
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+        }, 'image/png')
+      })
+
+      // Create a file from the blob
+      const file = new File([blob], 'quiz-result.png', { type: 'image/png' })
+
+      // Check if Web Share API is supported and can share files
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `${displayName} - Quiz Result`,
+          text: `Check out my quiz result: ${displayName}!`,
+        })
+      } else {
+        // Fallback: download the image
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'quiz-result.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error sharing the image:', error)
+      // Fallback: try to download the image
+      try {
+        const canvas = await html2canvas(cardRef.current, {
+          backgroundColor: null,
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          logging: false
+        })
+        const url = canvas.toDataURL('image/png')
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'quiz-result.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      } catch (fallbackError) {
+        console.error('Fallback share also failed:', fallbackError)
+      }
+    }
+  }
+
   if (!showExplanation) {
     // Card view
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultsScreen}>
-          <div className={styles.resultCard}>
+          <div ref={cardRef} className={styles.resultCard} data-share-root="result-card">
             {displayImage && (
               <div
                 className={styles.resultImage}
@@ -196,10 +305,11 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             />
           )}
 
-          <div className={styles.cardButtons}>
+          <div className={styles.actionButtons}>
+            
             {result.explanation && (
               <button
-                className={styles.cardButton}
+                className={styles.actionButton}
                 onClick={() => setShowExplanation(true)}
               >
                 <h2>
@@ -207,6 +317,17 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 </h2>
               </button>
             )}
+
+            <button
+              className={styles.actionButtonAlt}
+              onClick={handleShare}
+              title="Share your result"
+            >
+              <span className={styles.shareIcon + ' material-symbols-outlined'}>
+                share
+              </span>
+              <h2>Share</h2>
+            </button>
           </div>
         </div>
       </div>

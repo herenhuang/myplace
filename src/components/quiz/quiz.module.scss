@@ -949,16 +949,32 @@
   font-weight: 600;
   font-family: var(--font-instrument-serif);
   cursor: pointer;
-  @include transition-all(200ms);
+}
+
+.shareButton {
+  padding: 12px 24px;
+  border-radius: 24px;
+  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.05);
+  background: #6b7280;
+  color: white;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+  font-weight: 600;
+  font-family: 'Lora', serif;
+  cursor: pointer;
+  margin-right: 12px;
   white-space: nowrap;
+  @include transition-all(200ms);
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.2);
+    background: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: -4px 16px 32px rgba(0, 0, 0, 0.1);
   }
 
   &:active {
     transform: translateY(0);
+    box-shadow: -4px 8px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -1029,13 +1045,14 @@
   z-index: 3;
   margin-top: 16px;
   opacity: 0;
+  width: 90%;
   animation: fadeUpExplanation 0.7s ease-in-out both;
 }
 
 .actionButton {
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: 32px;
-  border: 2px solid rgba(255,255,255, 0.25);
+  border: 2px solid var(--quiz-primary-color, #ff6b35);
   @include transition-all(200ms);
   cursor: pointer;
   backdrop-filter: blur(10px);
@@ -1079,8 +1096,14 @@
   }
 }
 
+.shareIcon{
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--quiz-primary-color, #ff6b35);
+}
+
 .actionButtonAlt {
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: 32px;
   @include transition-all(200ms);
   cursor: pointer;
