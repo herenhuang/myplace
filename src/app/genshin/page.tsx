@@ -727,7 +727,7 @@ export default function GenshinQuiz() {
                               handleChoiceSelect(customInput, true)
                             }
                           }}
-                          placeholder="Custom response..."
+                          placeholder="Write your own answer..."
                           disabled={isLoading || isStreaming || !visibleButtons.includes(currentStep.choices.length)}
                           className={styles.customInput}
                         />
@@ -841,12 +841,12 @@ export default function GenshinQuiz() {
                 </div>
               </div>
 
-              <button
-                onClick={resetSimulation}
+              <a
+                href="/"
                 className={styles.appButton}
               >
-                <span>Complete</span>
-              </button>
+                <span>Play More</span>
+              </a>
 
             </div>
           </div>
@@ -858,50 +858,66 @@ export default function GenshinQuiz() {
   }
 
   return (
-    <PageContainer className="!max-w-none max-w-4xl">
-      <div className="flex flex-col items-center justify-center h-[100vh] w-[100vw] overflow-visible">
-        {/* Progress bar - only show during simulation */}
-        {screenState === 'simulation' && (
-          <div className={styles.progressContainer}>
-            <div className={styles.progressBarTrack}>
-              <div 
-                className={styles.progressBarFill}
-                style={{ width: `${(currentStepNumber / TOTAL_STEPS) * 100}%` }}
-              />
+    <>
+      {/* MyPlace Logo - desktop only, completely outside all containers */}
+      <a
+        href="/"
+        className={styles.desktopLogo}
+      >
+        <Image
+          src="/MyPlacelogo.png"
+          alt="MyPlace"
+          width={120}
+          height={40}
+          priority
+        />
+      </a>
+
+      <PageContainer className="!max-w-none max-w-4xl">
+        <div className="flex flex-col items-center justify-center h-[100vh] w-[100vw] overflow-visible">
+          {/* Progress bar - only show during simulation */}
+          {screenState === 'simulation' && (
+            <div className={styles.progressContainer}>
+              <div className={styles.progressBarTrack}>
+                <div
+                  className={styles.progressBarFill}
+                  style={{ width: `${(currentStepNumber / TOTAL_STEPS) * 100}%` }}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Persistent phone container */}
-        <div className={styles.stepContainer}>
-          <div className={styles.stepContent}>
-            <div 
-              className={styles.imageContainer} 
-              style={{ 
-                backgroundImage: backgroundImageUrl && screenState === 'simulation' 
-                  ? `url(${backgroundImageUrl})` 
-                  : screenState === 'welcome'
-                  ? `url(/genshin/teyvat.jpg)`
-                  : screenState === 'results' && archetype
-                  ? `url(/genshin/${archetype.toLowerCase()}-bg.jpg)`
-                  : 'none'
-              }}
-              data-image-loading={isImageLoading}
-              data-screen-state={screenState}
-            >
-              {renderContent()}
+          {/* Persistent phone container */}
+          <div className={styles.stepContainer}>
+            <div className={styles.stepContent}>
+              <div
+                className={styles.imageContainer}
+                style={{
+                  backgroundImage: backgroundImageUrl && screenState === 'simulation'
+                    ? `url(${backgroundImageUrl})`
+                    : screenState === 'welcome'
+                    ? `url(/genshin/teyvat.jpg)`
+                    : screenState === 'results' && archetype
+                    ? `url(/genshin/${archetype.toLowerCase()}-bg.jpg)`
+                    : 'none'
+                }}
+                data-image-loading={isImageLoading}
+                data-screen-state={screenState}
+              >
+                {renderContent()}
 
-              {/* Blobbert - contained inside imageContainer */}
-              <BlobbertTip
-                tip={getCurrentTip()}
-                isVisible={true}
-                showSpeechBubble={shouldShowSpeechBubble()}
-                bottomPosition={blobbertBottomPosition}
-              />
+                {/* Blobbert - contained inside imageContainer */}
+                <BlobbertTip
+                  tip={getCurrentTip()}
+                  isVisible={true}
+                  showSpeechBubble={shouldShowSpeechBubble()}
+                  bottomPosition={blobbertBottomPosition}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </PageContainer>
+      </PageContainer>
+    </>
   )
 }
