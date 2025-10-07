@@ -27,22 +27,23 @@ export default function ElevateCard({
   const height = Math.round(dimension * (5.5 / 4)); // 1.375 ratio
   
   // Calculate responsive sizes based on width
-  const titleSize = Math.round(width * 0.14); // 14% of width
-  const taglineSize = Math.round(width * 0.065); // 6.5% of width
-  const iconSize = Math.round(width * 0.7); // 70% of width
+  const titleSize = Math.round(width * 0.115); // 11.5% of width (reduced from 14%)
+  const taglineSize = Math.round(width * 0.055); // 5.5% of width (reduced from 6.5%)
+  const iconSize = Math.round(width * 0.6); // 60% of width (reduced from 70%)
   const padding = Math.round(width * 0.08); // 8% of width
 
   return (
     <div
-      className={`relative rounded-lg shadow-2xl overflow-hidden ${className}`}
+      className={`relative rounded-lg overflow-hidden ${className}`}
       style={{
         width: `${width}px`,
         height: `${height}px`,
         aspectRatio: '4 / 5.5',
-        backgroundImage: `url(${imagePath}/card.png)`,
+        backgroundImage: `url(${imagePath}/card2.png)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
+        filter: 'drop-shadow(-12px 36px 36px rgba(0, 0, 0, .2))'
       }}
     >
       <div 

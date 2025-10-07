@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import ElevateCard from '@/components/ElevateCard'
+import AnalyzingScreen from './AnalyzingScreen'
 import { startSession, recordStep, generateNextStep, analyzeArchetype, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
@@ -86,7 +87,7 @@ const NATION_DESCRIPTIONS: Record<string, { tagline: string; emoji: string }> = 
 // Blobbert tips for each screen
 const BLOBBERT_TIPS: Record<string, string> = {
   'welcome': "Ready to discover your home nation in Teyvat? Let's go!",
-  'step-1': "There are no wrong answers, just follow your heart!",
+  'step-1': "There are no wrong answers, just go with your gut. The more you share, the more accurate your results!",
   'step-2': "Every choice reveals something about you...",
   'step-3': "You're doing great! Stay true to yourself.",
   'step-4': "Almost there! Keep going.",
@@ -94,20 +95,6 @@ const BLOBBERT_TIPS: Record<string, string> = {
   'step-6': "Reflecting on your journey through Teyvat...",
   'analyzing': "Hang tight while I determine your home nation...",
   'results': "Here's your Genshin home nation!"
-}
-
-// Contextual click messages for tiny Blobbert
-const CONTEXTUAL_MESSAGES: Record<number, string[]> = {
-  1: ["Follow your gut!", "What's your first instinct?", "No wrong answers!"],
-  2: ["Trust yourself", "First reaction?", "What feels right?"],
-  3: ["Be authentic", "Your move", "Honest response?"],
-  4: ["Your values", "What matters?", "Think deep"],
-  5: ["Final choice!", "Trust yourself", "Your truth?"]
-}
-
-const getContextualMessage = (stepNumber: number): string => {
-  const messages = CONTEXTUAL_MESSAGES[stepNumber] || ["Write what you feel!"]
-  return messages[Math.floor(Math.random() * messages.length)]
 }
 
 // LocalStorage key for caching state
@@ -152,91 +139,10 @@ export default function GenshinQuiz() {
   
   const inputRef = useRef<HTMLInputElement>(null)
   const choicesContainerRef = useRef<HTMLDivElement>(null)
-  
 
-  // Blobbert click message state
-  const [blobbertClickMessage, setBlobbertClickMessage] = useState<string>("")
-  const [showClickMessage, setShowClickMessage] = useState(false)
-  
-  // Draggable Blobbert state - initialize within phone container
-  const [blobbertPosition, setBlobbertPosition] = useState({ 
-    x: typeof window !== 'undefined' ? window.innerWidth / 2 - 250 : 50, 
-    y: typeof window !== 'undefined' ? window.innerHeight - 150 : 150
-  })
-  const [isDraggingBlobbert, setIsDraggingBlobbert] = useState(false)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  // Dynamic Blobbert positioning
+  const [blobbertBottomPosition, setBlobbertBottomPosition] = useState(120)
 
-
-  // Blobbert click handler
-  const handleBlobbertClick = () => {
-    // Don't show message if dragging
-    if (isDraggingBlobbert) return
-    
-    if (screenState === 'simulation' && currentStepNumber >= 1 && currentStepNumber <= 5) {
-      const message = getContextualMessage(currentStepNumber)
-      setBlobbertClickMessage(message)
-      setShowClickMessage(true)
-      
-      // Auto-hide after 3 seconds
-      setTimeout(() => {
-        setShowClickMessage(false)
-      }, 3000)
-    }
-  }
-  
-  // Blobbert drag handlers
-  const handleBlobbertMouseDown = (e: React.MouseEvent) => {
-    setIsDraggingBlobbert(true)
-    setDragOffset({
-      x: e.clientX - blobbertPosition.x,
-      y: e.clientY - blobbertPosition.y
-    })
-  }
-  
-  const handleBlobbertMouseMove = useCallback((e: MouseEvent) => {
-    if (isDraggingBlobbert) {
-      // Get phone container dimensions
-      const phoneContainer = document.querySelector(`.${styles.imageContainer}`) as HTMLElement
-      if (!phoneContainer) return
-      
-      const containerRect = phoneContainer.getBoundingClientRect()
-      const blobbertSize = 50 // Blobbert width/height
-      const speechBubbleWidth = 200 // Approximate max width of speech bubble
-      
-      // Calculate new position
-      let newX = e.clientX - dragOffset.x
-      let newY = e.clientY - dragOffset.y
-      
-      // Constrain to phone container bounds (with padding)
-      const padding = 10
-      const minX = containerRect.left + padding
-      const maxX = containerRect.right - blobbertSize - speechBubbleWidth - padding
-      const minY = containerRect.top + padding
-      const maxY = containerRect.bottom - blobbertSize - padding
-      
-      newX = Math.max(minX, Math.min(newX, maxX))
-      newY = Math.max(minY, Math.min(newY, maxY))
-      
-      setBlobbertPosition({ x: newX, y: newY })
-    }
-  }, [isDraggingBlobbert, dragOffset])
-  
-  const handleBlobbertMouseUp = () => {
-    setIsDraggingBlobbert(false)
-  }
-  
-  // Add/remove mouse event listeners for dragging
-  useEffect(() => {
-    if (isDraggingBlobbert) {
-      window.addEventListener('mousemove', handleBlobbertMouseMove)
-      window.addEventListener('mouseup', handleBlobbertMouseUp)
-      
-      return () => {
-        window.removeEventListener('mousemove', handleBlobbertMouseMove)
-        window.removeEventListener('mouseup', handleBlobbertMouseUp)
-      }
-    }
-  }, [isDraggingBlobbert, handleBlobbertMouseMove])
   // Get current Blobbert tip
   const getCurrentTip = (): string => {
     if (screenState === 'welcome') return BLOBBERT_TIPS['welcome']
@@ -658,12 +564,50 @@ export default function GenshinQuiz() {
     if (currentStep && inputRef.current && screenState === 'simulation' && !isStreaming) {
       const totalButtons = currentStep.choices.length + (currentStep.allowCustomInput ? 1 : 0)
       const finalDelay = totalButtons * 100 + 400 // Wait for all buttons to appear
-      
+
       setTimeout(() => {
         inputRef.current?.focus()
       }, finalDelay)
     }
   }, [currentStep, screenState, isStreaming])
+
+  // Calculate Blobbert position dynamically based on choicesContainer height
+  useEffect(() => {
+    // For non-simulation screens, use a static small bottom position
+    if (screenState !== 'simulation') {
+      setBlobbertBottomPosition(20) // 20px from bottom for welcome, analyzing, results
+      return
+    }
+
+    const calculateBlobbertPosition = () => {
+      if (!choicesContainerRef.current) {
+        setBlobbertBottomPosition(120)
+        return
+      }
+
+      const choicesHeight = choicesContainerRef.current.offsetHeight
+
+      // Position Blobbert directly above the choicesContainer:
+      // Add some padding (e.g., 16px) to avoid overlap
+      const calculatedBottom = choicesHeight + 16
+
+      setBlobbertBottomPosition(calculatedBottom)
+    }
+
+    calculateBlobbertPosition()
+
+    const timer = setTimeout(calculateBlobbertPosition, 600)
+
+    const resizeObserver = new ResizeObserver(calculateBlobbertPosition)
+    if (choicesContainerRef.current) {
+      resizeObserver.observe(choicesContainerRef.current)
+    }
+
+    return () => {
+      clearTimeout(timer)
+      resizeObserver.disconnect()
+    }
+  }, [screenState, currentStep, visibleButtons, isStreaming])
 
 
   // Render content based on screen state
@@ -815,17 +759,7 @@ export default function GenshinQuiz() {
       case 'analyzing':
         return (
           <div className={styles.textContainer}>
-                <div className="flex flex-col h-full items-center justify-center py-12">
-                  <div 
-                    className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full z-100 animate-spin mb-6 cursor-pointer hover:scale-110 transition-transform"
-                    onClick={() => {
-                      clearSavedState()
-                      resetSimulation()
-                    }}
-                    title="Click to reset"
-                  ></div>
-                </div>
-  
+            <AnalyzingScreen />
           </div>
         )
 
@@ -956,93 +890,17 @@ export default function GenshinQuiz() {
               data-screen-state={screenState}
             >
               {renderContent()}
-              
+
+              {/* Blobbert - contained inside imageContainer */}
+              <BlobbertTip
+                tip={getCurrentTip()}
+                isVisible={true}
+                showSpeechBubble={shouldShowSpeechBubble()}
+                bottomPosition={blobbertBottomPosition}
+              />
             </div>
           </div>
         </div>
-        
-        {/* Draggable Floating Blobbert - appears during simulation */}
-        {screenState === 'simulation' && currentStepNumber >= 1 && currentStepNumber <= 6 && (
-          <div
-            onMouseDown={handleBlobbertMouseDown}
-            onClick={handleBlobbertClick}
-            style={{
-              position: 'fixed',
-              left: `${blobbertPosition.x}px`,
-              top: `${blobbertPosition.y}px`,
-              cursor: isDraggingBlobbert ? 'grabbing' : 'grab',
-              zIndex: 9999,
-              userSelect: 'none',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '8px',
-              pointerEvents: 'auto'
-            }}
-          >
-            {/* Blobbert Image - FIRST */}
-            <div style={{
-              width: '50px',
-              height: '50px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(255,255,255,0.9)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              flexShrink: 0,
-              transition: 'transform 0.2s ease'
-            }}>
-              <Image 
-                src="/elevate/blobbert.png" 
-                alt="Blobbert" 
-                width={50}
-                height={50}
-                draggable={false}
-              />
-            </div>
-            
-            {/* Speech bubble to the RIGHT of Blobbert - SECOND */}
-            {(shouldShowSpeechBubble() || showClickMessage) && (
-              <div style={{
-                backgroundColor: 'white',
-                borderRadius: '16px',
-                padding: '8px 12px',
-                maxWidth: '180px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                marginLeft: '8px',
-                pointerEvents: 'none',
-                opacity: (shouldShowSpeechBubble() || showClickMessage) ? 1 : 0,
-                transform: (shouldShowSpeechBubble() || showClickMessage) ? 'scale(1)' : 'scale(0.8)',
-                transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
-              }}>
-                <div style={{
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#666',
-                  marginBottom: '2px'
-                }}>Blobbert</div>
-                <p style={{
-                  fontSize: '12px',
-                  margin: 0,
-                  color: '#333',
-                  lineHeight: 1.3
-                }}>
-                  {shouldShowSpeechBubble() ? getCurrentTip() : blobbertClickMessage}
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Static Blobbert for welcome and results screens */}
-        {(screenState === 'welcome' || screenState === 'results') && (
-          <BlobbertTip 
-            tip={getCurrentTip()} 
-            isVisible={true}
-            showSpeechBubble={screenState === 'welcome'}
-            bottomPosition={20}
-          />
-        )}
       </div>
     </PageContainer>
   )
