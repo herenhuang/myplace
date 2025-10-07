@@ -51,7 +51,7 @@ export async function startHumanSession(clientSessionId?: string) {
 }
 
 // Queue for batching database operations
-let batchQueue: Array<{ sessionId: string; stepData: HumanStepData; resolve: (value: any) => void; reject: (error: any) => void }> = []
+let batchQueue: Array<{ sessionId: string; stepData: HumanStepData; resolve: (value: unknown) => void; reject: (error: unknown) => void }> = []
 let batchTimeout: NodeJS.Timeout | null = null
 
 export async function recordHumanStep(
@@ -252,7 +252,7 @@ export async function saveHumanAnalysis(
   }
 }
 
-export async function getPopulationStats(stepNumber: number, questionType: string) {
+export async function getPopulationStats(stepNumber: number) {
   try {
     const supabase = await createClient()
 

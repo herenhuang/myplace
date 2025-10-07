@@ -224,8 +224,8 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
             {responses.length < 15 && (
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>Partial Analysis:</strong> You've completed {responses.length} out of 15 questions. 
-                  {responses.length < 3 ? ' Complete the MBTI personality questions (1-3) for a more accurate personality assessment.' : 
+                  <strong>Partial Analysis:</strong> You&apos;ve completed {responses.length} out of 15 questions.
+                  {responses.length < 3 ? ' Complete the MBTI personality questions (1-3) for a more accurate personality assessment.' :
                    responses.length < 15 ? ' Complete the remaining interactive games for a comprehensive analysis.' : ''}
                 </p>
               </div>
@@ -307,7 +307,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                         </div>
                                         </div>
                                     );
-                                    } catch (e) {
+                                    } catch {
                                     // If JSON parsing fails, show as regular text
                                     return <p className="text-black text-sm leading-5">{qa.userResponse}</p>;
                                     }
@@ -395,7 +395,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                             </div>
                                             </div>
                                         );
-                                        } catch (e) {
+                                        } catch {
                                         // If JSON parsing fails, show as regular text
                                         return <p className="text-sm text-gray-800">{ai.response}</p>;
                                         }

@@ -19,13 +19,21 @@ type ViewState = 'form' | 'analyzing' | 'results'
 type ResultsTab = 'results-overview' | 'results-breakdown' | 'results-archetype'
 
 export default function HumanInferencePage() {
-  const [viewState, setViewState] = useState<ViewState>('form')
+  const [, setViewState] = useState<ViewState>('form')
   const [sessionId, setSessionId] = useState<string>('')
   const [dbSessionId, setDbSessionId] = useState<string>('')
   const [responses, setResponses] = useState<Record<number, string>>({})
   const [shapeSortingResults, setShapeSortingResults] = useState<Record<number, { [categoryId: string]: string[] }>>({})
   const [shapeOrderingResults, setShapeOrderingResults] = useState<Record<number, string[]>>({})
-  const [bubblePopperResults, setBubblePopperResults] = useState<Record<number, any>>({})
+  const [bubblePopperResults, setBubblePopperResults] = useState<Record<number, {
+    bubblesPopped: number
+    timeElapsed: number
+    completed: boolean
+    quitEarly: boolean
+    poppingPattern: 'sequential' | 'random' | 'strategic'
+    poppingSequence: number[]
+    bubbleGrid: number[][]
+  }>>({})
   const [focusTimes, setFocusTimes] = useState<Record<number, number>>({})
   const [pausedTimes, setPausedTimes] = useState<Record<number, number>>({})
   const [isTabVisible, setIsTabVisible] = useState(true)

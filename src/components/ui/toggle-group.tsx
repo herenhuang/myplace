@@ -64,19 +64,20 @@ const ToggleGroup = React.forwardRef<
     updateClip()
 
     const handle = () => updateClip()
+    const currentRoot = rootRef.current
     window.addEventListener("resize", handle)
-    rootRef.current?.addEventListener("keydown", handle)
-    rootRef.current?.addEventListener("pointerdown", handle)
+    currentRoot?.addEventListener("keydown", handle)
+    currentRoot?.addEventListener("pointerdown", handle)
 
     const mo = new MutationObserver(handle)
-    if (rootRef.current) {
-      mo.observe(rootRef.current, { attributes: true, subtree: true, attributeFilter: ["data-state", "aria-pressed", "class"] })
+    if (currentRoot) {
+      mo.observe(currentRoot, { attributes: true, subtree: true, attributeFilter: ["data-state", "aria-pressed", "class"] })
     }
 
     return () => {
       window.removeEventListener("resize", handle)
-      rootRef.current?.removeEventListener("keydown", handle)
-      rootRef.current?.removeEventListener("pointerdown", handle)
+      currentRoot?.removeEventListener("keydown", handle)
+      currentRoot?.removeEventListener("pointerdown", handle)
       mo.disconnect()
     }
   }, [updateClip])

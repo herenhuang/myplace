@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { HUMAN_ARCHETYPES, HUMAN_QUESTIONS } from '@/lib/human-questions'
 import { HumanStepData } from '@/lib/human-types'
-import { HUMAN_TEST_DISCLAIMER } from '@/lib/human-constants'
 import OpenAI from 'openai'
 
 interface AnalyzeRequest {
@@ -10,17 +9,35 @@ interface AnalyzeRequest {
 }
 
 // Helper functions to create standardized JSON representations for games
-function generateShapeDragJSON(results?: { [categoryId: string]: string[] }): any {
+function generateShapeDragJSON(results?: { [categoryId: string]: string[] }): Record<string, string[]> {
   if (!results) return {}
-  
+
   // Return the exact same format as user input
   return results
 }
 
+interface ShapeMetadata {
+  totalShapes: number
+  categoriesUsed: number
+  shapeProperties: Record<string, { color: string; shape: string; hasBorder: boolean }>
+  categoryAnalysis: Record<string, {
+    count: number
+    shapes: string[]
+    colorCounts: Record<string, number>
+    shapeCounts: Record<string, number>
+    borderCounts: { withBorder: number; withoutBorder: number }
+  }>
+}
+
 // Get metadata about shapes for analysis
-function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): any {
-  if (!results) return {}
-  
+function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): ShapeMetadata {
+  if (!results) return {
+    totalShapes: 0,
+    categoriesUsed: 0,
+    shapeProperties: {},
+    categoryAnalysis: {}
+  }
+
   const predefinedShapes = [
     { id: 'shape-1', color: 'red', shape: 'circle', hasBorder: true },
     { id: 'shape-2', color: 'blue', shape: 'square', hasBorder: false },
@@ -32,14 +49,14 @@ function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): any
     { id: 'shape-8', color: 'blue', shape: 'circle', hasBorder: false },
     { id: 'shape-9', color: 'green', shape: 'square', hasBorder: true }
   ]
-  
-  const metadata: any = {
+
+  const metadata: ShapeMetadata = {
     totalShapes: 9,
     categoriesUsed: Object.keys(results).length,
     shapeProperties: {},
     categoryAnalysis: {}
   }
-  
+
   // Build shape properties lookup
   predefinedShapes.forEach(shape => {
     metadata.shapeProperties[shape.id] = {
@@ -48,43 +65,57 @@ function getShapeDragMetadata(results?: { [categoryId: string]: string[] }): any
       hasBorder: shape.hasBorder
     }
   })
-  
+
   // Analyze each category
   for (const [categoryId, shapeIds] of Object.entries(results)) {
-    const categoryShapes = shapeIds.map(id => predefinedShapes.find(s => s.id === id)).filter(Boolean)
-    
+    const categoryShapes = shapeIds.map(id => predefinedShapes.find(s => s.id === id)).filter((s): s is typeof predefinedShapes[0] => s !== undefined)
+
     metadata.categoryAnalysis[categoryId] = {
       count: shapeIds.length,
       shapes: shapeIds,
       // Analyze common properties in this category
-      colorCounts: categoryShapes.reduce((acc: any, shape: any) => {
+      colorCounts: categoryShapes.reduce((acc: Record<string, number>, shape) => {
         acc[shape.color] = (acc[shape.color] || 0) + 1
         return acc
       }, {}),
-      shapeCounts: categoryShapes.reduce((acc: any, shape: any) => {
+      shapeCounts: categoryShapes.reduce((acc: Record<string, number>, shape) => {
         acc[shape.shape] = (acc[shape.shape] || 0) + 1
         return acc
       }, {}),
       borderCounts: {
-        withBorder: categoryShapes.filter((s: any) => s.hasBorder).length,
-        withoutBorder: categoryShapes.filter((s: any) => !s.hasBorder).length
+        withBorder: categoryShapes.filter(s => s.hasBorder).length,
+        withoutBorder: categoryShapes.filter(s => !s.hasBorder).length
       }
     }
   }
-  
+
   return metadata
 }
 
-function generateShapeOrderJSON(results?: string[]): any[] {
+function generateShapeOrderJSON(results?: string[]): string[] {
   if (!results) return []
-  
+
   // Return the exact same format as user input
   return results
 }
 
+interface OrderMetadata {
+  totalShapes: number
+  shapeProperties: Record<string, { color: string; shape: string; hasBorder: boolean }>
+  orderAnalysis: {
+    colorPattern: string[]
+    shapePattern: string[]
+    borderPattern: boolean[]
+  }
+}
+
 // Get metadata about shape ordering for analysis
-function getShapeOrderMetadata(results?: string[]): any {
-  if (!results) return {}
+function getShapeOrderMetadata(results?: string[]): OrderMetadata {
+  if (!results) return {
+    totalShapes: 0,
+    shapeProperties: {},
+    orderAnalysis: { colorPattern: [], shapePattern: [], borderPattern: [] }
+  }
   
   const predefinedShapes = [
     { id: 'ord-1', color: 'red', shape: 'circle', hasBorder: false },
@@ -97,16 +128,17 @@ function getShapeOrderMetadata(results?: string[]): any {
     { id: 'ord-8', color: 'cyan', shape: 'circle', hasBorder: true },
     { id: 'ord-9', color: 'lime', shape: 'square', hasBorder: false }
   ]
-  
-  const metadata: any = {
+
+  const metadata: OrderMetadata = {
     totalShapes: results.length,
     shapeProperties: {},
     orderAnalysis: {
-      sequence: results,
-      patterns: []
+      colorPattern: [],
+      shapePattern: [],
+      borderPattern: []
     }
   }
-  
+
   // Build shape properties lookup
   predefinedShapes.forEach(shape => {
     metadata.shapeProperties[shape.id] = {
@@ -115,48 +147,36 @@ function getShapeOrderMetadata(results?: string[]): any {
       hasBorder: shape.hasBorder
     }
   })
-  
+
   // Analyze ordering patterns
   if (results.length > 1) {
     // Check for color patterns
-    const colors = results.map(id => predefinedShapes.find(s => s.id === id)?.color).filter(Boolean)
-    const colorGroups = colors.reduce((acc: any[], color, i) => {
-      if (i === 0 || color !== colors[i-1]) acc.push(1)
-      else acc[acc.length-1]++
-      return acc
-    }, [])
-    if (colorGroups.length < results.length / 2) metadata.orderAnalysis.patterns.push('grouped-by-color')
-    
+    const colors = results.map(id => predefinedShapes.find(s => s.id === id)?.color).filter((c): c is string => c !== undefined)
+    metadata.orderAnalysis.colorPattern = colors
+
     // Check for shape patterns
-    const shapes = results.map(id => predefinedShapes.find(s => s.id === id)?.shape).filter(Boolean)
-    const shapeGroups = shapes.reduce((acc: any[], shape, i) => {
-      if (i === 0 || shape !== shapes[i-1]) acc.push(1)
-      else acc[acc.length-1]++
-      return acc
-    }, [])
-    if (shapeGroups.length < results.length / 2) metadata.orderAnalysis.patterns.push('grouped-by-shape')
-    
+    const shapes = results.map(id => predefinedShapes.find(s => s.id === id)?.shape).filter((s): s is string => s !== undefined)
+    metadata.orderAnalysis.shapePattern = shapes
+
     // Check for border patterns
-    const borders = results.map(id => predefinedShapes.find(s => s.id === id)?.hasBorder).filter(b => b !== undefined)
-    const borderGroups = borders.reduce((acc: any[], border, i) => {
-      if (i === 0 || border !== borders[i-1]) acc.push(1)
-      else acc[acc.length-1]++
-      return acc
-    }, [])
-    if (borderGroups.length < results.length / 2) metadata.orderAnalysis.patterns.push('grouped-by-border')
-    
-    // Check if no clear pattern (suggests randomness)
-    if (metadata.orderAnalysis.patterns.length === 0) {
-      metadata.orderAnalysis.patterns.push('no-clear-pattern')
-    }
+    const borders = results.map(id => predefinedShapes.find(s => s.id === id)?.hasBorder).filter((b): b is boolean => b !== undefined)
+    metadata.orderAnalysis.borderPattern = borders
   }
-  
+
   return metadata
 }
 
-function generateBubblePopperJSON(results?: any): any {
-  if (!results) return { bubblesPopped: 0, duration: 0, completed: false, bubbleGrid: [] }
-  
+interface BubblePopperResult {
+  bubblesPopped: number
+  duration: number
+  completed: boolean
+  pattern: string
+  bubbleGrid: unknown[]
+}
+
+function generateBubblePopperJSON(results?: { bubblesPopped?: number; timeElapsed?: number; completed?: boolean; poppingPattern?: string; bubbleGrid?: unknown[] }): BubblePopperResult {
+  if (!results) return { bubblesPopped: 0, duration: 0, completed: false, pattern: 'unknown', bubbleGrid: [] }
+
   return {
     bubblesPopped: results.bubblesPopped || 0,
     duration: results.timeElapsed || 0,
@@ -474,8 +494,6 @@ Analyze these responses now by comparing the user to the AI baselines.`
 
 
 export async function POST(request: NextRequest) {
-  const startTime = performance.now()
-  
   try {
     const body: AnalyzeRequest = await request.json()
     const { steps, averageResponseTime } = body
