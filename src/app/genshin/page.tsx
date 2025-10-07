@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/PageContainer'
@@ -841,12 +842,12 @@ export default function GenshinQuiz() {
                 </div>
               </div>
 
-              <a
+              <Link
                 href="/"
                 className={styles.appButton}
               >
                 <span>Play More</span>
-              </a>
+              </Link>
 
             </div>
           </div>
@@ -860,7 +861,7 @@ export default function GenshinQuiz() {
   return (
     <>
       {/* MyPlace Logo - desktop only, completely outside all containers */}
-      <a
+      <Link
         href="/"
         className={styles.desktopLogo}
       >
@@ -871,7 +872,7 @@ export default function GenshinQuiz() {
           height={40}
           priority
         />
-      </a>
+      </Link>
 
       <PageContainer className="!max-w-none max-w-4xl">
         <div className="flex flex-col items-center justify-center h-[100vh] w-[100vw] overflow-visible">

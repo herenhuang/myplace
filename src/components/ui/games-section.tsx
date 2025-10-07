@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styles from './games-section.module.scss';
 import Link from 'next/link';
 import Image from 'next/image';
 

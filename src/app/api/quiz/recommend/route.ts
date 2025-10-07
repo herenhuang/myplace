@@ -158,7 +158,7 @@ Return ONLY valid JSON, no markdown formatting:
       // Remove markdown code blocks if present
       const cleanedResponse = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
       recommendation = JSON.parse(cleanedResponse)
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse AI response:', responseText)
       throw new Error('Invalid AI response format')
     }
