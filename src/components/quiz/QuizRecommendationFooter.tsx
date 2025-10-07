@@ -201,28 +201,19 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
               </motion.button>
             </div>
 
+            <button
+              onClick={onBackToCard}
+              className={styles.backToAssessment}
+            >
+              Back to Assessment
+            </button>
+
             <a
-              href="/quizzes"
+              href="/quiz"
               className={styles.altLink}
             >
-              or see all quizzes
+              See all quizzes
             </a>
-
-            {/* Action buttons inside the recommendation card */}
-            <div className={styles.actionButtons}>
-              <button
-                className={styles.actionButton}
-                onClick={onBackToCard}
-              >
-                <h2>Back to Card</h2>
-              </button>
-              <button
-                className={styles.actionButtonAlt}
-                onClick={onRestart}
-              >
-                <h2>Take Again</h2>
-              </button>
-            </div>
           </motion.div>
         ) : null}
       </div>

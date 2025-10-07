@@ -50,7 +50,7 @@ export default function QuizWelcome({ config, onStart, isLoading, personalizatio
           onClick={onStart}
           disabled={isLoading}
         >
-          {isLoading ? 'Starting...' : (showStorySetup ? 'Begin Story →' : 'Start Quiz')}
+          {isLoading ? 'Starting...' : 'Play Now →'}
         </button>
       </div>
     </div>
