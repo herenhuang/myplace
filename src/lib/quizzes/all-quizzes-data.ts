@@ -114,7 +114,7 @@ export const ALL_QUIZZES: QuizItem[] = [
   },
   {
     id: 'elevate',
-    title: 'What Kind of Conference Attendee Are You?',
+    title: 'What Kind of Elevate Attendee Are You?',
     description: 'Navigate a day at Elevate and discover your style',
     category: 'work',
     route: '/quiz/elevate',

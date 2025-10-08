@@ -47,7 +47,7 @@ const PREDEFINED_STEPS: Record<number, Step> = {
 // Blobbert tips for each screen
 const BLOBBERT_TIPS: Record<string, string> = {
   'welcome': "Ready to discover your conference style? Let's go!",
-  'step-1': "There are no wrong answers, so just go with your gut!!",
+  'step-1': "There are no wrong answers, just go with your gut. The more you share, the more accurate your results!",
   // 'step-2': "Trust your instincts and choose what feels right.",
   // 'step-3': "You're doing great! Keep being yourself.",
   'step-4': "Keep the momentum—what catches your attention next?",
@@ -1051,37 +1051,39 @@ export default function ElevateSimulation() {
   return (
     <PageContainer className="!max-w-none max-w-4xl">
       <div className="flex flex-col items-center justify-center h-[100vh] w-[100vw] overflow-visible">
-        {/* Progress bar - only show during simulation */}
-        {screenState === 'simulation' && (
-          <div className={styles.progressContainer}>
-            <div className={styles.progressBarTrack}>
-              <div 
-                className={styles.progressBarFill}
-                style={{ width: `${(currentStepNumber / TOTAL_STEPS) * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
-
         {/* Persistent phone container */}
         <div className={styles.stepContainer}>
           <div className={styles.stepContent}>
-            <div 
-              className={styles.imageContainer} 
-              style={{ 
-                backgroundImage: backgroundImageUrl && screenState === 'simulation' 
-                  ? `url(${backgroundImageUrl})` 
+            <div
+              className={styles.imageContainer}
+              style={{
+                backgroundImage: backgroundImageUrl && screenState === 'simulation'
+                  ? `url(${backgroundImageUrl})`
                   : screenState === 'welcome'
                   ? `url(/elevate/orange.png)`
                   : 'none'
               }}
               data-image-loading={isImageLoading}
             >
+              {/* Progress bar - only show during simulation */}
+              {screenState === 'simulation' && (
+                <div className={styles.progressContainer}>
+                  {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+                    <div key={i} className={styles.progressBarTrack}>
+                      <div
+                        className={styles.progressBarFill}
+                        style={{ width: currentStepNumber > i ? '100%' : '0%' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {renderContent()}
-              
+
               {/* Floating Blobbert Button - appears on all screens inside imageContainer */}
-              <BlobbertTip 
-                tip={getCurrentTip()} 
+              <BlobbertTip
+                tip={getCurrentTip()}
                 isVisible={true}
                 showSpeechBubble={shouldShowSpeechBubble()}
                 bottomPosition={blobbertBottomPosition}
