@@ -647,14 +647,14 @@ First Words (HOW they showed up):
 Second Words (WHAT they prioritized):
 • Connector - Building relationships, making introductions, bringing people together
 • Organizer - Planning, preparation, strategic thinking
-• Explorer - Discovery, new experiences, following curiosity
-• Learner - Understanding deeply, taking notes, absorbing knowledge
-• Catalyst - Making things happen, sparking action, driving momentum
-• Observer - Watching dynamics, noticing patterns, understanding context
-• Storyteller - Capturing moments, sharing experiences, creating narrative
-• Visionary - Big ideas, future possibilities, expansive thinking
-• Anchor - Steady presence, grounding others, being a reliable constant
-• Synthesizer - Connecting concepts, integrating ideas, seeing relationships
+• Learner - Absorbing insights, expanding knowledge, curious explorer
+• Networker - Making connections, expanding circles, relationship-focused
+• Observer - Taking it in, processing deeply, thoughtful presence
+• Contributor - Sharing ideas, adding value, active participant
+• Strategist - Long-term thinking, intentional moves, calculated choices
+• Explorer - Discovering new things, following curiosity, open to surprises
+• Supporter - Helping others, being present, creating space
+• Curator - Selecting carefully, quality over quantity, intentional consumption
 
 BEHAVIORAL SIGNALS:
 - Proactive social initiation (networking, meeting new people) → Proactive, Social + Connector
@@ -683,23 +683,44 @@ SELECTION RULES:
 # Your Task:
 Analyze their choices and select the best word combination. Write like you're a wise, observant friend who watched them all day. Be warm but not gushy, insightful but not clinical. Avoid corporate-speak, therapy jargon, and AI-sounding phrases.
 
-Use this structure (250 words max total):
+Use this structure with <section> tags for multi-page display:
 
-# Uniquely You
-
-[One natural sentence about their main pattern - use "you" like you're talking directly to them]
-
+<section>
 ## Your Approach
 - You [specific thing they chose] when others might have [different behavior]. [Natural insight in conversational language]
 - You [another choice] while someone else might have [alternative]. [Another insight, casual but meaningful]
 - You [third choice] when others were [different approach]. [Final insight that feels like a friend's observation]
+</section>
 
+<section>
 ## What This Actually Means
 [2-3 sentences that sound like an insightful friend explaining what these choices reveal. Use "you" throughout. Keep it grounded and real, not flowery or abstract. Connect their choices to who they are.]
+</section>
 
+<section>
+## Personality Predictions
+
+Based on your conference style, here's your read on your personality:
+
+**MBTI Type: [4-LETTER TYPE] ([XX]% confident)**
+In 1-2 conversational sentences, explain why this MBTI type fits based on their choices. Reference specific behaviors. Be honest about confidence - if patterns are clear, go 60-85%. If mixed signals, go 15-40%.
+
+**Big Five Traits:**
+Output EXACTLY in this format (just the numbers, 0-100 scale):
+- Openness: [0-100]
+- Conscientiousness: [0-100]
+- Extraversion: [0-100]
+- Agreeableness: [0-100]
+- Neuroticism: [0-100]
+
+Then add 1-2 conversational sentences about what stands out in their Big Five profile.
+</section>
+
+<section>
 ## You May Also Be
 **[Alternative combination]** - [1 sentence about which choices pointed this way and what would have tipped them over]
 **[Another alternative if applicable]** - [1 sentence about another close call]
+</section>
 
 TONE GUIDELINES:
 - Write like you're chatting with a friend over coffee who watched them at this conference
@@ -725,7 +746,7 @@ Return a JSON object with:
   "secondWord": "chosen second word",
   "archetype": "[FirstWord] [SecondWord]",
   "tagline": "A punchy, memorable phrase (e.g., 'You turn coffee breaks into brainstorming sessions')",
-  "explanation": "[The full formatted explanation following the structure above, using markdown headers]"
+  "explanation": "[The full formatted explanation following the structure above, with <section> tags]"
 }
 
 Return ONLY the JSON - no other text.`
@@ -733,7 +754,7 @@ Return ONLY the JSON - no other text.`
     const chatCompletion = await Promise.race([
       anthropic.messages.create({
         model: 'claude-3-7-sonnet-latest',
-        max_tokens: 1024,
+        max_tokens: 2048,
         messages: [{ role: 'user', content: analysisPrompt + '\n\nPlease respond with valid JSON only.' }]
       }),
       new Promise<never>((_, reject) => 

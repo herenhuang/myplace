@@ -779,3 +779,170 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   align-self: flex-end !important;
   margin-left: auto;
 }
+
+// Action Buttons (for results page 1)
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 24px 0;
+  z-index: 3;
+  margin-top: 16px;
+  opacity: 0;
+  width: 90%;
+  animation: fadeUpExplanation 0.7s ease-in-out both;
+}
+
+.actionButton {
+  padding: 10px 16px;
+  border-radius: 32px;
+  border: 2px solid $primary-orange;
+  @include transition-all(200ms);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  background-color: $primary-orange;
+  box-shadow: -4px 12px 24px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: $primary-orange-dark;
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.36px;
+  }
+}
+
+.shareIcon {
+  font-size: 16px;
+  font-weight: 600;
+  color: $primary-orange;
+}
+
+.actionButtonAlt {
+  padding: 10px 16px;
+  border-radius: 32px;
+  @include transition-all(200ms);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  background: rgba(white, 0.5);
+  border: 2px solid $primary-orange;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: $primary-orange;
+    letter-spacing: -0.36px;
+  }
+
+  &:hover {
+    opacity: .8;
+  }
+}
+
+// Pagination Controls
+.paginationControls {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.paginationButton {
+  flex: 1;
+  padding: 12px 24px;
+  border-radius: 24px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  color: black;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-instrument-serif);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.resultsScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+  z-index: 10;
+  padding: 80px 24px 40px 24px;
+  box-sizing: border-box;
+}
+
+@keyframes fadeUpExplanation {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Recommendation Cards
+.recommendationCard {
+  display: block;
+  padding: 1rem;
+  border-radius: $border-radius-xl;
+  background-color: rgba(255,255,255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  @include transition-all(200ms);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(255,255,255, 1);
+    border-color: $primary-orange;
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  h3 {
+    color: $gray-800;
+    font-family: var(--font-instrument-serif);
+  }
+
+  p {
+    color: $gray-600;
+  }
+}
+
+.resultTagline {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(130, 44, 44, 0.7);
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+  font-style: italic;
+}
