@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import html2canvas from 'html2canvas'
+import Link from 'next/link'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import ElevateCard from '@/components/ElevateCard'
@@ -151,7 +152,7 @@ interface ElevateState {
   archetype: string
   tagline: string
   explanation: string
-  resultsPage: 'card' | 'explanation'
+  resultsPage: ResultsPage
   timestamp: number
 }
 
@@ -1289,7 +1290,7 @@ export default function ElevateSimulation() {
                     onClick={() => setResultsPage('recommendation')}
                     className={styles.paginationButton}
                   >
-                    What's Next →
+                    What&apos;s Next →
                   </button>
                 </div>
               </div>
@@ -1307,18 +1308,18 @@ export default function ElevateSimulation() {
                     Keep Exploring
                   </h2>
                   <div className={styles.markdownContent}>
-                    <p>Based on your conference style, we think you'd enjoy these quizzes:</p>
+                    <p>Based on your conference style, we think you&apos;d enjoy these quizzes:</p>
 
                     <div className="mt-6 space-y-4">
-                      <a href="/quiz/manager-style" className={styles.recommendationCard}>
-                        <h3 className="text-lg font-medium mb-1">What's Your Manager Style?</h3>
+                      <Link href="/quiz/manager-style" className={styles.recommendationCard}>
+                        <h3 className="text-lg font-medium mb-1">What&apos;s Your Manager Style?</h3>
                         <p className="text-sm text-gray-600">Discover how you really lead and what makes you effective</p>
-                      </a>
+                      </Link>
 
-                      <a href="/quiz/feedback-style" className={styles.recommendationCard}>
-                        <h3 className="text-lg font-medium mb-1">What's Your Feedback Style?</h3>
+                      <Link href="/quiz/feedback-style" className={styles.recommendationCard}>
+                        <h3 className="text-lg font-medium mb-1">What&apos;s Your Feedback Style?</h3>
                         <p className="text-sm text-gray-600">Learn how you give and receive feedback</p>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
