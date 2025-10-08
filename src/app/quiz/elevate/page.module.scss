@@ -899,6 +899,14 @@ $shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   box-sizing: border-box;
 }
 
+.explanationContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 40px 0;
+  min-height: 100%;
+  z-index: 10;
+}
+
 @keyframes fadeUpExplanation {
   from {
     opacity: 0;
