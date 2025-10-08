@@ -46,7 +46,7 @@ const PREDEFINED_STEPS: Record<number, Step> = {
 
 // Blobbert tips for each screen
 const BLOBBERT_TIPS: Record<string, string> = {
-  'welcome': "meow to discover your conference style? Let's go!",
+  'welcome': "Ready to discover your conference style? Let's go!",
   'step-1': "There are no wrong answers, just go with your gut. The more you share, the more accurate your results!",
   // 'step-2': "Trust your instincts and choose what feels right.",
   // 'step-3': "You're doing great! Keep being yourself.",
