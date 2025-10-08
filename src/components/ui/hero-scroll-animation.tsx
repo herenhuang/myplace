@@ -44,8 +44,10 @@ const Section1 = forwardRef<HTMLElement, Omit<SectionProps, 'user'> & { user: Us
     return () => clearTimeout(timer);
   }, []);
 
-  // Calculate progress based on actual first slide height
-  const firstSlideProgress = useTransform(scrollYProgress, [0, windowHeight > 0 ? firstSlideHeight / (firstSlideHeight + windowHeight) : 0], [0, 1]);
+  // Calculate progress based on actual first slide height - shrinks as you scroll away
+  const totalHeight = firstSlideHeight + 2 * windowHeight;
+  const firstSlideEnd = windowHeight > 0 ? firstSlideHeight / totalHeight : 0.33;
+  const firstSlideProgress = useTransform(scrollYProgress, [0, firstSlideEnd], [0, 1]);
   const scale = useTransform(firstSlideProgress, [0, 1], [1, 0.8]);
   const rotate = useTransform(firstSlideProgress, [0, 1], [0, -5]);
   
@@ -97,24 +99,88 @@ Section1.displayName = 'Section1';
 
 const Section2: React.FC<Omit<SectionProps, 'user'> & { firstSlideHeight: number }> = ({ scrollYProgress, firstSlideHeight }) => {
   const [isMobile, setIsMobile] = React.useState(false);
+  const [windowHeight, setWindowHeight] = React.useState(0);
 
   React.useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const updateWindowHeight = () => setWindowHeight(window.innerHeight);
+    
     checkMobile();
+    updateWindowHeight();
+    
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener('resize', updateWindowHeight);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('resize', updateWindowHeight);
+    };
   }, []);
 
-  // Calculate progress based on actual first slide height
-  const secondSlideProgress = useTransform(scrollYProgress, [firstSlideHeight / (firstSlideHeight + window.innerHeight), 1], [0, 1]);
-  const scale = useTransform(secondSlideProgress, [0, 1], [0.8, 1]);
-  const rotate = useTransform(secondSlideProgress, [0, 1], [5, 0]);
+  // Calculate progress for middle slide - enters then exits with same animation pattern
+  const totalHeight = firstSlideHeight + 2 * windowHeight;
+  const secondSlideStart = windowHeight > 0 ? firstSlideHeight / totalHeight : 0.33;
+  const secondSlideEnd = windowHeight > 0 ? (firstSlideHeight + windowHeight) / totalHeight : 0.66;
   
+  const scale = useTransform(scrollYProgress, 
+    [secondSlideStart, secondSlideEnd, 1], 
+    [0.8, 1, 0.8]
+  );
+  const rotate = useTransform(scrollYProgress, 
+    [secondSlideStart, secondSlideEnd, 1], 
+    [5, 0, -5]
+  );
 
   return (
     <motion.section
       style={isMobile ? {} : { scale, rotate }}
-      className='relative min-h-screen bg-gradient-to-t to-[#1a1919] from-[#06060e] text-white rounded-xl'
+      className='md:sticky md:top-0 relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-xl overflow-hidden'
+    >
+      <div className='absolute bottom-0 left-0 right-0 top-0'></div>
+      
+      <div className='relative z-10 w-full h-screen p-8'>
+        <iframe 
+          src="/human" 
+          className='w-full h-full rounded-2xl'
+          title="Human Page Preview"
+        />
+      </div>
+    </motion.section>
+  );
+};
+
+const Section3: React.FC<Omit<SectionProps, 'user'> & { firstSlideHeight: number }> = ({ scrollYProgress, firstSlideHeight }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [windowHeight, setWindowHeight] = React.useState(0);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const updateWindowHeight = () => setWindowHeight(window.innerHeight);
+    
+    checkMobile();
+    updateWindowHeight();
+    
+    window.addEventListener('resize', checkMobile);
+    window.addEventListener('resize', updateWindowHeight);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('resize', updateWindowHeight);
+    };
+  }, []);
+
+  // Calculate progress for final slide
+  const totalHeight = firstSlideHeight + 2 * windowHeight;
+  const thirdSlideStart = windowHeight > 0 ? (firstSlideHeight + windowHeight) / totalHeight : 0.5;
+  
+  const thirdSlideProgress = useTransform(scrollYProgress, [thirdSlideStart, 1], [0, 1]);
+  const scale = useTransform(thirdSlideProgress, [0, 1], [0.8, 1]);
+  const rotate = useTransform(thirdSlideProgress, [0, 1], [5, 0]);
+
+  return (
+    <motion.section
+      style={isMobile ? {} : { scale, rotate }}
+      className='md:sticky md:top-0 relative min-h-screen bg-gradient-to-t to-[#1a1919] from-[#06060e] text-white rounded-xl mt-50'
     >
 
       <div className='absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle,#505050,transparent_1px)] bg-[size:20px_20px]'></div>
@@ -201,9 +267,10 @@ const Component = forwardRef<HTMLElement, ComponentProps>(({ user }, ref) => {
 
   return (
     <>
-      <main ref={container} className='relative md:h-[200vh] bg-black'>
+      <main ref={container} className='relative md:h-[300vh] bg-black'>
         <Section1 ref={firstSlideRef} scrollYProgress={scrollYProgress} user={user} firstSlideHeight={firstSlideHeight} />
         <Section2 scrollYProgress={scrollYProgress} firstSlideHeight={firstSlideHeight} />
+        <Section3 scrollYProgress={scrollYProgress} firstSlideHeight={firstSlideHeight} />
       </main>
     </>
   );
