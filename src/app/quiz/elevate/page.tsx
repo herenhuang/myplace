@@ -1199,7 +1199,7 @@ export default function ElevateSimulation() {
         if (resultsPage === 'explanation-1') {
           return (
             <div className={styles.textContainer}>
-              <div className={styles.resultHeader}>
+              <div className={styles.explanationContainer}>
                 <div className="px-8 pt-10">
                   <h2 className={styles.resultTitle}>
                     {archetype}
@@ -1237,7 +1237,7 @@ export default function ElevateSimulation() {
         if (resultsPage === 'explanation-2') {
           return (
             <div className={styles.textContainer}>
-              <div className={styles.resultHeader}>
+              <div className={styles.explanationContainer}>
                 <div className="px-8 pt-10">
                   <h2 className={styles.resultTitle}>
                     {archetype}
@@ -1279,7 +1279,7 @@ export default function ElevateSimulation() {
 
           return (
             <div className={styles.textContainer}>
-              <div className={styles.resultHeader}>
+              <div className={styles.explanationContainer}>
                 <div className="px-8 pt-10">
                   <h2 className={styles.resultTitle}>
                     {archetype}
@@ -1335,7 +1335,7 @@ export default function ElevateSimulation() {
         if (resultsPage === 'recommendation') {
           return (
             <div className={styles.textContainer}>
-              <div className={styles.resultHeader}>
+              <div className={styles.explanationContainer}>
                 <div className="px-8 pt-10">
                   <h2 className={styles.resultTitle}>
                     Keep Exploring
