@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fef3c7" />
+      <stop offset="1" stop-color="#fed7aa" />
+    </linearGradient>
+    <linearGradient id="shadow" x1="0" x2="1">
+      <stop offset="0" stop-color="#d97706" stop-opacity="0.4" />
+      <stop offset="1" stop-color="#7c2d12" stop-opacity="0.15" />
+    </linearGradient>
+  </defs>
+  <rect width="960" height="640" fill="url(#bg)" />
+  <ellipse cx="480" cy="520" rx="260" ry="80" fill="url(#shadow)" />
+  <g transform="translate(350 220)">
+    <path d="M50 40 h160 l40 160 l-240 0 z" fill="#fb923c" stroke="#ea580c" stroke-width="6" />
+    <path d="M50 40 c10-60 190-60 200 0" fill="none" stroke="#ea580c" stroke-width="12" stroke-linecap="round" />
+    <path d="M40 80 h220" stroke="#f97316" stroke-width="4" stroke-dasharray="12 12" />
+    <rect x="120" y="120" width="80" height="60" rx="6" fill="#fef3c7" stroke="#f97316" stroke-width="4" />
+  </g>
+  <g transform="translate(160 340) rotate(-12)">
+    <rect width="150" height="100" rx="18" fill="#22d3ee" stroke="#0e7490" stroke-width="6" />
+    <rect x="48" y="26" width="54" height="48" rx="8" fill="#0ea5e9" />
+    <circle cx="36" cy="50" r="8" fill="#fff" />
+    <circle cx="114" cy="50" r="8" fill="#fff" />
+  </g>
+  <g transform="translate(640 360) rotate(8)">
+    <rect width="180" height="80" rx="12" fill="#a5b4fc" stroke="#4338ca" stroke-width="6" />
+    <rect x="30" y="22" width="120" height="36" rx="6" fill="#c7d2fe" />
+    <line x1="30" y1="36" x2="150" y2="36" stroke="#4f46e5" stroke-width="4" stroke-linecap="round" />
+    <line x1="30" y1="48" x2="150" y2="48" stroke="#4f46e5" stroke-width="4" stroke-linecap="round" />
+  </g>
+  <g transform="translate(460 360) rotate(-4)">
+    <path d="M0 0 h120 a12 12 0 0 1 12 12 v76 a12 12 0 0 1 -12 12 h-120 a12 12 0 0 1 -12 -12 v-76 a12 12 0 0 1 12 -12 z" fill="#fef3c7" stroke="#f97316" stroke-width="6" />
+    <line x1="24" y1="32" x2="132" y2="32" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
+    <line x1="24" y1="52" x2="132" y2="52" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
+    <line x1="24" y1="72" x2="96" y2="72" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
+  </g>
+  <g transform="translate(280 420) rotate(6)">
+    <rect width="140" height="60" rx="12" fill="#bbf7d0" stroke="#15803d" stroke-width="5" />
+    <text x="70" y="38" font-family="Inter, sans-serif" font-size="28" text-anchor="middle" fill="#166534">keys</text>
+  </g>
+  <g transform="translate(580 440) rotate(-8)">
+    <rect width="120" height="48" rx="10" fill="#fee2e2" stroke="#ef4444" stroke-width="5" />
+    <text x="60" y="32" font-family="Inter, sans-serif" font-size="26" text-anchor="middle" fill="#b91c1c">journal</text>
+  </g>
+</svg>
