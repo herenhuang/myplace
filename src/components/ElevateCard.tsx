@@ -39,25 +39,19 @@ export default function ElevateCard({
         width: `${width}px`,
         height: `${height}px`,
         aspectRatio: '4 / 5.5',
-        backgroundImage: `url(${imagePath}/card2.png)`,
+        backgroundImage: imagePath === '/elevate'
+          ? `url(/elevate/cardelevate.png)`
+          : `url(${imagePath}/card2.png)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         filter: 'drop-shadow(-12px 36px 36px rgba(0, 0, 0, .2))'
       }}
     >
-      <div 
+      <div
         className="flex flex-col justify-center items-center h-full"
         style={{ padding: `${padding}px` }}
       >
-        <Image
-          src={`${imagePath}/${formatArchetypeForIcon(archetype)}.svg`}
-          alt={`${archetype} icon`}
-          width={iconSize}
-          height={iconSize}
-          className="rounded-lg"
-          style={{ marginBottom: `${padding * 0.5}px` }}
-        />
         <h1
           className="font-semibold leading-tight text-center"
           style={{

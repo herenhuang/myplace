@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
+import html2canvas from 'html2canvas'
+import Link from 'next/link'
 import PageContainer from '@/components/layout/PageContainer'
 import BlobbertTip from '@/components/BlobbertTip'
 import ElevateCard from '@/components/ElevateCard'
 import AnalyzingScreen from './AnalyzingScreen'
+import PersonalityPredictions from '@/components/quiz/PersonalityPredictions'
 import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
@@ -25,10 +28,84 @@ interface Step {
 }
 
 type ScreenState = 'welcome' | 'simulation' | 'analyzing' | 'results'
+type ResultsPage = 'card' | 'explanation-1' | 'explanation-2' | 'personality' | 'recommendation'
 
 // Configuration
 const ENABLE_IMAGE_GENERATION = false // Toggle to enable/disable AI image generation
 const TOTAL_STEPS = 9 // Expanded to 9 steps for full-day arc
+
+// Parse markdown content into sections
+function parseSections(markdown: string): string[] {
+  if (!markdown) return ['']
+
+  const patterns = [
+    /<section>\s*([\s\S]*?)\s*<\/section>/gi,
+    /\<section\>([\s\S]*?)\<\/section\>/g,
+    /&lt;section&gt;([\s\S]*?)&lt;\/section&gt;/gi
+  ]
+
+  let sections: string[] = []
+
+  for (const pattern of patterns) {
+    const matches = markdown.matchAll(pattern)
+    sections = Array.from(matches, match => match[1].trim()).filter(s => s.length > 0)
+
+    if (sections.length > 0) {
+      break
+    }
+  }
+
+  if (sections.length === 0) {
+    const headerSplit = markdown.split(/(?=^## )/m).filter(s => s.trim().length > 0)
+    if (headerSplit.length > 1) {
+      sections = headerSplit
+    } else {
+      sections = [markdown]
+    }
+  }
+
+  return sections
+}
+
+// Parse personality predictions from markdown
+function parsePersonalityPredictions(section: string) {
+  try {
+    const mbtiMatch = section.match(/\*\*MBTI Type:\s*([A-Z]{4})\s*\((\d+)%\s*confident\)\*\*/i)
+    const mbtiType = mbtiMatch ? mbtiMatch[1] : 'Unknown'
+    const mbtiConfidence = mbtiMatch ? parseInt(mbtiMatch[2]) : 0
+
+    const mbtiExplMatch = section.match(/\*\*MBTI Type:.*?\*\*\s*([\s\S]*?)\s*\*\*Big Five/)
+    const mbtiExplanation = mbtiExplMatch ? mbtiExplMatch[1].trim() : ''
+
+    const opennessMatch = section.match(/Openness:\s*(\d+)/i)
+    const conscientiousnessMatch = section.match(/Conscientiousness:\s*(\d+)/i)
+    const extraversionMatch = section.match(/Extraversion:\s*(\d+)/i)
+    const agreeablenessMatch = section.match(/Agreeableness:\s*(\d+)/i)
+    const neuroticismMatch = section.match(/Neuroticism:\s*(\d+)/i)
+
+    const oceanScores = {
+      openness: opennessMatch ? parseInt(opennessMatch[1]) : 50,
+      conscientiousness: conscientiousnessMatch ? parseInt(conscientiousnessMatch[1]) : 50,
+      extraversion: extraversionMatch ? parseInt(extraversionMatch[1]) : 50,
+      agreeableness: agreeablenessMatch ? parseInt(agreeablenessMatch[1]) : 50,
+      neuroticism: neuroticismMatch ? parseInt(neuroticismMatch[1]) : 50
+    }
+
+    const oceanExplMatch = section.match(/Neuroticism:\s*\d+\s*([\s\S]*?)(?=##|$)/)
+    const oceanExplanation = oceanExplMatch ? oceanExplMatch[1].trim() : ''
+
+    return {
+      mbtiType,
+      mbtiConfidence,
+      mbtiExplanation,
+      oceanScores,
+      oceanExplanation
+    }
+  } catch (error) {
+    console.error('Error parsing personality predictions:', error)
+    return null
+  }
+}
 
 // Predefined step 1 only
 const PREDEFINED_STEPS: Record<number, Step> = {
@@ -47,7 +124,7 @@ const PREDEFINED_STEPS: Record<number, Step> = {
 // Blobbert tips for each screen
 const BLOBBERT_TIPS: Record<string, string> = {
   'welcome': "Ready to discover your conference style? Let's go!",
-  'step-1': "There are no wrong answers, so just go with your gut!!",
+  'step-1': "There are no wrong answers, just go with your gut. The more you share, the more accurate your results!",
   // 'step-2': "Trust your instincts and choose what feels right.",
   // 'step-3': "You're doing great! Keep being yourself.",
   'step-4': "Keep the momentum—what catches your attention next?",
@@ -75,7 +152,7 @@ interface ElevateState {
   archetype: string
   tagline: string
   explanation: string
-  resultsPage: 'card' | 'explanation'
+  resultsPage: ResultsPage
   timestamp: number
 }
 
@@ -100,10 +177,11 @@ export default function ElevateSimulation() {
   const [tagline, setTagline] = useState<string>('')
   const [explanation, setExplanation] = useState<string>('')
   const [analysisError, setAnalysisError] = useState<string>('')
-  const [resultsPage, setResultsPage] = useState<'card' | 'explanation'>('card')
+  const [resultsPage, setResultsPage] = useState<ResultsPage>('card')
   
   const inputRef = useRef<HTMLInputElement>(null)
   const choicesContainerRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
   
   // Dynamic Blobbert positioning
   const [blobbertBottomPosition, setBlobbertBottomPosition] = useState(120)
@@ -288,7 +366,7 @@ export default function ElevateSimulation() {
   const resetSimulation = () => {
     // Clear saved state from localStorage
     clearSavedState()
-    
+
     setScreenState('welcome')
     setCurrentStepNumber(0)
     setCurrentStep(null)
@@ -302,6 +380,60 @@ export default function ElevateSimulation() {
     setResultsPage('card')
     const sid = getOrCreateSessionId()
     setSessionId(sid)
+  }
+
+  const handleShare = async () => {
+    if (!cardRef.current) return
+
+    try {
+      // Ensure fonts and layout are fully ready
+      if (document.fonts && 'ready' in document.fonts) {
+        try {
+          await (document.fonts as any).ready
+        } catch {}
+      }
+      await new Promise(resolve => requestAnimationFrame(() => resolve(undefined)))
+
+      // Capture the card as an image
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false
+      })
+
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+        }, 'image/png')
+      })
+
+      // Create a file from the blob
+      const file = new File([blob], 'elevate-result.png', { type: 'image/png' })
+
+      // Check if Web Share API is supported and can share files
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `${archetype} - Elevate Conference Style`,
+          text: `Check out my Elevate conference style: ${archetype}!`,
+        })
+      } else {
+        // Fallback: download the image
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'elevate-result.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Error sharing the image:', error)
+    }
   }
 
   const handleChoiceSelect = async (choiceValue: string, isCustom: boolean = false) => {
@@ -976,72 +1108,236 @@ export default function ElevateSimulation() {
               </div>
 
               <div className={styles.welcomeHeader}>
-
-              <button
+                <button
                   onClick={resetSimulation}
                   className={styles.choiceButton}
                 >
                   Try Again
                 </button>
               </div>
-              
-          
             </div>
           )
         }
+
+        // Parse sections from explanation
+        const sections = parseSections(explanation)
 
         // Results Page 1: Card Display
         if (resultsPage === 'card') {
           return (
             <div className={styles.textContainer}>
-              <div className={styles.resultHeader}>
-                <div className="text-center mt-10 px-8 box-border">
-                  <div className={styles.resultCard}>
-                    <ElevateCard
-                      archetype={archetype}
-                      tagline={tagline || ''}
-                      dimension={280}
-                      className="mx-auto"
-                    />
-                  </div>
+              <div className={styles.resultsScreen}>
+                <div ref={cardRef} className={styles.resultCard} data-share-root="result-card">
+                  <ElevateCard
+                    archetype={archetype}
+                    tagline={tagline || ''}
+                    dimension={280}
+                    className="mx-auto"
+                  />
                 </div>
 
-                <button
-                  onClick={() => setResultsPage('explanation')}
-                  className={styles.appButton}
-                >
-                  <span>Continue →</span>
-                </button>
+                <div className={styles.actionButtons}>
+                  {explanation && (
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => setResultsPage('explanation-1')}
+                    >
+                      <h2>See Why →</h2>
+                    </button>
+                  )}
+
+                  <button
+                    className={styles.actionButtonAlt}
+                    onClick={handleShare}
+                    title="Share your result"
+                  >
+                    <span className={styles.shareIcon + ' material-symbols-outlined'}>
+                      share
+                    </span>
+                    <h2>Share</h2>
+                  </button>
+                </div>
               </div>
             </div>
           )
         }
 
-        // Results Page 2: Explanation
-        return (
-          <div className={styles.textContainer}>
-            <div className={styles.resultHeader}>
-              <div className="px-8 pt-10">
-                <h2 className={styles.resultTitle}>
-                  {archetype}
-                </h2>
-                <div className={styles.markdownContent}>
-                  <ReactMarkdown>
-                    {explanation}
-                  </ReactMarkdown>
+        // Results Page 2: Explanation Section 1 (Your Approach)
+        if (resultsPage === 'explanation-1') {
+          return (
+            <div className={styles.textContainer}>
+              <div className={styles.resultHeader}>
+                <div className="px-8 pt-10">
+                  <h2 className={styles.resultTitle}>
+                    {archetype}
+                  </h2>
+                  {tagline && (
+                    <p className={styles.resultTagline}>{tagline}</p>
+                  )}
+                  {sections[0] && (
+                    <div className={styles.markdownContent}>
+                      <ReactMarkdown>{sections[0]}</ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.paginationControls}>
+                  <button
+                    onClick={() => setResultsPage('card')}
+                    className={styles.paginationButton}
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    onClick={() => setResultsPage('explanation-2')}
+                    className={styles.paginationButton}
+                  >
+                    Next →
+                  </button>
                 </div>
               </div>
-
-              <button
-                onClick={resetSimulation}
-                className={styles.appButton}
-              >
-                <span>Complete</span>
-              </button>
-
             </div>
-          </div>
-        )
+          )
+        }
+
+        // Results Page 3: Explanation Section 2 (What This Actually Means)
+        if (resultsPage === 'explanation-2') {
+          return (
+            <div className={styles.textContainer}>
+              <div className={styles.resultHeader}>
+                <div className="px-8 pt-10">
+                  <h2 className={styles.resultTitle}>
+                    {archetype}
+                  </h2>
+                  {tagline && (
+                    <p className={styles.resultTagline}>{tagline}</p>
+                  )}
+                  {sections[1] && (
+                    <div className={styles.markdownContent}>
+                      <ReactMarkdown>{sections[1]}</ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.paginationControls}>
+                  <button
+                    onClick={() => setResultsPage('explanation-1')}
+                    className={styles.paginationButton}
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    onClick={() => setResultsPage('personality')}
+                    className={styles.paginationButton}
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        // Results Page 4: Personality Predictions + You May Also Be
+        if (resultsPage === 'personality') {
+          const personalitySection = sections[2] // Section 2 should be "## Personality Predictions"
+          const personalityData = personalitySection ? parsePersonalityPredictions(personalitySection) : null
+          const alternativesSection = sections[3] // Section 3 should be "## You May Also Be"
+
+          return (
+            <div className={styles.textContainer}>
+              <div className={styles.resultHeader}>
+                <div className="px-8 pt-10">
+                  <h2 className={styles.resultTitle}>
+                    {archetype}
+                  </h2>
+                  {tagline && (
+                    <p className={styles.resultTagline}>{tagline}</p>
+                  )}
+
+                  {personalityData ? (
+                    <div className={styles.markdownContent}>
+                      <PersonalityPredictions
+                        mbtiType={personalityData.mbtiType}
+                        mbtiConfidence={personalityData.mbtiConfidence}
+                        mbtiExplanation={personalityData.mbtiExplanation}
+                        oceanScores={personalityData.oceanScores}
+                        oceanExplanation={personalityData.oceanExplanation}
+                      />
+                    </div>
+                  ) : (
+                    <div className={styles.markdownContent}>
+                      <h2>Personality Predictions</h2>
+                      <p><em>Take more quizzes to see your personality predictions!</em></p>
+                    </div>
+                  )}
+
+                  {alternativesSection && (
+                    <div className={styles.markdownContent}>
+                      <ReactMarkdown>{alternativesSection}</ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.paginationControls}>
+                  <button
+                    onClick={() => setResultsPage('explanation-2')}
+                    className={styles.paginationButton}
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    onClick={() => setResultsPage('recommendation')}
+                    className={styles.paginationButton}
+                  >
+                    What&apos;s Next →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        // Results Page 5: Recommendations
+        if (resultsPage === 'recommendation') {
+          return (
+            <div className={styles.textContainer}>
+              <div className={styles.resultHeader}>
+                <div className="px-8 pt-10">
+                  <h2 className={styles.resultTitle}>
+                    Keep Exploring
+                  </h2>
+                  <div className={styles.markdownContent}>
+                    <p>Based on your conference style, we think you&apos;d enjoy these quizzes:</p>
+
+                    <div className="mt-6 space-y-4">
+                      <Link href="/quiz/manager-style" className={styles.recommendationCard}>
+                        <h3 className="text-lg font-medium mb-1">What&apos;s Your Manager Style?</h3>
+                        <p className="text-sm text-gray-600">Discover how you really lead and what makes you effective</p>
+                      </Link>
+
+                      <Link href="/quiz/feedback-style" className={styles.recommendationCard}>
+                        <h3 className="text-lg font-medium mb-1">What&apos;s Your Feedback Style?</h3>
+                        <p className="text-sm text-gray-600">Learn how you give and receive feedback</p>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.paginationControls}>
+                  <button
+                    onClick={resetSimulation}
+                    className={styles.paginationButton}
+                  >
+                    Retake Quiz
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        return null
 
       default:
         return null
@@ -1051,37 +1347,39 @@ export default function ElevateSimulation() {
   return (
     <PageContainer className="!max-w-none max-w-4xl">
       <div className="flex flex-col items-center justify-center h-[100vh] w-[100vw] overflow-visible">
-        {/* Progress bar - only show during simulation */}
-        {screenState === 'simulation' && (
-          <div className={styles.progressContainer}>
-            <div className={styles.progressBarTrack}>
-              <div 
-                className={styles.progressBarFill}
-                style={{ width: `${(currentStepNumber / TOTAL_STEPS) * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
-
         {/* Persistent phone container */}
         <div className={styles.stepContainer}>
           <div className={styles.stepContent}>
-            <div 
-              className={styles.imageContainer} 
-              style={{ 
-                backgroundImage: backgroundImageUrl && screenState === 'simulation' 
-                  ? `url(${backgroundImageUrl})` 
+            <div
+              className={styles.imageContainer}
+              style={{
+                backgroundImage: backgroundImageUrl && screenState === 'simulation'
+                  ? `url(${backgroundImageUrl})`
                   : screenState === 'welcome'
                   ? `url(/elevate/orange.png)`
                   : 'none'
               }}
               data-image-loading={isImageLoading}
             >
+              {/* Progress bar - only show during simulation */}
+              {screenState === 'simulation' && (
+                <div className={styles.progressContainer}>
+                  {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+                    <div key={i} className={styles.progressBarTrack}>
+                      <div
+                        className={styles.progressBarFill}
+                        style={{ width: currentStepNumber > i ? '100%' : '0%' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {renderContent()}
-              
+
               {/* Floating Blobbert Button - appears on all screens inside imageContainer */}
-              <BlobbertTip 
-                tip={getCurrentTip()} 
+              <BlobbertTip
+                tip={getCurrentTip()}
                 isVisible={true}
                 showSpeechBubble={shouldShowSpeechBubble()}
                 bottomPosition={blobbertBottomPosition}

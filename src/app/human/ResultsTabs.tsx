@@ -153,7 +153,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
               {[{ name: 'Creativity', score: data.subscores.creativity, color: 'from-purple-400 to-purple-600' }, { name: 'Spontaneity', score: data.subscores.spontaneity, color: 'from-blue-400 to-blue-600' }, { name: 'Authenticity', score: data.subscores.authenticity, color: 'from-green-400 to-green-600' }].map((s, i) => (
                 <div key={s.name}>
                   <div className="flex justify-between items-center mb-2"><span className="text-gray-700 font-medium">{s.name}</span><span className="text-gray-900 font-bold">{s.score}</span></div>
-                  <div className={styles.gradientTrack}><div className={`h-2 bg-gradient-to-r ${s.color} rounded-full absolute left-0 top-0 transition-all duration-1000 ease-out`} style={{ width: `${s.score}%`, transitionDelay: `${(i + 1) * 200}ms` }} /></div>
+                  <div className={styles.gradientTrack}><div className={`h-8 bg-gradient-to-r ${s.color} rounded-full absolute left-0 top-0 transition-all duration-1000 ease-out`} style={{ width: `${s.score}%`, transitionDelay: `${(i + 1) * 200}ms` }} /></div>
                 </div>
               ))}
                             </div>
