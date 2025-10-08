@@ -493,12 +493,6 @@ export default function ElevateSimulation() {
       console.log('📝 Recording step:', { dbSessionId, stepNumber: stepData.stepNumber, response: stepData.userResponse })
       const recordResult = await recordStep(dbSessionId, stepData)
 
-      if (recordResult.error) {
-        console.error('❌ Failed to record step:', recordResult.error)
-      } else {
-        console.log('✅ Step recorded successfully:', stepData.stepNumber)
-      }
-
       // Update previous responses
       const newResponses = [...previousResponses, responseText]
       setPreviousResponses(newResponses)
@@ -525,7 +519,6 @@ export default function ElevateSimulation() {
         }
       } else if (nextStepNumber === 2) {
         // Generate step 2: AI generates text, we add hard-coded question/choices
-        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 2`)
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         
         if ('error' in result) {
@@ -554,7 +547,6 @@ export default function ElevateSimulation() {
         }
       } else if (nextStepNumber === 3 || nextStepNumber === 4) {
         // Generate with AI - get text content first
-        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step ${nextStepNumber}`)
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         
         if ('error' in result) {
@@ -562,13 +554,7 @@ export default function ElevateSimulation() {
           setIsLoading(false)
           return
         }
-        
-        console.log(`\n📦 [FRONTEND] Received result from generateNextStep:`, {
-          success: result.success,
-          hasText: !!result.text,
-          hasQuestion: !!result.question,
-          choicesCount: result.choices?.length || 0
-        })
+      
         
         if (result.success) {
           if (nextStepNumber === 4) {
@@ -604,7 +590,6 @@ export default function ElevateSimulation() {
         }
       } else if (nextStepNumber === 5) {
         // Step 5: Start lunch arc - AI generates text only; we add question/choices
-        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 5 (lunch arc)`)
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         if ('error' in result) {
           console.error('❌ [FRONTEND] Error from generateNextStep (5):', result.error)
@@ -629,7 +614,7 @@ export default function ElevateSimulation() {
         }
       } else if (nextStepNumber === 6) {
         // Step 6: Follow-up after lunch - full AI generation
-        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 6 (post-lunch follow-up)`)
+
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         if ('error' in result) {
           console.error('❌ [FRONTEND] Error from generateNextStep (6):', result.error)
@@ -651,7 +636,6 @@ export default function ElevateSimulation() {
         }
       } else if (nextStepNumber === 7) {
         // Step 7: Helen Huang's talk - AI text only; we add question/choices
-        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 7 (Helen's talk)`)
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         if ('error' in result) {
           console.error('❌ [FRONTEND] Error from generateNextStep (7):', result.error)
@@ -676,10 +660,8 @@ export default function ElevateSimulation() {
         }
       } else if (nextStepNumber === 8) {
         // Step 8: Follow-up built off the talk - full AI generation
-        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 8 (post-talk follow-up)`)
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         if ('error' in result) {
-          console.error('❌ [FRONTEND] Error from generateNextStep (8):', result.error)
           setIsLoading(false)
           return
         }
@@ -698,7 +680,6 @@ export default function ElevateSimulation() {
         }
       } else if (nextStepNumber === 9) {
         // Step 9: Final conclusion - no question or choices
-        console.log(`\n🎬 [FRONTEND] Requesting AI generation for step 9 (day conclusion)`)
         const result = await generateNextStep(dbSessionId, nextStepNumber)
         if ('error' in result) {
           console.error('❌ [FRONTEND] Error from generateNextStep (9):', result.error)
@@ -719,7 +700,6 @@ export default function ElevateSimulation() {
       }
       
       if (nextStep) {
-        console.log(`\n🎯 [FRONTEND] Setting current step to ${nextStepNumber}`)
         setCurrentStep(nextStep)
         setCurrentStepNumber(nextStepNumber)
         setCustomInput('')
@@ -1374,7 +1354,7 @@ export default function ElevateSimulation() {
               {/* Floating Blobbert Button - appears on all screens inside imageContainer */}
               <BlobbertTip
                 tip={getCurrentTip()}
-                isVisible={true}
+                isVisible={!(screenState === 'results' && resultsPage === 'card')}
                 showSpeechBubble={shouldShowSpeechBubble()}
                 bottomPosition={blobbertBottomPosition}
               />
