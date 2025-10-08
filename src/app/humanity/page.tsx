@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import styles from './page.module.scss'
 import PageContainer from '@/components/layout/PageContainer'
 import { getOrCreateSessionId } from '@/lib/session'
+import Image from 'next/image'
 import {
   HUMANITY_QUESTIONS,
   HUMANITY_TOTAL_STEPS,
@@ -35,14 +36,17 @@ import AllocationDial from './components/AllocationDial'
 import AssociationPrompt from './components/AssociationPrompt'
 import FreeformNote from './components/FreeformNote'
 import HumanityResultsTabs from './results/ResultsTabs'
+import { HUMAN_TEST_DISCLAIMER } from '@/lib/human-constants'
+
 type ScreenState =
   | 'welcome'
+  | 'confirmation'
   | 'simulation'
   | 'analyzing'
   | 'results-overview'
   | 'results-breakdown'
   | 'results-archetype'
-const RESULTS_STATES: Array<Exclude<ScreenState, 'welcome' | 'simulation' | 'analyzing'>> =
+const RESULTS_STATES: Array<Exclude<ScreenState, 'welcome' | 'confirmation' | 'simulation' | 'analyzing'>> =
   ['results-overview', 'results-breakdown', 'results-archetype']
 export default function HumanitySimulationPage() {
   const router = useRouter()
@@ -164,12 +168,16 @@ export default function HumanitySimulationPage() {
       } else {
         setDbSessionId(remoteId)
       }
-      setCurrentStep(1)
-      setScreenState('simulation')
-      setStepStartTime(performance.now())
+      setScreenState('confirmation')
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const confirmStart = () => {
+    setCurrentStep(1)
+    setScreenState('simulation')
+    setStepStartTime(performance.now())
   }
   const getCompletionStatus = useCallback(
     (stepNumber: number, mechanic: HumanityMechanic) => {
@@ -605,52 +613,61 @@ export default function HumanitySimulationPage() {
         return null
     }
   }
+
+  const renderConfirmation = () => {
+    return (
+      <div className={`flex flex-col items-center justify-center h-screen ${styles.pageBg}`}>
+        <div className="max-w-md w-full h-full p-12 flex flex-col items-center justify-center">
+          <Image src="/elevate/blobbert.png" alt="Human" width={120} height={120} />
+          
+          <div className="text-left mt-8 mb-12">
+            <p className="text-black text-base leading-5 whitespace-pre-line">
+              {HUMAN_TEST_DISCLAIMER}
+            </p>
+          </div>
+
+          <button
+            onClick={confirmStart}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-12 rounded-full text-lg transition-colors shadow-lg"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    )
+  }
+
     return (
     <PageContainer className={styles.pageFrame}>
       {screenState === 'welcome' && (
+
+        
         <div className={styles.heroCard}>
-          <span className={styles.stepBadge}>
-            An experiment in mapping your human patterns
-          </span>
-          <h1 className={styles.heroTitle}>Humanity Wrapped</h1>
-          <p className={styles.heroSubtitle}>
-            Guide a handful of disguised mini-games — from rescue runs to chat
-            improvisations — and generate a personality breakdown tuned to what
-            makes you unmistakably human.
+          <div className={`flex flex-col items-center justify-center ${styles.pageBg}`}>
+        <div className="max-w-md w-full h-full p-12 text-center flex flex-col items-center justify-center">
+
+          <Image src="/elevate/blobbert.png" alt="Human" width={160} height={160} />
+          
+          <h1 className="text-4xl font-bold mb-4 text-gray-900 tracking-tight">
+            How Human Are You?
+          </h1>
+          
+          <p className="text-gray-600 mb-8 text-base leading-5">
+            Take this quick assessment to discover how uniquely human your behavior is compared to AI.
           </p>
-          <div className={styles.toggleRow}>
-            <div className={styles.toggleLabel}>
-              Single-page mode
-              <span className={styles.toggleSubtext}>
-                Fill everything at once. Great for quick review or editing.
-              </span>
-            </div>
-            <label className={styles.singlePageToggle}>
-              <input
-                type="checkbox"
-                checked={singlePagePreferred}
-                onChange={(event) => setSinglePagePreferred(event.target.checked)}
-              />
-              <span className={styles.singlePageSlider}></span>
-            </label>
-          </div>
-          <div className={styles.startActionRow}>
-            <button
-              type="button"
-              className={styles.primaryButton}
-              onClick={startSimulation}
-              disabled={isLoading}
-            >
-              {singlePagePreferred ? 'Open single page' : 'Start the simulation'}
-            </button>
-            {!singlePagePreferred && (
-              <span className="text-sm text-gray-600">
-                16 quick steps · cached locally so you can step away anytime.
-              </span>
-                )}
-              </div>
+
+          <button
+            onClick={startSimulation}
+            disabled={isLoading}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-18 cursor-pointer rounded-full text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+          >
+            {isLoading ? 'Starting...' : 'Start'}
+          </button>
+        </div>
+      </div>
             </div>
           )}
+      {screenState === 'confirmation' && renderConfirmation()}
       {screenState === 'simulation' && currentQuestion && (
         <div className="flex flex-col justify-center items-center gap-6 h-screen w-full border-box p-8 overflow-y-hidden">
 

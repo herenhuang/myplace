@@ -14,13 +14,12 @@
 }
 
 .heroCard {
-  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 55%, #eff6ff 100%);
-  border-radius: 2rem;
-  padding: clamp(2rem, 5vw, 3.5rem);
+  width: 100%;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+  align-items: center;
+  justify-content: center;
 }
 
 .heroTitle {
@@ -131,6 +130,7 @@
   overflow-y: scroll;
   flex: 1;
   width: 100%;
+  max-width: 90vw;
   max-height: 80vh;
   gap: 1.5rem;
 }
@@ -194,9 +194,12 @@
   box-shadow: 0 12px 25px rgba(249, 115, 22, 0.12);
 }
 
-.rescueCardSelected {
-  border-color: rgba(249, 115, 22, 0.6);
-  box-shadow: 0 18px 30px rgba(249, 115, 22, 0.18);
+.rescueCanvasCardSelected {
+  background: red;
+  .rescueEmoji {
+    border-color: rgba(249, 115, 22, 0.6);
+    filter: drop-shadow(0 0 10px rgba(white, 1));
+  }
 }
 
 .rescueCardDisabled {
@@ -205,7 +208,9 @@
 }
 
 .rescueEmoji {
-  font-size: 2rem;
+  font-size: 60px;
+  width: fit-content;
+  filter: drop-shadow(0 0 10px rgba(white, 1));
 }
 
 .rescueBadge {
@@ -241,6 +246,84 @@
   border-color: rgba(99, 102, 241, 0.45);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
   outline: none;
+}
+
+/* Canvas-based rescue picker */
+.rescueCanvas {
+  position: relative;
+  width: 100%;
+  height: 70vh; /* 70% of viewport height on desktop */
+  aspect-ratio: 1/1;
+  min-height: 500px;
+  max-height: 800px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 50%, #fecaca 100%);
+  border-radius: 24px;
+  border: 2px dashed rgba(249, 115, 22, 0.3);
+  overflow: hidden;
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: 768px) {
+    height: calc(100vh - 300px); /* Full available space on mobile, minus header/footer */
+    min-height: 400px;
+    max-height: none;
+    border-radius: 16px;
+  }
+}
+
+.rescueCanvasCard {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  padding: 0.85rem;
+  border-radius: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  cursor: grab;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transform-origin: center;
+  min-width: 140px;
+  max-width: 180px;
+  touch-action: none;
+  user-select: none;
+  
+  // Ensure child elements don't block pointer events
+  * {
+    pointer-events: none;
+  }
+  
+  &:active {
+    cursor: grabbing;
+  }
+  
+  @media (max-width: 768px) {
+    min-width: 120px;
+    max-width: 150px;
+    padding: 0.7rem;
+  }
+}
+
+.rescueCanvasCard:not(.rescueCanvasCardDisabled):hover {
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.15);
+}
+
+.rescueCanvasCardSelected {
+  border-color: #f97316;
+  border-width: 3px;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2), 0 8px 24px rgba(249, 115, 22, 0.25);
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+}
+
+.rescueCanvasCardDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
 }
 
 .chatWindow {
@@ -323,14 +406,19 @@
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 18px;
-  padding: 0.9rem 1rem;
-  min-width: 160px;
+  padding: 24px;
+  min-width: 120px;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   cursor: grab;
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .iconChipDragging {
@@ -345,7 +433,7 @@
 }
 
 .iconEmoji {
-  font-size: 1.6rem;
+  font-size: 60px;
 }
 
 .iconLabel {
