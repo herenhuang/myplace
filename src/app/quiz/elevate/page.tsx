@@ -9,7 +9,7 @@ import BlobbertTip from '@/components/BlobbertTip'
 import ElevateCard from '@/components/ElevateCard'
 import AnalyzingScreen from './AnalyzingScreen'
 import PersonalityPredictions from '@/components/quiz/PersonalityPredictions'
-import { startSession, recordStep, generateNextStep, generateStepImageForStep, analyzeArchetype, type StepData } from './actions'
+import { startSession, recordStep, generateNextStep, analyzeArchetype, type StepData } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from './page.module.scss'
 
@@ -31,7 +31,6 @@ type ScreenState = 'welcome' | 'simulation' | 'analyzing' | 'results'
 type ResultsPage = 'card' | 'explanation-1' | 'explanation-2' | 'personality' | 'recommendation'
 
 // Configuration
-const ENABLE_IMAGE_GENERATION = false // Toggle to enable/disable AI image generation
 const TOTAL_STEPS = 9 // Expanded to 9 steps for full-day arc
 
 // Parse markdown content into sections
@@ -185,6 +184,9 @@ export default function ElevateSimulation() {
   
   // Dynamic Blobbert positioning
   const [blobbertBottomPosition, setBlobbertBottomPosition] = useState(120)
+  
+  // Transition out state for slide-out animation
+  const [isTransitioningOut, setIsTransitioningOut] = useState(false)
 
   // Get current Blobbert tip
   const getCurrentTip = (): string => {
@@ -355,7 +357,14 @@ export default function ElevateSimulation() {
   }
 
   const startAnalysis = async () => {
+    // If called directly from the button (not from handleChoiceSelect), trigger slide-out
+    if (!isTransitioningOut) {
+      setIsTransitioningOut(true)
+      await new Promise(resolve => setTimeout(resolve, 400))
+    }
+    
     setScreenState('analyzing')
+    setIsTransitioningOut(false) // Reset since we're changing screens
     
     try {
       const result = await analyzeArchetype(dbSessionId)
@@ -453,12 +462,19 @@ export default function ElevateSimulation() {
   }
 
   const handleChoiceSelect = async (choiceValue: string, isCustom: boolean = false) => {
-    if (isLoading) return
+    if (isLoading || isTransitioningOut) return
     
     const responseText = isCustom ? customInput.trim() : choiceValue
     if (!responseText) return
 
+    // Trigger slide-out animation
+    setIsTransitioningOut(true)
+    
+    // Wait for animation to complete before proceeding
+    await new Promise(resolve => setTimeout(resolve, 400))
+
     setIsLoading(true)
+    // Keep isTransitioningOut true until new step loads
     
     try {
       const timeMs = Date.now() - stepStartTime
@@ -487,9 +503,10 @@ export default function ElevateSimulation() {
       const newResponses = [...previousResponses, responseText]
       setPreviousResponses(newResponses)
       
-      // Check if simulation is complete (4 steps)
+      // Check if simulation is complete (9 steps)
       if (currentStepNumber >= TOTAL_STEPS) {
         await startAnalysis()
+        setIsTransitioningOut(false) // Reset transition state after moving to analysis
         return
       }
       
@@ -576,49 +593,12 @@ export default function ElevateSimulation() {
             }
           }
           
-          // Set static background images for steps 3 and 4
+          // Set static background images for steps 3 and 4 (exactly like steps 1 and 2)
           if (nextStepNumber === 3) {
             setBackgroundImageUrl('/elevate/elevate-1.png')
             setIsImageLoading(false)
           } else if (nextStepNumber === 4) {
             setBackgroundImageUrl('/elevate/elevate-3.png')
-            setIsImageLoading(false)
-          }
-          
-          // Handle image generation based on toggle (only if image generation is enabled)
-          if (ENABLE_IMAGE_GENERATION && nextStepNumber !== 3 && nextStepNumber !== 4) {
-            // Clear previous background image and start loading new one
-            setBackgroundImageUrl(null)
-            setIsImageLoading(true)
-            
-            console.log(`\n✅ [FRONTEND] Next step object created:`, {
-              stepNumber: nextStep.stepNumber,
-              hasText: !!nextStep.text,
-              hasQuestion: !!nextStep.question,
-              choicesCount: nextStep.choices.length
-            })
-            
-            // Generate image in background (don't await) - pass the step text directly
-            const stepTextForImage = nextStep.text
-            generateStepImageForStep(nextStepNumber, stepTextForImage).then((imageResult) => {
-              if ('error' in imageResult) {
-                console.error('❌ [FRONTEND] Error generating image:', imageResult.error)
-                setIsImageLoading(false)
-              } else if (imageResult.success && imageResult.imageUrl) {
-                console.log('✅ [FRONTEND] Background image loaded successfully')
-                setBackgroundImageUrl(imageResult.imageUrl)
-                setIsImageLoading(false)
-              } else {
-                console.log('⚠️ [FRONTEND] No image generated')
-                setIsImageLoading(false)
-              }
-            }).catch((error) => {
-              console.error('❌ [FRONTEND] Error in background image generation:', error)
-              setIsImageLoading(false)
-            })
-          } else {
-            // Image generation disabled, clear image
-            setBackgroundImageUrl(null)
             setIsImageLoading(false)
           }
         }
@@ -665,32 +645,9 @@ export default function ElevateSimulation() {
             allowCustomInput: true,
             imageUrl: '/elevate/elevate-5.png'
           }
-          // Set static background image for step 6
+          // Set static background image for step 6 (exactly like steps 1 and 2)
           setBackgroundImageUrl('/elevate/elevate-5.png')
           setIsImageLoading(false)
-          
-          // Handle image generation based on toggle (only if enabled)
-          if (ENABLE_IMAGE_GENERATION) {
-            setBackgroundImageUrl(null)
-            setIsImageLoading(true)
-            const stepTextForImage = nextStep.text
-            generateStepImageForStep(nextStepNumber, stepTextForImage).then((imageResult) => {
-              if ('error' in imageResult) {
-                console.error('❌ [FRONTEND] Error generating image:', imageResult.error)
-                setIsImageLoading(false)
-              } else if (imageResult.success && imageResult.imageUrl) {
-                console.log('✅ [FRONTEND] Background image loaded successfully')
-                setBackgroundImageUrl(imageResult.imageUrl)
-                setIsImageLoading(false)
-              } else {
-                console.log('⚠️ [FRONTEND] No image generated')
-                setIsImageLoading(false)
-              }
-            }).catch((error) => {
-              console.error('❌ [FRONTEND] Error in background image generation:', error)
-              setIsImageLoading(false)
-            })
-          }
         }
       } else if (nextStepNumber === 7) {
         // Step 7: Helen Huang's talk - AI text only; we add question/choices
@@ -735,32 +692,9 @@ export default function ElevateSimulation() {
             allowCustomInput: true,
             imageUrl: '/elevate/elevate-4.png'
           }
-          // Set static background image for step 8
+          // Set static background image for step 8 (exactly like steps 1 and 2)
           setBackgroundImageUrl('/elevate/elevate-4.png')
           setIsImageLoading(false)
-          
-          // Handle image generation based on toggle (only if enabled)
-          if (ENABLE_IMAGE_GENERATION) {
-            setBackgroundImageUrl(null)
-            setIsImageLoading(true)
-            const stepTextForImage = nextStep.text
-            generateStepImageForStep(nextStepNumber, stepTextForImage).then((imageResult) => {
-              if ('error' in imageResult) {
-                console.error('❌ [FRONTEND] Error generating image:', imageResult.error)
-                setIsImageLoading(false)
-              } else if (imageResult.success && imageResult.imageUrl) {
-                console.log('✅ [FRONTEND] Background image loaded successfully')
-                setBackgroundImageUrl(imageResult.imageUrl)
-                setIsImageLoading(false)
-              } else {
-                console.log('⚠️ [FRONTEND] No image generated')
-                setIsImageLoading(false)
-              }
-            }).catch((error) => {
-              console.error('❌ [FRONTEND] Error in background image generation:', error)
-              setIsImageLoading(false)
-            })
-          }
         }
       } else if (nextStepNumber === 9) {
         // Step 9: Final conclusion - no question or choices
@@ -791,11 +725,16 @@ export default function ElevateSimulation() {
         setCustomInput('')
         setStepStartTime(Date.now())
         
+        // Reset transition state now that new content is loaded
+        setIsTransitioningOut(false)
+        
         // Scroll to top for next step
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     } catch (error) {
       console.error('Error processing choice:', error)
+      // Reset transition state on error
+      setIsTransitioningOut(false)
     } finally {
       setIsLoading(false)
     }
@@ -1005,7 +944,14 @@ export default function ElevateSimulation() {
       case 'simulation':
         return currentStep ? (
           <div className={styles.textContainer}>
-            <div className={styles.topText}>
+            <div 
+              className={styles.topText}
+              style={{
+                opacity: isTransitioningOut ? 0 : 1,
+                transform: isTransitioningOut ? 'translateY(-30px)' : 'translateY(0)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            >
               <div className={styles.stepText}>
                 <p>{displayedText}</p>
               </div>
@@ -1018,11 +964,19 @@ export default function ElevateSimulation() {
               
             </div>
 
-            <div ref={choicesContainerRef} className={styles.choicesContainer}>
+            <div 
+              ref={choicesContainerRef} 
+              className={styles.choicesContainer}
+              style={{
+                opacity: isTransitioningOut ? 0 : 1,
+                transform: isTransitioningOut ? 'translateY(40px)' : 'translateY(0)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            >
               {currentStepNumber === TOTAL_STEPS ? (
                 <button
                   onClick={startAnalysis}
-                  disabled={isLoading}
+                  disabled={isLoading || isTransitioningOut}
                   className={styles.appButton}
                 >
                   <span>Continue to Results →</span>
@@ -1032,7 +986,7 @@ export default function ElevateSimulation() {
                   {currentStep.choices.length === 0 && !currentStep.allowCustomInput && (
                     <button
                       onClick={() => handleChoiceSelect('Continue')}
-                      disabled={isLoading || isStreaming}
+                      disabled={isLoading || isStreaming || isTransitioningOut}
                       className={styles.appButton}
                       style={{ opacity: 1, transition: 'opacity 0.2s ease-in-out' }}
                     >
@@ -1045,13 +999,13 @@ export default function ElevateSimulation() {
                       <button
                         key={index}
                         onClick={() => handleChoiceSelect(choice.value)}
-                        disabled={isLoading || isStreaming || !isVisible}
+                        disabled={isLoading || isStreaming || !isVisible || isTransitioningOut}
                         className={styles.choiceButton}
                         style={{ 
                           opacity: 0,
                           transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
                           transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                          pointerEvents: isVisible ? 'auto' : 'none',
+                          pointerEvents: (isVisible && !isTransitioningOut) ? 'auto' : 'none',
                           ...(isVisible && { opacity: 1 })
                         }}
                       >
@@ -1070,7 +1024,7 @@ export default function ElevateSimulation() {
                           ? 'translateY(0)' 
                           : 'translateY(20px)',
                         transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                        pointerEvents: visibleButtons.includes(currentStep.choices.length) ? 'auto' : 'none',
+                        pointerEvents: (visibleButtons.includes(currentStep.choices.length) && !isTransitioningOut) ? 'auto' : 'none',
                         ...(visibleButtons.includes(currentStep.choices.length) && { opacity: 1 })
                       }}
                     >
@@ -1082,17 +1036,17 @@ export default function ElevateSimulation() {
                           value={customInput}
                           onChange={(e) => setCustomInput(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter' && customInput.trim() && !isLoading && !isStreaming) {
+                            if (e.key === 'Enter' && customInput.trim() && !isLoading && !isStreaming && !isTransitioningOut) {
                               handleChoiceSelect(customInput, true)
                             }
                           }}
                           placeholder="Custom response..."
-                          disabled={isLoading || isStreaming || !visibleButtons.includes(currentStep.choices.length)}
+                          disabled={isLoading || isStreaming || !visibleButtons.includes(currentStep.choices.length) || isTransitioningOut}
                           className={styles.customInput}
                         />
                         <button
                           onClick={() => handleChoiceSelect(customInput, true)}
-                          disabled={isLoading || !customInput.trim() || isStreaming || !visibleButtons.includes(currentStep.choices.length)}
+                          disabled={isLoading || !customInput.trim() || isStreaming || !visibleButtons.includes(currentStep.choices.length) || isTransitioningOut}
                           className={styles.submitButton}
                         >
                           {isLoading && (
@@ -1405,6 +1359,13 @@ export default function ElevateSimulation() {
                       />
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Large centered loading spinner */}
+              {isLoading && screenState === 'simulation' && (
+                <div className={styles.centerLoadingSpinner}>
+                  <div className={styles.largeSpinner}></div>
                 </div>
               )}
 
