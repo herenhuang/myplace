@@ -282,7 +282,23 @@ export default function ElevateSimulation() {
       setCurrentStepNumber(savedState.currentStepNumber)
       setCurrentStep(savedState.currentStep)
       setPreviousResponses(savedState.previousResponses)
-      setBackgroundImageUrl(savedState.backgroundImageUrl)
+      
+      // Ensure correct background image based on step number (for backwards compatibility)
+      let correctBackgroundImage = savedState.backgroundImageUrl
+      if (savedState.screenState === 'simulation' && savedState.currentStepNumber) {
+        const stepNum = savedState.currentStepNumber
+        if (stepNum === 1) correctBackgroundImage = '/elevate/orange.png'
+        else if (stepNum === 2) correctBackgroundImage = '/elevate/orange-2.png'
+        else if (stepNum === 3) correctBackgroundImage = '/elevate/elevate-1.png'
+        else if (stepNum === 4) correctBackgroundImage = '/elevate/elevate-3.png'
+        else if (stepNum === 5) correctBackgroundImage = '/elevate/marble.png'
+        else if (stepNum === 6) correctBackgroundImage = '/elevate/elevate-5.png'
+        else if (stepNum === 7) correctBackgroundImage = '/elevate/marble-1.png'
+        else if (stepNum === 8) correctBackgroundImage = '/elevate/elevate-4.png'
+        else if (stepNum === 9) correctBackgroundImage = null
+      }
+      setBackgroundImageUrl(correctBackgroundImage)
+      
       setArchetype(savedState.archetype)
       setTagline(savedState.tagline || '')
       setExplanation(savedState.explanation)
@@ -545,7 +561,8 @@ export default function ElevateSimulation() {
               text: result.text || '',
               question: '',
               choices: [],
-              allowCustomInput: false
+              allowCustomInput: false,
+              imageUrl: '/elevate/elevate-3.png'
             }
           } else {
             // Step 3 - full generation
@@ -554,12 +571,22 @@ export default function ElevateSimulation() {
               text: result.text || '',
               question: result.question || '',
               choices: (result.choices || []).map((c: string) => ({ label: c, value: c })),
-              allowCustomInput: true
+              allowCustomInput: true,
+              imageUrl: '/elevate/elevate-1.png'
             }
           }
           
-          // Handle image generation based on toggle
-          if (ENABLE_IMAGE_GENERATION) {
+          // Set static background images for steps 3 and 4
+          if (nextStepNumber === 3) {
+            setBackgroundImageUrl('/elevate/elevate-1.png')
+            setIsImageLoading(false)
+          } else if (nextStepNumber === 4) {
+            setBackgroundImageUrl('/elevate/elevate-3.png')
+            setIsImageLoading(false)
+          }
+          
+          // Handle image generation based on toggle (only if image generation is enabled)
+          if (ENABLE_IMAGE_GENERATION && nextStepNumber !== 3 && nextStepNumber !== 4) {
             // Clear previous background image and start loading new one
             setBackgroundImageUrl(null)
             setIsImageLoading(true)
@@ -635,8 +662,14 @@ export default function ElevateSimulation() {
             text: result.text || '',
             question: result.question || '',
             choices: (result.choices || []).map((c: string) => ({ label: c, value: c })),
-            allowCustomInput: true
+            allowCustomInput: true,
+            imageUrl: '/elevate/elevate-5.png'
           }
+          // Set static background image for step 6
+          setBackgroundImageUrl('/elevate/elevate-5.png')
+          setIsImageLoading(false)
+          
+          // Handle image generation based on toggle (only if enabled)
           if (ENABLE_IMAGE_GENERATION) {
             setBackgroundImageUrl(null)
             setIsImageLoading(true)
@@ -657,9 +690,6 @@ export default function ElevateSimulation() {
               console.error('❌ [FRONTEND] Error in background image generation:', error)
               setIsImageLoading(false)
             })
-          } else {
-            setBackgroundImageUrl(null)
-            setIsImageLoading(false)
           }
         }
       } else if (nextStepNumber === 7) {
@@ -702,8 +732,14 @@ export default function ElevateSimulation() {
             text: result.text || '',
             question: result.question || '',
             choices: (result.choices || []).map((c: string) => ({ label: c, value: c })),
-            allowCustomInput: true
+            allowCustomInput: true,
+            imageUrl: '/elevate/elevate-4.png'
           }
+          // Set static background image for step 8
+          setBackgroundImageUrl('/elevate/elevate-4.png')
+          setIsImageLoading(false)
+          
+          // Handle image generation based on toggle (only if enabled)
           if (ENABLE_IMAGE_GENERATION) {
             setBackgroundImageUrl(null)
             setIsImageLoading(true)
@@ -724,9 +760,6 @@ export default function ElevateSimulation() {
               console.error('❌ [FRONTEND] Error in background image generation:', error)
               setIsImageLoading(false)
             })
-          } else {
-            setBackgroundImageUrl(null)
-            setIsImageLoading(false)
           }
         }
       } else if (nextStepNumber === 9) {
