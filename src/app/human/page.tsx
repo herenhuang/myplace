@@ -645,46 +645,75 @@ export default function HumanTestPage() {
   }
 
   const renderAnalyzing = () => {
+    const circleRadius = 160
+    const circleCircumference = 2 * Math.PI * circleRadius
+    const progressOffset = circleCircumference - (analysisProgress / 100) * circleCircumference
+
     return (
       <div className={`flex flex-col items-center justify-center h-screen w-screen bg-white ${styles.pageBg}`}>
-        <div className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-12 text-center">
+        <div className="max-w-lg w-full bg-white rounded-3xl p-12 text-center">
           {!analysisError ? (
             <>
-              <div className="mb-8">
-                <div className="w-32 h-32 mx-auto bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                  <div className="text-6xl">🧠</div>
-                </div>
-              </div>
-              
-              <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                Analyzing...
-              </h2>
-              
-              <div className="mb-6">
-                <div 
-                  className="w-full bg-gray-200 rounded-full h-3 mb-3"
-                  role="progressbar"
-                  aria-valuenow={Math.round(analysisProgress)}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label="Analysis progress"
+              <div className="relative flex items-center justify-center mb-8">
+                {/* Circular Progress Ring */}
+                <svg 
+                  className="absolute" 
+                  width="400" 
+                  height="400"
+                  style={{ transform: 'rotate(-90deg)' }}
                 >
-                  <div 
-                    className="bg-gradient-to-r from-orange-400 to-orange-600 h-3 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${analysisProgress}%` }}
+                  {/* Background circle */}
+                  <circle
+                    cx="200"
+                    cy="200"
+                    r={circleRadius}
+                    stroke="rgba(229, 231, 235, 1)"
+                    strokeWidth="8"
+                    fill="none"
                   />
+                  {/* Progress circle */}
+                  <circle
+                    cx="200"
+                    cy="200"
+                    r={circleRadius}
+                    stroke="url(#gradient)"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={circleCircumference}
+                    strokeDashoffset={progressOffset}
+                    strokeLinecap="round"
+                    style={{
+                      transition: 'stroke-dashoffset 1000ms ease-out'
+                    }}
+                    role="progressbar"
+                    aria-valuenow={Math.round(analysisProgress)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Analysis progress"
+                  />
+                  {/* Gradient definition */}
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="rgb(251, 146, 60)" />
+                      <stop offset="100%" stopColor="rgb(249, 115, 22)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
+                {/* Center content */}
+                <div className="relative z-10 flex flex-col items-center">
+                  
+                  <h2 className="font-[Instrument_Serif] text-5xl font-medium tracking-tight mb-3 text-black">
+                    Analyzing...
+                  </h2>
+                  
+                  <p className="text-gray-600 text-sm font-medium">
+                    {analysisStage}
+                  </p>
+                  
                 </div>
-                <p className="text-gray-600 text-sm font-medium">
-                  {analysisStage}
-                </p>
-                <p className="text-gray-500 text-xs mt-1">
-                  {Math.round(analysisProgress)}% complete
-                </p>
               </div>
-              
-              <p className="text-gray-600 text-base">
-                Comparing your responses against AI patterns from multiple models...
-              </p>
+            
             </>
           ) : (
             <>
