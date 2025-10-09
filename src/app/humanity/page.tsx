@@ -971,17 +971,17 @@ export default function HumanitySimulationPage() {
           <Image src="/elevate/blobbert.png" alt="Human" width={160} height={160} />
           
           <h1 className="font-[Instrument_Serif] text-7xl font-medium mb-4 text-gray-900 tracking-tighter">
-            How Human Are You?
+            What Makes You Human?
           </h1>
           
-          <p className="text-black/40 mb-8 text-base tracking-tight leading-5">
-            Take this quick assessment to discover how uniquely human your behavior is compared to AI.
+          <p className="text-black/40 mb-8 text-base tracking-tight leading-5 ">
+            A Personality Quiz You Can <i>Play</i>
           </p>
 
           <button
             onClick={startSimulation}
             disabled={isLoading}
-            className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-18 cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 w-[200px] cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             {isLoading ? 'Starting...' : 'Start'}
           </button>
