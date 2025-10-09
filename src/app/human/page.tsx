@@ -381,23 +381,23 @@ export default function HumanTestPage() {
     const question = getCurrentQuestion()
     
     return (
-      <div className={`flex flex-col items-center justify-center ${styles.pageBg}`}>
-        <div className="max-w-md w-full h-full p-12 text-center flex flex-col items-center justify-center">
+      <div className={`flex flex-col items-center justify-center h-screen w-screen bg-white ${styles.pageBg}`}>
+        <div className="max-w-[800px] w-full h-full p-12 text-center flex flex-col items-center justify-center">
 
           <Image src="/elevate/blobbert.png" alt="Human" width={160} height={160} />
           
-          <h1 className="text-4xl font-bold mb-4 text-gray-900 tracking-tight">
+          <h1 className="font-[Instrument_Serif] text-7xl font-medium mb-4 text-gray-900 tracking-tighter">
             How Human Are You?
           </h1>
           
-          <p className="text-gray-600 mb-8 text-base leading-5">
+          <p className="font-[Inter] text-black/40 mb-8 text-base tracking-tight leading-5">
             Take this quick assessment to discover how uniquely human your behavior is compared to AI.
           </p>
 
           <button
             onClick={startTest}
             disabled={isLoading}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-18 cursor-pointer rounded-full text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2 px-18 cursor-pointer rounded-full text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             {isLoading ? 'Starting...' : 'Start'}
           </button>
@@ -408,13 +408,13 @@ export default function HumanTestPage() {
 
   const renderConfirmation = () => {
     return (
-      <div className={`flex flex-col items-center justify-center ${styles.pageBg}`}>
+      <div className={`flex flex-col items-center justify-center h-screen w-screen bg-white ${styles.pageBg}`}>
         <div className="max-w-md w-full h-full p-12 flex flex-col items-center justify-center">
 
          <Image src="/elevate/blobbert.png" alt="Human" width={120} height={120} />
           
           <div className="text-left mt-8 mb-12">
-            <p className="text-black text-base leading-5 whitespace-pre-line">
+            <p className="text-black text-base tracking-tight leading-5 whitespace-pre-line">
               {HUMAN_TEST_DISCLAIMER}
             </p>
           </div>
@@ -454,7 +454,7 @@ export default function HumanTestPage() {
                                   userInput.trim().length >= (question.minCharacterLength || 0)
 
     return (
-      <div className={`flex flex-col h-screen items-center justify-center ${styles.pageBg}`}>
+      <div className={`flex flex-col items-center justify-center h-screen w-screen bg-white ${styles.pageBg}`}>
         <div className="max-w-4xl w-full h-full flex flex-col items-center justify-center relative">
 
             <div 
@@ -646,7 +646,7 @@ export default function HumanTestPage() {
 
   const renderAnalyzing = () => {
     return (
-      <div className={`flex flex-col items-center justify-center ${styles.pageBg}`}>
+      <div className={`flex flex-col items-center justify-center h-screen w-screen bg-white ${styles.pageBg}`}>
         <div className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-12 text-center">
           {!analysisError ? (
             <>
