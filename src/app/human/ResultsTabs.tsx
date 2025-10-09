@@ -9,7 +9,6 @@ import ReadOnlyShapeSort from '@/components/ReadOnlyShapeSort'
 import ReadOnlyShapeSequence from '@/components/ReadOnlyShapeSequence'
 import ReadOnlyBubbleGrid from '@/components/ReadOnlyBubbleGrid'
 
-import Image from 'next/image'
 type ActiveTab = 'results-overview' | 'results-breakdown' | 'results-archetype'
 
 interface Props {
@@ -316,97 +315,6 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                                 return <p className="text-black text-sm leading-5">{qa.userResponse || '—'}</p>;
                                 })()}
                     </div>
-
-                   {/* AI examples */}
-                   {item.aiExamples && (
-                      <div className="mt-4 grid grid-cols-1 gap-3">
-                                {[
-                                { key: 'chatgpt', name: 'ChatGPT', iconClass: styles.iconGPT, iconUrl: '/openai.svg', response: item.aiExamples.chatgpt },
-                                { key: 'gemini', name: 'Gemini', iconClass: styles.iconGoogle, iconUrl: '/google.svg', response: item.aiExamples.gemini },
-                                { key: 'claude', name: 'Claude', iconClass: styles.iconClaude, iconUrl: '/claude.svg', response: item.aiExamples.claude }
-                                ].map((ai) => (
-                                <div key={ai.key} className="rounded-xl border border-gray-200 p-3 bg-white">
-                                    <div className="flex items-center gap-1.5 border-1 border-gray-300 px-2 py-1.5 mb-2 rounded-full w-fit">
-                                    <Image
-                                      src={ai.iconUrl}
-                                      alt={ai.name}
-                                      width={15}
-                                      height={15}
-                                    />
-                                    <div className="text-xs font-semibold text-gray-900">{ai.name}</div>
-                                    </div>
-                                    {(() => {
-                                    const stepData = responses.find(r => r.stepNumber === item.stepNumber);
-                                    const isGameQuestion = stepData?.questionType === 'shape-sorting' || stepData?.questionType === 'shape-ordering' || stepData?.questionType === 'bubble-popper';
-                                    
-                                    if (isGameQuestion && ai.response && ai.response !== '—') {
-                                        try {
-                                        const jsonData = JSON.parse(ai.response);
-                                        
-                                        if (stepData?.questionType === 'shape-sorting') {
-                                            // Handle both object format and array format from AI responses
-                                            let sortingData = jsonData;
-                                            if (Array.isArray(jsonData)) {
-                                                // Convert array format to object format if needed
-                                                sortingData = {
-                                                    category1: jsonData.slice(0, 3),
-                                                    category2: jsonData.slice(3, 6),
-                                                    category3: jsonData.slice(6, 9)
-                                                };
-                                            }
-                                            
-                                            if (typeof sortingData === 'object' && !Array.isArray(sortingData)) {
-                                                return (
-                                                    <div className="text-sm">
-                                                        <div className="text-gray-600 text-xs mb-2">{ai.name} shape sorting</div>
-                                                        <ReadOnlyShapeSort data={sortingData} size="small" showLabels={false} />
-                                                    </div>
-                                                );
-                                            }
-                                        }
-                                        
-                                        if (stepData?.questionType === 'shape-ordering' && Array.isArray(jsonData)) {
-                                            return (
-                                                <div className="text-sm">
-                                                    <div className="text-gray-600 text-xs mb-2">{ai.name} shape ordering ({jsonData.length} shapes)</div>
-                                                    <ReadOnlyShapeSequence data={jsonData} size="small" />
-                                                </div>
-                                            );
-                                        }
-                                        
-                                        if (stepData?.questionType === 'bubble-popper' && typeof jsonData === 'object') {
-                                            return (
-                                                <div className="text-sm">
-                                                    <div className="text-gray-600 text-xs mb-2">{ai.name} bubble popper</div>
-                                                    <ReadOnlyBubbleGrid data={jsonData} size="small" />
-                                                </div>
-                                            );
-                                        }
-                                        
-                                        // Fallback to JSON display
-                                        return (
-                                            <div className="text-sm">
-                                            <div className="text-gray-600 text-xs mb-1">JSON Response:</div>
-                                            <pre className="text-xs bg-gray-50 p-2 rounded border overflow-x-auto text-gray-800">
-                                                {JSON.stringify(jsonData, null, 2)}
-                                            </pre>
-                                            <div className="mt-2 text-xs text-gray-600">
-                                                Visual representation unavailable
-                                            </div>
-                                            </div>
-                                        );
-                                        } catch {
-                                        // If JSON parsing fails, show as regular text
-                                        return <p className="text-sm text-gray-800">{ai.response}</p>;
-                                        }
-                                    }
-                                    
-                                    return <p className="text-sm text-gray-800">{ai.response || '—'}</p>;
-                                    })()}
-                        </div>
-                                ))}
-                      </div>
-                    )}
                   
                   </div>
                   <div className={styles.resultBlock}>
