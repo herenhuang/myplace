@@ -91,6 +91,7 @@ export interface HumanityAssociationQuestion extends HumanityBaseQuestion {
   prompt?: string
   characterLimit?: number
   allowSentimentTag?: boolean
+  timeLimit?: number
 }
 
 export interface HumanityFreeformQuestion extends HumanityBaseQuestion {

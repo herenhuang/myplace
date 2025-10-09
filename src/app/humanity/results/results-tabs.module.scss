@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Oswald:wght@200..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Sora:wght@100..800&family=Unbounded:wght@200..900&display=swap');
 
+$orange: #ff5e00;
+
 .resultsRoot {
     padding-top: 1rem;
     width: 100%;
@@ -9,6 +11,7 @@
     letter-spacing: -.5px;
     background-image: linear-gradient(to top left, #ffded2, #ffe7ce);
     padding: 48px;
+    height: 100dvh;
     box-sizing: border-box;
 }
 
@@ -33,11 +36,13 @@
   border-radius: 18px;
   padding: 24px;
   box-shadow: -12px 36px 36px rgba(0,0,0,0.1);
+  width: 480px;
+  max-width: 100%;
 }
 
 .gradientTrack {
   width: 100%;
-  height: 32px;
+  height: 24px;
   background: linear-gradient(to right, rgba(#f97316, .2), rgba(#f9ad16, .2));
   border-radius: 60px;
   position: relative;
@@ -57,9 +62,9 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: 20px;
-    height: 20px;
-    margin: 6px;
+    width: 28px;
+    height: 16px;
+    margin: 4px;
     border-radius: 40px;
     background: linear-gradient(to right, #f97316, #f97316);
     box-shadow: -2px 4px 8px rgba(black, .08);
@@ -85,17 +90,17 @@
 .percentileBox { background: #ffedd5; border: 1px solid #fed7aa; border-radius: 0.75rem; padding: 0.75rem; }
 
 .archetypeEmoji { 
-    font-size: 100px;
+    font-size: 120px;
 }
 
 .archetypeName { 
     font-family: 'Instrument Serif', 'Plus Jakarta Sans', sans-serif; 
-    font-size: 48px;
+    font-size: 60px;
     font-weight: 500;
     line-height: 1;
     text-transform: uppercase;
-    color: #1f2937; 
-    letter-spacing: -2px;
+    color: black; 
+    letter-spacing: -3px;
 }
 
 /* Stepper */
@@ -105,4 +110,57 @@
 .stepIndex { width: 1.25rem; height: 1.25rem; border-radius: 9999px; background: #f3f4f6; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
 .stepNavItemActive .stepIndex { background: #fdba74; color: #ffffff; }
 .stepLabel { font-size: 0.875rem; font-weight: 600; }
+
+/* Slide Animation */
+.slideContainer {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nextButton{
+  font-family: 'Instrument Serif', 'Plus Jakarta Sans', sans-serif;
+  background: $orange;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0px;
+  cursor: pointer;
+  margin-top: 0px;
+
+  &:hover{
+    opacity: 0.8;
+  }
+}
+
+.slideActive {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.slideScrollable {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-bottom: 2rem;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 

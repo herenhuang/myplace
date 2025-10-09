@@ -35,7 +35,6 @@ import IconOrderingBoard from './components/IconOrderingBoard'
 import AllocationDial from './components/AllocationDial'
 import AssociationPrompt from './components/AssociationPrompt'
 import FreeformNote from './components/FreeformNote'
-import HumanityResultsTabs from './results/ResultsTabs'
 import { HUMAN_TEST_DISCLAIMER } from '@/lib/human-constants'
 
 type ScreenState =
@@ -73,6 +72,7 @@ export default function HumanitySimulationPage() {
   const [displayedContextQuestion, setDisplayedContextQuestion] = useState('')
   const [isContextStreaming, setIsContextStreaming] = useState(false)
   const [isCardFloating, setIsCardFloating] = useState(false)
+  const [isTextQuestionsFloating, setIsTextQuestionsFloating] = useState(false)
   const streamingIntervals = useRef<{ contextText?: NodeJS.Timeout; contextQuestion?: NodeJS.Timeout }>({})
   const [refreshKey, setRefreshKey] = useState(0)
   const [rescueResponses, setRescueResponses] = useState<
@@ -134,8 +134,9 @@ export default function HumanitySimulationPage() {
       setAllocationResponses(allocation)
       setAssociationResponses(association)
       setFreeformResponse(freeform)
-      if (cached.responses.length === HUMANITY_TOTAL_STEPS) {
-        setScreenState('results-overview')
+      if (cached.responses.length === HUMANITY_TOTAL_STEPS && cached.analysisResult) {
+        // Redirect to results page if analysis is complete
+        router.push('/humanity/results?slide=1')
       }
     }
   }, [])
@@ -189,14 +190,15 @@ export default function HumanitySimulationPage() {
     }
 
     if (!currentQuestion || screenState !== 'simulation') {
-      setDisplayedContextText('')
-      setDisplayedContextQuestion('')
-      setIsContextStreaming(false)
-      setIsCardFloating(false)
-      return
-    }
+    setDisplayedContextText('')
+    setDisplayedContextQuestion('')
+    setIsContextStreaming(false)
+    setIsCardFloating(false)
+    setIsTextQuestionsFloating(false)
+    return
+  }
 
-    const fullContextText = currentQuestion.text || ''
+  const fullContextText = currentQuestion.text || ''
     const fullContextQuestion = currentQuestion.question || ''
     const intervals = streamingIntervals.current
 
@@ -366,6 +368,21 @@ export default function HumanitySimulationPage() {
   )
   const activeStepComplete =
     currentQuestion && getCompletionStatus(currentQuestion.stepNumber, currentQuestion.mechanic)
+  
+  // Delayed float-in for text questions after main task is complete
+  useEffect(() => {
+    if (isCardFloating && activeStepComplete && currentQuestion && screenState === 'simulation') {
+      // Wait for task completion, then expand text questions
+      const timeoutId = setTimeout(() => {
+        setIsTextQuestionsFloating(true)
+      }, 300) // 300ms delay after task completion
+
+      return () => clearTimeout(timeoutId)
+    } else {
+      setIsTextQuestionsFloating(false)
+    }
+  }, [isCardFloating, activeStepComplete, currentQuestion, screenState])
+
   const handleStepDataUpdate = useCallback(
     (
       stepData: HumanityStepData,
@@ -539,9 +556,9 @@ export default function HumanitySimulationPage() {
       stepStartTime,
     ],
   )
-  const goToNextStep = async () => {
-    // Show warning if task is incomplete but allow proceeding
-    if (!activeStepComplete && currentQuestion) {
+  const goToNextStep = async (skipConfirmation = false) => {
+    // Show warning if task is incomplete but allow proceeding (unless skipConfirmation is true)
+    if (!skipConfirmation && !activeStepComplete && currentQuestion) {
       const confirmProceed = window.confirm(
         `This task is incomplete. Are you sure you want to continue? Your partial progress will be saved.`
       )
@@ -567,6 +584,11 @@ export default function HumanitySimulationPage() {
       setStepStartTime(performance.now())
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }
+
+  // Auto-advance for association prompts (no confirmation alert)
+  const goToNextStepAutoAdvance = async () => {
+    await goToNextStep(true)
   }
   const goToPrevStep = () => {
     if (currentStep <= 1) return
@@ -706,7 +728,8 @@ export default function HumanitySimulationPage() {
       }
       setAnalysisProgress(100)
       setAnalysisStage('Complete!')
-      setScreenState('results-overview')
+      // Redirect to new results page with slide navigation
+      router.push('/humanity/results?slide=1')
     } catch (error) {
       console.error('Humanity analysis failed:', error)
       setAnalysisError(
@@ -804,7 +827,8 @@ export default function HumanitySimulationPage() {
               }))
             }
             showTextQuestions={false}
-            onTimeout={goToNextStep}
+            onTimeout={goToNextStepAutoAdvance}
+            timeLimit={currentQuestion.timeLimit}
           />
         )
       case 'freeform':
@@ -889,6 +913,7 @@ export default function HumanitySimulationPage() {
               }))
             }
             showTextQuestions={true}
+            timeLimit={currentQuestion.timeLimit}
           />
         )
       case 'freeform':
@@ -1026,8 +1051,10 @@ export default function HumanitySimulationPage() {
             >
               {renderActiveMechanic()}
             </div>
-            {renderTextQuestions() !== null && currentQuestion.mechanic !== 'association' && (
-              <div className={styles.textQuestionsContainer}>
+            {renderTextQuestions() !== null && currentQuestion.mechanic !== 'association' && activeStepComplete && (
+              <div 
+                className={`${styles.textQuestionsContainer} ${isTextQuestionsFloating ? styles.textQuestionsFloating : ''}`}
+              >
                 {renderTextQuestions()}
               </div>
             )}
@@ -1044,7 +1071,7 @@ export default function HumanitySimulationPage() {
             </button>
             <button
               type="button"
-              onClick={goToNextStep}
+              onClick={() => goToNextStep()}
               className={styles.primaryButton}
               disabled={isLoading}
             >
@@ -1096,16 +1123,6 @@ export default function HumanitySimulationPage() {
           )}
         </div>
       )}
-      {RESULTS_STATES.includes(screenState as any) && (
-        <HumanityResultsTabs
-          sessionId={sessionId}
-          responses={responses}
-          analysisResult={analysisResult}
-          activeTab={activeResultsTab}
-          onChangeTab={(tab) => updateScreenState(tab)}
-          analysisError={analysisError}
-        />
-      )}
-      </div>
-    )
-  }
+    </div>
+  )
+}

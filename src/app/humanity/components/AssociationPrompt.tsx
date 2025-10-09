@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import {
   HumanityAssociationQuestion,
   HumanityAssociationResponse,
@@ -14,6 +14,7 @@ interface AssociationPromptProps {
   disabled?: boolean
   showTextQuestions?: boolean
   onTimeout?: () => void
+  timeLimit?: number
 }
 
 const SENTIMENT_OPTIONS: Array<{
@@ -33,37 +34,71 @@ export default function AssociationPrompt({
   disabled = false,
   showTextQuestions = true,
   onTimeout,
+  timeLimit = 20,
 }: AssociationPromptProps) {
   const [word, setWord] = useState<string>('');
   const [sentiment, setSentiment] = useState<
     'positive' | 'neutral' | 'negative' | undefined
   >();
-  const [timeLeft, setTimeLeft] = useState<number>(20);
+  const [timeLeft, setTimeLeft] = useState<number>(timeLimit);
+  
+  // Use refs to maintain stable references across renders
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const onTimeoutRef = useRef(onTimeout);
+
+  // Keep onTimeoutRef up to date without triggering re-renders
+  useEffect(() => {
+    onTimeoutRef.current = onTimeout;
+  }, [onTimeout]);
 
   useEffect(() => {
-    // This effect synchronizes the state if the question changes without the component remounting.
+    // This effect synchronizes the state ONLY when the question changes, not when value updates from typing
     setWord(value?.word ?? '');
     setSentiment(value?.sentiment);
-    setTimeLeft(20); // Reset timer when question changes
-  }, [question.id, value]);
+    setTimeLeft(timeLimit); // Reset timer when question changes
+  }, [question.id, timeLimit]); // Removed 'value' to prevent timer reset on typing
 
-  // Timer effect
+  // Timer effect with stable references
   useEffect(() => {
-    if (disabled || showTextQuestions) return;
-
-    if (timeLeft === 0) {
-      if (onTimeout) {
-        onTimeout();
+    if (disabled || showTextQuestions) {
+      // Clear timer if disabled or showing text questions
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
       }
       return;
     }
 
-    const timerId = setTimeout(() => {
-      setTimeLeft(timeLeft - 1);
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    // Start new timer
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          // Timer reached zero
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          if (onTimeoutRef.current) {
+            onTimeoutRef.current();
+          }
+          return 0;
+        }
+        return prevTime - 1;
+      });
     }, 1000);
 
-    return () => clearTimeout(timerId);
-  }, [timeLeft, disabled, showTextQuestions, onTimeout]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [disabled, showTextQuestions, question.id]); // Only re-run when these change
 
   const handleWordChange = (newWord: string) => {
     setWord(newWord);
@@ -79,58 +114,76 @@ export default function AssociationPrompt({
     return null; // AssociationPrompt doesn't have separate text questions
   }
 
+  // Calculate circular progress
+  const progress = (timeLeft / timeLimit) * 100
+  const circleRadius = 200
+  const circleCircumference = 2 * Math.PI * circleRadius
+  const progressOffset = circleCircumference - (progress / 100) * circleCircumference
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="relative flex items-center justify-center w-full overflow-hidden">
+      {/* Circular Progress Ring wrapping entire content */}
+      <svg 
+        className="absolute" 
+        width="500" 
+        height="500"
+        style={{ transform: 'rotate(-90deg)' }}
+      >
+        {/* Background circle */}
+        <circle
+          cx="250"
+          cy="250"
+          r={circleRadius}
+          stroke="rgba(229, 231, 235, 1)"
+          strokeWidth="8"
+          fill="none"
+        />
+        {/* Progress circle */}
+        <circle
+          cx="250"
+          cy="250"
+          r={circleRadius}
+          stroke={timeLeft <= 5 ? 'rgb(234, 88, 12)' : 'rgb(249, 115, 22)'}
+          strokeWidth="8"
+          fill="none"
+          strokeDasharray={circleCircumference}
+          strokeDashoffset={progressOffset}
+          strokeLinecap="round"
+          style={{
+            transition: 'stroke-dashoffset 1s linear, stroke 0.3s ease'
+          }}
+        />
+      </svg>
+      
+      {/* Center content */}
+      <div className="relative z-10 flex flex-col justify-center items-center gap-6 w-[440px] h-[440px] overflow-hidden">
+
         <div className={styles.associationCue}>
-          <span className="text-sm uppercase tracking-wide text-gray-500">
-            Cue
+          <span className="text-sm uppercase tracking-tight w-[70%] mx-auto text-gray-500 text-center block">
+            What's the first word that comes to mind?
           </span>
-          <span className="text-2xl font-bold text-gray-900">{question.cue}</span>
+          <span className="font-[Instrument_Serif] tracking-tight text-uppercase text-5xl font-medium text-gray-900 text-center block mt-2">{question.cue}</span>
         </div>
-        <div className={`text-2xl font-bold ${timeLeft <= 5 ? 'text-orange-600' : 'text-gray-400'}`}>
-          {timeLeft}s
-        </div>
-      </div>
 
-      <input
-        className={styles.associationInput}
-        type="text"
-        value={word}
-        disabled={disabled}
-        maxLength={question.characterLimit ?? 60}
-        placeholder={question.prompt ?? 'First word or phrase...'}
-        onChange={(event) => handleWordChange(event.target.value)}
-      />
-      <div className="flex justify-between text-xs text-gray-500">
-        <span>
-          {question.characterLimit
-            ? `${word.length}/${question.characterLimit}`
-            : `${word.length} characters`}
-        </span>
-        <span>Auto-advances when time is up</span>
+        <input
+          className={styles.associationInput}
+          type="text"
+          value={word}
+          disabled={disabled}
+          maxLength={question.characterLimit ?? 60}
+          placeholder={'First Word...'}
+          onChange={(event) => handleWordChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && onTimeout) {
+              event.preventDefault();
+              onTimeout(); 
+            }
+          }}
+          autoFocus
+        />
+        
+       
       </div>
-
-      {question.allowSentimentTag && (
-        <div className="flex gap-2">
-          {SENTIMENT_OPTIONS.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              disabled={disabled}
-              className={
-                sentiment === option.id
-                  ? styles.sentimentButtonActive
-                  : styles.sentimentButton
-              }
-              onClick={() => handleSentimentChange(option.id)}
-            >
-              <span>{option.emoji}</span>
-              <span>{option.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

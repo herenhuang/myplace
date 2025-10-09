@@ -100,22 +100,22 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
           <>
                     <div className={styles.card}>
                         <h2 className="text-2xl font-bold mb-2 text-gray-900 text-center">Your Metascore</h2>
-          <p className="text-gray-600 text-center mb-8 capitalize">{(data.humanessLevel || data.humanityLevel).replace(/-/g, ' ')}</p>
+                         <p className="text-gray-600 text-center mb-8 capitalize">{(data.humanessLevel || data.humanityLevel).replace(/-/g, ' ')}</p>
                         <div className="text-center">
                             <h1 className={styles.metascore}>{data.metascore}</h1>
-        </div>
-
-                        <div className="max-w-4xl mx-auto">
-                            <p className="text-base text-black py-6 text-center text-base leading-5 tracking-tight">
-                                {data.primaryArchetype.description}
-                            </p>
-                            <div className="flex flex-wrap gap-2 justify-center">
-                                {data.primaryArchetype.traits.map((t, i)=>(
-                                    <span key={i} className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">{t}</span>
-                                ))}
                             </div>
-                        </div>
-        </div>
+
+                              <div className="max-w-4xl mx-auto">
+                                      <p className="text-base text-black py-6 text-center text-base leading-5 tracking-tight">
+                                          {data.primaryArchetype.description}
+                                      </p>
+                                      <div className="flex flex-wrap gap-2 justify-center">
+                                          {data.primaryArchetype.traits.map((t, i)=>(
+                                              <span key={i} className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">{t}</span>
+                                          ))}
+                                      </div>
+                            </div>
+                  </div>
                     
                     <div className="flex gap-8">
                         <div className={styles.card + ' w-[320px]'}> 
@@ -126,7 +126,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                             <p className="text-base text-black text-base leading-5">
                                 {data.primaryArchetype.description}
                             </p>
-          </div>
+                    </div>
 
                         <div className={styles.card + ' flex-1'}>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Breakdown</h3>
