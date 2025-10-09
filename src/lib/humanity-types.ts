@@ -11,6 +11,8 @@ interface HumanityBaseQuestion {
   stepNumber: number
   title: string
   description?: string
+  text?: string
+  question?: string
   mechanic: HumanityMechanic
 }
 
@@ -44,6 +46,10 @@ export interface HumanityChatQuestion extends HumanityBaseQuestion {
   userPromptPlaceholder?: string
   summaryPrompt?: string
   maxUserTurns?: number
+  // New fields for reactive conversations
+  npcPersonality?: string
+  conversationContext?: string
+  isReactive?: boolean
 }
 
 export interface HumanityIcon {
@@ -66,6 +72,8 @@ export interface HumanityAllocationCategory {
   label: string
   description?: string
   color: string
+  dynamicDescription?: (amount: number, totalAmount: number) => string
+  dynamicIcon?: (amount: number, totalAmount: number) => string
 }
 
 export interface HumanityAllocationQuestion extends HumanityBaseQuestion {

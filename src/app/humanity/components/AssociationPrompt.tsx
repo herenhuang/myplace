@@ -12,6 +12,8 @@ interface AssociationPromptProps {
   value?: HumanityAssociationResponse
   onChange: (response: HumanityAssociationResponse) => void
   disabled?: boolean
+  showTextQuestions?: boolean
+  onTimeout?: () => void
 }
 
 const SENTIMENT_OPTIONS: Array<{
@@ -29,19 +31,42 @@ export default function AssociationPrompt({
   value,
   onChange,
   disabled = false,
+  showTextQuestions = true,
+  onTimeout,
 }: AssociationPromptProps) {
-  const [word, setWord] = useState<string>(value?.word ?? '')
+  const [word, setWord] = useState<string>('');
   const [sentiment, setSentiment] = useState<
     'positive' | 'neutral' | 'negative' | undefined
-  >(value?.sentiment)
+  >();
+  const [timeLeft, setTimeLeft] = useState<number>(20);
 
   useEffect(() => {
-    setWord(value?.word ?? '')
-    setSentiment(value?.sentiment)
-  }, [value?.word, value?.sentiment])
+    // This effect synchronizes the state if the question changes without the component remounting.
+    setWord(value?.word ?? '');
+    setSentiment(value?.sentiment);
+    setTimeLeft(20); // Reset timer when question changes
+  }, [question.id, value]);
+
+  // Timer effect
+  useEffect(() => {
+    if (disabled || showTextQuestions) return;
+
+    if (timeLeft === 0) {
+      if (onTimeout) {
+        onTimeout();
+      }
+      return;
+    }
+
+    const timerId = setTimeout(() => {
+      setTimeLeft(timeLeft - 1);
+    }, 1000);
+
+    return () => clearTimeout(timerId);
+  }, [timeLeft, disabled, showTextQuestions, onTimeout]);
 
   const handleWordChange = (newWord: string) => {
-    setWord(newWord)
+    setWord(newWord);
     onChange({ word: newWord, sentiment })
   }
 
@@ -50,13 +75,22 @@ export default function AssociationPrompt({
     onChange({ word, sentiment: newSentiment })
   }
 
+  if (showTextQuestions) {
+    return null; // AssociationPrompt doesn't have separate text questions
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <div className={styles.associationCue}>
-        <span className="text-sm uppercase tracking-wide text-gray-500">
-          Cue
-        </span>
-        <span className="text-2xl font-bold text-gray-900">{question.cue}</span>
+      <div className="flex items-center justify-between">
+        <div className={styles.associationCue}>
+          <span className="text-sm uppercase tracking-wide text-gray-500">
+            Cue
+          </span>
+          <span className="text-2xl font-bold text-gray-900">{question.cue}</span>
+        </div>
+        <div className={`text-2xl font-bold ${timeLeft <= 5 ? 'text-orange-600' : 'text-gray-400'}`}>
+          {timeLeft}s
+        </div>
       </div>
 
       <input
@@ -74,7 +108,7 @@ export default function AssociationPrompt({
             ? `${word.length}/${question.characterLimit}`
             : `${word.length} characters`}
         </span>
-        <span>Hit enter to keep moving</span>
+        <span>Auto-advances when time is up</span>
       </div>
 
       {question.allowSentimentTag && (

@@ -6,12 +6,14 @@ import {
   HumanityAllocationResponse,
 } from '@/lib/humanity-types'
 import styles from '../page.module.scss'
+import VerticalSlider from './VerticalSlider'
 
 interface AllocationDialProps {
   question: HumanityAllocationQuestion
   value?: HumanityAllocationResponse
   onChange: (response: HumanityAllocationResponse) => void
   disabled?: boolean
+  showTextQuestions?: boolean
 }
 
 interface DonutSlice {
@@ -65,30 +67,32 @@ export default function AllocationDial({
   value,
   onChange,
   disabled = false,
+  showTextQuestions = true,
 }: AllocationDialProps) {
-  const [allocations, setAllocations] = useState<Record<string, number>>(() => {
-    if (value?.allocations) return value.allocations
-    const equalShare = Math.round(question.totalAmount / question.categories.length)
-    const remainder = question.totalAmount - equalShare * question.categories.length
-    const base = Object.fromEntries(
-      question.categories.map((cat, index) => [
-        cat.id,
-        index === 0 ? equalShare + remainder : equalShare,
-      ]),
-    )
-    return base
-  })
-  const [toughestChoice, setToughestChoice] = useState<string>(
-    value?.toughestChoice ?? '',
-  )
-  const [note, setNote] = useState<string>(value?.note ?? '')
+  const [allocations, setAllocations] = useState<Record<string, number>>({});
+  const [toughestChoice, setToughestChoice] = useState<string>('');
+  const [note, setNote] = useState<string>('');
 
   useEffect(() => {
-    if (value?.allocations) setAllocations(value.allocations)
-    if (typeof value?.toughestChoice === 'string')
-      setToughestChoice(value.toughestChoice)
-    if (typeof value?.note === 'string') setNote(value.note)
-  }, [value?.allocations, value?.toughestChoice, value?.note])
+    // This effect synchronizes the state if the question changes without the component remounting.
+    const initialAllocations = (() => {
+      if (value?.allocations) return value.allocations;
+      const equalShare = Math.round(
+        question.totalAmount / question.categories.length,
+      );
+      const remainder =
+        question.totalAmount - equalShare * question.categories.length;
+      return Object.fromEntries(
+        question.categories.map((cat, index) => [
+          cat.id,
+          index === 0 ? equalShare + remainder : equalShare,
+        ]),
+      );
+    })();
+    setAllocations(initialAllocations);
+    setToughestChoice(value?.toughestChoice ?? '');
+    setNote(value?.note ?? '');
+  }, [question.id, value]);
 
   const total = useMemo(() => {
     return Object.values(allocations).reduce((sum, value) => sum + value, 0)
@@ -199,124 +203,128 @@ export default function AllocationDial({
     })
   }
 
-  return (
-    <div className={styles.dialLayout}>
-      <div className={styles.dialVisual}>
-        <svg width="240" height="240" viewBox="0 0 240 240">
-          <circle cx="120" cy="120" r="110" fill="#f9fafb" />
-          {slices.map((slice) => {
-            if (slice.sweep <= 0) return null
-            const path = describeArc(90, 120, slice.startAngle, slice.endAngle)
-            return (
-              <path
-                key={slice.id}
-                d={path}
-                stroke={slice.color}
-                strokeWidth={40}
-                fill="none"
-              />
-            )
-          })}
-          <circle cx="120" cy="120" r="60" fill="#ffffff" />
-          <text
-            x="120"
-            y="115"
-            textAnchor="middle"
-            className={styles.dialAmount}
-          >
-            ${question.totalAmount}
-          </text>
-          <text
-            x="120"
-            y="140"
-            textAnchor="middle"
-            className={styles.dialSubtitle}
-          >
-            {question.currency}
-          </text>
-        </svg>
-      </div>
-
-      <div className="flex flex-col gap-5 flex-1">
-        <div className="grid grid-cols-1 gap-4">
-          {question.categories.map((category) => {
-            const amount = allocations[category.id] ?? 0
-            return (
-              <div key={category.id} className={styles.dialRow}>
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={styles.colorSwatch}
-                        style={{ backgroundColor: category.color }}
-                      />
-                      <span className="font-semibold text-gray-900">
-                        {category.label}
-                      </span>
-                    </div>
-                    {category.description && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        {category.description}
-                      </p>
-                    )}
-                  </div>
-                  <span className="text-sm font-semibold text-gray-800">
-                    ${amount}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={question.totalAmount}
-                  value={amount}
-                  disabled={disabled}
-                  className={styles.dialSlider}
-                  onChange={(event) =>
-                    handleSliderChange(category.id, Number(event.target.value))
-                  }
-                />
-              </div>
-            )
-          })}
+  if (showTextQuestions) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">
+            Total allocated:
+          </span>
+          <span className={`text-lg font-bold ${total === question.totalAmount ? 'text-green-600' : 'text-orange-600'}`}>
+            ${total} / ${question.totalAmount}
+          </span>
         </div>
 
-        <div className="flex flex-col gap-3">
-          {question.toughestChoicePrompt && (
-            <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-gray-700">
-                {question.toughestChoicePrompt}
-              </span>
-              <select
-                className={styles.selectField}
-                disabled={disabled}
-                value={toughestChoice}
-                onChange={(event) => handleToughestChoiceChange(event.target.value)}
-              >
-                <option value="">Pick one</option>
-                {question.categories.map((category) => (
-                  <option key={category.id} value={category.label}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+        {question.toughestChoicePrompt && (
           <label className="flex flex-col gap-2">
             <span className="text-sm font-medium text-gray-700">
-              Why this balance?
+              {question.toughestChoicePrompt}
             </span>
-            <textarea
-              className={styles.noteTextarea}
-              placeholder="Drop a quick note about the mix."
-              value={note}
+            <select
+              className={styles.selectField}
               disabled={disabled}
-              onChange={(event) => handleNoteChange(event.target.value)}
-              maxLength={280}
-            />
-            <span className="text-xs text-gray-400 text-right">
-              {note.length}/280
-            </span>
+              value={toughestChoice}
+              onChange={(event) => handleToughestChoiceChange(event.target.value)}
+            >
+              <option value="">Pick one</option>
+              {question.categories.map((category) => (
+                <option key={category.id} value={category.label}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
           </label>
+        )}
+
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-gray-700">
+            Why this balance?
+          </span>
+          <textarea
+            className={styles.noteTextarea}
+            placeholder="Drop a quick note about the mix."
+            value={note}
+            disabled={disabled}
+            onChange={(event) => handleNoteChange(event.target.value)}
+            maxLength={280}
+          />
+          <span className="text-xs text-gray-400 text-right">
+            {note.length}/280
+          </span>
+        </label>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-8 w-full">
+      {/* Pie Chart and Vertical Sliders */}
+      <div className="flex flex-col lg:flex-row gap-8 items-center justify-center transition-0">
+         {/* Reactive Pie Chart */}
+         <div className="flex-shrink-0">
+           <div className={styles.dialVisual}>
+             <svg width="240" height="240" viewBox="0 0 240 240">
+               <circle cx="120" cy="120" r="110" fill="#f9fafb" />
+               {slices.map((slice) => {
+                 if (slice.sweep <= 0) return null
+                 const path = describeArc(90, 120, slice.startAngle, slice.endAngle)
+                 return (
+                   <path
+                     key={slice.id}
+                     d={path}
+                     stroke={slice.color}
+                     strokeWidth={40}
+                     fill="none"
+                   />
+                 )
+               })}
+               <circle cx="120" cy="120" r="60" fill="#ffffff" />
+               <text
+                 x="120"
+                 y="115"
+                 textAnchor="middle"
+                 className={styles.dialAmount}
+               >
+                 ${question.totalAmount}
+               </text>
+               <text
+                 x="120"
+                 y="140"
+                 textAnchor="middle"
+                 className={styles.dialSubtitle}
+               >
+                 {question.currency}
+               </text>
+             </svg>
+           </div>
+         </div>
+
+        {/* Vertical Sliders arranged horizontally */}
+        <div className={styles.horizontalSliderGroup}>
+        {question.categories.map((category) => {
+          const amount = allocations[category.id] ?? 0
+          const dynamicDescription = category.dynamicDescription
+            ? category.dynamicDescription(amount, question.totalAmount)
+            : category.description
+          const dynamicIcon = category.dynamicIcon
+            ? category.dynamicIcon(amount, question.totalAmount)
+            : undefined
+
+          return (
+            <VerticalSlider
+              key={category.id}
+              value={amount}
+              min={0}
+              max={question.totalAmount}
+              onChange={(newValue) => handleSliderChange(category.id, newValue)}
+              disabled={disabled}
+              color={category.color}
+              label={category.label}
+              icon={dynamicIcon}
+              description={dynamicDescription}
+            />
+          )
+        })}
         </div>
       </div>
     </div>

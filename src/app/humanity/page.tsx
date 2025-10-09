@@ -52,6 +52,7 @@ export default function HumanitySimulationPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [screenState, setScreenState] = useState<ScreenState>('welcome')
+  const [isProgressBarVisible, setIsProgressBarVisible] = useState(false)
   const [singlePagePreferred, setSinglePagePreferred] = useState(false)
   const [sessionId, setSessionId] = useState<string>('')
   const [dbSessionId, setDbSessionId] = useState<string>('')
@@ -66,6 +67,14 @@ export default function HumanitySimulationPage() {
   const [activeResultsTab, setActiveResultsTab] = useState<
     'results-overview' | 'results-breakdown' | 'results-archetype'
   >('results-overview')
+
+  // Text streaming state
+  const [displayedContextText, setDisplayedContextText] = useState('')
+  const [displayedContextQuestion, setDisplayedContextQuestion] = useState('')
+  const [isContextStreaming, setIsContextStreaming] = useState(false)
+  const [isCardFloating, setIsCardFloating] = useState(false)
+  const streamingIntervals = useRef<{ contextText?: NodeJS.Timeout; contextQuestion?: NodeJS.Timeout }>({})
+  const [refreshKey, setRefreshKey] = useState(0)
   const [rescueResponses, setRescueResponses] = useState<
     Record<number, HumanityRescueResponse>
   >({})
@@ -148,6 +157,126 @@ export default function HumanitySimulationPage() {
       setStepStartTime(performance.now())
     }
   }, [searchParams])
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (event.clientY < 80) {
+        setIsProgressBarVisible(true)
+      } else {
+        setIsProgressBarVisible(false)
+      }
+    }
+    if (screenState === 'simulation') {
+      window.addEventListener('mousemove', handleMouseMove)
+    } else {
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [screenState])
+
+  // Text streaming effect for context text and question
+  useEffect(() => {
+    // Clear any existing intervals
+    if (streamingIntervals.current.contextText) {
+      clearInterval(streamingIntervals.current.contextText)
+      streamingIntervals.current.contextText = undefined
+    }
+    if (streamingIntervals.current.contextQuestion) {
+      clearInterval(streamingIntervals.current.contextQuestion)
+      streamingIntervals.current.contextQuestion = undefined
+    }
+
+    if (!currentQuestion || screenState !== 'simulation') {
+      setDisplayedContextText('')
+      setDisplayedContextQuestion('')
+      setIsContextStreaming(false)
+      setIsCardFloating(false)
+      return
+    }
+
+    const fullContextText = currentQuestion.text || ''
+    const fullContextQuestion = currentQuestion.question || ''
+    const intervals = streamingIntervals.current
+
+    setDisplayedContextText('')
+    setDisplayedContextQuestion('')
+    setIsContextStreaming(true)
+    setIsCardFloating(false)
+
+    let contextTextIndex = 0
+    let contextQuestionIndex = 0
+
+    // Stream the context text first
+    if (fullContextText) {
+      intervals.contextText = setInterval(() => {
+        if (contextTextIndex < fullContextText.length) {
+          setDisplayedContextText(fullContextText.slice(0, contextTextIndex + 1))
+          contextTextIndex++
+        } else {
+          if (intervals.contextText) {
+            clearInterval(intervals.contextText)
+            intervals.contextText = undefined
+          }
+          
+          // Start floating the card after context text is done
+          setIsCardFloating(true)
+          
+          // Start streaming the question after a brief delay
+          if (fullContextQuestion) {
+            setTimeout(() => {
+              intervals.contextQuestion = setInterval(() => {
+                if (contextQuestionIndex < fullContextQuestion.length) {
+                  setDisplayedContextQuestion(fullContextQuestion.slice(0, contextQuestionIndex + 1))
+                  contextQuestionIndex++
+                } else {
+                  if (intervals.contextQuestion) {
+                    clearInterval(intervals.contextQuestion)
+                    intervals.contextQuestion = undefined
+                  }
+                  setIsContextStreaming(false)
+                }
+              }, 15) // Slightly faster for questions
+            }, 300) // Brief delay before question starts
+          } else {
+            setIsContextStreaming(false)
+          }
+        }
+      }, 15) // 25ms per character for context text
+    } else if (fullContextQuestion) {
+      // If no context text, just stream the question and float the card
+      setIsCardFloating(true)
+      setTimeout(() => {
+        intervals.contextQuestion = setInterval(() => {
+          if (contextQuestionIndex < fullContextQuestion.length) {
+            setDisplayedContextQuestion(fullContextQuestion.slice(0, contextQuestionIndex + 1))
+            contextQuestionIndex++
+          } else {
+            if (intervals.contextQuestion) {
+              clearInterval(intervals.contextQuestion)
+              intervals.contextQuestion = undefined
+            }
+            setIsContextStreaming(false)
+          }
+        }, 30)
+      }, 300)
+    } else {
+      // No text to stream, just float the card
+      setIsCardFloating(true)
+      setIsContextStreaming(false)
+    }
+
+    return () => {
+      if (intervals.contextText) {
+        clearInterval(intervals.contextText)
+      }
+      if (intervals.contextQuestion) {
+        clearInterval(intervals.contextQuestion)
+      }
+    }
+  }, [currentQuestion, screenState])
+
   // Reset start time when step changes
   useEffect(() => {
     if (screenState === 'simulation') {
@@ -201,11 +330,14 @@ export default function HumanitySimulationPage() {
             (msg) => msg.sender === 'user',
           ).length ?? 0) > 0
         case 'ordering': {
-          if (question.mechanic !== 'ordering') return false
+          if (question.mechanic !== 'ordering') return false;
+          const icons = Array.isArray(question.icons) ? question.icons : [];
+          if (icons.length === 0) {
+            return (orderingResponses[stepNumber]?.themeLabel?.trim() ?? '').length > 0;
+          }
           return (
-            orderingResponses[stepNumber]?.orderedIds.length ===
-            question.icons.length
-          )
+            orderingResponses[stepNumber]?.orderedIds.length === icons.length
+          );
         }
         case 'allocation': {
           if (question.mechanic !== 'allocation') return false
@@ -441,6 +573,79 @@ export default function HumanitySimulationPage() {
     setCurrentStep((step) => Math.max(1, step - 1))
     setStepStartTime(performance.now())
   }
+
+  const handleRefreshCurrentSlide = () => {
+    if (!currentQuestion) return
+
+    const confirmRefresh = window.confirm(
+      'Are you sure you want to reset this slide? All progress on this slide will be lost.'
+    )
+    if (!confirmRefresh) return
+
+    // Clear the response for the current step only
+    const stepNumber = currentQuestion.stepNumber
+
+    switch (currentQuestion.mechanic) {
+      case 'rescue':
+        setRescueResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'chat':
+        setChatResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'ordering':
+        setOrderingResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'allocation':
+        setAllocationResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'association':
+        setAssociationResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'freeform':
+        setFreeformResponse((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+    }
+
+    // Remove from responses array
+    const updatedResponses = responses.filter((r) => r.stepNumber !== stepNumber)
+    setResponses(updatedResponses)
+
+    // Update cache
+    saveHumanityCache({
+      sessionId,
+      responses: updatedResponses,
+      analysisResult: analysisResult ?? undefined,
+      updatedAt: Date.now(),
+    })
+
+    // Force component remount by incrementing refresh key
+    setRefreshKey((prev) => prev + 1)
+    setStepStartTime(performance.now())
+  }
   const updateScreenState = (next: ScreenState) => {
     setScreenState(next)
     if (RESULTS_STATES.includes(next as any)) {
@@ -528,7 +733,7 @@ export default function HumanitySimulationPage() {
       case 'rescue':
         return (
           <RescuePicker
-            key={currentQuestion.id}
+            key={`${currentQuestion.id}-${refreshKey}`}
             question={currentQuestion}
             value={rescueResponses[currentQuestion.stepNumber]}
             onChange={(value) =>
@@ -537,12 +742,13 @@ export default function HumanitySimulationPage() {
                 [currentQuestion.stepNumber]: value,
               }))
             }
+            showTextQuestions={false}
           />
         )
       case 'chat':
         return (
           <ChatScenario
-            key={currentQuestion.id}
+            key={`${currentQuestion.id}-${refreshKey}`}
             question={currentQuestion}
             value={chatResponses[currentQuestion.stepNumber]}
             onChange={(value) =>
@@ -551,12 +757,14 @@ export default function HumanitySimulationPage() {
                 [currentQuestion.stepNumber]: value,
               }))
             }
+            onBack={goToPrevStep}
+            showTextQuestions={false}
           />
         )
       case 'ordering':
         return (
           <IconOrderingBoard
-            key={currentQuestion.id}
+            key={`${currentQuestion.id}-${refreshKey}`}
             question={currentQuestion}
             value={orderingResponses[currentQuestion.stepNumber]}
             onChange={(value) =>
@@ -565,12 +773,13 @@ export default function HumanitySimulationPage() {
                 [currentQuestion.stepNumber]: value,
               }))
             }
+            showTextQuestions={false}
           />
         )
       case 'allocation':
         return (
           <AllocationDial
-            key={currentQuestion.id}
+            key={`${currentQuestion.id}-${refreshKey}`}
             question={currentQuestion}
             value={allocationResponses[currentQuestion.stepNumber]}
             onChange={(value) =>
@@ -579,12 +788,13 @@ export default function HumanitySimulationPage() {
                 [currentQuestion.stepNumber]: value,
               }))
             }
+            showTextQuestions={false}
           />
         )
       case 'association':
         return (
           <AssociationPrompt
-            key={currentQuestion.id}
+            key={`${currentQuestion.id}-${refreshKey}`}
             question={currentQuestion}
             value={associationResponses[currentQuestion.stepNumber]}
             onChange={(value) =>
@@ -593,12 +803,14 @@ export default function HumanitySimulationPage() {
                 [currentQuestion.stepNumber]: value,
               }))
             }
+            showTextQuestions={false}
+            onTimeout={goToNextStep}
           />
         )
       case 'freeform':
         return (
           <FreeformNote
-            key={currentQuestion.id}
+            key={`${currentQuestion.id}-${refreshKey}`}
             question={currentQuestion}
             value={freeformResponse[currentQuestion.stepNumber]}
             onChange={(value) =>
@@ -607,6 +819,91 @@ export default function HumanitySimulationPage() {
                 [currentQuestion.stepNumber]: value,
               }))
             }
+            showTextQuestions={false}
+          />
+        )
+      default:
+        return null
+    }
+  }
+
+  const renderTextQuestions = () => {
+    if (!currentQuestion) return null
+    
+    switch (currentQuestion.mechanic) {
+      case 'rescue':
+        return (
+          <RescuePicker
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={rescueResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setRescueResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'allocation':
+        return (
+          <AllocationDial
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={allocationResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setAllocationResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'ordering':
+        return (
+          <IconOrderingBoard
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={orderingResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setOrderingResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'association':
+        return (
+          <AssociationPrompt
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={associationResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setAssociationResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'freeform':
+        return (
+          <FreeformNote
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={freeformResponse[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setFreeformResponse((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
           />
         )
       default:
@@ -617,18 +914,18 @@ export default function HumanitySimulationPage() {
   const renderConfirmation = () => {
     return (
       <div className={`flex flex-col items-center justify-center h-screen ${styles.pageBg}`}>
-        <div className="max-w-md w-full h-full p-12 flex flex-col items-center justify-center">
+        <div className="max-w-lg w-full h-full p-12 flex flex-col items-center justify-center">
           <Image src="/elevate/blobbert.png" alt="Human" width={120} height={120} />
           
           <div className="text-left mt-8 mb-12">
-            <p className="text-black text-base leading-5 whitespace-pre-line">
+            <p className="font-[Lora] text-black text-base leading-5 whitespace-pre-line">
               {HUMAN_TEST_DISCLAIMER}
             </p>
           </div>
 
           <button
             onClick={confirmStart}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-12 rounded-full text-lg transition-colors shadow-lg"
+             className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-18 cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             Confirm
           </button>
@@ -638,28 +935,28 @@ export default function HumanitySimulationPage() {
   }
 
     return (
-    <PageContainer className={styles.pageFrame}>
+    <div>
       {screenState === 'welcome' && (
 
         
         <div className={styles.heroCard}>
           <div className={`flex flex-col items-center justify-center ${styles.pageBg}`}>
-        <div className="max-w-md w-full h-full p-12 text-center flex flex-col items-center justify-center">
+        <div className="max-w-[800px] w-full h-full p-12 text-center flex flex-col items-center justify-center">
 
           <Image src="/elevate/blobbert.png" alt="Human" width={160} height={160} />
           
-          <h1 className="text-4xl font-bold mb-4 text-gray-900 tracking-tight">
+          <h1 className="font-[Instrument_Serif] text-7xl font-medium mb-4 text-gray-900 tracking-tighter">
             How Human Are You?
           </h1>
           
-          <p className="text-gray-600 mb-8 text-base leading-5">
+          <p className="text-black/40 mb-8 text-base tracking-tight leading-5">
             Take this quick assessment to discover how uniquely human your behavior is compared to AI.
           </p>
 
           <button
             onClick={startSimulation}
             disabled={isLoading}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-18 cursor-pointer rounded-full text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-18 cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             {isLoading ? 'Starting...' : 'Start'}
           </button>
@@ -668,22 +965,75 @@ export default function HumanitySimulationPage() {
             </div>
           )}
       {screenState === 'confirmation' && renderConfirmation()}
+      {screenState === 'simulation' && (
+        <div
+          className={`${styles.progressBar} ${
+            isProgressBarVisible ? styles.progressBarVisible : ''
+          }`}
+        >
+          {Array.from({ length: HUMANITY_TOTAL_STEPS }, (_, i) => {
+            const stepNumber = i + 1
+            const isCompleted = responses.some(
+              (r) => r.stepNumber === stepNumber,
+            )
+            const isActive = currentStep === stepNumber
+            return (
+              <div
+                key={i}
+                className={styles.progressBarWrapper}
+                onClick={() => router.push(`/humanity?slide=${stepNumber}`)}
+                title={`Go to step ${stepNumber}`}
+              >
+                <div
+                  className={
+                    isActive
+                      ? styles.progressBarTrackActive
+                      : styles.progressBarTrack
+                  }
+                >
+                  <div
+                    className={styles.progressInner}
+                    style={{ width: isCompleted ? '100%' : '0%' }}
+                  />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
       {screenState === 'simulation' && currentQuestion && (
-        <div className="flex flex-col justify-center items-center gap-6 h-screen w-full border-box p-8 overflow-y-hidden">
-
-
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressInner}
-              style={{ width: `${progressPercent}%` }}
-            />
+        <div className="flex flex-col justify-center items-center gap-6 h-screen w-full border-box p-8 pt-12 overflow-y-hidden">
+          <div className={styles.simulationLayout}>
+            {(currentQuestion.text || currentQuestion.question) && currentQuestion.mechanic !== 'association' && (
+              <div className={styles.contextContainer}>
+                {currentQuestion.text && (
+                  <p className={`${styles.contextText} ${isContextStreaming && displayedContextText.length < (currentQuestion.text?.length || 0) ? styles.streaming : ''}`}>
+                    {displayedContextText}
+                  </p>
+                )}
+                {currentQuestion.question && (
+                  <p className={`${styles.contextQuestion} ${isContextStreaming && displayedContextQuestion.length < (currentQuestion.question?.length || 0) ? styles.streaming : ''}`}>
+                    {displayedContextQuestion}
+                  </p>
+                )}
+              </div>
+            )}
+            <div 
+              className={`${styles.card} ${isCardFloating ? styles.cardFloating : ''}`}
+              style={{
+                opacity: isCardFloating ? 1 : 0
+              }}
+            >
+              {renderActiveMechanic()}
             </div>
-
-          <div className="flex flex-col justify-center items-center flex-1">
-            <div className={styles.card}>{renderActiveMechanic()}</div>
+            {renderTextQuestions() !== null && currentQuestion.mechanic !== 'association' && (
+              <div className={styles.textQuestionsContainer}>
+                {renderTextQuestions()}
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={goToPrevStep}
@@ -701,6 +1051,27 @@ export default function HumanitySimulationPage() {
               {currentStep === HUMANITY_TOTAL_STEPS ? 'Analyze results' : 'Next'}
             </button>
           </div>
+
+          {/* Refresh Button */}
+          <button
+            type="button"
+            onClick={handleRefreshCurrentSlide}
+            className={styles.refreshButton}
+            aria-label="Reset current slide"
+            title="Reset current slide"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+            </svg>
+          </button>
         </div>
       )}
       {screenState === 'analyzing' && (
@@ -708,10 +1079,15 @@ export default function HumanitySimulationPage() {
           <p className="text-sm font-semibold tracking-wide uppercase text-gray-500">
             Analyzing your patterns
           </p>
-          <div className={styles.progressBar} style={{ width: '100%' }}>
+          <div style={{ width: '100%', height: '6px', background: 'rgba(148, 163, 184, 0.25)', borderRadius: '999px', overflow: 'hidden' }}>
             <div
-              className={styles.progressInner}
-              style={{ width: `${analysisProgress}%` }}
+              style={{ 
+                height: '100%', 
+                width: `${analysisProgress}%`, 
+                background: 'linear-gradient(90deg, #f97316, #fbbf24)',
+                borderRadius: '999px',
+                transition: 'width 0.3s ease'
+              }}
             />
           </div>
           <p className="text-lg font-medium text-gray-700">{analysisStage}</p>
@@ -730,6 +1106,6 @@ export default function HumanitySimulationPage() {
           analysisError={analysisError}
         />
       )}
-      </PageContainer>
+      </div>
     )
   }

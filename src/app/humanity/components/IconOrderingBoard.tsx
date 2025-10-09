@@ -24,6 +24,7 @@ interface IconOrderingBoardProps {
   value?: HumanityOrderingResponse
   onChange: (response: HumanityOrderingResponse) => void
   disabled?: boolean
+  showTextQuestions?: boolean
 }
 
 export default function IconOrderingBoard({
@@ -31,23 +32,26 @@ export default function IconOrderingBoard({
   value,
   onChange,
   disabled = false,
+  showTextQuestions = true,
 }: IconOrderingBoardProps) {
-  const initialOrder = useMemo(() => {
-    if (value?.orderedIds?.length) return value.orderedIds
-    return question.icons.map((icon) => icon.id)
-  }, [question.icons, value?.orderedIds])
-
-  const [orderedIds, setOrderedIds] = useState<string[]>(initialOrder)
+  const icons = Array.isArray(question.icons) ? question.icons : []
+  const [orderedIds, setOrderedIds] = useState<string[]>(
+    value?.orderedIds?.length
+      ? value.orderedIds
+      : icons.map((icon) => icon.id),
+  )
   const [themeLabel, setThemeLabel] = useState<string>(value?.themeLabel ?? '')
 
+  // This effect synchronizes the state if the question changes without the component remounting.
+  // By depending on `question.id`, we ensure this runs every time a new question is passed in.
   useEffect(() => {
-    if (value?.orderedIds?.length) {
-      setOrderedIds(value.orderedIds)
-    }
-    if (typeof value?.themeLabel === 'string') {
-      setThemeLabel(value.themeLabel)
-    }
-  }, [value?.orderedIds, value?.themeLabel])
+    const currentIcons = Array.isArray(question.icons) ? question.icons : []
+    const initialOrder = value?.orderedIds?.length
+      ? value.orderedIds
+      : currentIcons.map((icon) => icon.id)
+    setOrderedIds(initialOrder)
+    setThemeLabel(value?.themeLabel ?? '')
+  }, [question.id, question.icons, value])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -80,38 +84,66 @@ export default function IconOrderingBoard({
     })
   }
 
+  if (showTextQuestions) {
+    return (
+      <div className="flex flex-col gap-4">
+        {question.askForTheme && (
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-gray-700">
+              What would you call this sequence?
+            </span>
+            <input
+              type="text"
+              value={themeLabel}
+              disabled={disabled}
+              className={styles.themeInput}
+              placeholder={question.themePlaceholder ?? 'Add a quick title'}
+              onChange={(event) => handleThemeChange(event.target.value)}
+              maxLength={60}
+            />
+            <span className="text-xs text-gray-400 text-right">
+              {themeLabel.length}/60
+            </span>
+          </label>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <div className={styles.iconTrackWrapper}>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          modifiers={[restrictToHorizontalAxis]}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={orderedIds}
-            strategy={horizontalListSortingStrategy}
+      {icons.length > 0 && (
+        <div className={styles.iconTrackWrapper}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            modifiers={[restrictToHorizontalAxis]}
+            onDragEnd={handleDragEnd}
           >
-            <div className={styles.iconTrack}>
-              {orderedIds.map((id) => {
-                const icon = question.icons.find((option) => option.id === id)
-                if (!icon) return null
-                return (
-                  <SortableIconChip
-                    key={icon.id}
-                    id={icon.id}
-                    emoji={icon.emoji}
-                    label={icon.label}
-                    meaning={icon.meaning}
-                    disabled={disabled}
-                  />
-                )
-              })}
-            </div>
-          </SortableContext>
-        </DndContext>
-      </div>
+            <SortableContext
+              items={orderedIds}
+              strategy={horizontalListSortingStrategy}
+            >
+              <div className={styles.iconTrack}>
+                {orderedIds.map((id) => {
+                  const icon = icons.find((option) => option.id === id)
+                  if (!icon) return null
+                  return (
+                    <SortableIconChip
+                      key={icon.id}
+                      id={icon.id}
+                      emoji={icon.emoji}
+                      label={icon.label}
+                      meaning={icon.meaning}
+                      disabled={disabled}
+                    />
+                  )
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </div>
+      )}
 
       {question.askForTheme && (
         <label className="flex flex-col gap-2">
