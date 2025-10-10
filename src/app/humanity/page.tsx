@@ -19,6 +19,10 @@ import {
   HumanityRescueResponse,
   HumanityStepData,
   HumanityAnalysisResult,
+  HumanityDivergentAssociationResponse,
+  HumanityAlternativeUsesResponse,
+  HumanityThreeWordsResponse,
+  HumanityBubblePopperResponse,
 } from '@/lib/humanity-types'
 import {
   loadHumanityCache,
@@ -35,6 +39,10 @@ import IconOrderingBoard from './components/IconOrderingBoard'
 import AllocationDial from './components/AllocationDial'
 import AssociationPrompt from './components/AssociationPrompt'
 import FreeformNote from './components/FreeformNote'
+import DivergentAssociation from './components/DivergentAssociation'
+import AlternativeUses from './components/AlternativeUses'
+import ThreeWords from './components/ThreeWords'
+import BubblePopperWrapper from './components/BubblePopperWrapper'
 import { HUMAN_TEST_DISCLAIMER } from '@/lib/human-constants'
 
 type ScreenState =
@@ -93,6 +101,18 @@ export default function HumanitySimulationPage() {
   const [freeformResponse, setFreeformResponse] = useState<
     Record<number, HumanityFreeformResponse>
   >({})
+  const [divergentAssociationResponses, setDivergentAssociationResponses] = useState<
+    Record<number, HumanityDivergentAssociationResponse>
+  >({})
+  const [alternativeUsesResponses, setAlternativeUsesResponses] = useState<
+    Record<number, HumanityAlternativeUsesResponse>
+  >({})
+  const [threeWordsResponses, setThreeWordsResponses] = useState<
+    Record<number, HumanityThreeWordsResponse>
+  >({})
+  const [bubblePopperResponses, setBubblePopperResponses] = useState<
+    Record<number, HumanityBubblePopperResponse>
+  >({})
   const [stepStartTime, setStepStartTime] = useState<number>(0)
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const currentQuestion = useMemo(
@@ -116,6 +136,10 @@ export default function HumanitySimulationPage() {
       const allocation: typeof allocationResponses = {}
       const association: typeof associationResponses = {}
       const freeform: typeof freeformResponse = {}
+      const divergentAssociation: typeof divergentAssociationResponses = {}
+      const alternativeUses: typeof alternativeUsesResponses = {}
+      const threeWords: typeof threeWordsResponses = {}
+      const bubblePopper: typeof bubblePopperResponses = {}
       cached.responses.forEach((step) => {
         if (step.rescueResponse) rescue[step.stepNumber] = step.rescueResponse
         if (step.chatResponse) chat[step.stepNumber] = step.chatResponse
@@ -127,6 +151,14 @@ export default function HumanitySimulationPage() {
           association[step.stepNumber] = step.associationResponse
         if (step.freeformResponse)
           freeform[step.stepNumber] = step.freeformResponse
+        if (step.divergentAssociationResponse)
+          divergentAssociation[step.stepNumber] = step.divergentAssociationResponse
+        if (step.alternativeUsesResponse)
+          alternativeUses[step.stepNumber] = step.alternativeUsesResponse
+        if (step.threeWordsResponse)
+          threeWords[step.stepNumber] = step.threeWordsResponse
+        if (step.bubblePopperResponse)
+          bubblePopper[step.stepNumber] = step.bubblePopperResponse
       })
       setRescueResponses(rescue)
       setChatResponses(chat)
@@ -134,6 +166,10 @@ export default function HumanitySimulationPage() {
       setAllocationResponses(allocation)
       setAssociationResponses(association)
       setFreeformResponse(freeform)
+      setDivergentAssociationResponses(divergentAssociation)
+      setAlternativeUsesResponses(alternativeUses)
+      setThreeWordsResponses(threeWords)
+      setBubblePopperResponses(bubblePopper)
       if (cached.responses.length === HUMANITY_TOTAL_STEPS && cached.analysisResult) {
         // Redirect to results page if analysis is complete
         router.push('/humanity/results?slide=1')
@@ -354,6 +390,40 @@ export default function HumanitySimulationPage() {
           )
         case 'freeform':
           return true
+        case 'divergent-association': {
+          const response = divergentAssociationResponses[stepNumber]
+          if (!response) return false
+          const question = HUMANITY_QUESTIONS.find(
+            (candidate) => candidate.stepNumber === stepNumber,
+          )
+          if (question?.mechanic !== 'divergent-association') return false
+          return response.words.filter((w) => w.trim().length > 0).length === question.wordCount
+        }
+        case 'alternative-uses': {
+          const response = alternativeUsesResponses[stepNumber]
+          if (!response) return false
+          const question = HUMANITY_QUESTIONS.find(
+            (candidate) => candidate.stepNumber === stepNumber,
+          )
+          if (question?.mechanic !== 'alternative-uses') return false
+          const minUses = question.minUses || 1
+          return response.uses.filter((u) => u.trim().length > 0).length >= minUses
+        }
+        case 'three-words': {
+          const response = threeWordsResponses[stepNumber]
+          if (!response) return false
+          const question = HUMANITY_QUESTIONS.find(
+            (candidate) => candidate.stepNumber === stepNumber,
+          )
+          if (question?.mechanic !== 'three-words') return false
+          const storyLower = response.story.toLowerCase()
+          return (
+            response.story.trim().length > 0 &&
+            question.words.every((word) => storyLower.includes(word.toLowerCase()))
+          )
+        }
+        case 'bubble-popper':
+          return Boolean(bubblePopperResponses[stepNumber])
       default:
         return false
     }
@@ -364,6 +434,10 @@ export default function HumanitySimulationPage() {
       orderingResponses,
       allocationResponses,
       associationResponses,
+      divergentAssociationResponses,
+      alternativeUsesResponses,
+      threeWordsResponses,
+      bubblePopperResponses,
     ],
   )
   const activeStepComplete =
@@ -541,6 +615,70 @@ export default function HumanitySimulationPage() {
             freeformResponse: freeform || { text: '' },
           } satisfies HumanityStepData
         }
+        case 'divergent-association': {
+          const divergentAssociation = divergentAssociationResponses[question.stepNumber]
+          if (!divergentAssociation || divergentAssociation.words.filter(w => w.trim()).length === 0) {
+            return {
+              ...base,
+              userResponse: '[Skipped]',
+              divergentAssociationResponse: divergentAssociation || { words: [] },
+            } satisfies HumanityStepData
+          }
+          const summary = divergentAssociation.words.filter(w => w.trim()).join(' • ')
+          return {
+            ...base,
+            userResponse: summary,
+            divergentAssociationResponse: divergentAssociation,
+          } satisfies HumanityStepData
+        }
+        case 'alternative-uses': {
+          const alternativeUses = alternativeUsesResponses[question.stepNumber]
+          if (!alternativeUses || alternativeUses.uses.filter(u => u.trim()).length === 0) {
+            return {
+              ...base,
+              userResponse: '[Skipped]',
+              alternativeUsesResponse: alternativeUses || { uses: [] },
+            } satisfies HumanityStepData
+          }
+          const summary = `${alternativeUses.uses.filter(u => u.trim()).length} uses`
+          return {
+            ...base,
+            userResponse: summary,
+            alternativeUsesResponse: alternativeUses,
+          } satisfies HumanityStepData
+        }
+        case 'three-words': {
+          const threeWords = threeWordsResponses[question.stepNumber]
+          if (!threeWords || !threeWords.story.trim()) {
+            return {
+              ...base,
+              userResponse: '[Skipped]',
+              threeWordsResponse: threeWords || { story: '' },
+            } satisfies HumanityStepData
+          }
+          const summary = threeWords.story
+          return {
+            ...base,
+            userResponse: summary,
+            threeWordsResponse: threeWords,
+          } satisfies HumanityStepData
+        }
+        case 'bubble-popper': {
+          const bubblePopper = bubblePopperResponses[question.stepNumber]
+          if (!bubblePopper) {
+            return {
+              ...base,
+              userResponse: '[Skipped]',
+              bubblePopperResponse: bubblePopper || { bubblesPopped: 0, timeElapsed: 0, completed: false, quitEarly: true, poppingPattern: 'random', poppingSequence: [], bubbleGrid: [] },
+            } satisfies HumanityStepData
+          }
+          const summary = `${bubblePopper.bubblesPopped} bubbles • ${bubblePopper.timeElapsed}s • ${bubblePopper.poppingPattern}`
+          return {
+            ...base,
+            userResponse: summary,
+            bubblePopperResponse: bubblePopper,
+          } satisfies HumanityStepData
+        }
         default:
           return null
       }
@@ -553,6 +691,10 @@ export default function HumanitySimulationPage() {
       allocationResponses,
       associationResponses,
       freeformResponse,
+      divergentAssociationResponses,
+      alternativeUsesResponses,
+      threeWordsResponses,
+      bubblePopperResponses,
       stepStartTime,
     ],
   )
@@ -645,6 +787,34 @@ export default function HumanitySimulationPage() {
         break
       case 'freeform':
         setFreeformResponse((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'divergent-association':
+        setDivergentAssociationResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'alternative-uses':
+        setAlternativeUsesResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'three-words':
+        setThreeWordsResponses((prev) => {
+          const updated = { ...prev }
+          delete updated[stepNumber]
+          return updated
+        })
+        break
+      case 'bubble-popper':
+        setBubblePopperResponses((prev) => {
           const updated = { ...prev }
           delete updated[stepNumber]
           return updated
@@ -846,6 +1016,66 @@ export default function HumanitySimulationPage() {
             showTextQuestions={false}
           />
         )
+      case 'divergent-association':
+        return (
+          <DivergentAssociation
+            key={`${currentQuestion.id}-${refreshKey}`}
+            question={currentQuestion}
+            value={divergentAssociationResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setDivergentAssociationResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={false}
+          />
+        )
+      case 'alternative-uses':
+        return (
+          <AlternativeUses
+            key={`${currentQuestion.id}-${refreshKey}`}
+            question={currentQuestion}
+            value={alternativeUsesResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setAlternativeUsesResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={false}
+          />
+        )
+      case 'three-words':
+        return (
+          <ThreeWords
+            key={`${currentQuestion.id}-${refreshKey}`}
+            question={currentQuestion}
+            value={threeWordsResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setThreeWordsResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={false}
+          />
+        )
+      case 'bubble-popper':
+        return (
+          <BubblePopperWrapper
+            key={`${currentQuestion.id}-${refreshKey}`}
+            question={currentQuestion}
+            value={bubblePopperResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setBubblePopperResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={false}
+          />
+        )
       default:
         return null
     }
@@ -924,6 +1154,66 @@ export default function HumanitySimulationPage() {
             value={freeformResponse[currentQuestion.stepNumber]}
             onChange={(value) =>
               setFreeformResponse((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'divergent-association':
+        return (
+          <DivergentAssociation
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={divergentAssociationResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setDivergentAssociationResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'alternative-uses':
+        return (
+          <AlternativeUses
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={alternativeUsesResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setAlternativeUsesResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'three-words':
+        return (
+          <ThreeWords
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={threeWordsResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setThreeWordsResponses((prev) => ({
+                ...prev,
+                [currentQuestion.stepNumber]: value,
+              }))
+            }
+            showTextQuestions={true}
+          />
+        )
+      case 'bubble-popper':
+        return (
+          <BubblePopperWrapper
+            key={`${currentQuestion.id}-text-${refreshKey}`}
+            question={currentQuestion}
+            value={bubblePopperResponses[currentQuestion.stepNumber]}
+            onChange={(value) =>
+              setBubblePopperResponses((prev) => ({
                 ...prev,
                 [currentQuestion.stepNumber]: value,
               }))
@@ -1051,7 +1341,13 @@ export default function HumanitySimulationPage() {
             >
               {renderActiveMechanic()}
             </div>
-            {renderTextQuestions() !== null && currentQuestion.mechanic !== 'association' && activeStepComplete && (
+            {renderTextQuestions() !== null && 
+             currentQuestion.mechanic !== 'association' && 
+             currentQuestion.mechanic !== 'divergent-association' &&
+             currentQuestion.mechanic !== 'alternative-uses' &&
+             currentQuestion.mechanic !== 'three-words' &&
+             currentQuestion.mechanic !== 'bubble-popper' &&
+             activeStepComplete && (
               <div 
                 className={`${styles.textQuestionsContainer} ${isTextQuestionsFloating ? styles.textQuestionsFloating : ''}`}
               >

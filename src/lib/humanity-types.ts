@@ -5,6 +5,10 @@ export type HumanityMechanic =
   | 'allocation'
   | 'association'
   | 'freeform'
+  | 'divergent-association'
+  | 'alternative-uses'
+  | 'three-words'
+  | 'bubble-popper'
 
 interface HumanityBaseQuestion {
   id: string
@@ -102,6 +106,37 @@ export interface HumanityFreeformQuestion extends HumanityBaseQuestion {
   placeholder?: string
 }
 
+export interface HumanityDivergentAssociationQuestion extends HumanityBaseQuestion {
+  mechanic: 'divergent-association'
+  prompt: string
+  wordCount: number
+  characterLimit?: number
+}
+
+export interface HumanityAlternativeUsesQuestion extends HumanityBaseQuestion {
+  mechanic: 'alternative-uses'
+  prompt: string
+  objectName: string
+  minUses?: number
+  maxUses?: number
+  initialUses?: string[]
+}
+
+export interface HumanityThreeWordsQuestion extends HumanityBaseQuestion {
+  mechanic: 'three-words'
+  prompt: string
+  words: string[]
+  characterLimit?: number
+  minSentences?: number
+  maxSentences?: number
+}
+
+export interface HumanityBubblePopperQuestion extends HumanityBaseQuestion {
+  mechanic: 'bubble-popper'
+  prompt: string
+  timeLimit: number
+}
+
 export type HumanityQuestion =
   | HumanityRescueQuestion
   | HumanityChatQuestion
@@ -109,6 +144,10 @@ export type HumanityQuestion =
   | HumanityAllocationQuestion
   | HumanityAssociationQuestion
   | HumanityFreeformQuestion
+  | HumanityDivergentAssociationQuestion
+  | HumanityAlternativeUsesQuestion
+  | HumanityThreeWordsQuestion
+  | HumanityBubblePopperQuestion
 
 export interface HumanityRescueResponse {
   selectedItemIds: string[]
@@ -149,6 +188,28 @@ export interface HumanityFreeformResponse {
   text: string
 }
 
+export interface HumanityDivergentAssociationResponse {
+  words: string[]
+}
+
+export interface HumanityAlternativeUsesResponse {
+  uses: string[]
+}
+
+export interface HumanityThreeWordsResponse {
+  story: string
+}
+
+export interface HumanityBubblePopperResponse {
+  bubblesPopped: number
+  timeElapsed: number
+  completed: boolean
+  quitEarly: boolean
+  poppingPattern: 'sequential' | 'random' | 'strategic'
+  poppingSequence: number[]
+  bubbleGrid: number[][]
+}
+
 export interface HumanityStepData {
   questionId: string
   stepNumber: number
@@ -165,6 +226,10 @@ export interface HumanityStepData {
   allocationResponse?: HumanityAllocationResponse
   associationResponse?: HumanityAssociationResponse
   freeformResponse?: HumanityFreeformResponse
+  divergentAssociationResponse?: HumanityDivergentAssociationResponse
+  alternativeUsesResponse?: HumanityAlternativeUsesResponse
+  threeWordsResponse?: HumanityThreeWordsResponse
+  bubblePopperResponse?: HumanityBubblePopperResponse
 }
 
 export interface HumanitySessionData {

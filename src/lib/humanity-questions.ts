@@ -7,6 +7,10 @@ import {
   HumanityOrderingQuestion,
   HumanityQuestion,
   HumanityRescueQuestion,
+  HumanityDivergentAssociationQuestion,
+  HumanityAlternativeUsesQuestion,
+  HumanityThreeWordsQuestion,
+  HumanityBubblePopperQuestion,
 } from './humanity-types'
 import { v4 as uuidv4 } from 'uuid';
 
@@ -89,6 +93,62 @@ const buildFreeformQuestion = (
   id: uuidv4(),
   mechanic: 'freeform',
   title: overrides.title ?? 'Final Thoughts',
+  stepNumber,
+  ...overrides,
+})
+
+const buildDivergentAssociationQuestion = (
+  overrides: Omit<
+    HumanityDivergentAssociationQuestion,
+    'mechanic' | 'title' | 'stepNumber' | 'id'
+  > & { title?: string },
+  stepNumber: number,
+): HumanityDivergentAssociationQuestion => ({
+  id: uuidv4(),
+  mechanic: 'divergent-association',
+  title: overrides.title ?? 'Divergent Words',
+  stepNumber,
+  ...overrides,
+})
+
+const buildAlternativeUsesQuestion = (
+  overrides: Omit<
+    HumanityAlternativeUsesQuestion,
+    'mechanic' | 'title' | 'stepNumber' | 'id'
+  > & { title?: string },
+  stepNumber: number,
+): HumanityAlternativeUsesQuestion => ({
+  id: uuidv4(),
+  mechanic: 'alternative-uses',
+  title: overrides.title ?? 'Alternative Uses',
+  stepNumber,
+  ...overrides,
+})
+
+const buildThreeWordsQuestion = (
+  overrides: Omit<
+    HumanityThreeWordsQuestion,
+    'mechanic' | 'title' | 'stepNumber' | 'id'
+  > & { title?: string },
+  stepNumber: number,
+): HumanityThreeWordsQuestion => ({
+  id: uuidv4(),
+  mechanic: 'three-words',
+  title: overrides.title ?? 'Three Words',
+  stepNumber,
+  ...overrides,
+})
+
+const buildBubblePopperQuestion = (
+  overrides: Omit<
+    HumanityBubblePopperQuestion,
+    'mechanic' | 'title' | 'stepNumber' | 'id'
+  > & { title?: string },
+  stepNumber: number,
+): HumanityBubblePopperQuestion => ({
+  id: uuidv4(),
+  mechanic: 'bubble-popper',
+  title: overrides.title ?? 'Bubble Pop',
   stepNumber,
   ...overrides,
 })
@@ -228,73 +288,6 @@ const RESCUE_QUESTIONS: HumanityRescueQuestion[] = [
     },
     2,
   ),
-  buildRescueQuestion(
-    {
-      title: 'Superpowers',
-      text: 'A mysterious stranger appears and offers you a choice: you can pick any 3 superpowers from a list of 9. This is real. This is happening. Choose wisely—you only get one shot at this.',
-      question: 'Which powers do you choose?',
-      prompt: 'Pick 3 superpowers.',
-      selectionCount: 3,
-      notePlaceholder: 'What would you do with these powers?',
-      items: [
-        {
-          id: 'flight',
-          label: 'Flight',
-          emoji: '🦅',
-          description: 'Fly anywhere at will.',
-        },
-        {
-          id: 'invisibility',
-          label: 'Invisibility',
-          emoji: '👻',
-          description: 'Turn completely invisible.',
-        },
-        {
-          id: 'telepathy',
-          label: 'Telepathy',
-          emoji: '🧠',
-          description: 'Read minds and send thoughts.',
-        },
-        {
-          id: 'time_control',
-          label: 'Time Control',
-          emoji: '⏰',
-          description: 'Pause, rewind, or fast-forward time.',
-        },
-        {
-          id: 'super_strength',
-          label: 'Super Strength',
-          emoji: '💪',
-          description: 'Lift anything, unstoppable force.',
-        },
-        {
-          id: 'healing',
-          label: 'Instant Healing',
-          emoji: '✨',
-          description: 'Heal yourself and others instantly.',
-        },
-        {
-          id: 'teleportation',
-          label: 'Teleportation',
-          emoji: '🌀',
-          description: 'Instantly travel anywhere.',
-        },
-        {
-          id: 'shape_shift',
-          label: 'Shape-Shifting',
-          emoji: '🦎',
-          description: 'Transform into anyone or anything.',
-        },
-        {
-          id: 'precognition',
-          label: 'Precognition',
-          emoji: '🔮',
-          description: 'See the future clearly.',
-        },
-      ],
-    },
-    3,
-  ),
 ]
 
 const CHAT_QUESTIONS: HumanityChatQuestion[] = [
@@ -381,52 +374,7 @@ const CHAT_QUESTIONS: HumanityChatQuestion[] = [
   ),
 ]
 
-const ORDERING_QUESTIONS: HumanityOrderingQuestion[] = [
-  buildOrderingQuestion(
-    {
-      title: 'Weather Parade',
-      text: 'Imagine you have a control panel that lets you design a perfect afternoon, moment by moment. The controls are a set of glyphs, each representing a different kind of weather.',
-      question: 'What sequence feels most like your ideal day?',
-      prompt: 'Arrange these weather glyphs in the order that feels "right" for a perfect afternoon.',
-      icons: [
-        { id: 'sunrise', label: 'Sunrise shimmer', emoji: '🌅', meaning: 'Early optimism' },
-        { id: 'mist', label: 'Soft mist', emoji: '🌫️', meaning: 'Quiet focus' },
-        { id: 'rainbow', label: 'Sky arc', emoji: '🌈', meaning: 'Surprise delight' },
-        { id: 'storm', label: 'Electric storm', emoji: '🌩️', meaning: 'Bold energy' },
-        { id: 'breeze', label: 'Blue breeze', emoji: '🌬️', meaning: 'Gentle motion' },
-        { id: 'downpour', label: 'Warm rain', emoji: '🌦️', meaning: 'Cleansing shift' },
-        { id: 'zenith', label: 'Noon blaze', emoji: '☀️', meaning: 'Full clarity' },
-        { id: 'fogbow', label: 'Fog halo', emoji: '🌁', meaning: 'Mystery mood' },
-        { id: 'nightfall', label: 'Nightfall glow', emoji: '🌆', meaning: 'Calm landing' },
-      ],
-      askForTheme: true,
-      themePlaceholder: 'Name your weather story...',
-    },
-    12,
-  ),
-  buildOrderingQuestion(
-    {
-      title: 'Creative Toolkit',
-      text: 'You have a magical creative toolkit spread before you—each tool holds a different kind of creative energy. Some help you capture ideas, others set the mood, and a few help you bring concepts to life.',
-      question: 'What\'s your ideal creative workflow?',
-      prompt: 'Line up these creative tools in the order you\'d reach for them starting a fresh project.',
-      icons: [
-        { id: 'notebook', label: 'Blank notebook', emoji: '📓', meaning: 'Idea capture' },
-        { id: 'camera', label: 'Instant camera', emoji: '📸', meaning: 'See from new angles' },
-        { id: 'lofi', label: 'Lo-fi loop', emoji: '🎧', meaning: 'Set the vibe' },
-        { id: 'sticky', label: 'Sticky notes', emoji: '🗒️', meaning: 'Shuffle fragments' },
-        { id: 'paint', label: 'Paint palette', emoji: '🎨', meaning: 'Color intuition' },
-        { id: 'drum', label: 'Pocket drum', emoji: '🥁', meaning: 'Tap your rhythm' },
-        { id: 'code', label: 'Tiny code editor', emoji: '💻', meaning: 'Structure ideas' },
-        { id: 'tea', label: 'Steaming tea', emoji: '🍵', meaning: 'Slow down senses' },
-        { id: 'projector', label: 'Idea projector', emoji: '📽️', meaning: 'Play it out' },
-      ],
-      askForTheme: true,
-      themePlaceholder: 'Call this ritual...',
-    },
-    13,
-  ),
-]
+const ORDERING_QUESTIONS: HumanityOrderingQuestion[] = []
 
 const ALLOCATION_QUESTIONS: HumanityAllocationQuestion[] = [
   buildAllocationQuestion(
@@ -588,45 +536,110 @@ const ASSOCIATION_QUESTIONS: HumanityAssociationQuestion[] = [
     },
     9,
   ),
-  buildAssociationQuestion(
+]
+
+const DIVERGENT_ASSOCIATION_QUESTION: HumanityDivergentAssociationQuestion = buildDivergentAssociationQuestion(
+  {
+    title: 'Divergent Thinking',
+    text: 'Now for something different. Your task is to think of 7 words that are <b>as different from each other </b> as possible. The more unrelated the words, the better.',
+    question: 'What 7 words come to mind?',
+    prompt: 'List 7 words that are maximally different from each other.',
+    wordCount: 7,
+    characterLimit: 30,
+  },
+  10,
+)
+
+const ALTERNATIVE_USES_QUESTIONS: HumanityAlternativeUsesQuestion[] = [
+  buildAlternativeUsesQuestion(
     {
-      title: 'Word Flash · Metamorphosis',
-      cue: 'Metamorphosis',
-      prompt: 'First word or phrase that comes to you.',
-      characterLimit: 40,
-      allowSentimentTag: true,
-    },
-    10,
-  ),
-  buildAssociationQuestion(
-    {
-      title: 'Word Flash · Echo',
-      cue: 'Echo',
-      prompt: 'What\'s your immediate association?',
-      characterLimit: 40,
-      allowSentimentTag: true,
+      title: 'Alternative Uses · Brick',
+      text: 'Creativity often comes from seeing familiar objects in new ways. Think beyond the obvious.',
+      question: 'How many different uses can you think of for a brick?',
+      prompt: 'List as many uses as you can think of for a brick.',
+      objectName: 'a brick',
+      minUses: 3,
+      maxUses: 20,
+      initialUses: ['Build a wall', 'Use as a doorstop'],
     },
     11,
   ),
+  buildAlternativeUsesQuestion(
+    {
+      title: 'Alternative Uses · Bowl',
+      text: 'Keep the creative energy going. What else could this everyday item become?',
+      question: 'What are all the different ways you could use a bowl?',
+      prompt: 'List as many uses as you can think of for a bowl.',
+      objectName: 'a bowl',
+      minUses: 3,
+      maxUses: 20,
+      initialUses: ['Hold food', 'Mix ingredients'],
+    },
+    12,
+  ),
 ]
+
+const THREE_WORDS_QUESTIONS: HumanityThreeWordsQuestion[] = [
+  buildThreeWordsQuestion(
+    {
+      title: 'Three Words Story',
+      text: 'Time to weave a narrative. You\'ll be given three random words. Your challenge is to create a sentence that naturally includes all three.',
+      question: 'Craft a sentence using these three words.',
+      prompt: 'Write a sentence that incorporates all three words.',
+      words: ['telescope', 'umbrella', 'midnight'],
+      characterLimit: 300,
+      minSentences: 1,
+      maxSentences: 3,
+    },
+    13,
+  ),
+  buildThreeWordsQuestion(
+    {
+      title: 'Three Words Story',
+      text: 'One more! Let\'s see how you connect these unexpected elements.',
+      question: 'Create a sentence with these three words.',
+      prompt: 'Write a sentence that incorporates all three words.',
+      words: ['library', 'thunder', 'chocolate'],
+      characterLimit: 300,
+      minSentences: 1,
+      maxSentences: 3,
+    },
+    14,
+  ),
+]
+
+const BUBBLE_POPPER_QUESTION: HumanityBubblePopperQuestion = buildBubblePopperQuestion(
+  {
+    title: 'Bubble Pop',
+    text: 'Here\'s a grid of 100 bubbles. You have 20 seconds. Pop as many or as few as you want—there\'s no right answer. Just do what feels natural.',
+    question: 'How do you approach this?',
+    prompt: 'Pop bubbles for 20 seconds.',
+    timeLimit: 20,
+  },
+  15,
+)
 
 const FREEFORM_QUESTION: HumanityFreeformQuestion = buildFreeformQuestion(
   {
     title: 'Anything Else?',
-    text: 'We\'ve been through quite a journey together—from rescuing scattered belongings to designing emotional landscapes, from navigating chat disasters to allocating resources for your future self. Each choice has revealed something unique about how you think and what you value.',
+    text: 'We\'ve been through quite a journey together—from rescuing scattered belongings to creative challenges, from navigating chat disasters to popping bubbles. Each choice has revealed something unique about how you think and what you value.',
     question: 'Is there anything else you\'d like to share?',
     prompt: 'Share anything you want the analysis to know before we wrap.',
     minLength: 0,
     maxLength: 600,
     placeholder: 'Drop any surprises, caveats, or secret goals for future-you...',
   },
-  15,
+  16,
 )
 
 export const HUMANITY_QUESTIONS: HumanityQuestion[] = [
   ...RESCUE_QUESTIONS,
   ...CHAT_QUESTIONS,
   ...ASSOCIATION_QUESTIONS,
+  DIVERGENT_ASSOCIATION_QUESTION,
+  ...ALTERNATIVE_USES_QUESTIONS,
+  ...THREE_WORDS_QUESTIONS,
+  BUBBLE_POPPER_QUESTION,
   ...ORDERING_QUESTIONS,
   ...ALLOCATION_QUESTIONS,
   FREEFORM_QUESTION,
@@ -641,5 +654,9 @@ export const HUMANITY_MECHANICS: HumanityMechanic[] = [
   'allocation',
   'association',
   'freeform',
+  'divergent-association',
+  'alternative-uses',
+  'three-words',
+  'bubble-popper',
 ]
 
