@@ -54,7 +54,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_ID || ''} />
+      {process.env.NEXT_PUBLIC_GOOGLE_TAG_ID && (
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_ID} />
+      )}
       <body
         className={`${inter.variable} ${instrumentSerif.variable} ${lora.variable} ${newsreader.variable} antialiased`}
         suppressHydrationWarning
