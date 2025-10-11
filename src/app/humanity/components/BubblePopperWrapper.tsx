@@ -10,6 +10,7 @@ interface BubblePopperWrapperProps {
   value?: HumanityBubblePopperResponse
   onChange: (value: HumanityBubblePopperResponse) => void
   showTextQuestions?: boolean
+  onComplete?: () => void
 }
 
 export default function BubblePopperWrapper({
@@ -17,6 +18,7 @@ export default function BubblePopperWrapper({
   value,
   onChange,
   showTextQuestions = false,
+  onComplete,
 }: BubblePopperWrapperProps) {
   const [bubbles, setBubbles] = useState<boolean[]>(Array(100).fill(false))
   const [timeElapsed, setTimeElapsed] = useState(0)
@@ -99,6 +101,11 @@ export default function BubblePopperWrapper({
       poppingSequence,
       bubbleGrid,
     })
+
+    // Auto-advance to next slide after a short delay
+    if (onComplete) {
+      setTimeout(() => onComplete(), 1500)
+    }
   }
 
   const handleBubblePop = (index: number) => {
@@ -127,18 +134,6 @@ export default function BubblePopperWrapper({
 
   return (
     <div className={styles.bubblePopperContainer}>
-      <div className={styles.bubbleGameHeader}>
-        <div className={styles.bubbleStat}>
-          <span className={styles.bubbleStatValue}>{bubblesPopped}</span>
-          <span className={styles.bubbleStatLabel}>/ 100 popped</span>
-        </div>
-        <div className={styles.bubbleStat}>
-          <span className={`${styles.bubbleStatValue} ${timeRemaining <= 5 ? styles.timeWarning : ''}`}>
-            {timeRemaining}s
-          </span>
-          <span className={styles.bubbleStatLabel}>remaining</span>
-        </div>
-      </div>
 
       <div className={styles.timerProgressBar}>
         <div 

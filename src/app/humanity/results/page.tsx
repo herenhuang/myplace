@@ -170,7 +170,7 @@ function HumanityResultsPage() {
       </div>
 
       {/* Slide Container */}
-      <div className="flex flex-col items-center justify-center h-full w-full p-8">
+      <div className={resultsStyles.resultsContainer}>
         {/* Slide 1: Archetype */}
         {currentSlide === 1 && (
           <div key="slide-1" className={`${resultsStyles.slideContainer} ${resultsStyles.slideActive}`}>
@@ -590,7 +590,7 @@ function HumanityResultsPage() {
       {currentSlide > 1 && (
         <button
           onClick={() => goToSlide(currentSlide - 1)}
-          className="fixed left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-10"
+          className="fixed hidden md:flex left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-lg items-center justify-center transition-all z-10"
           aria-label="Previous slide"
         >
           <span className="material-symbols-rounded text-gray-900">arrow_back</span>
@@ -599,7 +599,7 @@ function HumanityResultsPage() {
       {currentSlide < TOTAL_SLIDES && (
         <button
           onClick={() => goToSlide(currentSlide + 1)}
-          className="fixed right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all z-10"
+          className="fixed hidden md:flex right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-lg items-center justify-center transition-all z-10"
           aria-label="Next slide"
         >
           <span className="material-symbols-rounded text-gray-900">arrow_forward</span>

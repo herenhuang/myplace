@@ -140,7 +140,7 @@ const Section2: React.FC<Omit<SectionProps, 'user'> & { firstSlideHeight: number
       
       <div className='relative z-10 w-full h-screen p-8'>
         <iframe 
-          src="/human" 
+          src="/humanity" 
           className='w-full h-full rounded-2xl'
           title="Human Page Preview"
         />

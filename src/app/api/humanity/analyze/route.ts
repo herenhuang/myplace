@@ -105,7 +105,7 @@ Analyze the following responses and return a JSON object with this EXACT structu
     "similarityScore": <number 0-100>,
     "characteristics": ["<trait1>", "<trait2>", "<trait3>"],
     "description": "<2-3 sentences explaining why this model matches>",
-    "imagePath": "</openai.svg|/claude.svg|/google.svg|/file.svg>"
+    "imagePath": "</openai.svg|/claude.svg|/google.svg|/grok.svg>"
   },
   "personality": {
     "extraversion_introversion": <number 0-100, where 0=strong I, 50=balanced, 100=strong E>,

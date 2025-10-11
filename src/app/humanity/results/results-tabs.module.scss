@@ -10,14 +10,20 @@ $orange: #ff5e00;
     font-family: 'Sora', 'Lora', serif;
     letter-spacing: -.5px;
     background-image: linear-gradient(to top left, #ffded2, #ffe7ce);
-    padding: 48px;
-    height: 100dvh;
+    padding: 48px 0;
+    min-height: 100dvh;
+    height: fit-content;
     box-sizing: border-box;
 }
 
 .resultsContainer{
-    width: 800px;
-    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    min-height: 90dvh;
+    height: fit-content;
     margin: 0 auto;
 }
 
@@ -37,7 +43,7 @@ $orange: #ff5e00;
   padding: 24px;
   box-shadow: -12px 36px 36px rgba(0,0,0,0.1);
   width: 480px;
-  max-width: 100%;
+  max-width: 80vw;
 }
 
 .gradientTrack {

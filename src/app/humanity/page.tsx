@@ -1080,6 +1080,7 @@ function HumanitySimulationPage() {
               }))
             }
             showTextQuestions={false}
+            onComplete={() => goToNextStep()}
           />
         )
       default:
