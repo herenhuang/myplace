@@ -115,6 +115,7 @@ export default function HumanitySimulationPage() {
   >({})
   const [stepStartTime, setStepStartTime] = useState<number>(0)
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [isSourceModalOpen, setIsSourceModalOpen] = useState(false)
   const currentQuestion = useMemo(
     () => HUMANITY_QUESTIONS.find((question) => question.stepNumber === currentStep),
     [currentStep],
@@ -1395,6 +1396,81 @@ export default function HumanitySimulationPage() {
               <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
             </svg>
           </button>
+
+          {/* Source Button */}
+          <button
+            type="button"
+            onClick={() => setIsSourceModalOpen(true)}
+            className={styles.sourceButton}
+            aria-label="View source JSON"
+            title="View source JSON"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Source Modal */}
+      {isSourceModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsSourceModalOpen(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>Response Data (JSON)</h3>
+              <button
+                onClick={() => setIsSourceModalOpen(false)}
+                className={styles.modalClose}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <pre className={styles.jsonDisplay}>
+                {JSON.stringify(
+                  {
+                    averageResponseTime: responses.length > 0
+                      ? Math.round(responses.reduce((sum, r) => sum + r.responseTimeMs, 0) / responses.length)
+                      : 0,
+                    steps: responses,
+                  },
+                  null,
+                  2
+                )}
+              </pre>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    JSON.stringify(
+                      {
+                        averageResponseTime: responses.length > 0
+                          ? Math.round(responses.reduce((sum, r) => sum + r.responseTimeMs, 0) / responses.length)
+                          : 0,
+                        steps: responses,
+                      },
+                      null,
+                      2
+                    )
+                  )
+                }}
+                className={styles.copyButton}
+              >
+                Copy to Clipboard
+              </button>
+            </div>
+          </div>
         </div>
       )}
       {screenState === 'analyzing' && (

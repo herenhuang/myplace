@@ -252,14 +252,26 @@ export interface HumanityAnalysisResult {
     spontaneity: number // 0-100
     authenticity: number // 0-100
   }
-  // Multi-axis personality dimensions
+  humanityMetrics: {
+    perplexity: number // Lower = more predictable (AI-like), Higher = more varied (human-like)
+    burstiness: number // 0-100, Higher = more varied sentence structure (human-like)
+    entropy: number // 0-100, Higher = more unpredictable word choices (human-like)
+  }
+  mostSimilarModel: {
+    name: 'ChatGPT' | 'Claude' | 'Gemini' | 'Grok'
+    similarityScore: number // 0-100
+    characteristics: string[]
+    description: string
+    imagePath: string
+  }
+  // Multi-axis personality dimensions (MBTI-based)
   personality: {
+    extraversion_introversion: number // 0 = strong I, 50 = balanced, 100 = strong E
+    intuition_sensing: number // 0 = strong S, 50 = balanced, 100 = strong N
+    thinking_feeling: number // 0 = strong T, 50 = balanced, 100 = strong F
+    judging_perceiving: number // 0 = strong J, 50 = balanced, 100 = strong P
     creative_conventional: number // 0 = conventional, 100 = creative
     analytical_intuitive: number // 0 = analytical, 100 = intuitive
-    emotional_logical: number // 0 = logical, 100 = emotional
-    spontaneous_calculated: number // 0 = calculated, 100 = spontaneous
-    abstract_concrete: number // 0 = concrete, 100 = abstract
-    divergent_convergent: number // 0 = convergent, 100 = divergent
   }
   breakdown: Array<{
     questionId: string
@@ -296,6 +308,7 @@ export interface HumanityAnalysisResult {
     name: string
     description: string
     traits: string[]
+    iconPath: string // Path to icon image in /public/elevate/
   }
   overallAnalysis: string
   // Legacy fields for backward compatibility

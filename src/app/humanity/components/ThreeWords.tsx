@@ -20,6 +20,13 @@ export default function ThreeWords({
 }: ThreeWordsProps) {
   const [story, setStory] = useState(value?.story || '')
 
+  // Sync with cached value when it loads
+  useEffect(() => {
+    if (value?.story) {
+      setStory(value.story)
+    }
+  }, [value])
+
   useEffect(() => {
     onChange({ story })
   }, [story])

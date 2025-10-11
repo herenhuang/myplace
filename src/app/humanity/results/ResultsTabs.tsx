@@ -119,7 +119,13 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                     
                     <div className="flex gap-8">
                         <div className={styles.card + ' w-[320px]'}> 
-                            <div className={styles.archetypeEmoji}>🎭</div>
+                            <div className={styles.archetypeIcon}>
+                              <img 
+                                src={data.primaryArchetype.iconPath || '/elevate/icon_observer.png'} 
+                                alt={data.primaryArchetype.name}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
                             <h2 className={styles.archetypeName}>
                                 {data.primaryArchetype.name}
                             </h2>
@@ -129,7 +135,7 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
                     </div>
 
                         <div className={styles.card + ' flex-1'}>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Breakdown</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Subscores</h3>
             <div className="space-y-4">
               {[{ name: 'Creativity', score: data.subscores.creativity, color: 'from-purple-400 to-purple-600' }, { name: 'Spontaneity', score: data.subscores.spontaneity, color: 'from-blue-400 to-blue-600' }, { name: 'Authenticity', score: data.subscores.authenticity, color: 'from-green-400 to-green-600' }].map((s, i) => (
                 <div key={s.name}>
@@ -156,20 +162,90 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
             </div>
           </div>
 
+                    {/* Humanity Metrics */}
+                    {data.humanityMetrics && (
+                      <div className={styles.card}>
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Humanity Metrics</h3>
+                        <div className="grid grid-cols-3 gap-4">
+                          {[
+                            { 
+                              name: 'Perplexity', 
+                              score: data.humanityMetrics.perplexity, 
+                              description: 'Response variety'
+                            },
+                            { 
+                              name: 'Burstiness', 
+                              score: data.humanityMetrics.burstiness, 
+                              description: 'Structure variation'
+                            },
+                            { 
+                              name: 'Entropy', 
+                              score: data.humanityMetrics.entropy, 
+                              description: 'Word diversity'
+                            }
+                          ].map((metric) => (
+                            <div key={metric.name} className="text-center">
+                              <div className="text-3xl font-bold text-orange-600 mb-1">{metric.score}</div>
+                              <div className="text-xs font-semibold text-gray-700">{metric.name}</div>
+                              <div className="text-xs text-gray-500">{metric.description}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500 text-center mt-3">
+                          Higher scores indicate more human-like patterns
+                        </p>
+                      </div>
+                    )}
+
+                    {/* AI Model Similarity */}
+                    {data.mostSimilarModel && (
+                      <div className={styles.card}>
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">You are most similar to...</h3>
+                        <div className="flex items-center gap-4 mb-3">
+                          <div className="flex-shrink-0">
+                            <img 
+                              src={data.mostSimilarModel.imagePath} 
+                              alt={data.mostSimilarModel.name}
+                              className="w-12 h-12 object-contain"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-xl font-bold text-gray-900">{data.mostSimilarModel.name}</h4>
+                            <div className="text-sm text-gray-600">
+                              {data.mostSimilarModel.similarityScore}% similarity
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {data.mostSimilarModel.characteristics.map((trait, i) => (
+                            <span
+                              key={i}
+                              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                            >
+                              {trait}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          {data.mostSimilarModel.description}
+                        </p>
+                      </div>
+                    )}
+
           {data.personality && (
                     <div className={styles.card}>
             <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Personality Profile</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Personality Profile (MBTI)</h3>
               <div className="grid grid-cols-1 gap-3">
                 {[
+                  { key: 'extraversion_introversion', lowLabel: 'Introvert (I)', highLabel: 'Extravert (E)' },
+                  { key: 'intuition_sensing', lowLabel: 'Sensing (S)', highLabel: 'Intuition (N)' },
+                  { key: 'thinking_feeling', lowLabel: 'Thinking (T)', highLabel: 'Feeling (F)' },
+                  { key: 'judging_perceiving', lowLabel: 'Judging (J)', highLabel: 'Perceiving (P)' },
                   { key: 'creative_conventional', lowLabel: 'Conventional', highLabel: 'Creative' },
-                  { key: 'analytical_intuitive', lowLabel: 'Analytical', highLabel: 'Intuitive' },
-                  { key: 'emotional_logical', lowLabel: 'Logical', highLabel: 'Emotional' },
-                  { key: 'spontaneous_calculated', lowLabel: 'Calculated', highLabel: 'Spontaneous' },
-                  { key: 'abstract_concrete', lowLabel: 'Concrete', highLabel: 'Abstract' },
-                  { key: 'divergent_convergent', lowLabel: 'Convergent', highLabel: 'Divergent' }
+                  { key: 'analytical_intuitive', lowLabel: 'Analytical', highLabel: 'Intuitive' }
                 ].map((axis, idx) => {
-                  const value = (data.personality as Record<string, number>)[axis.key]
+                  const value = (data.personality as Record<string, number>)[axis.key] || 50
                   return (
                     <div key={axis.key}>
                       <div className="flex justify-between items-center mb-1 text-sm">
@@ -340,7 +416,13 @@ export default function ResultsTabs({ sessionId, analysisResult, responses, acti
       {activeTab === 'results-archetype' && data && (
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <div className={styles.archetypeEmoji}>🎭</div>
+            <div className={styles.archetypeIcon}>
+              <img 
+                src={data.primaryArchetype.iconPath || '/elevate/icon_observer.png'} 
+                alt={data.primaryArchetype.name}
+                className="w-full h-full object-contain mx-auto"
+              />
+            </div>
             <h2 className={styles.archetypeName}>{data.primaryArchetype.name}</h2>
           </div>
           <div className="mb-8 p-6">

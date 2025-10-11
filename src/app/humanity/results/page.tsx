@@ -175,7 +175,13 @@ export default function HumanityResultsPage() {
         {currentSlide === 1 && (
           <div key="slide-1" className={`${resultsStyles.slideContainer} ${resultsStyles.slideActive}`}>
             <div className={resultsStyles.card + ' w-[400px] h-[500px] text-center flex flex-col items-center justify-center'}>
-              <div className={resultsStyles.archetypeEmoji}>🎭</div>
+              <div className={resultsStyles.archetypeIcon}>
+                <img 
+                  src={data.primaryArchetype.iconPath || '/elevate/icon_observer.png'} 
+                  alt={data.primaryArchetype.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
               <h2 className={resultsStyles.archetypeName}>
                 {data.primaryArchetype.name}
               </h2>
@@ -203,41 +209,118 @@ export default function HumanityResultsPage() {
           </div>
         )}
 
-        {/* Slide 2: Metascore */}
+        {/* Slide 2: Metascore & AI Similarity */}
         {currentSlide === 2 && (
           <div key="slide-2" className={`${resultsStyles.slideContainer} ${resultsStyles.slideActive}`}>
-            <div className={resultsStyles.card + ' max-w-2xl'}>
-              <p className="text-gray-600 text-center mb-8 capitalize">
-                {(data.humanessLevel || data.humanityLevel).replace(/-/g, ' ')}
-              </p>
-              <div className="text-center mb-8">
-                <h1 className={resultsStyles.metascore}>{data.metascore}</h1>
-              </div>
-              <div className="mb-6">
-                <div className="space-y-4">
-                  {[
-                    { name: 'Creativity', score: data.subscores.creativity, color: 'from-purple-400 to-purple-600' },
-                    { name: 'Spontaneity', score: data.subscores.spontaneity, color: 'from-blue-400 to-blue-600' },
-                    { name: 'Authenticity', score: data.subscores.authenticity, color: 'from-green-400 to-green-600' }
-                  ].map((s, i) => (
-                    <div key={s.name}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-700 font-medium">{s.name}</span>
-                        <span className="text-gray-900 font-bold">{s.score}</span>
+            <div className="flex flex-col gap-6 w-full max-w-4xl">
+              {/* Metascore Card */}
+              <div className={resultsStyles.card + ' max-w-2xl mx-auto'}>
+                <p className="text-gray-600 text-center mb-8 capitalize">
+                  {(data.humanessLevel || data.humanityLevel).replace(/-/g, ' ')}
+                </p>
+                <div className="text-center mb-8">
+                  <h1 className={resultsStyles.metascore}>{data.metascore}</h1>
+                </div>
+                <div className="mb-6">
+                  <div className="space-y-4">
+                    {[
+                      { name: 'Creativity', score: data.subscores.creativity, color: 'from-purple-400 to-purple-600' },
+                      { name: 'Spontaneity', score: data.subscores.spontaneity, color: 'from-blue-400 to-blue-600' },
+                      { name: 'Authenticity', score: data.subscores.authenticity, color: 'from-green-400 to-green-600' }
+                    ].map((s, i) => (
+                      <div key={s.name}>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-700 font-medium">{s.name}</span>
+                          <span className="text-gray-900 font-bold">{s.score}</span>
+                        </div>
+                        <div className={resultsStyles.gradientTrack}>
+                          <div
+                            className={`h-4 m-1 bg-gradient-to-r ${s.color} rounded-full absolute left-0 top-0 transition-all duration-1000 ease-out`}
+                            style={{ width: `${s.score}%`, transitionDelay: `${(i + 1) * 200}ms` }}
+                          />
+                        </div>
                       </div>
-                      <div className={resultsStyles.gradientTrack}>
-                        <div
-                          className={`h-4 m-1 bg-gradient-to-r ${s.color} rounded-full absolute left-0 top-0 transition-all duration-1000 ease-out`}
-                          style={{ width: `${s.score}%`, transitionDelay: `${(i + 1) * 200}ms` }}
-                        />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Humanity Metrics */}
+              {data.humanityMetrics && (
+                <div className={resultsStyles.card + ' max-w-2xl mx-auto'}>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Humanity Metrics</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { 
+                        name: 'Perplexity', 
+                        score: data.humanityMetrics.perplexity, 
+                        icon: 'psychology',
+                        description: 'Response variety',
+                        color: 'text-purple-600'
+                      },
+                      { 
+                        name: 'Burstiness', 
+                        score: data.humanityMetrics.burstiness, 
+                        icon: 'auto_awesome',
+                        description: 'Structure variation',
+                        color: 'text-blue-600'
+                      },
+                      { 
+                        name: 'Entropy', 
+                        score: data.humanityMetrics.entropy, 
+                        icon: 'scatter_plot',
+                        description: 'Word diversity',
+                        color: 'text-green-600'
+                      }
+                    ].map((metric) => (
+                      <div key={metric.name} className="text-center p-4 bg-gray-50 rounded-lg">
+                        <span className={`material-symbols-rounded text-3xl ${metric.color} mb-2`}>{metric.icon}</span>
+                        <div className={`text-2xl font-bold ${metric.color} mb-1`}>{metric.score}</div>
+                        <div className="text-xs font-semibold text-gray-700 mb-1">{metric.name}</div>
+                        <div className="text-xs text-gray-500">{metric.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 text-center mt-4">
+                    Higher scores indicate more human-like patterns
+                  </p>
+                </div>
+              )}
+
+              {/* AI Model Similarity */}
+              {data.mostSimilarModel && (
+                <div className={resultsStyles.card + ' max-w-2xl mx-auto'}>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">You are most similar to...</h3>
+                  <div className="flex items-center gap-6 mb-4">
+                    <div className="flex-shrink-0">
+                      <img 
+                        src={data.mostSimilarModel.imagePath} 
+                        alt={data.mostSimilarModel.name}
+                        className="w-16 h-16 object-contain"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-2xl font-bold text-gray-900 mb-1">{data.mostSimilarModel.name}</h4>
+                      <div className="text-sm text-gray-600 mb-2">
+                        {data.mostSimilarModel.similarityScore}% similarity
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {data.mostSimilarModel.characteristics.map((trait, i) => (
+                          <span
+                            key={i}
+                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                          >
+                            {trait}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {data.mostSimilarModel.description}
+                  </p>
                 </div>
-
-               
-              </div>
-            
+              )}
             </div>
 
             <button
@@ -267,13 +350,12 @@ export default function HumanityResultsPage() {
 
               <div className="grid grid-cols-1 gap-1">
                 {[
-                  { key: 'creative_conventional', lowLabel: 'Conventional', highLabel: 'Creative', lowIcon: 'arrow_upward', highIcon: 'emoji_objects' },
-                  { key: 'analytical_intuitive', lowLabel: 'Analytical', highLabel: 'Intuitive', lowIcon: 'arrow_upward', highIcon: 'arrow_downward' },
-                  { key: 'emotional_logical', lowLabel: 'Logical', highLabel: 'Emotional', lowIcon: 'cognition', highIcon: 'favorite' },
-                  { key: 'spontaneous_calculated', lowLabel: 'Calculated', highLabel: 'Spontaneous', lowIcon: 'functions', highIcon: 'egg_alt' },
-                  { key: 'divergent_convergent', lowLabel: 'Convergent', highLabel: 'Divergent', lowIcon: 'merge', highIcon: 'call_split' }
+                  { key: 'extraversion_introversion', lowLabel: 'Introvert (I)', highLabel: 'Extravert (E)', lowIcon: 'person', highIcon: 'groups' },
+                  { key: 'intuition_sensing', lowLabel: 'Sensing (S)', highLabel: 'Intuition (N)', lowIcon: 'visibility', highIcon: 'psychology' },
+                  { key: 'thinking_feeling', lowLabel: 'Thinking (T)', highLabel: 'Feeling (F)', lowIcon: 'cognition', highIcon: 'favorite' },
+                  { key: 'judging_perceiving', lowLabel: 'Judging (J)', highLabel: 'Perceiving (P)', lowIcon: 'rule', highIcon: 'explore' },
                 ].map((axis, idx) => {
-                  const value = (data.personality as Record<string, number>)[axis.key]
+                  const value = (data.personality as Record<string, number>)[axis.key] || 50
                   return (
                     <div key={axis.key} className="flex justify-center items-center mb-1 gap-2 text-sm">
 

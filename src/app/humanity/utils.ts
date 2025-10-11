@@ -1,6 +1,6 @@
 import { HumanityStepData } from '@/lib/humanity-types'
 
-export const HUMANITY_CACHE_KEY = 'humanity-simulation-cache-v1'
+export const HUMANITY_CACHE_KEY = 'humanity-simulation-cache-v2'
 
 export interface HumanityLocalCache {
   sessionId: string

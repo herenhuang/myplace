@@ -104,6 +104,7 @@ export default function AlternativeUses({
 
   const [inputValue, setInputValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -111,6 +112,17 @@ export default function AlternativeUses({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // Sync with cached value when it loads
+  useEffect(() => {
+    if (value?.uses && value.uses.length > 0 && !isInitialized) {
+      setUses(value.uses.map((text, idx) => ({
+        id: `use-${idx}-${Date.now()}`,
+        text,
+      })))
+      setIsInitialized(true)
+    }
+  }, [value, isInitialized])
 
   useEffect(() => {
     // Update parent with current uses

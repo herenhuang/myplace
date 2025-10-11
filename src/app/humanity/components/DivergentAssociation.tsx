@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from '../page.module.scss'
 import {
   HumanityDivergentAssociationQuestion,
@@ -20,6 +20,16 @@ export default function DivergentAssociation({
 }: DivergentAssociationProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
+  const [words, setWords] = useState<string[]>(
+    value?.words || Array(question.wordCount).fill('')
+  )
+
+  // Sync with cached value when it loads
+  useEffect(() => {
+    if (value?.words && value.words.length > 0) {
+      setWords(value.words)
+    }
+  }, [value])
   useEffect(() => {
     // Focus first input on mount
     if (!showTextQuestions && inputRefs.current[0]) {
@@ -27,11 +37,10 @@ export default function DivergentAssociation({
     }
   }, [showTextQuestions])
 
-  const words = value?.words || Array(question.wordCount).fill('')
-
   const handleWordChange = (index: number, newWord: string) => {
     const newWords = [...words]
     newWords[index] = newWord
+    setWords(newWords)
     onChange({ words: newWords })
   }
 
