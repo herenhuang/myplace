@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import styles from '../page.module.scss'
@@ -36,7 +36,7 @@ import AssociationPrompt from '../components/AssociationPrompt'
 import FreeformNote from '../components/FreeformNote'
 import HumanityResultsTabs from '../results/ResultsTabs'
 type ResultsTabKey = 'results-overview' | 'results-breakdown' | 'results-archetype'
-export default function HumanitySinglePage() {
+function HumanitySinglePage() {
   const searchParams = useSearchParams()
   const [sessionId, setSessionId] = useState('')
   const [dbSessionId, setDbSessionId] = useState('')
@@ -407,6 +407,7 @@ export default function HumanitySinglePage() {
     recordStartTime(stepNumber)
     switch (mechanic) {
       case 'rescue':
+        if (question.mechanic !== 'rescue') return null
         return (
           <RescuePicker
             question={question}
@@ -421,6 +422,7 @@ export default function HumanitySinglePage() {
           />
         )
       case 'chat':
+        if (question.mechanic !== 'chat') return null
         return (
           <ChatScenario
             question={question}
@@ -432,9 +434,11 @@ export default function HumanitySinglePage() {
                 return next
               })
             }}
+            onBack={() => {}}
           />
         )
       case 'ordering':
+        if (question.mechanic !== 'ordering') return null
         return (
           <IconOrderingBoard
             question={question}
@@ -449,6 +453,7 @@ export default function HumanitySinglePage() {
           />
         )
       case 'allocation':
+        if (question.mechanic !== 'allocation') return null
         return (
           <AllocationDial
             question={question}
@@ -463,6 +468,7 @@ export default function HumanitySinglePage() {
           />
         )
       case 'association':
+        if (question.mechanic !== 'association') return null
         return (
           <AssociationPrompt
             question={question}
@@ -477,6 +483,7 @@ export default function HumanitySinglePage() {
           />
         )
       case 'freeform':
+        if (question.mechanic !== 'freeform') return null
         return (
           <FreeformNote
             question={question}
@@ -580,5 +587,13 @@ export default function HumanitySinglePage() {
         </div>
       )}
     </PageContainer>
+  )
+}
+
+export default function HumanitySinglePageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HumanitySinglePage />
+    </Suspense>
   )
 }

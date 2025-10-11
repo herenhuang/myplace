@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import styles from './page.module.scss'
 import PageContainer from '@/components/layout/PageContainer'
@@ -55,7 +55,7 @@ type ScreenState =
   | 'results-archetype'
 const RESULTS_STATES: Array<Exclude<ScreenState, 'welcome' | 'confirmation' | 'simulation' | 'analyzing'>> =
   ['results-overview', 'results-breakdown', 'results-archetype']
-export default function HumanitySimulationPage() {
+function HumanitySimulationPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [screenState, setScreenState] = useState<ScreenState>('welcome')
@@ -1496,5 +1496,13 @@ export default function HumanitySimulationPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function HumanitySimulationPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HumanitySimulationPage />
+    </Suspense>
   )
 }

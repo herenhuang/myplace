@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { Suspense, useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { HumanityAnalysisResult, HumanityStepData } from '@/lib/humanity-types'
 import { loadHumanityCache } from '../utils'
@@ -8,7 +8,7 @@ import { getOrCreateSessionId } from '@/lib/session'
 import styles from '../page.module.scss'
 import resultsStyles from './results-tabs.module.scss'
 
-export default function HumanityResultsPage() {
+function HumanityResultsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [sessionId, setSessionId] = useState<string>('')
@@ -606,6 +606,14 @@ export default function HumanityResultsPage() {
         </button>
       )}
     </div>
+  )
+}
+
+export default function HumanityResultsPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HumanityResultsPage />
+    </Suspense>
   )
 }
 

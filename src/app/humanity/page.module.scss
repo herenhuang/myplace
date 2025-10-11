@@ -1728,7 +1728,7 @@ $orange: #ff5e00;
   transition: all 0.2s ease;
   
   &:hover {
-    background: darken($orange, 5%);
+    background: color-mix(in srgb, $orange 95%, black);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
   }

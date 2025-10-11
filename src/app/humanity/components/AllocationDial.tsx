@@ -141,7 +141,7 @@ export default function AllocationDial({
       0,
     )
 
-    let updated: Record<string, number> = {
+    const updated: Record<string, number> = {
       ...allocationsSnapshot,
       [editedId]: clampedValue,
     }
