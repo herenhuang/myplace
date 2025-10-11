@@ -87,21 +87,7 @@ export default function AlternativeUses({
   onChange,
   showTextQuestions = false,
 }: AlternativeUsesProps) {
-  const [uses, setUses] = useState<UseItem[]>(() => {
-    if (value?.uses && value.uses.length > 0) {
-      return value.uses.map((text, idx) => ({
-        id: `use-${idx}-${Date.now()}`,
-        text,
-      }))
-    }
-    // Start with pre-filled items from question
-    const initialUses = question.initialUses || []
-    return initialUses.map((text, idx) => ({
-      id: `use-${idx}-${Date.now()}`,
-      text,
-    }))
-  })
-
+  const [uses, setUses] = useState<UseItem[]>([])
   const [inputValue, setInputValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
@@ -113,21 +99,35 @@ export default function AlternativeUses({
     })
   )
 
-  // Sync with cached value when it loads
+  // Initialize with cached value OR default initial uses
   useEffect(() => {
-    if (value?.uses && value.uses.length > 0 && !isInitialized) {
-      setUses(value.uses.map((text, idx) => ({
-        id: `use-${idx}-${Date.now()}`,
-        text,
-      })))
+    if (!isInitialized) {
+      if (value?.uses && value.uses.length > 0) {
+        // Load cached responses
+        setUses(value.uses.map((text, idx) => ({
+          id: `use-${idx}-${Date.now()}`,
+          text,
+        })))
+      } else {
+        // Load default initial uses from question
+        const initialUses = question.initialUses || []
+        const initialItems = initialUses.map((text, idx) => ({
+          id: `use-${idx}-${Date.now()}`,
+          text,
+        }))
+        setUses(initialItems)
+      }
       setIsInitialized(true)
     }
-  }, [value, isInitialized])
+  }, [value, isInitialized, question.initialUses])
 
   useEffect(() => {
-    // Update parent with current uses
-    onChange({ uses: uses.map((u) => u.text) })
-  }, [uses])
+    // Update parent with current uses only after initialization
+    if (isInitialized && uses.length > 0) {
+      onChange({ uses: uses.map((u) => u.text) })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uses, isInitialized])
 
   useEffect(() => {
     // Focus textarea on mount

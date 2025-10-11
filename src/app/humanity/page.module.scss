@@ -1,4 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Geist:wght@100..900&family=Hedvig+Letters+Sans&family=Hedvig+Letters+Serif:opsz@12..24&family=IM+Fell+Double+Pica:ital@0;1&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Oswald:wght@200..700&family=Ovo&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Sora:wght@100..800&family=Unbounded:wght@200..900&display=swap');
+
 $orange: #ff5e00;
+$body: 'Instrument Sans', 'DM Sans', serif;
 
 .pageFrame {
   min-height: 100dvh;
@@ -138,6 +141,15 @@ $orange: #ff5e00;
   gap: 1.5rem;
   width: fit-content;
   position: relative;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    max-height: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    overflow-y: visible;
+    width: 100vw;
+  }
 }
 
 .cardFloating {
@@ -155,12 +167,12 @@ $orange: #ff5e00;
   }
 }
 
-.textQuestionsFloating {
-  width: 350px;
-  max-width: 350px;
-  padding: 24px;
-  opacity: 1;
-}
+// .textQuestionsFloating {
+//   width: 350px;
+//   max-width: 350px;
+//   padding: 24px;
+//   opacity: 1;
+// }
 
 @keyframes textQuestionsExpandIn {
   0% {
@@ -220,30 +232,86 @@ $orange: #ff5e00;
   gap: 40px;
   width: 100%;
   flex: 1;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: scroll;
+    padding: 24px 0;
+    max-height: 100%;
+    width: 100vw;
+    gap: 24px;
+  }
 }
 
 .contextContainer {
   flex: 1;
   max-width: 400px;
   margin-bottom: 24px;
+  @media screen and (max-width: 768px) {
+    padding: 24px;
+    margin-bottom: 0;
+  }
 }
 
-.textQuestionsContainer {
-  width: 0;
-  max-width: 0;
-  padding: 0;
-  background: rgba(249, 250, 251, 0.5);
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
+.contextImageWrapper {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 24px;
+  margin-bottom: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: none;
+}
+
+.contextImageVisible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.contextImage {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+
+// New approach: Follow-up questions inside context container
+.followUpQuestions {
+  max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: width 0.6s ease-out, max-width 0.6s ease-out, opacity 0.6s ease-out, padding 0.6s ease-out;
+  margin-top: 32px;
+  transition: none;
+
+  // On mobile, always show when rendered (no collapse)
+  @media (max-width: 768px) {
+    max-height: none;
+    opacity: 1;
+    margin-top: 24px;
+  }
+}
+
+.followUpQuestionsVisible {
+  max-height: 1000px;
+  opacity: 1;
+  margin-top: 32px;
+  transition: max-height 0.5s ease-out, opacity 0.5s ease-out, margin-top 0.5s ease-out; // Smooth show
+
+  // On mobile, keep consistent spacing
+  @media (max-width: 768px) {
+    margin-top: 24px;
+  }
 }
 
 .contextText {
-  font-family: 'Lora', serif;
+  font-family: $body;
   font-size: 18px;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
+  font-weight: 500;
   line-height: 1.3;
   color: black;
   margin-bottom: 24px;
@@ -251,10 +319,10 @@ $orange: #ff5e00;
 
 
 .contextQuestion {
-  font-family: 'Lora', serif;
+  font-family: $body;
   font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.3px;
+  font-weight: 650;
+  letter-spacing: -0.5px;
   line-height: 1.3;
   color: black;
   min-height: 24px;
@@ -304,6 +372,12 @@ $orange: #ff5e00;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
+
+  @media screen and (max-width: 768px) {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 .rescueCard {
@@ -317,6 +391,8 @@ $orange: #ff5e00;
   flex-direction: column;
   gap: 0.75rem;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+
+  
 }
 
 .rescueCard:not(.rescueCardDisabled):hover {
@@ -342,6 +418,10 @@ $orange: #ff5e00;
   font-size: 60px;
   width: fit-content;
   filter: drop-shadow(0 0 10px rgba(white, 1));
+
+  @media screen and (max-width: 768px) {
+    font-size: 32px;
+  }
 }
 
 .rescueBadge {
@@ -361,22 +441,23 @@ $orange: #ff5e00;
 }
 
 .noteTextarea {
-  width: 100%;
-  min-height: 102px;
-  border-radius: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  padding: 0.85rem 1rem;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  background: #ffffff;
-  resize: vertical;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-}
+  width: 400px;
+  background: rgba(black, .03);
+  border-bottom: 2px solid rgba(black, .05);
+  border-radius: 8px 8px 0 0;
+  padding: 18px;
+  min-height: 100px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -.4px;
+  resize: none;
+  transition: .2s ease;
 
-.noteTextarea:focus {
-  border-color: rgba(99, 102, 241, 0.45);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-  outline: none;
+  &:focus{
+    outline: none;
+    border-color: rgba(black, .1);
+  }
 }
 
 /* Canvas-based rescue picker */
@@ -409,16 +490,16 @@ $orange: #ff5e00;
   position: absolute;
   left: 50%;
   top: 50%;
-  padding: 0.85rem;
+  padding: 12px;
   border-radius: 16px;
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 16px;
   cursor: grab;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   transform-origin: center;
-  min-width: 140px;
+  min-width: 120px;
   max-width: 180px;
   touch-action: none;
   user-select: none;
@@ -862,15 +943,23 @@ $orange: #ff5e00;
 }
 
 .freeformTextarea {
-  width: 100%;
-  border-radius: 24px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  padding: 1rem 1.2rem;
+  width: 400px;
+  background: rgba(black, .03);
+  border-bottom: 2px solid rgba(black, .05);
+  border-radius: 8px 8px 0 0;
+  padding: 18px;
   min-height: 180px;
-  font-size: 1rem;
-  line-height: 1.6;
-  background: #ffffff;
-  resize: vertical;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -.4px;
+  resize: none;
+  transition: .2s ease;
+
+  &:focus{
+    outline: none;
+    border-color: rgba(black, .1);
+  }
 }
 
 .stepNav {
@@ -900,10 +989,10 @@ $orange: #ff5e00;
 }
 
 .progressBar {
-  width: 100%;
+  width: 90%;
   flex-shrink: 0;
   display: flex;
-  gap: 4px;
+  gap: 8px;
   box-sizing: border-box;
   padding: 0 24px;
   position: fixed;
@@ -911,7 +1000,7 @@ $orange: #ff5e00;
   left: 0;
   right: 0;
   z-index: 100;
-  transform: translateY(-100%);
+  //transform: translateY(-100%);
   transition: transform 0.3s ease-in-out;
   backdrop-filter: blur(8px);
 }
@@ -1120,27 +1209,32 @@ $orange: #ff5e00;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 0px;
   padding:  12px;
   background: white;
   aspect-ratio: 1/1;
-  border: 2px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 120px;
   cursor: pointer;
   transition: all 0.2s ease;
-  height: 200px;
-  
+  height: 160px;
 
-  
+  @media screen and (max-width: 768px) {
+    flex-direction: row;
+    gap: 12px;
+    height: 80px;
+    aspect-ratio: none;
+  }
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
 }
 
 .rescueGridCardSelected {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.08), rgba(251, 146, 60, 0.08));
-  border-color: $orange;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+  background: white;
+  border-color: white;
+  box-shadow: 0 0 40px rgba(249, 115, 22, 0.4);
 }
 
 .rescueGridCardDisabled {
@@ -1192,20 +1286,16 @@ $orange: #ff5e00;
 
   line-height: 32px;
 
-  font-family: 'Lora', sans-serif;
 }
 
 .wordInput {
   width: 240px;
-  padding: 8px 12px;
-  border: 1px solid rgba(black, 0.1);
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 8px 0px;
+  border-bottom: 2px solid rgba(black, 0.05);
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.3px;
   transition: all 0.2s ease;
-  
-  font-family: 'Lora', sans-serif;
 
   &::placeholder {
     color: rgba(0, 0, 0, 0.3);
@@ -1236,7 +1326,6 @@ $orange: #ff5e00;
 }
 
 .objectPrompt {
-  font-family: 'Lora', sans-serif;
   font-size: 16px;
   color: rgba(0, 0, 0, 0.7);
   letter-spacing: -.4px;
@@ -1259,7 +1348,6 @@ $orange: #ff5e00;
 }
 
 .useItem {
-  font-family: 'Lora', sans-serif;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1310,7 +1398,6 @@ $orange: #ff5e00;
   line-height: 1.5;
   resize: none;
   transition: all 0.2s ease;
-  font-family: 'Lora', sans-serif;
   
   &::placeholder {
     color: rgba(0, 0, 0, 0.3);
@@ -1419,38 +1506,73 @@ $orange: #ff5e00;
   font-size: 16px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.6);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
 }
 
 .wordChipIncluded {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(34, 197, 94, 0.15);
   border-color: rgb(34, 197, 94);
   color: rgb(21, 128, 61);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1),
+              0 4px 12px rgba(34, 197, 94, 0.2);
+  transform: scale(1.05);
+  animation: lightUp 0.3s ease-out;
+}
+
+@keyframes lightUp {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.2),
+                0 4px 16px rgba(34, 197, 94, 0.3);
+    transform: scale(1.08);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1),
+                0 4px 12px rgba(34, 197, 94, 0.2);
+    transform: scale(1.05);
+  }
 }
 
 .checkmark {
   font-size: 14px;
   color: rgb(34, 197, 94);
+  animation: checkmarkAppear 0.3s ease-out;
+}
+
+@keyframes checkmarkAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .storyInput {
   width: 100%;
   padding: 16px 20px;
-  border: 2px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0);
+  background: rgba(black, .03);
   border-radius: 12px;
   font-size: 16px;
-  line-height: 1.6;
-  resize: vertical;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  line-height: 1.5;
+  resize: none;
   min-height: 100px;
   transition: all 0.2s ease;
   
   &:focus {
     outline: none;
-    border-color: $orange;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
   }
 }
 

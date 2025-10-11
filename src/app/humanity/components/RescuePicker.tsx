@@ -84,9 +84,6 @@ export default function RescuePicker({
     return (
       <div className="flex flex-col gap-4">
         <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-gray-700">
-            {question.notePlaceholder ?? 'Why these?'}
-          </span>
           <textarea
             className={styles.noteTextarea}
             placeholder={question.notePlaceholder ?? 'Share your quick reasoning.'}
@@ -127,11 +124,11 @@ export default function RescuePicker({
                 {item.emoji}
               </span>
               <div className="flex flex-col text-center gap-1">
-                <span className="font-[Lora] text-base font-semibold tracking-tighter text-black">
+                <span className="text-base font-semibold tracking-tighter text-black">
                   {item.label}
                 </span>
                 {item.description && (
-                  <span className="text-xs tracking-tight text-black/40 leading-tight width-[80px]">
+                  <span className="text-xs tracking-tight text-black/40 leading-tight width-[80px] hidden">
                     {item.description}
                   </span>
                 )}

@@ -15,6 +15,7 @@ interface ChatScenarioProps {
   disabled?: boolean;
   onBack: () => void;
   showTextQuestions?: boolean;
+  onComplete?: () => void;
 }
 
 const NPC_DELAY_MS = 600;
@@ -26,6 +27,7 @@ export default function ChatScenario({
   disabled = false,
   onBack,
   showTextQuestions = true,
+  onComplete,
 }: ChatScenarioProps) {
   const [transcript, setTranscript] = useState<HumanityChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -103,6 +105,9 @@ export default function ChatScenario({
       endedEarly,
     })
 
+    // Check if this was the last turn
+    const isLastTurn = (userTurns + 1) >= maxTurns
+
     // Show typing indicator
     setTimeout(() => {
       setIsNpcTyping(true)
@@ -148,9 +153,17 @@ export default function ChatScenario({
                 transcript: withNpc,
                 endedEarly,
               })
+              // Auto-advance if this was the last turn
+              if (isLastTurn && onComplete) {
+                setTimeout(() => onComplete(), NPC_DELAY_MS + 800)
+              }
             }, NPC_DELAY_MS)
           } else {
             setIsNpcTyping(false)
+            // Auto-advance if this was the last turn
+            if (isLastTurn && onComplete) {
+              setTimeout(() => onComplete(), 800)
+            }
           }
         } else {
           // Fallback to predefined script if API fails
@@ -172,9 +185,17 @@ export default function ChatScenario({
                 transcript: withNpc,
                 endedEarly,
               })
+              // Auto-advance if this was the last turn
+              if (isLastTurn && onComplete) {
+                setTimeout(() => onComplete(), NPC_DELAY_MS + 800)
+              }
             }, NPC_DELAY_MS)
           } else {
             setIsNpcTyping(false)
+            // Auto-advance if this was the last turn
+            if (isLastTurn && onComplete) {
+              setTimeout(() => onComplete(), 800)
+            }
           }
         }
       } catch (error) {
@@ -197,9 +218,17 @@ export default function ChatScenario({
               transcript: withNpc,
               endedEarly,
             })
+            // Auto-advance if this was the last turn
+            if (isLastTurn && onComplete) {
+              setTimeout(() => onComplete(), NPC_DELAY_MS + 800)
+            }
           }, NPC_DELAY_MS)
         } else {
           setIsNpcTyping(false)
+          // Auto-advance if this was the last turn
+          if (isLastTurn && onComplete) {
+            setTimeout(() => onComplete(), 800)
+          }
         }
       }
     } else {
@@ -221,9 +250,17 @@ export default function ChatScenario({
             transcript: withNpc,
             endedEarly,
           })
+          // Auto-advance if this was the last turn
+          if (isLastTurn && onComplete) {
+            setTimeout(() => onComplete(), NPC_DELAY_MS + 800)
+          }
         }, NPC_DELAY_MS)
       } else {
         setIsNpcTyping(false)
+        // Auto-advance if this was the last turn
+        if (isLastTurn && onComplete) {
+          setTimeout(() => onComplete(), 800)
+        }
       }
     }
   }
@@ -235,6 +272,10 @@ export default function ChatScenario({
       transcript,
       endedEarly: true,
     })
+    // Auto-advance when ending early
+    if (onComplete) {
+      setTimeout(() => onComplete(), 800)
+    }
   }
 
   if (showTextQuestions) {

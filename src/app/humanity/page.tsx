@@ -197,6 +197,10 @@ function HumanitySimulationPage() {
   }, [searchParams])
 
   useEffect(() => {
+    if (screenState !== 'simulation') {
+      return
+    }
+
     const handleMouseMove = (event: MouseEvent) => {
       if (event.clientY < 80) {
         setIsProgressBarVisible(true)
@@ -204,11 +208,9 @@ function HumanitySimulationPage() {
         setIsProgressBarVisible(false)
       }
     }
-    if (screenState === 'simulation') {
-      window.addEventListener('mousemove', handleMouseMove)
-    } else {
-      window.removeEventListener('mousemove', handleMouseMove)
-    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
     }
@@ -227,22 +229,24 @@ function HumanitySimulationPage() {
     }
 
     if (!currentQuestion || screenState !== 'simulation') {
-    setDisplayedContextText('')
-    setDisplayedContextQuestion('')
-    setIsContextStreaming(false)
-    setIsCardFloating(false)
-    setIsTextQuestionsFloating(false)
-    return
-  }
+      setDisplayedContextText('')
+      setDisplayedContextQuestion('')
+      setIsContextStreaming(false)
+      setIsCardFloating(false)
+      setIsTextQuestionsFloating(false)
+      return
+    }
 
-  const fullContextText = currentQuestion.text || ''
-    const fullContextQuestion = currentQuestion.question || ''
-    const intervals = streamingIntervals.current
-
+    // Reset all animation states and text immediately when step changes
     setDisplayedContextText('')
     setDisplayedContextQuestion('')
     setIsContextStreaming(true)
     setIsCardFloating(false)
+    setIsTextQuestionsFloating(false)
+
+    const fullContextText = currentQuestion.text || ''
+    const fullContextQuestion = currentQuestion.question || ''
+    const intervals = streamingIntervals.current
 
     let contextTextIndex = 0
     let contextQuestionIndex = 0
@@ -952,6 +956,7 @@ function HumanitySimulationPage() {
               }))
             }
             onBack={goToPrevStep}
+            onComplete={() => goToNextStep()}
             showTextQuestions={false}
           />
         )
@@ -1322,15 +1327,42 @@ function HumanitySimulationPage() {
           <div className={styles.simulationLayout}>
             {(currentQuestion.text || currentQuestion.question) && currentQuestion.mechanic !== 'association' && (
               <div className={styles.contextContainer}>
+               
                 {currentQuestion.text && (
                   <p className={`${styles.contextText} ${isContextStreaming && displayedContextText.length < (currentQuestion.text?.length || 0) ? styles.streaming : ''}`}>
-                    {displayedContextText}
+                    {/* Render HTML in context text */}
+                    <span dangerouslySetInnerHTML={{ __html: displayedContextText }} />
                   </p>
                 )}
                 {currentQuestion.question && (
                   <p className={`${styles.contextQuestion} ${isContextStreaming && displayedContextQuestion.length < (currentQuestion.question?.length || 0) ? styles.streaming : ''}`}>
-                    {displayedContextQuestion}
+                    {/* Render HTML in context question */}
+                    <span dangerouslySetInnerHTML={{ __html: displayedContextQuestion }} />
                   </p>
+                )}
+
+                {currentQuestion.contextImage && (
+                  <div className={`${styles.contextImageWrapper} ${!isContextStreaming ? styles.contextImageVisible : ''}`}>
+                    <img 
+                      src={currentQuestion.contextImage} 
+                      alt={currentQuestion.title}
+                      className={styles.contextImage}
+                    />
+                  </div>
+                )}
+
+                {/* Follow-up questions float in after task completion */}
+                {renderTextQuestions() !== null && 
+                 currentQuestion.mechanic !== 'divergent-association' &&
+                 currentQuestion.mechanic !== 'alternative-uses' &&
+                 currentQuestion.mechanic !== 'three-words' &&
+                 currentQuestion.mechanic !== 'bubble-popper' &&
+                 currentStep !== HUMANITY_TOTAL_STEPS && (
+                  <div 
+                    className={`${styles.followUpQuestions} ${activeStepComplete && isTextQuestionsFloating ? styles.followUpQuestionsVisible : ''}`}
+                  >
+                    {renderTextQuestions()}
+                  </div>
                 )}
               </div>
             )}
@@ -1342,19 +1374,6 @@ function HumanitySimulationPage() {
             >
               {renderActiveMechanic()}
             </div>
-            {renderTextQuestions() !== null && 
-             currentQuestion.mechanic !== 'association' && 
-             currentQuestion.mechanic !== 'divergent-association' &&
-             currentQuestion.mechanic !== 'alternative-uses' &&
-             currentQuestion.mechanic !== 'three-words' &&
-             currentQuestion.mechanic !== 'bubble-popper' &&
-             activeStepComplete && (
-              <div 
-                className={`${styles.textQuestionsContainer} ${isTextQuestionsFloating ? styles.textQuestionsFloating : ''}`}
-              >
-                {renderTextQuestions()}
-              </div>
-            )}
           </div>
 
           <div className="flex items-center justify-between gap-3">

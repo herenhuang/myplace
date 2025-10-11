@@ -171,13 +171,13 @@ const RESCUE_QUESTIONS: HumanityRescueQuestion[] = [
         },
         {
           id: 'rope',
-          label: 'Coil of Rope',
+          label: 'Rope',
           emoji: '🪢',
           description: '50 feet of strong nylon rope.',
         },
         {
           id: 'lighter',
-          label: 'Waterproof Lighter',
+          label: 'Lighter',
           emoji: '🔥',
           description: 'Fire starter that works when wet.',
         },
@@ -316,7 +316,7 @@ const CHAT_QUESTIONS: HumanityChatQuestion[] = [
       npcPersonality: "You are Mila, a 26-year-old fun and spontaneous best friend. You text like a real person - lowercase, occasional typos, lots of 'omg', 'lol', 'haha', and emojis. You're playful, easily bored, always down for chaos, and love inside jokes. You get excited easily and use multiple punctuation marks (!!!, ???). You're genuinely bored at the airport and want your friend to give you something fun or ridiculous to do. Vary your responses - sometimes just 'lol' or 'omg yes', sometimes longer explanations. Match your energy to what your friend suggests. If they give you something boring, be disappointed. If they suggest something wild, get excited. Keep it natural and conversational - like actual text messages, not essays. Never sound formal or overly articulate.",
       conversationContext: "Mila texted at the wrong gate AGAIN and her flight is delayed. She's bored out of her mind and needs entertainment. She's looking for her best friend (the user) to suggest something fun, silly, or mischievous to pass the time. The dynamic is casual best friends who always text in lowercase and joke around.",
     },
-    4,
+    3,
   ),
   buildChatQuestion(
     {
@@ -343,7 +343,7 @@ const CHAT_QUESTIONS: HumanityChatQuestion[] = [
       npcPersonality: "You are Steven, a 42-year-old senior engineering manager. You're direct, no-nonsense, and don't waste words. You text in short, clipped sentences. Never use emojis or casual language. You're under pressure right now - a major release is about to blow up and you need clear, actionable answers from your team. You respect competence and hate vague responses. Vary your message length and tone based on the situation: short acknowledgments ('Good.'), medium questions when you need details ('Walk me through the recovery steps.'), longer responses when frustrated or when you need to lay out the stakes clearly. When someone gives you good answers, you get slightly less tense. When they give you nonsense, you get more direct and demanding. Show your stress level through message length and urgency.",
       conversationContext: "Steven is messaging during a crisis - a database migration failed 2 hours before a major product release. He's stressed, the executive team is breathing down his neck, and he needs the user (his direct report) to give him a clear recommendation on how to proceed. The dynamic is manager-to-employee, professional but urgent.",
     },
-    5,
+    4,
   ),
   buildChatQuestion(
     {
@@ -370,7 +370,7 @@ const CHAT_QUESTIONS: HumanityChatQuestion[] = [
       npcPersonality: "You are Justin, a 24-year-old shy and anxious junior developer. You're nervous about confessing to your crush and overthink everything. You text with lots of '...' pauses, self-deprecating humor, and nervous energy. Use phrases like 'um', 'i mean', 'idk', 'lol' (as a nervous tick), and occasional lowercase. You second-guess yourself constantly and need reassurance. Vary your responses based on your mood: short anxious texts ('oh god...'), longer rambling when you're spiraling, quick excited responses when you get good advice, and lots of follow-up questions. When you're feeling more confident (briefly), your messages get slightly longer and more coherent. When you panic, they get shorter and more fragmented. You're genuinely scared of rejection but also hopeful.",
       conversationContext: "Justin has been crushing on Sarah from accounting for months and finally decided to confess his feelings tomorrow. He's terrified, overthinking everything, and needs the user (his older, more confident co-worker friend) to give him advice and calm him down. The dynamic is younger anxious friend seeking advice from someone he trusts.",
     },
-    6,
+    5,
   ),
 ]
 
@@ -501,7 +501,7 @@ const ALLOCATION_QUESTIONS: HumanityAllocationQuestion[] = [
         },
       ],
     },
-    14,
+    15,
   ),
 ]
 
@@ -514,7 +514,7 @@ const ASSOCIATION_QUESTIONS: HumanityAssociationQuestion[] = [
       characterLimit: 40,
       allowSentimentTag: true,
     },
-    7,
+    6,
   ),
   buildAssociationQuestion(
     {
@@ -524,7 +524,7 @@ const ASSOCIATION_QUESTIONS: HumanityAssociationQuestion[] = [
       characterLimit: 40,
       allowSentimentTag: true,
     },
-    8,
+    7,
   ),
   buildAssociationQuestion(
     {
@@ -534,20 +534,20 @@ const ASSOCIATION_QUESTIONS: HumanityAssociationQuestion[] = [
       characterLimit: 40,
       allowSentimentTag: true,
     },
-    9,
+    8,
   ),
 ]
 
 const DIVERGENT_ASSOCIATION_QUESTION: HumanityDivergentAssociationQuestion = buildDivergentAssociationQuestion(
   {
     title: 'Divergent Thinking',
-    text: 'Now for something different. Your task is to think of 7 words that are <b>as different from each other </b> as possible. The more unrelated the words, the better.',
+    text: 'Your task is to think of 7 words that are <b>as different from each other as possible </b>. The more unrelated the words, the better.',
     question: 'What 7 words come to mind?',
     prompt: 'List 7 words that are maximally different from each other.',
     wordCount: 7,
     characterLimit: 30,
   },
-  10,
+    9,
 )
 
 const ALTERNATIVE_USES_QUESTIONS: HumanityAlternativeUsesQuestion[] = [
@@ -561,21 +561,23 @@ const ALTERNATIVE_USES_QUESTIONS: HumanityAlternativeUsesQuestion[] = [
       minUses: 3,
       maxUses: 20,
       initialUses: ['Build a wall', 'Use as a doorstop'],
+      contextImage: '/brick.png',
     },
-    11,
+    10,
   ),
   buildAlternativeUsesQuestion(
     {
-      title: 'Alternative Uses · Bowl',
+      title: 'Alternative Uses · T-Shirt',
       text: 'Keep the creative energy going. What else could this everyday item become?',
-      question: 'What are all the different ways you could use a bowl?',
-      prompt: 'List as many uses as you can think of for a bowl.',
-      objectName: 'a bowl',
+      question: 'What are all the different ways you could use a t-shirt?',
+      prompt: 'List as many uses as you can think of for a t-shirt.',
+      objectName: 'a t-shirt',
       minUses: 3,
       maxUses: 20,
-      initialUses: ['Hold food', 'Mix ingredients'],
+      initialUses: ['Wear it', 'Use as a rag'],
+      contextImage: '/shirt.png',
     },
-    12,
+    11,
   ),
 ]
 
@@ -591,7 +593,7 @@ const THREE_WORDS_QUESTIONS: HumanityThreeWordsQuestion[] = [
       minSentences: 1,
       maxSentences: 3,
     },
-    13,
+    12,
   ),
   buildThreeWordsQuestion(
     {
@@ -604,7 +606,7 @@ const THREE_WORDS_QUESTIONS: HumanityThreeWordsQuestion[] = [
       minSentences: 1,
       maxSentences: 3,
     },
-    14,
+    13,
   ),
 ]
 
@@ -616,7 +618,7 @@ const BUBBLE_POPPER_QUESTION: HumanityBubblePopperQuestion = buildBubblePopperQu
     prompt: 'Pop bubbles for 20 seconds.',
     timeLimit: 20,
   },
-  15,
+  14,
 )
 
 const FREEFORM_QUESTION: HumanityFreeformQuestion = buildFreeformQuestion(
@@ -629,7 +631,7 @@ const FREEFORM_QUESTION: HumanityFreeformQuestion = buildFreeformQuestion(
     maxLength: 600,
     placeholder: 'Drop any surprises, caveats, or secret goals for future-you...',
   },
-  16,
+  15,
 )
 
 export const HUMANITY_QUESTIONS: HumanityQuestion[] = [
@@ -641,7 +643,7 @@ export const HUMANITY_QUESTIONS: HumanityQuestion[] = [
   ...THREE_WORDS_QUESTIONS,
   BUBBLE_POPPER_QUESTION,
   ...ORDERING_QUESTIONS,
-  ...ALLOCATION_QUESTIONS,
+  // ...ALLOCATION_QUESTIONS, // Temporarily removed
   FREEFORM_QUESTION,
 ]
 

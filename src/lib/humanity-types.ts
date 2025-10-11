@@ -18,6 +18,7 @@ interface HumanityBaseQuestion {
   text?: string
   question?: string
   mechanic: HumanityMechanic
+  contextImage?: string // optional image path for the context section
 }
 
 export interface HumanityRescueItem {

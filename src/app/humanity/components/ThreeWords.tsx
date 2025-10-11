@@ -20,16 +20,18 @@ export default function ThreeWords({
 }: ThreeWordsProps) {
   const [story, setStory] = useState(value?.story || '')
 
-  // Sync with cached value when it loads
+  // Sync with cached value when question changes or loads from cache
   useEffect(() => {
-    if (value?.story) {
+    if (value?.story !== undefined && value.story !== story) {
       setStory(value.story)
     }
-  }, [value])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question.id, value?.story])
 
-  useEffect(() => {
-    onChange({ story })
-  }, [story])
+  const handleStoryChange = (newStory: string) => {
+    setStory(newStory)
+    onChange({ story: newStory })
+  }
 
   const validateWords = () => {
     const storyLower = story.toLowerCase()
@@ -65,7 +67,7 @@ export default function ThreeWords({
 
       <textarea
         value={story}
-        onChange={(e) => setStory(e.target.value)}
+        onChange={(e) => handleStoryChange(e.target.value)}
         placeholder="Write your sentence here..."
         maxLength={question.characterLimit}
         className={styles.storyInput}
