@@ -117,12 +117,9 @@ export default function BubblePopperWrapper({
     }
   }
 
-  const formatTime = (seconds: number) => {
-    return `${seconds}s`
-  }
-
   const bubblesPopped = bubbles.filter((b) => b).length
   const timeRemaining = question.timeLimit - timeElapsed
+  const timeProgress = (timeElapsed / question.timeLimit) * 100
 
   if (showTextQuestions) {
     return null
@@ -137,10 +134,17 @@ export default function BubblePopperWrapper({
         </div>
         <div className={styles.bubbleStat}>
           <span className={`${styles.bubbleStatValue} ${timeRemaining <= 5 ? styles.timeWarning : ''}`}>
-            {formatTime(timeRemaining)}
+            {timeRemaining}s
           </span>
           <span className={styles.bubbleStatLabel}>remaining</span>
         </div>
+      </div>
+
+      <div className={styles.timerProgressBar}>
+        <div 
+          className={`${styles.timerProgressFill} ${timeRemaining <= 5 ? styles.timerProgressWarning : ''}`}
+          style={{ width: `${timeProgress}%` }}
+        />
       </div>
 
       <div className={styles.bubblesGrid}>
@@ -159,7 +163,7 @@ export default function BubblePopperWrapper({
 
       {gameEnded && (
         <div className={styles.gameEndMessage}>
-          Game ended! You popped {bubblesPopped} bubbles in {timeElapsed} seconds.
+          Game Complete
         </div>
       )}
     </div>
