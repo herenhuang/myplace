@@ -1,59 +1,63 @@
-import type { Metadata } from "next";
-import { Inter, Instrument_Serif, Lora, Newsreader } from "next/font/google";
-import "./globals.css";
-import 'material-symbols';
+import type { Metadata } from 'next'
+import { Inter, Instrument_Serif, Lora, Newsreader } from 'next/font/google'
+import './globals.css'
+import 'material-symbols'
+import { GoogleTagManager } from '@next/third-parties/google'
 import { AmplitudeProvider } from "@/components/analytics/AmplitudeProvider";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ['latin'],
   variable: '--font-sans',
-});
+})
 
 const instrumentSerif = Instrument_Serif({
   weight: ['400'],
   style: ['normal', 'italic'],
-  subsets: ["latin"],
+  subsets: ['latin'],
   variable: '--font-instrument-serif',
-});
+})
 
 const lora = Lora({
   weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
-  subsets: ["latin"],
+  subsets: ['latin'],
   variable: '--font-lora',
-});
+})
 
 const newsreader = Newsreader({
   weight: ['200', '300', '400', '500', '600', '700', '800'],
   style: ['normal', 'italic'],
-  subsets: ["latin"],
+  subsets: ['latin'],
   variable: '--font-newsreader',
-});
+})
 
 export const metadata: Metadata = {
-  title: "MyPlace - Personality quizzes you can play",
-  description: "Play games, learn about yourself and show them off in your own digital space. Interactive personality quizzes and games to discover yourself.",
+  title: 'MyPlace - Personality quizzes you can play',
+  description:
+    'Play games, learn about yourself and show them off in your own digital space. Interactive personality quizzes and games to discover yourself.',
   icons: {
-    icon: "/elevate/blobbert.png",
-    shortcut: "/elevate/blobbert.png",
-    apple: "/elevate/blobbert.png",
+    icon: '/elevate/blobbert.png',
+    shortcut: '/elevate/blobbert.png',
+    apple: '/elevate/blobbert.png',
   },
-};
+}
 
 export const viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
-  interactiveWidget: "resizes-content",
-};
-
+  interactiveWidget: 'resizes-content',
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {process.env.NEXT_PUBLIC_GOOGLE_TAG_ID && (
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_ID} />
+      )}
       <body
         className={`${inter.variable} ${instrumentSerif.variable} ${lora.variable} ${newsreader.variable} antialiased`}
         suppressHydrationWarning
@@ -63,5 +67,5 @@ export default function RootLayout({
         </AmplitudeProvider>
       </body>
     </html>
-  );
+  )
 }
