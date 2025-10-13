@@ -44,6 +44,12 @@ import AlternativeUses from './components/AlternativeUses'
 import ThreeWords from './components/ThreeWords'
 import BubblePopperWrapper from './components/BubblePopperWrapper'
 import { HUMAN_TEST_DISCLAIMER } from '@/lib/human-constants'
+import {
+  trackHumanityStart,
+  trackHumanityStepComplete,
+  trackHumanityComplete,
+  trackHumanityDropOff,
+} from '@/lib/analytics/amplitude'
 
 type ScreenState =
   | 'welcome'
@@ -216,6 +222,31 @@ function HumanitySimulationPage() {
     }
   }, [screenState])
 
+  // Track drop-offs when user leaves the page before completing
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (
+        screenState === 'simulation' &&
+        currentStep < HUMANITY_TOTAL_STEPS &&
+        dbSessionId
+      ) {
+        const timeSpent = performance.now() - stepStartTime
+        trackHumanityDropOff(
+          dbSessionId,
+          currentStep,
+          HUMANITY_TOTAL_STEPS,
+          timeSpent
+        )
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [screenState, currentStep, dbSessionId, stepStartTime])
+
   // Text streaming effect for context text and question
   useEffect(() => {
     // Clear any existing intervals
@@ -339,6 +370,8 @@ function HumanitySimulationPage() {
         console.error('Failed to start humanity session:', error)
       } else {
         setDbSessionId(remoteId)
+        // Track game start
+        trackHumanityStart(remoteId)
       }
       setScreenState('confirmation')
     } finally {
@@ -717,6 +750,23 @@ function HumanitySimulationPage() {
     const stepData = buildStepData()
     if (!stepData) return
     handleStepDataUpdate(stepData)
+    
+    // Track step completion with Amplitude
+    if (dbSessionId && currentQuestion) {
+      const timeSpent = performance.now() - stepStartTime
+      trackHumanityStepComplete(
+        dbSessionId,
+        stepData.stepNumber,
+        HUMANITY_TOTAL_STEPS,
+        currentQuestion.mechanic,
+        timeSpent,
+        {
+          step_completed: activeStepComplete,
+          step_id: currentQuestion.id,
+        }
+      )
+    }
+    
     try {
       if (dbSessionId) {
         await recordHumanityStep(dbSessionId, stepData)
@@ -900,6 +950,15 @@ function HumanitySimulationPage() {
       })
       if (dbSessionId) {
         await saveHumanityAnalysis(dbSessionId, result)
+        // Track game completion
+        trackHumanityComplete(
+          dbSessionId,
+          HUMANITY_TOTAL_STEPS,
+          totalResponseTime,
+          {
+            average_response_time_ms: averageResponseTime,
+          }
+        )
       }
       setAnalysisProgress(100)
       setAnalysisStage('Complete!')

@@ -7,6 +7,7 @@ import { loadHumanityCache } from '../utils'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from '../page.module.scss'
 import resultsStyles from './results-tabs.module.scss'
+import { trackHumanityResultsView } from '@/lib/analytics/amplitude'
 
 function HumanityResultsPage() {
   const router = useRouter()
@@ -76,8 +77,18 @@ function HumanityResultsPage() {
     if (slideNumber >= 1 && slideNumber <= TOTAL_SLIDES) {
       router.push(`/humanity/results?slide=${slideNumber}`)
       setCurrentSlide(slideNumber)
+      
+      // Track results view
+      const slideNames = ['archetype', 'metascore', 'personality', 'breakdown']
+      const slideName = slideNames[slideNumber - 1] || `slide-${slideNumber}`
+      if (sessionId) {
+        trackHumanityResultsView(sessionId, slideName, {
+          slide_number: slideNumber,
+          total_slides: TOTAL_SLIDES,
+        })
+      }
     }
-  }, [router, TOTAL_SLIDES])
+  }, [router, TOTAL_SLIDES, sessionId])
 
   // Load session data and handle URL params
   useEffect(() => {
