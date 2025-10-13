@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Instrument_Serif, Lora, Newsreader } from "next/font/google";
 import "./globals.css";
 import 'material-symbols';
+import { AmplitudeProvider } from "@/components/analytics/AmplitudeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -57,7 +58,9 @@ export default function RootLayout({
         className={`${inter.variable} ${instrumentSerif.variable} ${lora.variable} ${newsreader.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
+        <AmplitudeProvider>
+          {children}
+        </AmplitudeProvider>
       </body>
     </html>
   );
