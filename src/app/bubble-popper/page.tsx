@@ -6,6 +6,10 @@ import { getOrCreateSessionId } from '@/lib/session'
 import { saveAndAnalyze, getGlobalStats } from './actions'
 import PageContainer from '@/components/layout/PageContainer'
 import styles from './page.module.scss'
+import {
+  trackGameStart,
+  trackGameComplete,
+} from '@/lib/analytics/amplitude'
 
 type ScreenState = 'welcome' | 'game' | 'archetype' | 'assessment'
 
@@ -101,6 +105,11 @@ export default function BubblePopperPage() {
     setPoppingSequence([])
     setIsGameActive(true)
     setScreenState('game')
+    
+    // Track game start
+    trackGameStart('bubble-popper', 'Bubble Popper', {
+      session_id: sessionId,
+    })
   }
 
   const analyzePoppingPattern = (sequence: number[]): 'sequential' | 'random' | 'strategic' => {
@@ -174,6 +183,15 @@ export default function BubblePopperPage() {
       poppingSequence: sequence
     }
     setGameData(data)
+    
+    // Track completion
+    trackGameComplete('bubble-popper', 'Bubble Popper', {
+      session_id: sessionId,
+      bubbles_popped: bubblesPopped,
+      time_elapsed: timeElapsed,
+      completed: completed,
+      popping_pattern: pattern,
+    })
     
     // Generate one-liner for results screen
     generateOneLiner(data)

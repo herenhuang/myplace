@@ -9,6 +9,11 @@ import './styles.css';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { getOrCreateSessionId } from '@/lib/session';
+import {
+	trackGameStart,
+	trackGameProgress,
+	trackGameComplete,
+} from '@/lib/analytics/amplitude';
 
 const CACHE_KEY = 'word-association-cache';
 
@@ -61,6 +66,13 @@ export default function WordAssociationPage() {
 		startTimer();
 		setAnalysisResult(null);
 		setAnalysisError(null);
+		
+		// Track game start
+		trackGameStart('word-association', 'Word Association', {
+			session_id: sessionId,
+			word_count: selectedLength,
+			time_per_word_ms: timePerWordMs,
+		});
 	};
 
 	const startTimer = () => {
@@ -98,6 +110,15 @@ export default function WordAssociationPage() {
 
 	const commitAndNext = () => {
 		commitCurrent();
+		
+		// Track progress
+		trackGameProgress('word-association', 'Word Association', index + 1, words.length, {
+			session_id: sessionId,
+			word: words[index],
+			response: inputValue.trim(),
+			time_ms: Math.min(elapsedMs, timePerWordMs),
+		});
+		
 		if (index + 1 >= words.length) {
 			finishGame();
 		} else {
@@ -123,6 +144,13 @@ export default function WordAssociationPage() {
 			null,
 			2
 		);
+
+		// Track completion
+		trackGameComplete('word-association', 'Word Association', {
+			session_id: sessionId,
+			total_words: selectedLength,
+			total_responses: responses.length,
+		});
 
 		startAnalysis(async () => {
 			const result = await analyze(resultsJson, sessionId);

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { generateWorkplaceScenario } from './actions'
 import { getOrCreateSessionId } from '@/lib/session'
+import { trackGameStart } from '@/lib/analytics/amplitude'
 
 export default function WorkplaceSimulation() {
   const [isGenerating, setIsGenerating] = useState(false)
@@ -41,6 +42,13 @@ export default function WorkplaceSimulation() {
       }
       
       if (result.success) {
+        // Track game start
+        trackGameStart('workplace-simulation', 'Workplace Crisis', {
+          session_id: result.sessionId,
+          job_title: formData.jobTitle,
+          company: formData.company,
+        })
+        
         // Navigate to story with the database session id
         router.push(`/workplace-simulation/story?session_id=${result.sessionId}`)
       }

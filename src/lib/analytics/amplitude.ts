@@ -92,9 +92,11 @@ export function trackPageView(pageName?: string, properties?: Record<string, any
 
 /**
  * Track when a game/quiz is started
+ * Creates specific event name: "Started: Humanity Test"
  */
 export function trackGameStart(gameId: string, gameName: string, properties?: Record<string, any>) {
-  trackEvent('Game Started', {
+  trackEvent(`Started: ${gameName}`, {
+    event_type: 'Game Started',
     game_id: gameId,
     game_name: gameName,
     ...properties,
@@ -103,9 +105,11 @@ export function trackGameStart(gameId: string, gameName: string, properties?: Re
 
 /**
  * Track when a game/quiz is completed
+ * Creates specific event name: "Completed: Humanity Test"
  */
 export function trackGameComplete(gameId: string, gameName: string, properties?: Record<string, any>) {
-  trackEvent('Game Completed', {
+  trackEvent(`Completed: ${gameName}`, {
+    event_type: 'Game Completed',
     game_id: gameId,
     game_name: gameName,
     ...properties,
@@ -114,6 +118,7 @@ export function trackGameComplete(gameId: string, gameName: string, properties?:
 
 /**
  * Track progress through a game (slide/step completion)
+ * Creates descriptive event names visible in Amplitude Live view
  */
 export function trackGameProgress(
   gameId: string,
@@ -123,8 +128,12 @@ export function trackGameProgress(
   properties?: Record<string, any>
 ) {
   const progressPercentage = Math.round((step / totalSteps) * 100);
+  
+  // Create descriptive event name for Live view visibility
+  const eventName = `${gameName}: Step ${step}/${totalSteps}`;
 
-  trackEvent('Game Progress', {
+  trackEvent(eventName, {
+    event_type: 'Game Progress',
     game_id: gameId,
     game_name: gameName,
     current_step: step,
@@ -201,6 +210,7 @@ export function trackHumanityStart(sessionId: string) {
 
 /**
  * Track when a user completes a step in the Humanity game
+ * Creates ultra-specific event names: "Humanity: Step 3 - Rescue"
  */
 export function trackHumanityStepComplete(
   sessionId: string,
@@ -210,10 +220,21 @@ export function trackHumanityStepComplete(
   timeSpent: number,
   properties?: Record<string, any>
 ) {
-  trackGameProgress('humanity', 'Humanity Test', stepNumber, totalSteps, {
-    session_id: sessionId,
+  // Create very specific event name for Live view
+  const mechanicTitle = mechanic.charAt(0).toUpperCase() + mechanic.slice(1).replace('-', ' ');
+  const eventName = `Humanity: Step ${stepNumber}/${totalSteps} - ${mechanicTitle}`;
+  
+  trackEvent(eventName, {
+    event_type: 'Game Progress',
+    game_id: 'humanity',
+    game_name: 'Humanity Test',
+    current_step: stepNumber,
+    total_steps: totalSteps,
+    progress_percentage: Math.round((stepNumber / totalSteps) * 100),
     step_mechanic: mechanic,
     time_spent_ms: timeSpent,
+    time_spent_seconds: Math.round(timeSpent / 1000),
+    session_id: sessionId,
     ...properties,
   });
 }
