@@ -281,19 +281,63 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
   if (!showExplanation) {
     // Card view
+    // Special handling for Wednesday bouncer quiz
+    const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
+    const decision = (result.wordMatrixResult as any)?.decision || 'APPROVED' // Default to approved if missing
+    const isApproved = decision === 'APPROVED'
+    const likelihood = (result.wordMatrixResult as any)?.likelihood || null
+
     return (
       <div className={styles.textContainer}>
         <div className={styles.resultsScreen}>
           <div ref={cardRef} className={styles.resultCard} data-share-root="result-card">
-            {displayImage && (
-              <div
-                className={styles.resultImage}
-                style={{ backgroundImage: `url(${displayImage})` }}
-              />
-            )}
-            <h1 className={styles.resultName}>{displayName}</h1>
-            {displayTagline && (
-              <p className={styles.resultTagline}>{displayTagline}</p>
+            {isWednesdayBouncer ? (
+              // Wednesday Bouncer: Show verdict prominently
+              <>
+                <h1 className={styles.resultName} style={{ fontSize: isApproved ? '28px' : '24px', marginBottom: '16px' }}>
+                  {isApproved ? '✅ YOU\'RE IN' : '🤔 NOT QUITE THE VIBE'}
+                </h1>
+                {isApproved ? (
+                  <>
+                    <h2 className={styles.resultTagline} style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>
+                      {displayName}
+                    </h2>
+                    {likelihood && (
+                      <p className={styles.resultTagline} style={{ fontSize: '14px', opacity: 0.8 }}>
+                        {likelihood}% chance of a good time
+                      </p>
+                    )}
+                    {displayTagline && (
+                      <p className={styles.resultTagline} style={{ marginTop: '12px' }}>{displayTagline}</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className={styles.resultTagline} style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                      (but maybe we read you wrong)
+                    </p>
+                    {displayTagline && (
+                      <p className={styles.resultTagline} style={{ marginTop: '16px', fontSize: '13px', lineHeight: '1.4' }}>
+                        {displayTagline}
+                      </p>
+                    )}
+                  </>
+                )}
+              </>
+            ) : (
+              // Regular quizzes: Show image + name
+              <>
+                {displayImage && (
+                  <div
+                    className={styles.resultImage}
+                    style={{ backgroundImage: `url(${displayImage})` }}
+                  />
+                )}
+                <h1 className={styles.resultName}>{displayName}</h1>
+                {displayTagline && (
+                  <p className={styles.resultTagline}>{displayTagline}</p>
+                )}
+              </>
             )}
           </div>
 
@@ -306,28 +350,43 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           )}
 
           <div className={styles.actionButtons}>
-            
-            {result.explanation && (
+            {isWednesdayBouncer && !isApproved ? (
+              // Rejected: Show big "Try Again" button
               <button
                 className={styles.actionButton}
-                onClick={() => setShowExplanation(true)}
+                onClick={onRestart}
+                style={{ fontSize: '18px' }}
               >
                 <h2>
-                  See Why →
+                  Try Again
                 </h2>
               </button>
+            ) : (
+              // Approved or regular quiz: Show "See Why" button
+              result.explanation && (
+                <button
+                  className={styles.actionButton}
+                  onClick={() => setShowExplanation(true)}
+                >
+                  <h2>
+                    See Why →
+                  </h2>
+                </button>
+              )
             )}
 
-            <button
-              className={styles.actionButtonAlt}
-              onClick={handleShare}
-              title="Share your result"
-            >
-              <span className={styles.shareIcon + ' material-symbols-outlined'}>
-                share
-              </span>
-              <h2>Share</h2>
-            </button>
+            {!(isWednesdayBouncer && !isApproved) && (
+              <button
+                className={styles.actionButtonAlt}
+                onClick={handleShare}
+                title="Share your result"
+              >
+                <span className={styles.shareIcon + ' material-symbols-outlined'}>
+                  share
+                </span>
+                <h2>Share</h2>
+              </button>
+            )}
           </div>
         </div>
       </div>

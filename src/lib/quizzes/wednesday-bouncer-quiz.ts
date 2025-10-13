@@ -206,10 +206,10 @@ CONTEXT FROM EVALUATION:
 Their full responses:
 {{answers}}
 
-Now write the results page. Structure it exactly like this:
+Now write the results page. Structure it with these sections:
 
 <section>
-# [If APPROVED: "You're In ✨" | If REJECTED: "Not Quite The Vibe (But Maybe We're Wrong?)"]
+# You're In ✨
 
 {{tagline}}
 
@@ -221,12 +221,11 @@ Now write the results page. Structure it exactly like this:
 
 Based on your responses, here's what stood out:
 
-[List the specific observations from the evaluation. Reference actual things they said. Make it feel personal.]
+[List the specific observations from the evaluation - bullet points are fine. Reference actual things they said. Make it feel personal.]
 
 These aren't judgments - just observations about your energy and how you show up.
 </section>
 
-[ONLY IF APPROVED - include these sections:]
 <section>
 ## Your Wednesday Archetype: {{archetype}}
 
@@ -238,40 +237,21 @@ You're coming in as a {{archetype}}. Here's what that means for Wednesday night:
 </section>
 
 <section>
-## Likelihood of a Good Time: {{likelihood}}%
+## What to Expect Wednesday
 
-[Explain why this percentage in 2-3 sentences. Be honest and specific. Reference their actual vibe/answers. If it's lower than 80%, be kind about why - maybe they seemed hesitant, or their interests might not fully align, but there's still potential.]
-</section>
+Here's the vibe:
+- **Shoes off, cozy vibes**: This is an intimate living room gathering, not a formal event
+- **Deep conversations**: People come ready to talk about ideas, curiosities, what they're working on
+- **Unstructured mingling**: No agenda, no presentations - just good people connecting organically
+- **Bring your curiosity**: The best nights happen when people are genuinely interested in each other
 
-<section>
-## What to Expect
-
-[Give them 2-3 specific things to expect on Wednesday night based on their archetype and responses. Make it feel real and grounded, not generic.]
-</section>
-
-[ONLY IF REJECTED - include these sections instead:]
-<section>
-## The Honest Truth
-
-[Explain gently why the vibe didn't quite match. Be specific but kind. Maybe their energy seemed off, or their answers felt surface-level, or something just didn't click. Make it about fit, not worthiness.]
-
-But here's the thing: we might have totally read you wrong. These questions are just one snapshot. If you feel like you didn't show your real self, **try again**. Answer differently. Let us see more of who you actually are.
-
-This isn't a rejection of YOU - it's just a vibe check that didn't fully align. And that's okay.
-</section>
-
-<section>
-## If You Try Again
-
-[Give them 1-2 kind suggestions about what would help them get approved. Be specific and constructive, not preachy. Maybe: be more specific, share a real story, let personality come through, etc.]
+Based on your {{likelihood}}% likelihood and your {{archetype}} energy, you'll probably vibe well with this format. Come ready to be yourself.
 </section>
 
 <section>
 ## Bottom Line
 
-[If APPROVED: We're genuinely excited to have you Wednesday. Your {{archetype}} energy is exactly what makes these nights special. See you there.]
-
-[If REJECTED: You seem interesting - we just didn't quite catch the full picture. If you want to try again and show us more of your real self, we're here for it. No hard feelings either way.]
+We're genuinely excited to have you Wednesday. Your {{archetype}} energy is exactly what makes these nights special. See you there.
 </section>
 
 TONE GUIDELINES:
