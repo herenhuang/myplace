@@ -4,6 +4,10 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import { getSession, continueStory } from '../actions'
+import {
+  trackGameProgress,
+  trackGameComplete,
+} from '@/lib/analytics/amplitude'
 
 interface StoryChunk {
   type: 'narrative' | 'user-action'
@@ -66,6 +70,22 @@ function WorkplaceStoryContent() {
       
       if (result.success && result.data) {
         setSimulationData(result.data as SimulationData);
+        const newTurn = (result.data as SimulationData).result.currentTurn;
+        
+        // Track progress
+        trackGameProgress('workplace-simulation', 'Workplace Crisis', newTurn, 5, {
+          session_id: sessionId,
+          response_length: userInput.trim().length,
+        });
+        
+        // Track completion if on final turn
+        if (newTurn >= 5) {
+          trackGameComplete('workplace-simulation', 'Workplace Crisis', {
+            session_id: sessionId,
+            total_turns: newTurn,
+          });
+        }
+        
         setUserInput('');
         
         // Scroll to new content after a brief delay
