@@ -4,7 +4,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
   id: 'wednesday-bouncer-quiz',
   title: 'Wednesday Vibe Check',
   description: 'Tell us about yourself. We\'re listening.',
-  type: 'story-matrix',
+  type: 'narrative', // Changed to narrative for conversational flow
 
   theme: {
     primaryColor: '#000000',
@@ -34,38 +34,72 @@ export const wednesdayBouncerQuiz: QuizConfig = {
     ]
   },
 
+  // Brief context about the event
+  storySetup: {
+    title: "Wednesday Vibe Check",
+    premise: `You're interested in coming to Wednesday night.
+
+Here's the vibe: intimate gathering, shoes off, deep conversations, people who are genuinely curious about ideas and each other. Not a networking thing. Not a party. Something in between.
+
+We're looking for people who'll vibe with that energy.
+
+Let's talk.`,
+    timeframe: "5 questions",
+    characters: []
+  },
+
   questions: [
     {
       id: 'q1-energy',
-      text: 'What kind of energy are you bringing to Wednesday night?',
+      baseScenario: {
+        timeMarker: "Question 1",
+        dimension: "energy",
+        coreSetup: 'What kind of energy are you bringing to Wednesday night?'
+      },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
     },
 
     {
       id: 'q2-excitement',
-      text: 'What gets you most excited about coming to this?',
+      baseScenario: {
+        timeMarker: "Question 2",
+        dimension: "motivation",
+        coreSetup: 'What gets you most excited about coming to this?'
+      },
       options: [],
       allowCustomInput: true
     },
 
     {
       id: 'q3-conversation',
-      text: 'Tell me about the best conversation you\'ve had recently.',
+      baseScenario: {
+        timeMarker: "Question 3",
+        dimension: "depth",
+        coreSetup: 'Tell me about the best conversation you\'ve had recently.'
+      },
       options: [],
       allowCustomInput: true
     },
 
     {
       id: 'q4-curiosity',
-      text: 'What\'s something you\'ve been curious about or thinking about lately?',
+      baseScenario: {
+        timeMarker: "Question 4",
+        dimension: "curiosity",
+        coreSetup: 'What\'s something you\'ve been curious about or thinking about lately?'
+      },
       options: [],
       allowCustomInput: true
     },
 
     {
       id: 'q5-contribution',
-      text: 'What do you think you\'ll bring to the room on Wednesday?',
+      baseScenario: {
+        timeMarker: "Question 5",
+        dimension: "contribution",
+        coreSetup: 'What do you think you\'ll bring to the room on Wednesday?'
+      },
       options: [],
       allowCustomInput: true
     }
