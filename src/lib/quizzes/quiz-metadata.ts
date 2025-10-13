@@ -83,6 +83,16 @@ export const quizMetadata: Record<string, QuizMetadata> = {
     emotionalContext: ['rest', 'adventure', 'self-care', 'lifestyle preferences'],
     typicalUseCase: 'Understanding how you recharge and find joy',
     keyDimensions: ['activity level', 'planning vs spontaneity', 'social vs solo', 'comfort vs adventure']
+  },
+
+  'wednesday-bouncer-quiz': {
+    id: 'wednesday-bouncer-quiz',
+    title: 'Wednesday Vibe Check',
+    description: 'Tell us about yourself. We\'re listening.',
+    theme: 'event screening and vibe assessment',
+    emotionalContext: ['authenticity', 'enthusiasm', 'curiosity', 'self-expression'],
+    typicalUseCase: 'Evaluating fit for intimate gatherings and events',
+    keyDimensions: ['genuine enthusiasm', 'authenticity', 'vibe alignment', 'interestingness', 'contribution']
   }
 }
 

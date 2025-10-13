@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    const { quizId, sessionId, stepsTotal } = await request.json()
+    const { quizId, sessionId, stepsTotal, personalizationData } = await request.json()
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -14,12 +14,19 @@ export async function POST(request: NextRequest) {
     const clientIp = ipHeader ? ipHeader.split(',')[0]?.trim() || null : null
     const userAgent = hdrs.get('user-agent') || null
 
+    // Extract email and name from personalizationData if provided
+    const email = personalizationData?.email || null
+    const name = personalizationData?.name || null
+
     const sessionData = {
       game_id: quizId,
       user_id: user?.id ?? null,
       session_id: sessionId ?? null,
+      email: email,
+      name: name,
       data: {
         responses: [],
+        personalizationData: personalizationData || {},
         meta: { clientIp, userAgent }
       },
       result: null,

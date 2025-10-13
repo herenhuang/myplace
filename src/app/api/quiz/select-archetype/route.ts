@@ -80,7 +80,10 @@ export async function POST(request: NextRequest) {
         secondWord: archetype.secondWord,
         tagline: archetype.tagline || '',
         reasoning: archetype.reasoning || '',
-        alternatives
+        alternatives,
+        decision: archetype.decision || null,
+        likelihood: archetype.likelihood || null,
+        specificObservations: archetype.specificObservations || []
       }
     })
 

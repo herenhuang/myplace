@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    const { quizId, sessionId, responses, result } = await request.json()
+    const { quizId, sessionId, responses, result, personalizationData } = await request.json()
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -14,13 +14,20 @@ export async function POST(request: NextRequest) {
     const clientIp = ipHeader ? ipHeader.split(',')[0]?.trim() || null : null
     const userAgent = hdrs.get('user-agent') || null
 
+    // Extract email and name from personalizationData if provided
+    const email = personalizationData?.email || null
+    const name = personalizationData?.name || null
+
     // Build the session data
     const sessionData = {
       game_id: quizId,
       user_id: user?.id ?? null,
       session_id: sessionId ?? null,
+      email: email,
+      name: name,
       data: {
         responses,
+        personalizationData: personalizationData || {},
         completedAt: new Date().toISOString(),
         meta: { clientIp, userAgent }
       },
@@ -40,6 +47,16 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Error saving completed quiz:', error)
       return NextResponse.json({ error: 'Failed to save quiz results.' }, { status: 500 })
+    }
+
+    // For Wednesday bouncer quiz, trigger Luma guest list check
+    if (quizId === 'wednesday-bouncer-quiz' && email && data.id) {
+      // Fire and forget - don't wait for Luma check
+      fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/wednesday/check-luma`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, sessionId: data.id })
+      }).catch(err => console.error('Failed to check Luma:', err))
     }
 
     return NextResponse.json({ success: true, sessionId: data.id })
