@@ -362,14 +362,14 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 </h2>
               </button>
             ) : (
-              // Approved or regular quiz: Show "See Why" button
+              // Approved or regular quiz: Show "See Why" or "Get Details" button
               result.explanation && (
                 <button
                   className={styles.actionButton}
                   onClick={() => setShowExplanation(true)}
                 >
                   <h2>
-                    See Why →
+                    {isWednesdayBouncer && isApproved ? 'Get Details →' : 'See Why →'}
                   </h2>
                 </button>
               )
@@ -490,6 +490,125 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     }
 
     return null
+  }
+
+  // Special handling for approved Wednesday bouncer - show event details instead of explanation
+  const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
+  const decision = (result.wordMatrixResult as any)?.decision || 'APPROVED'
+  const isApproved = decision === 'APPROVED'
+  const likelihood = (result.wordMatrixResult as any)?.likelihood || null
+
+  if (isWednesdayBouncer && isApproved) {
+    return (
+      <div className={styles.textContainer}>
+        <div className={styles.explanationContainer} style={{ paddingBottom: '40px' }}>
+          {/* Event Details for Approved Wednesday Users */}
+          {currentPage === 1 && (
+            <>
+              <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px' }}>
+                <h2 style={{ marginBottom: '20px', fontSize: '22px' }}>📍 Event Details</h2>
+                <div className={styles.mapContainer}>
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2788.485567596393!2d-79.39922425477354!3d43.651879473358456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882b358496deb65b%3A0x34e9d4e42d3bbdbd!2sStudio%20Homme!5e0!3m2!1sen!2sca!4v1760411184248!5m2!1sen!2sca"
+                    width="100%"
+                    height="300"
+                    style={{ border: 0, borderRadius: '12px' }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                <div style={{ marginTop: '20px', lineHeight: '1.8' }}>
+                  <p>
+                    <strong>Location:</strong>{' '}
+                    <a
+                      href="https://maps.app.goo.gl/QpnhjrjX9mt7zTyx5"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#2563eb', textDecoration: 'underline' }}
+                    >
+                      Studio Homme
+                    </a>
+                    , 71 Grange Ave #304
+                  </p>
+                  <p><strong>Time:</strong> Wednesday 5:45 - 8:45, talk at 6:45</p>
+                </div>
+              </div>
+
+              <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
+                <h2 style={{ marginBottom: '16px', fontSize: '20px' }}>🚪 How to Get In</h2>
+                <p style={{ lineHeight: '1.8', marginBottom: '12px' }}>
+                  Look out for the red door, then go up 3 flights of stairs
+                </p>
+                <h3 style={{ fontSize: '18px', marginTop: '20px', marginBottom: '12px' }}>Don't forget:</h3>
+                <p style={{ lineHeight: '1.8' }}>
+                  Bring some snackies or drinks to share if you can (even if it's with one other person) + bring indoor slippers if you'd like OR just show up honestly, it's not that deep! Heh.
+                </p>
+              </div>
+            </>
+          )}
+
+          {/* Page 2: Archetype & Results */}
+          {currentPage === 2 && (
+            <>
+              <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px', textAlign: 'center' }}>
+                <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600 }}>✨ Your Wednesday Archetype</h2>
+                <h3 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px', color: '#1f2937', lineHeight: '1.2' }}>
+                  {displayName}
+                </h3>
+                {displayTagline && (
+                  <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#4b5563' }}>
+                    {displayTagline}
+                  </p>
+                )}
+                {likelihood && (
+                  <p style={{ fontSize: '14px', marginTop: '20px', opacity: 0.7, color: '#6b7280' }}>
+                    {likelihood}% chance of having a good time Wednesday
+                  </p>
+                )}
+              </div>
+
+              {result.explanation && (
+                <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
+                  <h2 style={{ marginBottom: '16px', fontSize: '20px', fontWeight: 600 }}>Why You're In</h2>
+                  <div style={{ lineHeight: '1.8', color: '#4b5563' }}>
+                    <ReactMarkdown>{result.explanation}</ReactMarkdown>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Pagination Controls */}
+          <div className={styles.paginationControls}>
+            {currentPage > 1 ? (
+              <button
+                className={styles.paginationButton}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              >
+                ← Back
+              </button>
+            ) : (
+              <button
+                className={styles.paginationButton}
+                onClick={() => setShowExplanation(false)}
+              >
+                ← Back
+              </button>
+            )}
+
+            {currentPage < 2 && (
+              <button
+                className={styles.paginationButton}
+                onClick={() => setCurrentPage(2)}
+              >
+                Next →
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

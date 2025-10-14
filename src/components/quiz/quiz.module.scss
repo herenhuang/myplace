@@ -650,6 +650,38 @@
   flex: 1;
 }
 
+.wednesdayDetailsCard {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  h3 {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  p {
+    color: #4b5563;
+    margin: 8px 0;
+  }
+
+  strong {
+    color: #1f2937;
+  }
+}
+
+.mapContainer {
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
 .stickyHeader {
   position: sticky;
   top: 0;
