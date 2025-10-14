@@ -208,53 +208,27 @@ CONTEXT FROM EVALUATION:
 Their full responses:
 {{answers}}
 
-Now write the results page. Structure it with these sections:
-
-<section>
-# You're In ✨
+Now write the results page. Use clean markdown without any HTML tags. Structure it with these sections:
 
 {{tagline}}
 
 {{reasoning}}
-</section>
 
-<section>
-## What We Noticed About You
+---
 
-Based on your responses, here's what stood out:
-
-[List the specific observations from the evaluation - bullet points are fine. Reference actual things they said. Make it feel personal.]
-
-These aren't judgments - just observations about your energy and how you show up.
-</section>
-
-<section>
-## Your Wednesday Archetype: {{archetype}}
+## {{archetype}}
 
 You're coming in as a {{archetype}}. Here's what that means for Wednesday night:
 
 [Write 2-3 sentences about what this archetype brings to the room. Be specific to their actual answers - reference things they said. Make it feel personal and true.]
 
 [Add 1-2 sentences about what they'll probably get out of the night, based on their archetype.]
-</section>
 
-<section>
-## What to Expect Wednesday
+---
 
-Here's the vibe:
-- **Shoes off, cozy vibes**: This is an intimate living room gathering, not a formal event
-- **Deep conversations**: People come ready to talk about ideas, curiosities, what they're working on
-- **Unstructured mingling**: No agenda, no presentations - just good people connecting organically
-- **Bring your curiosity**: The best nights happen when people are genuinely interested in each other
-
-Based on your {{likelihood}}% likelihood and your {{archetype}} energy, you'll probably vibe well with this format. Come ready to be yourself.
-</section>
-
-<section>
 ## Bottom Line
 
 We're genuinely excited to have you Wednesday. Your {{archetype}} energy is exactly what makes these nights special. See you there.
-</section>
 
 TONE GUIDELINES:
 - Direct and warm, never corporate

@@ -553,18 +553,18 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           {/* Page 2: Archetype & Results */}
           {currentPage === 2 && (
             <>
-              <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px', textAlign: 'center' }}>
-                <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600, color: '#4b5563' }}>✨ Your Wednesday Archetype</h2>
-                <h3 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px', color: '#4b5563', lineHeight: '1.2' }}>
+              <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px' }}>
+                <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600, color: '#1f2937' }}>✨ Your Wednesday Archetype</h2>
+                <h3 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px', color: '#1f2937', lineHeight: '1.2' }}>
                   {displayName}
                 </h3>
                 {displayTagline && (
-                  <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#4b5563' }}>
+                  <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#1f2937' }}>
                     {displayTagline}
                   </p>
                 )}
                 {likelihood && (
-                  <p style={{ fontSize: '14px', marginTop: '20px', color: '#6b7280' }}>
+                  <p style={{ fontSize: '14px', marginTop: '20px', color: '#1f2937', opacity: 0.7 }}>
                     {likelihood}% chance of having a good time Wednesday
                   </p>
                 )}
@@ -572,8 +572,8 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
               {result.explanation && (
                 <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
-                  <h2 style={{ marginBottom: '16px', fontSize: '20px', fontWeight: 600 }}>Why You're In</h2>
-                  <div style={{ lineHeight: '1.8', color: '#4b5563' }}>
+                  <h2 style={{ marginBottom: '16px', fontSize: '20px', fontWeight: 600, color: '#1f2937' }}>Why You're In</h2>
+                  <div style={{ lineHeight: '1.8', color: '#1f2937' }}>
                     <ReactMarkdown>{result.explanation}</ReactMarkdown>
                   </div>
                 </div>

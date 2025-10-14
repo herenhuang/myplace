@@ -655,20 +655,26 @@
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-family: var(--font-lora);
 
   h2 {
     font-weight: 600;
     color: #1f2937;
+    font-family: var(--font-instrument-serif);
+    font-size: 18px;
   }
 
   h3 {
     font-weight: 600;
     color: #374151;
+    font-family: var(--font-instrument-serif);
   }
 
   p {
     color: #4b5563;
     margin: 8px 0;
+    font-size: 15px;
+    line-height: 1.7;
   }
 
   strong {
