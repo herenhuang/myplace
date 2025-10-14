@@ -142,17 +142,24 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
 
   // Get question text based on quiz type
   // Priority: adaptedText (for narrative) > text (for story-matrix/archetype) > baseScenario.coreSetup (fallback)
-  const questionText = adaptedText || 
-                      question.text || 
+  const questionText = adaptedText ||
+                      question.text ||
                       (question.baseScenario ? question.baseScenario.coreSetup : '')
   const timeMarker = question.baseScenario?.timeMarker
+
+  // Split adapted text into paragraphs (for Bouncer Blob response + question)
+  const textParagraphs = questionText.split('\n').filter(p => p.trim())
 
   return (
     <div className={styles.textContainer}>
       <div className={styles.topText}>
         <div className={styles.questionText}>
           {timeMarker && <p className={styles.timeMarker}>{timeMarker}</p>}
-          <h2>{questionText}</h2>
+          {textParagraphs.map((paragraph, index) => (
+            <h2 key={index} style={{ marginBottom: index < textParagraphs.length - 1 ? '1rem' : '0' }}>
+              {paragraph}
+            </h2>
+          ))}
         </div>
       </div>
       <div className={styles.choicesContainer}>
