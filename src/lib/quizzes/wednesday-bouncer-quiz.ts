@@ -55,7 +55,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'Hey {{lumaName}}, all you need to do is answer truthfully. There are no right answers! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
+        coreSetup: 'Howdy {{lumaName}}! You\'re on the Luma list... but to get in... I\'ma need to ask you some more questions. There are no right answers though, there\'s just your answers.\n\nAnyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
