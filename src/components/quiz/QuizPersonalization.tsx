@@ -3,16 +3,20 @@
 import { useState } from 'react'
 import { PersonalizationForm } from '@/lib/quizzes/types'
 import styles from './quiz.module.scss'
+import Image from 'next/image'
 
 interface QuizPersonalizationProps {
   form: PersonalizationForm
   onSubmit: (data: Record<string, string>) => void
   isLoading: boolean
+  quizId?: string
 }
 
-export default function QuizPersonalization({ form, onSubmit, isLoading }: QuizPersonalizationProps) {
+export default function QuizPersonalization({ form, onSubmit, isLoading, quizId }: QuizPersonalizationProps) {
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
 
   const handleChange = (fieldId: string, value: string) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }))
@@ -29,7 +33,7 @@ export default function QuizPersonalization({ form, onSubmit, isLoading }: QuizP
   const handleSubmit = () => {
     // Validate required fields
     const newErrors: Record<string, string> = {}
-    
+
     form.fields.forEach(field => {
       const required = field.required !== false // Default to true
       if (required && !formData[field.id]?.trim()) {
@@ -48,9 +52,20 @@ export default function QuizPersonalization({ form, onSubmit, isLoading }: QuizP
   return (
     <div className={styles.personalizationContainer}>
       <div className={styles.personalizationContent}>
-        <h2 className={styles.personalizationTitle}>Let&apos;s Personalize Your Story</h2>
-        
-        {form.instructions && (
+        {isWednesdayBouncer && (
+          <div className={styles.bouncerIntro}>
+            <Image src="/bouncerblob.png" alt="Bouncer Blob" width={120} height={120} />
+            <p className={styles.bouncerIntroText}>
+              I&apos;m Bouncer Blob, here to figure out whether you should actually get into Helen&apos;s event.
+            </p>
+          </div>
+        )}
+
+        <h2 className={styles.personalizationTitle}>
+          {isWednesdayBouncer ? 'First, who are you?' : "Let's Personalize Your Story"}
+        </h2>
+
+        {form.instructions && !isWednesdayBouncer && (
           <p className={styles.personalizationInstructions}>{form.instructions}</p>
         )}
 

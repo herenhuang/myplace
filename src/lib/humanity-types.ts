@@ -19,6 +19,7 @@ interface HumanityBaseQuestion {
   question?: string
   mechanic: HumanityMechanic
   contextImage?: string // optional image path for the context section
+  requiresMobilePopup?: boolean // if true, uses full-screen popup on mobile instead of vertical scroll
 }
 
 export interface HumanityRescueItem {

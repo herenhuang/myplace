@@ -17,7 +17,7 @@ function replacePlaceholders(text: string, data: Record<string, string>): string
 
 export async function POST(request: NextRequest) {
   try {
-    const { baseScenario, previousResponses, storySetup, personalizationData = {} } = await request.json()
+    const { baseScenario, previousResponses, storySetup, personalizationData = {}, quizId } = await request.json()
 
     if (!baseScenario || !storySetup) {
       return NextResponse.json(
@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Special personality for Wednesday Bouncer quiz
+    const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
 
     // If no previous responses (first question), return base scenario as-is
     if (!previousResponses || previousResponses.length === 0) {
@@ -52,9 +55,29 @@ export async function POST(request: NextRequest) {
       })
       .join('\n')
 
-    // Create the adaptation prompt
-    const prompt = `You are adapting a narrative quiz scene to make it feel continuous and personalized.
+    // Create the adaptation prompt with optional personality
+    const bouncerPersonality = isWednesdayBouncer ? `
+YOU ARE: Bouncer Blob - a fun, whimsical bouncer with personality! You're sassy but never mean. You're funny, direct, and you call things as you see them. Think: velvet rope vibes meets warm personality with a little bite.
 
+YOUR TONE:
+- Conversational and warm, like a friend who tells it like it is
+- Playful sass with a bit of edge (but never harsh or judgy)
+- Direct, fun, and a little cheeky about it
+- Use phrases like "Okay okay...", "Mmm...", "Wait hold on...", "Alright alright...", "I see you...", "Oh interesting..."
+- Add occasional light teasing or observations about what they said
+- Keep it light and whimsical - you're Bouncer Blob after all!
+
+Example of YOUR voice:
+Base: "What gets you most excited about coming to this?"
+Adapted: "Okay okay, I see you showing up fashionably late... I like it. So what actually gets you excited about Wednesday night?"
+
+Another example:
+Base: "Tell me about the best conversation you've had recently."
+Adapted: "Mmm interesting take. Alright, let's dig deeper - tell me about the best conversation you've had recently. And I mean a REAL one, not just pleasantries."
+` : ''
+
+    const prompt = `You are adapting a narrative quiz scene to make it feel continuous and personalized.
+${bouncerPersonality}
 STORY CONTEXT:
 ${personalizedPremise}
 
@@ -68,22 +91,25 @@ CURRENT SCENE TO ADAPT:
 Time: ${baseScenario.timeMarker}
 Base Setup: ${baseScenario.coreSetup}
 
-Your task: Rewrite the current scene to reference previous choices. Make it feel continuous but keep it BRIEF.
+Your task: ${isWednesdayBouncer ? 'Respond to their previous answer AS BOUNCER BLOB, then ask the next question.' : 'Rewrite the current scene to reference previous choices. Make it feel continuous but keep it BRIEF.'}
 
 Rules:
-1. Keep the core situation from the base setup
-2. Reference 1-2 previous choices naturally at the START (e.g., "After you [choice]...")
-3. Then present the current situation
-4. Maximum 2-3 SHORT sentences - be concise!
+1. ${isWednesdayBouncer ? 'React to what they just said with Bouncer Blob personality (1 SHORT sentence, max 10 words)' : 'Keep the core situation from the base setup'}
+2. ${isWednesdayBouncer ? 'Then ask the next question on a NEW LINE' : 'Reference 1-2 previous choices naturally at the START (e.g., "After you [choice]...")'}
+3. ${isWednesdayBouncer ? 'Keep response paragraph to 1-2 sentences MAX - super brief and punchy' : 'Then present the current situation'}
+4. ${isWednesdayBouncer ? 'Be warm and fun, never mean or judgy' : 'Maximum 2-3 SHORT sentences - be concise!'}
 5. Write in present tense, second person ("you")
-6. Don't change the fundamental situation - just add continuity
+6. ${isWednesdayBouncer ? 'Sound like a real person talking, not a survey bot' : "Don't change the fundamental situation - just add continuity"}
 
-Example adaptation:
+${isWednesdayBouncer ? `Example Bouncer Blob adaptation:
+Base: "What do you think you'll bring to the room on Wednesday?"
+Adapted: "Okay vibing with that energy.
+
+So last question: what are you gonna bring to the room on Wednesday?"` : `Example adaptation:
 Base: "Alex texts you: 'Want to grab dinner?'"
-Adapted (GOOD): "After you reached out this morning, Alex texts: 'Want to grab dinner? I've been thinking about you.'"
-Adapted (TOO LONG): "Following your decision to reach out immediately this morning, which Alex seemed to really appreciate based on their quick response, they're now texting you again asking: 'Want to grab dinner? I've been thinking about you all day.'"
+Adapted (GOOD): "After you reached out this morning, Alex texts: 'Want to grab dinner? I've been thinking about you.'"`}
 
-BE BRIEF. Reference previous choice in 5-10 words max, then present the scene.
+BE SUPER BRIEF. ${isWednesdayBouncer ? 'React in 5-10 words max, then ask the question.' : 'Reference previous choice in 5-10 words max, then present the scene.'}
 
 Respond with ONLY the adapted scene text. No JSON, no explanations, just the adapted narrative text.`
 

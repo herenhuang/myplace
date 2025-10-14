@@ -122,6 +122,7 @@ function HumanitySimulationPage() {
   const [stepStartTime, setStepStartTime] = useState<number>(0)
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [isSourceModalOpen, setIsSourceModalOpen] = useState(false)
+  const [isMobileCardOpen, setIsMobileCardOpen] = useState(false)
   const currentQuestion = useMemo(
     () => HUMANITY_QUESTIONS.find((question) => question.stepNumber === currentStep),
     [currentStep],
@@ -774,6 +775,10 @@ function HumanitySimulationPage() {
     } catch (error) {
       console.error('Failed to persist humanity step:', error)
     }
+    
+    // Close mobile card when moving to next step
+    setIsMobileCardOpen(false)
+    
     if (stepData.stepNumber >= HUMANITY_TOTAL_STEPS) {
       await runAnalysis([...responses, stepData])
     } else {
@@ -789,6 +794,7 @@ function HumanitySimulationPage() {
   }
   const goToPrevStep = () => {
     if (currentStep <= 1) return
+    setIsMobileCardOpen(false) // Close mobile card when going back
     setCurrentStep((step) => Math.max(1, step - 1))
     setStepStartTime(performance.now())
   }
@@ -1306,7 +1312,7 @@ function HumanitySimulationPage() {
 
           <button
             onClick={confirmStart}
-             className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 px-18 cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+             className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-18 cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             Confirm
           </button>
@@ -1337,7 +1343,7 @@ function HumanitySimulationPage() {
           <button
             onClick={startSimulation}
             disabled={isLoading}
-            className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 pb-2.5 w-[200px] cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="font-[Instrument_Serif] uppercase bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 w-[200px] cursor-pointer rounded-full text-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             {isLoading ? 'Starting...' : 'Start'}
           </button>
@@ -1383,7 +1389,7 @@ function HumanitySimulationPage() {
         </div>
       )}
       {screenState === 'simulation' && currentQuestion && (
-        <div className="flex flex-col justify-center items-center gap-6 h-screen w-full border-box p-8 pt-12 overflow-y-hidden">
+        <div className={`${styles.simulationContainer} ${currentQuestion.requiresMobilePopup ? styles.simulationContainerPopup : styles.simulationContainerScroll}`}>
           <div className={styles.simulationLayout}>
             {(currentQuestion.text || currentQuestion.question) && currentQuestion.mechanic !== 'association' && (
               <div className={styles.contextContainer}>
@@ -1411,32 +1417,74 @@ function HumanitySimulationPage() {
                   </div>
                 )}
 
-                {/* Follow-up questions float in after task completion */}
-                {renderTextQuestions() !== null && 
+                {/* Follow-up questions - float in on desktop after task completion, hidden on mobile (shown below card) */}
+                {!currentQuestion.requiresMobilePopup && renderTextQuestions() !== null && 
                  currentQuestion.mechanic !== 'divergent-association' &&
                  currentQuestion.mechanic !== 'alternative-uses' &&
                  currentQuestion.mechanic !== 'three-words' &&
                  currentQuestion.mechanic !== 'bubble-popper' &&
                  currentStep !== HUMANITY_TOTAL_STEPS && (
                   <div 
-                    className={`${styles.followUpQuestions} ${activeStepComplete && isTextQuestionsFloating ? styles.followUpQuestionsVisible : ''}`}
+                    className={`${styles.followUpQuestions} ${styles.followUpQuestionsDesktop} ${activeStepComplete && isTextQuestionsFloating ? styles.followUpQuestionsVisible : ''}`}
                   >
                     {renderTextQuestions()}
                   </div>
                 )}
+
+                {/* Mobile Start Button - only show for questions requiring mobile popup */}
+                {currentQuestion.requiresMobilePopup && !isContextStreaming && (
+                  <button
+                    onClick={() => setIsMobileCardOpen(true)}
+                    className={styles.mobileStartButton}
+                  >
+                    Start
+                  </button>
+                )}
               </div>
             )}
+            
+            {/* Desktop Card - always shown on desktop, conditionally on mobile */}
             <div 
-              className={`${styles.card} ${isCardFloating ? styles.cardFloating : ''}`}
+              className={`${styles.card} ${currentQuestion.requiresMobilePopup ? styles.cardDesktop : styles.cardResponsive} ${isCardFloating ? styles.cardFloating : ''}`}
               style={{
                 opacity: isCardFloating ? 1 : 0
               }}
             >
               {renderActiveMechanic()}
             </div>
+
+            {/* Follow-up questions on mobile - shown after card task */}
+            {!currentQuestion.requiresMobilePopup && renderTextQuestions() !== null && 
+             currentQuestion.mechanic !== 'divergent-association' &&
+             currentQuestion.mechanic !== 'alternative-uses' &&
+             currentQuestion.mechanic !== 'three-words' &&
+             currentQuestion.mechanic !== 'bubble-popper' &&
+             currentStep !== HUMANITY_TOTAL_STEPS && (
+              <div className={`${styles.followUpQuestions} ${styles.followUpQuestionsMobile}`}>
+                {renderTextQuestions()}
+              </div>
+            )}
+
+            {/* Mobile Modal Card - only for questions requiring popup */}
+            {currentQuestion.requiresMobilePopup && isMobileCardOpen && (
+              <div className={styles.mobileCardModal}>
+                <div className={styles.mobileCardHeader}>
+                  <button 
+                    onClick={() => setIsMobileCardOpen(false)}
+                    className={styles.mobileCardClose}
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className={styles.mobileCardContent}>
+                  {renderActiveMechanic()}
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-between gap-3">
+          <div className={styles.navigationButtons}>
             <button
               type="button"
               onClick={goToPrevStep}
@@ -1553,25 +1601,93 @@ function HumanitySimulationPage() {
         </div>
       )}
       {screenState === 'analyzing' && (
-        <div className={`${styles.card} ${styles.analyzingPanel}`}>
-          <p className="text-sm font-semibold tracking-wide uppercase text-gray-500">
-            Analyzing your patterns
-          </p>
-          <div style={{ width: '100%', height: '6px', background: 'rgba(148, 163, 184, 0.25)', borderRadius: '999px', overflow: 'hidden' }}>
-            <div
-              style={{ 
-                height: '100%', 
-                width: `${analysisProgress}%`, 
-                background: 'linear-gradient(90deg, #f97316, #fbbf24)',
-                borderRadius: '999px',
-                transition: 'width 0.3s ease'
-              }}
-            />
+        <div className={`flex flex-col items-center justify-center h-screen w-screen bg-white ${styles.pageBg}`}>
+          <div className="max-w-lg w-full bg-white rounded-3xl p-12 text-center">
+            {!analysisError ? (
+              <>
+                <div className="relative flex items-center justify-center mb-8">
+                  {/* Circular Progress Ring */}
+                  <svg 
+                    className="absolute" 
+                    width="400" 
+                    height="400"
+                    style={{ transform: 'rotate(-90deg)' }}
+                  >
+                    {/* Background circle */}
+                    <circle
+                      cx="200"
+                      cy="200"
+                      r={160}
+                      stroke="rgba(229, 231, 235, 1)"
+                      strokeWidth="8"
+                      fill="none"
+                    />
+                    {/* Progress circle */}
+                    <circle
+                      cx="200"
+                      cy="200"
+                      r={160}
+                      stroke="url(#gradient)"
+                      strokeWidth="8"
+                      fill="none"
+                      strokeDasharray={2 * Math.PI * 160}
+                      strokeDashoffset={2 * Math.PI * 160 - (analysisProgress / 100) * 2 * Math.PI * 160}
+                      strokeLinecap="round"
+                      style={{
+                        transition: 'stroke-dashoffset 1000ms ease-out'
+                      }}
+                      role="progressbar"
+                      aria-valuenow={Math.round(analysisProgress)}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label="Analysis progress"
+                    />
+                    {/* Gradient definition */}
+                    <defs>
+                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="rgb(251, 146, 60)" />
+                        <stop offset="100%" stopColor="rgb(249, 115, 22)" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+
+                  {/* Center content */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <h2 className="font-[Instrument_Serif] text-5xl font-medium tracking-tight mb-3 text-black">
+                      Analyzing...
+                    </h2>
+                    
+                    <p className="text-gray-600 text-sm font-medium">
+                      {analysisStage}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-8">
+                  <div className="w-32 h-32 mx-auto bg-red-100 rounded-full flex items-center justify-center shadow-lg">
+                    <div className="text-6xl">⚠️</div>
+                  </div>
+                </div>
+                
+                <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                  Analysis Error
+                </h2>
+                
+                <p className="text-red-600 text-lg mb-6">
+                  {analysisError}
+                </p>
+                
+                <button
+                  onClick={() => runAnalysis(responses)}
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-full text-lg transition-colors shadow-lg"
+                >
+                  Retry Analysis
+                </button>
+              </>
+            )}
           </div>
-          <p className="text-lg font-medium text-gray-700">{analysisStage}</p>
-          {analysisError && (
-            <p className="text-sm text-red-500 text-center">{analysisError}</p>
-          )}
         </div>
       )}
     </div>

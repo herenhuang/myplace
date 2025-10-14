@@ -39,28 +39,42 @@ export async function POST(request: NextRequest) {
 
     const responseText = message.content[0].type === 'text' ? message.content[0].text : ''
 
+    console.log('AI Response for archetype selection:', responseText)
+
     // Parse JSON response
     let archetype
     try {
+      // Remove markdown code blocks if present (```json ... ```)
+      let cleanedText = responseText.trim()
+      if (cleanedText.startsWith('```')) {
+        cleanedText = cleanedText.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
+      }
+
       // Try to extract JSON from the response
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+      const jsonMatch = cleanedText.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         archetype = JSON.parse(jsonMatch[0])
       } else {
+        console.error('No JSON found in AI response. Full response:', responseText)
         throw new Error('No JSON found in response')
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', responseText, parseError)
       return NextResponse.json(
-        { error: 'Failed to parse AI response' },
+        { error: 'Failed to parse AI response', details: responseText },
         { status: 500 }
       )
     }
 
     // Validate the response has required fields
     if (!archetype.firstWord || !archetype.secondWord) {
+      console.error('Missing required fields in archetype:', archetype)
       return NextResponse.json(
-        { error: 'Invalid archetype selection' },
+        {
+          error: 'Invalid archetype selection - missing firstWord or secondWord',
+          received: archetype,
+          success: false
+        },
         { status: 500 }
       )
     }
@@ -80,7 +94,10 @@ export async function POST(request: NextRequest) {
         secondWord: archetype.secondWord,
         tagline: archetype.tagline || '',
         reasoning: archetype.reasoning || '',
-        alternatives
+        alternatives,
+        decision: archetype.decision || null,
+        likelihood: archetype.likelihood || null,
+        specificObservations: archetype.specificObservations || []
       }
     })
 

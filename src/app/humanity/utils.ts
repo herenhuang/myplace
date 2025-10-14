@@ -34,3 +34,12 @@ export function saveHumanityCache(cache: HumanityLocalCache) {
   }
 }
 
+export function clearHumanityCache() {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(HUMANITY_CACHE_KEY)
+  } catch (error) {
+    console.warn('[humanity] Failed to clear cache:', error)
+  }
+}
+

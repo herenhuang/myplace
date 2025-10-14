@@ -64,7 +64,7 @@ CONVERSATION:
 ${conversationText}
 User: ${userMessage}
 
-Reply as ${npcName}. One short text message only (1-2 sentences max). Stay in character. Don't explain or break character.`
+Reply as ${npcName}. CRITICAL: Keep it SHORT - maximum 15 words. Most replies should be 5-10 words. Text naturally. Stay in character.`
 
     // Call Groq API
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -78,14 +78,14 @@ Reply as ${npcName}. One short text message only (1-2 sentences max). Stay in ch
         messages: [
           {
             role: 'system',
-            content: `${npcPersonality}\n\nCONTEXT: ${conversationContext}\n\nRespond naturally as ${npcName}. Vary your message length and tone based on the situation and your emotional state. Sometimes be brief, sometimes elaborate. Never break character.`,
+            content: `${npcPersonality}\n\nCONTEXT: ${conversationContext}\n\nIMPORTANT: Keep all responses SHORT - maximum 15 words, usually 5-10 words. Text like a real person texting quickly. Never write paragraphs or long explanations. Stay in character.`,
           },
           {
             role: 'user',
             content: `${conversationText}\nUser: ${userMessage}\n\n${npcName}:`,
           },
         ],
-        max_tokens: 200,
+        max_tokens: 50,
         temperature: 1.0,
         top_p: 0.9,
         frequency_penalty: 0.5,
