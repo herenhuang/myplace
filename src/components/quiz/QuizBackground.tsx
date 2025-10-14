@@ -29,13 +29,28 @@ export default function QuizBackground() {
     let blobs: Blob[] = []
     let time = 0
 
+    // Detect mobile
+    const isMobile = () => window.innerWidth < 768
+
     const resizeCanvas = () => {
       const parent = canvas.parentElement
       if (!parent) return
-      
-      canvas.width = parent.offsetWidth
-      canvas.height = parent.offsetHeight
-      
+
+      const mobile = isMobile()
+
+      // On mobile, use lower resolution to reduce GPU load
+      // This helps blur render correctly
+      if (mobile) {
+        canvas.width = parent.offsetWidth * 0.75
+        canvas.height = parent.offsetHeight * 0.75
+        // Scale canvas back up with CSS
+        canvas.style.width = parent.offsetWidth + 'px'
+        canvas.style.height = parent.offsetHeight + 'px'
+      } else {
+        canvas.width = parent.offsetWidth
+        canvas.height = parent.offsetHeight
+      }
+
       // Recreate blobs on resize
       blobs = createBlobs()
     }
@@ -51,30 +66,36 @@ export default function QuizBackground() {
         'rgba(255, 140, 80, 0.3)',    // Medium Orange
       ]
 
-      // Create 4 large blobs
-      for (let i = 0; i < 4; i++) {
+      const mobile = isMobile()
+
+      // On mobile: only 3 large blobs with reduced motion
+      const blobCount = mobile ? 3 : 4
+      const smallBlobCount = mobile ? 0 : 8
+
+      // Create large blobs
+      for (let i = 0; i < blobCount; i++) {
         const baseX = Math.random() * canvas.width
         const baseY = Math.random() * canvas.height
-        
+
         newBlobs.push({
           baseX,
           baseY,
           x: baseX,
           y: baseY,
-          radius: Math.random() * 80 + 50, // 100-180px radius
+          radius: mobile ? Math.random() * 100 + 80 : Math.random() * 80 + 50, // Larger on mobile
           color: colors[i % colors.length],
           angle: Math.random() * Math.PI * 2,
-          angleSpeed: (Math.random() * 0.0004 + 0.0003) * (Math.random() > 0.5 ? 1 : -1), // Slow rotation
-          orbitRadius: Math.random() * 120 + 60, // Larger circular movement 60-180
-          speed: Math.random() * 0.4 + .5, // Drift speed
+          angleSpeed: mobile ? 0 : (Math.random() * 0.0004 + 0.0003) * (Math.random() > 0.5 ? 1 : -1), // No orbit on mobile
+          orbitRadius: mobile ? 0 : Math.random() * 120 + 60, // No orbit on mobile
+          speed: mobile ? Math.random() * 0.2 + 0.1 : Math.random() * 0.4 + .5, // Slower drift on mobile
         })
       }
 
-      // Create 8 small blobs
-      for (let i = 0; i < 8; i++) {
+      // Create small blobs (desktop only)
+      for (let i = 0; i < smallBlobCount; i++) {
         const baseX = Math.random() * canvas.width
         const baseY = Math.random() * canvas.height
-        
+
         newBlobs.push({
           baseX,
           baseY,
@@ -100,7 +121,10 @@ export default function QuizBackground() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.save()
-      ctx.filter = 'blur(60px)'
+
+      // Reduce blur on mobile for better rendering
+      const mobile = isMobile()
+      ctx.filter = mobile ? 'blur(25px)' : 'blur(60px)'
 
       time += deltaSec
 
@@ -109,19 +133,21 @@ export default function QuizBackground() {
         blob.angle += blob.angleSpeed * deltaSec
 
         // Create smooth floating motion using sine waves
-        const driftX = Math.sin(time * blob.speed + index) * blob.orbitRadius
-        const driftY = Math.cos(time * blob.speed * 0.8 + index) * blob.orbitRadius
+        const driftRange = mobile ? blob.orbitRadius * 0.3 : blob.orbitRadius // Reduce drift on mobile
+        const driftX = Math.sin(time * blob.speed + index) * driftRange
+        const driftY = Math.cos(time * blob.speed * 0.8 + index) * driftRange
 
-        // Circular orbit motion
+        // Circular orbit motion (disabled on mobile)
         const orbitX = Math.cos(blob.angle) * blob.orbitRadius * 0.5
         const orbitY = Math.sin(blob.angle) * blob.orbitRadius * 0.5
 
         blob.x = blob.baseX + driftX + orbitX
         blob.y = blob.baseY + driftY + orbitY
 
-        // Slowly drift the base position
-        blob.baseX += Math.sin(time * 0.1 + index * 0.5) * 20 * deltaSec
-        blob.baseY += Math.cos(time * 0.08 + index * 0.3) * 20 * deltaSec
+        // Slowly drift the base position (reduced on mobile)
+        const baseDrift = mobile ? 5 : 20
+        blob.baseX += Math.sin(time * 0.1 + index * 0.5) * baseDrift * deltaSec
+        blob.baseY += Math.cos(time * 0.08 + index * 0.3) * baseDrift * deltaSec
 
         // Wrap
         if (blob.baseX < -blob.radius) blob.baseX = canvas.width + blob.radius
@@ -129,9 +155,28 @@ export default function QuizBackground() {
         if (blob.baseY < -blob.radius) blob.baseY = canvas.height + blob.radius
         if (blob.baseY > canvas.height + blob.radius) blob.baseY = -blob.radius
 
+        // Draw blob as radial gradient for soft edges even without blur
+        const gradient = ctx.createRadialGradient(blob.x, blob.y, 0, blob.x, blob.y, blob.radius)
+
+        // Extract RGBA values from blob.color
+        const colorMatch = blob.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/)
+        if (colorMatch) {
+          const [, r, g, b, a] = colorMatch
+          const alpha = a || '1'
+
+          // Gradient from full opacity center to transparent edge
+          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`)
+          gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${parseFloat(alpha) * 0.6})`)
+          gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`)
+        } else {
+          // Fallback to solid fill if color parsing fails
+          gradient.addColorStop(0, blob.color)
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+        }
+
         ctx.beginPath()
         ctx.arc(blob.x, blob.y, blob.radius, 0, Math.PI * 2)
-        ctx.fillStyle = blob.color
+        ctx.fillStyle = gradient
         ctx.fill()
         ctx.closePath()
       })
@@ -171,6 +216,8 @@ export default function QuizBackground() {
         background: 'white',
         zIndex: 0,
         pointerEvents: 'none',
+        willChange: 'transform', // Performance hint for mobile
+        filter: 'blur(30px)', // CSS fallback blur if canvas blur fails
       }}
     />
   )
