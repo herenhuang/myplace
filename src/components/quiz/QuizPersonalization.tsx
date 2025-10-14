@@ -15,6 +15,7 @@ interface QuizPersonalizationProps {
 export default function QuizPersonalization({ form, onSubmit, isLoading, quizId }: QuizPersonalizationProps) {
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false)
 
   const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
 
@@ -30,7 +31,7 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
     }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate required fields
     const newErrors: Record<string, string> = {}
 
@@ -46,7 +47,35 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
       return
     }
 
-    onSubmit(formData)
+    // For Wednesday bouncer quiz, check email against Luma database
+    if (isWednesdayBouncer && formData.email) {
+      setIsCheckingEmail(true)
+      try {
+        const response = await fetch('/api/luma/check-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email })
+        })
+
+        const data = await response.json()
+
+        if (data.success && data.found) {
+          // Email found - add the name from Luma
+          const enrichedData = { ...formData, lumaName: data.name }
+          onSubmit(enrichedData)
+        } else {
+          // Email not found
+          setErrors({ email: 'Hmm, I don\'t see this email on the Luma list. Can you double-check?' })
+          setIsCheckingEmail(false)
+        }
+      } catch (error) {
+        console.error('Error checking email:', error)
+        // On error, allow them through anyway
+        onSubmit(formData)
+      }
+    } else {
+      onSubmit(formData)
+    }
   }
 
   return (
@@ -54,9 +83,9 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
       <div className={styles.personalizationContent}>
         {isWednesdayBouncer && (
           <div className={styles.bouncerIntro}>
-            <Image src="/bouncerblob.png" alt="Bouncer Blob" width={120} height={120} />
+            <Image src="/bouncerblob2.png" alt="Bouncer Blob" width={120} height={120} />
             <p className={styles.bouncerIntroText}>
-              I&apos;m Bouncer Blob, here to figure out whether you should actually get into Helen&apos;s event.
+              I&apos;m Bouncer Blob, here to figure out whether you should actually get into Helen&apos;s whatever the heck it is.
             </p>
           </div>
         )}
@@ -114,9 +143,9 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
         <button
           className={styles.personalizationButton}
           onClick={handleSubmit}
-          disabled={isLoading}
+          disabled={isLoading || isCheckingEmail}
         >
-          {isLoading ? 'Starting...' : 'Start My Story →'}
+          {isCheckingEmail ? 'Checking...' : isLoading ? 'Starting...' : 'Start My Story →'}
         </button>
       </div>
     </div>

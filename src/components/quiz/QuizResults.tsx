@@ -533,14 +533,14 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                     </a>
                     , 71 Grange Ave #304
                   </p>
-                  <p><strong>Time:</strong> Wednesday 5:45 - 8:45, talk at 6:45</p>
+                  <p><strong>Time:</strong> Wednesday 5:45 - 8:45, try to come before 6:45 pls</p>
                 </div>
               </div>
 
               <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
                 <h2 style={{ marginBottom: '16px', fontSize: '20px' }}>🚪 How to Get In</h2>
                 <p style={{ lineHeight: '1.8', marginBottom: '12px' }}>
-                  Look out for the red door, then go up 3 flights of stairs
+                  Look out for the red door, then go up 3 flights of stairs. Worry not, you will get an email beforehand too.
                 </p>
                 <h3 style={{ fontSize: '18px', marginTop: '20px', marginBottom: '12px' }}>Don't forget:</h3>
                 <p style={{ lineHeight: '1.8' }}>

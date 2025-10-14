@@ -2,8 +2,8 @@ import { QuizConfig } from './types'
 
 export const wednesdayBouncerQuiz: QuizConfig = {
   id: 'wednesday-bouncer-quiz',
-  title: 'Are you really in?',
-  description: 'You need the address for Helen\'s event on Wednesday? Let\'s see if Bouncer Blob lets you in.',
+  title: 'Are you really in? 🎟️ ',
+  description: 'You need the address for Helen\'s mingle session x mini launch right? Well first you\'ll have to see what Bouncer Blob thinks.',
   type: 'narrative', // Changed to narrative for conversational flow
 
   theme: {
@@ -55,7 +55,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'All you need to do is answer truthfully. There are no right answers! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
+        coreSetup: 'Hey {{lumaName}}, all you need to do is answer truthfully. There are no right answers! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true

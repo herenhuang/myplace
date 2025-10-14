@@ -14,7 +14,7 @@ interface QuizQuestionProps {
   personalizationData?: Record<string, string> // For narrative quizzes - user's personalization inputs
 }
 
-export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText }: QuizQuestionProps) {
+export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText, personalizationData }: QuizQuestionProps) {
   const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
   const [visibleOptions, setVisibleOptions] = useState<number[]>([])
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
@@ -140,11 +140,27 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     return totalWithUser > 0 ? Math.round((countWithUser / totalWithUser) * 100) : 0
   }
 
+  // Helper to replace placeholders like {{lumaName}} with actual values
+  const replacePlaceholders = (text: string, data: Record<string, string>): string => {
+    let result = text
+    Object.entries(data).forEach(([key, value]) => {
+      const placeholder = `{{${key}}}`
+      result = result.replace(new RegExp(placeholder, 'g'), value)
+    })
+    return result
+  }
+
   // Get question text based on quiz type
   // Priority: adaptedText (for narrative) > text (for story-matrix/archetype) > baseScenario.coreSetup (fallback)
-  const questionText = adaptedText ||
+  let questionText = adaptedText ||
                       question.text ||
                       (question.baseScenario ? question.baseScenario.coreSetup : '')
+
+  // Replace placeholders with personalization data
+  if (personalizationData) {
+    questionText = replacePlaceholders(questionText, personalizationData)
+  }
+
   const timeMarker = question.baseScenario?.timeMarker
 
   // Split adapted text into paragraphs (for Bouncer Blob response + question)

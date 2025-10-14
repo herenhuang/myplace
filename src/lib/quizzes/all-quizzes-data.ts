@@ -124,7 +124,7 @@ export const ALL_QUIZZES: QuizItem[] = [
   // LIFE QUIZZES
   {
     id: 'wednesday-bouncer-quiz',
-    title: 'Are you really in?',
+    title: 'Are you really in? 🎟️ ',
     description: 'You need the address for Helen\'s event on Wednesday? Let\'s see if Bouncer Blob lets you in.',
     category: 'life',
     route: '/quiz/wednesday-bouncer-quiz',
