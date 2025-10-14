@@ -275,6 +275,26 @@
 // Custom Input Styles
 .customInputContainer {
   margin-top: 1rem; // More spacing above to separate from hardcoded options
+  position: relative;
+}
+
+.bouncerBubble {
+  position: absolute;
+  left: 8px;
+  top: -60px;
+  width: 48px;
+  height: 48px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+
+  img {
+    border-radius: 50%;
+  }
 }
 
 .customInputWrapper {
@@ -1504,10 +1524,6 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 32px;
-
-  img {
-    animation: float 3s ease-in-out infinite;
-  }
 }
 
 .bouncerIntroText {

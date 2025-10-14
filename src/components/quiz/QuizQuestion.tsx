@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { QuizConfig } from '@/lib/quizzes/types'
 import styles from './quiz.module.scss'
+import Image from 'next/image'
 
 interface QuizQuestionProps {
   config: QuizConfig
@@ -14,6 +15,7 @@ interface QuizQuestionProps {
 }
 
 export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText }: QuizQuestionProps) {
+  const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
   const [visibleOptions, setVisibleOptions] = useState<number[]>([])
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null)
@@ -195,6 +197,12 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         {/* Custom Input Field */}
         {question.allowCustomInput && (
           <div className={styles.customInputContainer}>
+            {/* Bouncer Blob bubble for Wednesday quiz */}
+            {isWednesdayBouncer && (
+              <div className={styles.bouncerBubble}>
+                <Image src="/bouncerblob.png" alt="Bouncer Blob" width={48} height={48} />
+              </div>
+            )}
             <div className={styles.customInputWrapper}>
               {/* Background fill for custom input when selected (only if comparison enabled) */}
               {isCustomSelected && showComparison && stats && config.showQuestionComparison && (
