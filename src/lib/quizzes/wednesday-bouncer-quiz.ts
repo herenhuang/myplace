@@ -128,7 +128,6 @@ export const wednesdayBouncerQuiz: QuizConfig = {
 1. Make a decision: APPROVED or REJECTED (but make rejection feel kind - "maybe we read you wrong")
 2. Assign a likelihood percentage (0-100%) of them having a good time on Wednesday
 3. If APPROVED, give them an archetype that describes what kind of participant they'll be
-4. Evaluate on: genuine enthusiasm, authenticity, vibe alignment, interestingness
 
 Here are the words for archetypes:
 FIRST WORDS (their energy): {{firstWords}}
@@ -137,27 +136,24 @@ SECOND WORDS (their role): {{secondWords}}
 Their responses:
 {{answers}}
 
-CRITICAL EVALUATION CRITERIA:
-- Genuine enthusiasm: Do they actually care about this? Or just saying what they think we want to hear?
-- Authenticity: Are they being real? Do their answers feel honest and human?
-- Vibe alignment: Would they actually vibe with an intimate, thoughtful gathering?
-- Interestingness: Do they bring curiosity, depth, or unique perspective?
+CRITICAL EVALUATION PHILOSOPHY:
+This is about EFFORT and GENUINE INTEREST, not "right answers." The bar is: are they actually interested in coming and willing to engage? Did they put in real effort across MOST of their answers?
 
-RED FLAGS (lean toward REJECTED):
-- Generic, templated responses ("I'm excited to network and meet new people!")
-- Zero specificity or personal detail
-- Overly professional/corporate language
-- Responses that feel AI-generated or copy-pasted
-- No curiosity or depth
-- Can't articulate what they'd bring
+RED FLAGS (REJECT - low effort or disengaged):
+- Most answers are one-word or extremely minimal (e.g., "6pm", "Yes", "Idk")
+- Generic, templated responses with no personality ("I'm excited to network!")
+- Feels like they're not actually interested or just going through the motions
+- Copy-pasted or AI-generated sounding (no human voice)
+- Overall vibe: phoning it in, disconnected, not really trying
 
-GREEN FLAGS (lean toward APPROVED):
-- Specific, personal stories or examples
-- Genuine curiosity about something
-- Self-awareness and honesty
-- Interesting perspective or way of thinking
-- Real enthusiasm that comes through in their voice
-- Clear sense of what they'd contribute
+GREEN FLAGS (APPROVE - genuine interest + effort):
+- MOST responses show thought, personality, or engagement (not just one)
+- Personal details, specifics, or honest answers coming through
+- Showing up as themselves - can be casual, silly, or serious, but it's THEM
+- Genuine interest in coming to the event (doesn't need to be effusive, just real)
+- Overall vibe: they're trying, they care, they want to be there
+
+THE BAR: You need to see genuine effort and interest across MOST of their 5 answers. A couple short answers is fine if the others show engagement. But if most answers are minimal or generic, reject them. They can always try again with more effort.
 
 Respond in JSON:
 {
