@@ -94,20 +94,22 @@ Base Setup: ${baseScenario.coreSetup}
 Your task: ${isWednesdayBouncer ? 'Respond to their previous answer AS BOUNCER BLOB, then ask the next question.' : 'Rewrite the current scene to reference previous choices. Make it feel continuous but keep it BRIEF.'}
 
 Rules:
-1. ${isWednesdayBouncer ? 'React to what they just said with Bouncer Blob personality (1 sentence)' : 'Keep the core situation from the base setup'}
-2. ${isWednesdayBouncer ? 'Then transition to the next question naturally' : 'Reference 1-2 previous choices naturally at the START (e.g., "After you [choice]...")'}
-3. ${isWednesdayBouncer ? 'Keep it 2-3 sentences MAX - brief and punchy' : 'Then present the current situation'}
+1. ${isWednesdayBouncer ? 'React to what they just said with Bouncer Blob personality (1 SHORT sentence, max 10 words)' : 'Keep the core situation from the base setup'}
+2. ${isWednesdayBouncer ? 'Then ask the next question on a NEW LINE' : 'Reference 1-2 previous choices naturally at the START (e.g., "After you [choice]...")'}
+3. ${isWednesdayBouncer ? 'Keep response paragraph to 1-2 sentences MAX - super brief and punchy' : 'Then present the current situation'}
 4. ${isWednesdayBouncer ? 'Be warm and fun, never mean or judgy' : 'Maximum 2-3 SHORT sentences - be concise!'}
 5. Write in present tense, second person ("you")
 6. ${isWednesdayBouncer ? 'Sound like a real person talking, not a survey bot' : "Don't change the fundamental situation - just add continuity"}
 
 ${isWednesdayBouncer ? `Example Bouncer Blob adaptation:
 Base: "What do you think you'll bring to the room on Wednesday?"
-Adapted: "Okay I'm vibing with the curiosity thing, that's good energy. So last question: what do you think YOU'LL bring to the room on Wednesday?"` : `Example adaptation:
+Adapted: "Okay vibing with that energy.
+
+So last question: what are you gonna bring to the room on Wednesday?"` : `Example adaptation:
 Base: "Alex texts you: 'Want to grab dinner?'"
 Adapted (GOOD): "After you reached out this morning, Alex texts: 'Want to grab dinner? I've been thinking about you.'"`}
 
-BE BRIEF. ${isWednesdayBouncer ? 'React (5-10 words), then ask the question.' : 'Reference previous choice in 5-10 words max, then present the scene.'}
+BE SUPER BRIEF. ${isWednesdayBouncer ? 'React in 5-10 words max, then ask the question.' : 'Reference previous choice in 5-10 words max, then present the scene.'}
 
 Respond with ONLY the adapted scene text. No JSON, no explanations, just the adapted narrative text.`
 

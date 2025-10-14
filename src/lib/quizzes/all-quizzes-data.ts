@@ -124,8 +124,8 @@ export const ALL_QUIZZES: QuizItem[] = [
   // LIFE QUIZZES
   {
     id: 'wednesday-bouncer-quiz',
-    title: 'Wednesday Vibe Check',
-    description: 'Tell us about yourself. We\'re listening.',
+    title: 'Are you really in?',
+    description: 'You need the address for Helen\'s event on Wednesday? Let\'s see if Bouncer Blob lets you in.',
     category: 'life',
     route: '/quiz/wednesday-bouncer-quiz',
     backgroundImage: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)'

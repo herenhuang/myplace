@@ -2,8 +2,8 @@ import { QuizConfig } from './types'
 
 export const wednesdayBouncerQuiz: QuizConfig = {
   id: 'wednesday-bouncer-quiz',
-  title: 'Wednesday Vibe Check',
-  description: 'Tell us about yourself. We\'re listening.',
+  title: 'Are you really in?',
+  description: 'You need the address for Helen\'s event on Wednesday? Let\'s see if Bouncer Blob lets you in.',
   type: 'narrative', // Changed to narrative for conversational flow
 
   theme: {
@@ -34,60 +34,48 @@ export const wednesdayBouncerQuiz: QuizConfig = {
     ]
   },
 
-  // Brief context about the event
-  storySetup: {
-    title: "Wednesday Vibe Check",
-    premise: `You're interested in coming to Wednesday night.
-
-Here's the vibe: intimate gathering, shoes off, deep conversations, people who are genuinely curious about ideas and each other. Not a networking thing. Not a party. Something in between.
-
-We're looking for people who'll vibe with that energy.
-
-Let's talk.`,
-    timeframe: "5 questions",
-    characters: []
-  },
-
   questions: [
     {
-      id: 'q1-energy',
+      id: 'q1-arrival',
       baseScenario: {
         timeMarker: "Question 1",
-        dimension: "energy",
-        coreSetup: 'What kind of energy are you bringing to Wednesday night?'
+        dimension: "timing",
+        coreSetup: 'So, the event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?',
+        imageUrl: '/bouncerblob.png',
+        introText: 'I\'m Bouncer Blob, here to figure out whether you should actually get into Helen\'s event.'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
     },
 
     {
-      id: 'q2-excitement',
+      id: 'q2-social-style',
       baseScenario: {
         timeMarker: "Question 2",
-        dimension: "motivation",
-        coreSetup: 'What gets you most excited about coming to this?'
+        dimension: "social-approach",
+        coreSetup: 'You\'re standing there, there\'s only like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you?'
       },
       options: [],
       allowCustomInput: true
     },
 
     {
-      id: 'q3-conversation',
+      id: 'q3-interesting-thing',
       baseScenario: {
         timeMarker: "Question 3",
         dimension: "depth",
-        coreSetup: 'Tell me about the best conversation you\'ve had recently.'
+        coreSetup: 'OK what\'s an interesting thing about you that you\'d want someone else to know?'
       },
       options: [],
       allowCustomInput: true
     },
 
     {
-      id: 'q4-curiosity',
+      id: 'q4-followup',
       baseScenario: {
         timeMarker: "Question 4",
-        dimension: "curiosity",
-        coreSetup: 'What\'s something you\'ve been curious about or thinking about lately?'
+        dimension: "followup",
+        coreSetup: '[This will be AI-generated based on Q3 answer - a natural conversational follow-up]'
       },
       options: [],
       allowCustomInput: true
@@ -98,7 +86,7 @@ Let's talk.`,
       baseScenario: {
         timeMarker: "Question 5",
         dimension: "contribution",
-        coreSetup: 'What do you think you\'ll bring to the room on Wednesday?'
+        coreSetup: 'Last question. Are you going to bring anything? Slippers? Don\'t forget it\'s a no shoe space! You gonna bring snacks or drinks to share cause it\'s potluck style? There\'s no right or wrong answer here.'
       },
       options: [],
       allowCustomInput: true
