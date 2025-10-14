@@ -1337,7 +1337,10 @@
   }
 
   .progressContainer {
-    display: none;
+    top: 12px;
+    left: 16px;
+    right: 16px;
+    z-index: 30; // Higher z-index to stay above mobile content
   }
 
   .imageContainer {
