@@ -29,11 +29,14 @@ export async function POST(request: NextRequest) {
     // Special personality for Wednesday Bouncer quiz
     const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
 
-    // If no previous responses (first question), return base scenario as-is
+    // If no previous responses (first question), replace placeholders and return
     if (!previousResponses || previousResponses.length === 0) {
+      console.log('🎯 Q1 Personalization:', { personalizationData, baseScenario: baseScenario.coreSetup })
+      const personalizedText = replacePlaceholders(baseScenario.coreSetup, personalizationData)
+      console.log('✅ Q1 Result:', personalizedText)
       return NextResponse.json({
         success: true,
-        adaptedText: baseScenario.coreSetup,
+        adaptedText: personalizedText,
         timeMarker: baseScenario.timeMarker
       })
     }
@@ -128,7 +131,13 @@ Respond with ONLY the adapted scene text. No JSON, no explanations, just the ada
       }]
     })
 
-    const adaptedText = message.content[0].type === 'text' ? message.content[0].text.trim() : baseScenario.coreSetup
+    let adaptedText = message.content[0].type === 'text' ? message.content[0].text.trim() : baseScenario.coreSetup
+
+    // Remove wrapping quotation marks if AI added them
+    if ((adaptedText.startsWith('"') && adaptedText.endsWith('"')) ||
+        (adaptedText.startsWith("'") && adaptedText.endsWith("'"))) {
+      adaptedText = adaptedText.slice(1, -1).trim()
+    }
 
     return NextResponse.json({
       success: true,

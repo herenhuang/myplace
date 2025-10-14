@@ -16,7 +16,11 @@ export async function POST(request: NextRequest) {
 
     // Extract email and name from personalizationData if provided
     const email = personalizationData?.email || null
-    const name = personalizationData?.name || null
+    const name = personalizationData?.name || personalizationData?.lumaName || null
+
+    // Extract decision status for Wednesday bouncer quiz
+    // Check both locations: result.decision (from API) and result.wordMatrixResult.decision (from state)
+    const decision = result?.decision || result?.wordMatrixResult?.decision || null
 
     // Build the session data
     const sessionData = {
@@ -25,6 +29,7 @@ export async function POST(request: NextRequest) {
       session_id: sessionId ?? null,
       email: email,
       name: name,
+      decision: decision, // Add decision status (APPROVED/REJECTED)
       data: {
         responses,
         personalizationData: personalizationData || {},

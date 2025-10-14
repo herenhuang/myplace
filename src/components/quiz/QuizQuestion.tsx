@@ -14,7 +14,7 @@ interface QuizQuestionProps {
   personalizationData?: Record<string, string> // For narrative quizzes - user's personalization inputs
 }
 
-export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText }: QuizQuestionProps) {
+export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText, personalizationData }: QuizQuestionProps) {
   const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
   const [visibleOptions, setVisibleOptions] = useState<number[]>([])
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
@@ -140,15 +140,42 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
     return totalWithUser > 0 ? Math.round((countWithUser / totalWithUser) * 100) : 0
   }
 
+  // Helper to replace placeholders like {{lumaName}} with actual values
+  const replacePlaceholders = (text: string, data: Record<string, string>): string => {
+    let result = text
+    Object.entries(data).forEach(([key, value]) => {
+      const placeholder = `{{${key}}}`
+      result = result.replace(new RegExp(placeholder, 'g'), value)
+    })
+    return result
+  }
+
   // Get question text based on quiz type
   // Priority: adaptedText (for narrative) > text (for story-matrix/archetype) > baseScenario.coreSetup (fallback)
-  const questionText = adaptedText ||
+  let questionText = adaptedText ||
                       question.text ||
                       (question.baseScenario ? question.baseScenario.coreSetup : '')
+
+  // Replace placeholders with personalization data
+  if (personalizationData) {
+    questionText = replacePlaceholders(questionText, personalizationData)
+  }
+
   const timeMarker = question.baseScenario?.timeMarker
 
   // Split adapted text into paragraphs (for Bouncer Blob response + question)
   const textParagraphs = questionText.split('\n').filter(p => p.trim())
+
+  // Helper to render text with markdown italics (*text*)
+  const renderMarkdown = (text: string) => {
+    const parts = text.split(/(\*[^*]+\*)/)
+    return parts.map((part, i) => {
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <em key={i}>{part.slice(1, -1)}</em>
+      }
+      return part
+    })
+  }
 
   return (
     <div className={styles.textContainer}>
@@ -157,7 +184,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
           {timeMarker && <p className={styles.timeMarker}>{timeMarker}</p>}
           {textParagraphs.map((paragraph, index) => (
             <h2 key={index} style={{ marginBottom: index < textParagraphs.length - 1 ? '1rem' : '0' }}>
-              {paragraph}
+              {renderMarkdown(paragraph)}
             </h2>
           ))}
         </div>
@@ -207,7 +234,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
             {/* Bouncer Blob bubble for Wednesday quiz */}
             {isWednesdayBouncer && (
               <div className={styles.bouncerBubble}>
-                <Image src="/bouncerblob.png" alt="Bouncer Blob" width={48} height={48} />
+                <Image src="/bouncerblob2.png" alt="Bouncer Blob" width={48} height={48} />
               </div>
             )}
             <div className={styles.customInputWrapper}>
@@ -241,14 +268,18 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
                 </span>
               )}
 
-              {/* Submit arrow when typing */}
+              {/* Submit arrow when typing, or spinner when loading */}
               {customInput.trim() && !selectedValue && (
                 <button
                   className={styles.customInputSubmit}
                   onClick={handleCustomSubmit}
                   disabled={isLoading}
                 >
-                  →
+                  {isLoading ? (
+                    <div className={styles.miniSpinner}></div>
+                  ) : (
+                    '→'
+                  )}
                 </button>
               )}
             </div>

@@ -173,6 +173,27 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
   }
 
   const handleShare = async () => {
+    // Log share attempt to Supabase
+    try {
+      await fetch('/api/quiz/log-share-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quizId: config.id,
+          personalityId: result.personalityId,
+          timestamp: new Date().toISOString(),
+          sessionId: result.sessionId
+        })
+      })
+    } catch (error) {
+      console.error('Failed to log share attempt:', error)
+    }
+
+    // Show trick popup
+    alert('HA! Tricked ya, this button doesn\'t work yet! 😄')
+
+    /* Original share code - disabled for now
+    return
     if (!cardRef.current) return
 
     try {
@@ -277,6 +298,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
         console.error('Fallback share also failed:', fallbackError)
       }
     }
+    */
   }
 
   if (!showExplanation) {
@@ -533,14 +555,14 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                     </a>
                     , 71 Grange Ave #304
                   </p>
-                  <p><strong>Time:</strong> Wednesday 5:45 - 8:45, talk at 6:45</p>
+                  <p><strong>Time:</strong> Wednesday 5:45 - 8:45, try to come before 6:45 pls</p>
                 </div>
               </div>
 
               <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
                 <h2 style={{ marginBottom: '16px', fontSize: '20px' }}>🚪 How to Get In</h2>
                 <p style={{ lineHeight: '1.8', marginBottom: '12px' }}>
-                  Look out for the red door, then go up 3 flights of stairs
+                  Look out for the red door, then go up 3 flights of stairs. Worry not, you will get an email beforehand too.
                 </p>
                 <h3 style={{ fontSize: '18px', marginTop: '20px', marginBottom: '12px' }}>Don't forget:</h3>
                 <p style={{ lineHeight: '1.8' }}>
@@ -632,8 +654,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
       <div className={styles.textContainer}>
         <div className={styles.explanationContainer} style={{ paddingBottom: '40px' }}>
           <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px' }}>
-            <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600 }}>Why Not This Time</h2>
-            <div style={{ lineHeight: '1.8', color: '#4b5563' }}>
+            <div style={{ lineHeight: '1.8', color: '#1f2937' }}>
               <ReactMarkdown>{result.explanation}</ReactMarkdown>
             </div>
           </div>

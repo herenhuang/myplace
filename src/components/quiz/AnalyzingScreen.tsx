@@ -14,10 +14,12 @@ interface AnalyzingScreenProps {
   customMessages?: string[]
 }
 
-export default function AnalyzingScreen({ customMessages }: AnalyzingScreenProps = {}) {
+export default function AnalyzingScreen({ customMessages, quizId }: AnalyzingScreenProps & { quizId?: string } = {}) {
   const messages = customMessages || defaultMessages
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fadeClass, setFadeClass] = useState(styles.fadeIn)
+
+  const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,11 +31,17 @@ export default function AnalyzingScreen({ customMessages }: AnalyzingScreenProps
     }, 2000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [messages.length])
 
   return (
     <div className={styles.analyzingScreen}>
-      <Image src="/elevate/blobbert.png" alt="Analyzing" width={100} height={100} />
+      <Image
+        src={isWednesdayBouncer ? "/bouncerblob.png" : "/elevate/blobbert.png"}
+        alt="Analyzing"
+        width={100}
+        height={100}
+        style={{ position: 'relative', zIndex: 20 }}
+      />
       <p className={`${styles.analyzingText} ${fadeClass}`}>
         {messages[currentIndex]}
       </p>

@@ -67,7 +67,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate the response has required fields
-    if (!archetype.firstWord || !archetype.secondWord) {
+    // For REJECTED decisions, archetype words are optional
+    const isRejected = archetype.decision === 'REJECTED'
+
+    if (!isRejected && (!archetype.firstWord || !archetype.secondWord)) {
       console.error('Missing required fields in archetype:', archetype)
       return NextResponse.json(
         {
@@ -90,8 +93,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       archetype: {
-        firstWord: archetype.firstWord,
-        secondWord: archetype.secondWord,
+        firstWord: archetype.firstWord || '',
+        secondWord: archetype.secondWord || '',
         tagline: archetype.tagline || '',
         reasoning: archetype.reasoning || '',
         alternatives,

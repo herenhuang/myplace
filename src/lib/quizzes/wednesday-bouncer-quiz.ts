@@ -2,8 +2,8 @@ import { QuizConfig } from './types'
 
 export const wednesdayBouncerQuiz: QuizConfig = {
   id: 'wednesday-bouncer-quiz',
-  title: 'Are you really in?',
-  description: 'You need the address for Helen\'s event on Wednesday? Let\'s see if Bouncer Blob lets you in.',
+  title: 'Are you really in? 🎟️ ',
+  description: 'You need the address for Helen\'s mingle session x mini launch right? Well first you\'ll have to see what Bouncer Blob thinks.',
   type: 'narrative', // Changed to narrative for conversational flow
 
   theme: {
@@ -18,25 +18,20 @@ export const wednesdayBouncerQuiz: QuizConfig = {
     "Bouncer Blob is thinking...",
     "Busy deciding...",
     "Should you be let in?",
-    "Almost done..."
+    "Almost done...",
+    "Or is it...",
+    "Ready to judge..."
   ],
 
   personalizationForm: {
-    instructions: 'First, let us know who you are.',
+    instructions: 'Email please.',
     fields: [
       {
         id: 'email',
-        question: 'Email',
+        question: '',
         type: 'text',
         placeholder: 'your@email.com',
         required: true
-      },
-      {
-        id: 'name',
-        question: 'Name (optional)',
-        type: 'text',
-        placeholder: 'How should we call you?',
-        required: false
       }
     ]
   },
@@ -55,7 +50,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'All you need to do is answer truthfully. There are no right answers! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
+        coreSetup: 'Howdy {{lumaName}}! You\'re on the Luma list... but to get in... I\'ma need to ask you some more questions. There are no *right* answers though, there\'s just *your* answers.\n\nAnyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
@@ -223,7 +218,7 @@ CRITICAL FORMATTING RULES:
 - Use --- to separate sections (this will create visual cards)
 - Keep it simple and clean
 
-FORMAT (follow this EXACTLY):
+FORMAT FOR APPROVED:
 
 {{tagline}}
 
@@ -233,20 +228,30 @@ FORMAT (follow this EXACTLY):
 
 ## What to Expect
 
-You're coming in as a {{archetype}}. [Write 1-2 SHORT sentences about what this archetype means for Wednesday night. Be specific to their actual answers. Keep it brief and punchy.]
+[Write 1-2 SHORT sentences about what this archetype means for Wednesday night. IMPORTANT: Reference specific details from their answers ONLY ONCE - don't repeat the same facts. Keep it brief and punchy. Focus on the vibe they'll bring.]
 
 ---
 
 ## Bottom Line
 
-[Write 1-2 sentences max. Keep it warm but concise. Reference their {{archetype}} energy.]
+[Write 1-2 sentences max. Keep it warm but concise. Make it about the OVERALL impression, NOT repeating specific details you already mentioned. Focus on the energy/vibe.]
+
+FORMAT FOR REJECTED (use this if decision is REJECTED):
+
+## Hmmmm... Try Again Maybe?
+
+OK here's the thing... [Write 2-3 sentences explaining that their answers didn't quite show they really wanted to be here. Be honest but kind. Focus on lack of effort/engagement, not on WHO they are. Make it about FIT not WORTH. End with encouragement to try again with more genuine responses.]
+
+But honestly, we might've read you wrong. Feel free to give it another shot if you want - we're always down to give people a second chance.
 
 TONE GUIDELINES:
 - Direct and warm, never corporate
 - Make them feel validated and seen
-- If rejected, emphasize it's about FIT not WORTH
+- If rejected, emphasize it's about FIT not WORTH - they seemed disconnected from the event, not that they're not good enough
 - Use contractions, keep it conversational
-- Be specific to their actual answers - quote or reference them
+- Be specific to their actual answers BUT mention each detail ONLY ONCE across all sections
+- Don't repeat the same facts/observations in multiple sections - it sounds robotic
+- Vary your language - if you mentioned something specific in "What to Expect", DON'T mention it again in "Bottom Line"
 - No generic platitudes - make it feel real and personal`
   }
 }
