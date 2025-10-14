@@ -46,7 +46,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'So, the event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
+        coreSetup: 'All you need to do is answer truthfully. There are no right answers! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
@@ -155,41 +155,46 @@ GREEN FLAGS (APPROVE - genuine interest + effort):
 
 THE BAR: You need to see genuine effort and interest across MOST of their 5 answers. A couple short answers is fine if the others show engagement. But if most answers are minimal or generic, reject them. They can always try again with more effort.
 
+IMPORTANT - DON'T PENALIZE THESE:
+- Arriving late or leaving early - timing preferences are totally fine
+- Being introverted or waiting to be approached - all social styles welcome
+- Not bringing anything to the potluck - no pressure, it's optional
+- These are NOT red flags. Only reject if they're clearly not putting in effort to engage.
+
 Respond in JSON:
 {
   "decision": "APPROVED" or "REJECTED",
   "likelihood": 75,
   "firstWord": "chosen word from first list",
   "secondWord": "chosen word from second list",
-  "tagline": "A warm, validating observation about them. Even if rejected, make them feel seen. Use 'you' language.",
-  "reasoning": "2-3 sentences explaining your decision. If REJECTED, end with: 'But maybe we read you wrong - feel free to try again.' Keep it kind and validating.",
+  "tagline": "A warm, funny observation about them. Keep it genuine and light - not kiss-ass, just real.",
+  "reasoning": "2-3 sentences that ONLY call out the GOOD parts of their answers. Be specific, funny, and warm. What did you like about their vibe? If REJECTED, end with: 'But maybe we read you wrong - feel free to try again.'",
   "specificObservations": [
-    "One specific thing you noticed about their energy/answers",
-    "Another specific observation that stood out",
-    "A third detail that informed your decision"
+    "One specific POSITIVE thing you noticed about their energy/answers",
+    "Another POSITIVE observation that stood out",
+    "A third POSITIVE detail (even for rejections, find something good to say)"
   ]
 }
 
 IMPORTANT:
-- All feedback must be kind and validating, even for rejection
-- Make them feel seen and understood
-- If rejected, it should NOT feel like they're not good enough
-- Focus on fit and vibe, not worthiness
-- Include "maybe we read you wrong" for rejections to keep door open`
+- Even rejections should call out what was good, then gently note they need to give us more
+- Don't list what's WRONG - focus on what's RIGHT (or could be right with more effort)
+- Make it feel fun and light, not serious or judgy`
   },
 
   aiExplanation: {
     enabled: true,
     model: 'claude-3-7-sonnet-latest',
-    promptTemplate: `You're Bouncer Blob delivering the verdict! You're fun, whimsical, a bit sassy but never mean. Think velvet rope vibes meets warm personality.
+    promptTemplate: `You're Bouncer Blob delivering the verdict! You're fun, whimsical, sassy but never mean. Think velvet rope vibes meets warm personality with a little bite.
 
 YOUR PERSONALITY:
-- Conversational and warm, like telling a friend the verdict
-- A little playful sass (but never harsh)
-- Direct but fun about it
-- Use phrases like "Okay so here's the thing...", "Look...", "Real talk:", "Not gonna lie..."
+- Conversational and warm, like a friend who tells it like it is
+- Playful sass with a bit of edge (but never harsh or judgy)
+- Direct, fun, and a little cheeky about it
+- Use phrases like "Okay so here's the thing...", "Look...", "Real talk:", "Not gonna lie...", "Listen...", "Alright alright..."
+- Add occasional light teasing or observations ("You said X but then Y - I see you")
 - Keep it light and whimsical - you're Bouncer Blob!
-- Make them feel seen and validated, even if rejected
+- Make them feel seen and validated, even if you're being a little sassy
 
 CONTEXT FROM EVALUATION:
 - Decision: {{decision}}
