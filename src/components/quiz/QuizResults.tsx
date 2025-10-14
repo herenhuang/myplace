@@ -326,7 +326,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                     </h2>
                     {likelihood && (
                       <p className={styles.resultTagline} style={{ fontSize: '14px', opacity: 0.8, color: '#1f2937' }}>
-                        {likelihood}% chance of a good time
+                        {likelihood}% chance of a great time
                       </p>
                     )}
                     {displayTagline && (
@@ -587,7 +587,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 )}
                 {likelihood && (
                   <p style={{ fontSize: '14px', marginTop: '20px', color: '#1f2937', opacity: 0.8 }}>
-                    {likelihood}% chance of having a good time Wednesday
+                    {likelihood}% chance of having a great time Wednesday
                   </p>
                 )}
               </div>

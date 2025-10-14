@@ -628,8 +628,12 @@ export default function QuizEngine({ config }: QuizEngineProps) {
     clearSavedState()
     setScreenState('welcome')
     setCurrentQuestionIndex(0)
+    setQuestionPath([]) // Clear question path
     setResponses([])
     setResult(null)
+    setAdaptedQuestions({}) // Clear adapted questions
+    setPersonalizationData({}) // Clear personalization data
+    setDbSessionId('') // Clear DB session ID
     const sid = getOrCreateSessionId()
     setSessionId(sid)
     window.scrollTo({ top: 0, behavior: 'smooth' })
