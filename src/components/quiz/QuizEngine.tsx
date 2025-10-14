@@ -504,9 +504,12 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           })
 
           const selectData = await selectResponse.json()
-          
+
+          console.log('Select archetype response:', selectData)
+
           if (!selectData.success || !selectData.archetype) {
-            throw new Error('Failed to select archetype')
+            console.error('Invalid archetype response:', selectData)
+            throw new Error(`Failed to select archetype: ${selectData.error || 'Unknown error'}`)
           }
 
           const { firstWord, secondWord, tagline, reasoning, alternatives, decision, likelihood, specificObservations } = selectData.archetype

@@ -137,23 +137,22 @@ Their responses:
 {{answers}}
 
 CRITICAL EVALUATION PHILOSOPHY:
-This is about EFFORT and GENUINE INTEREST, not "right answers." The bar is: are they actually interested in coming and willing to engage? Did they put in real effort across MOST of their answers?
+This is about EFFORT and GENUINE INTEREST, not "right answers." The bar is LOW - if they're putting in ANY real effort and seem interested, approve them. We're looking for people who are clearly NOT trying, not filtering for perfect answers.
 
-RED FLAGS (REJECT - low effort or disengaged):
-- Most answers are one-word or extremely minimal (e.g., "6pm", "Yes", "Idk")
-- Generic, templated responses with no personality ("I'm excited to network!")
-- Feels like they're not actually interested or just going through the motions
-- Copy-pasted or AI-generated sounding (no human voice)
-- Overall vibe: phoning it in, disconnected, not really trying
+RED FLAGS (REJECT - these are the ONLY reasons to reject):
+- ALL answers are one-word or extremely minimal with zero personality (e.g., just "6pm", "Yes", "Idk", "Nothing" across the board)
+- All responses are generic templates with no human voice ("I'm excited to network!" repeated in different ways)
+- Clearly copy-pasted or AI-generated sounding across all answers
+- Overall vibe: actively phoning it in, completely disconnected, zero effort
 
-GREEN FLAGS (APPROVE - genuine interest + effort):
-- MOST responses show thought, personality, or engagement (not just one)
-- Personal details, specifics, or honest answers coming through
-- Showing up as themselves - can be casual, silly, or serious, but it's THEM
-- Genuine interest in coming to the event (doesn't need to be effusive, just real)
-- Overall vibe: they're trying, they care, they want to be there
+GREEN FLAGS (APPROVE - if you see ANY of these, approve them):
+- ANY specific details mentioned (marathon training, startup work, specific interests)
+- ANY personality coming through (humor, honesty, casual tone, real voice)
+- ANY genuine engagement with the questions (not just one-word answers)
+- Showing up as themselves - doesn't need to be elaborate, just REAL
+- Even brief answers are fine if they feel genuine and human
 
-THE BAR: You need to see genuine effort and interest across MOST of their 5 answers. A couple short answers is fine if the others show engagement. But if most answers are minimal or generic, reject them. They can always try again with more effort.
+THE BAR IS LOW: If someone mentions even ONE specific thing about themselves, shows ANY personality, or gives thoughtful responses to even HALF the questions, APPROVE THEM. Only reject if it's truly zero-effort across the board.
 
 IMPORTANT - DON'T PENALIZE THESE:
 - Arriving late or leaving early - timing preferences are totally fine

@@ -68,8 +68,13 @@ export async function POST(request: NextRequest) {
 
     // Validate the response has required fields
     if (!archetype.firstWord || !archetype.secondWord) {
+      console.error('Missing required fields in archetype:', archetype)
       return NextResponse.json(
-        { error: 'Invalid archetype selection' },
+        {
+          error: 'Invalid archetype selection - missing firstWord or secondWord',
+          received: archetype,
+          success: false
+        },
         { status: 500 }
       )
     }
