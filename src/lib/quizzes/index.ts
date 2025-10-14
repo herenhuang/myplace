@@ -19,6 +19,7 @@ import { datingTextingStyleQuiz } from './dating-texting-style-quiz'
 import { pmPressureStyleQuiz } from './pm-pressure-style-quiz'
 import { productDecisionStyleQuiz } from './product-decision-style-quiz'
 import { pmTradeoffStyleQuiz } from './pm-tradeoff-style-quiz'
+import { wednesdayBouncerQuiz } from './wednesday-bouncer-quiz'
 import { ALL_QUIZZES } from './all-quizzes-data'
 
 // Registry of all available quizzes
@@ -35,7 +36,8 @@ export const quizRegistry: Record<string, QuizConfig> = {
   'dating-texting-style': datingTextingStyleQuiz,
   'pm-pressure-style': pmPressureStyleQuiz,
   'product-decision-style': productDecisionStyleQuiz,
-  'pm-tradeoff-style': pmTradeoffStyleQuiz
+  'pm-tradeoff-style': pmTradeoffStyleQuiz,
+  'wednesday-bouncer-quiz': wednesdayBouncerQuiz
   // Add new quizzes here:
   // Use the personalization template for narrative quizzes!
 }

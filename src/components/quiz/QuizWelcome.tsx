@@ -22,7 +22,11 @@ function replacePlaceholders(text: string, data: Record<string, string>): string
 
 export default function QuizWelcome({ config, onStart, isLoading, personalizationData = {} }: QuizWelcomeProps) {
   // For narrative quizzes with personalization, show story setup here
-  const showStorySetup = config.type === 'narrative' && config.storySetup && Object.keys(personalizationData).length > 0
+  // BUT hide it for Wednesday bouncer quiz (it's only needed for adaptive narrative API)
+  const showStorySetup = config.type === 'narrative' &&
+                         config.storySetup &&
+                         config.storySetup.title && // Only show if there's a title (Wednesday quiz has no title)
+                         Object.keys(personalizationData).length > 0
 
   return (
     <div className={styles.welcomeContainer}>
