@@ -29,11 +29,14 @@ export async function POST(request: NextRequest) {
     // Special personality for Wednesday Bouncer quiz
     const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
 
-    // If no previous responses (first question), return base scenario as-is
+    // If no previous responses (first question), replace placeholders and return
     if (!previousResponses || previousResponses.length === 0) {
+      console.log('🎯 Q1 Personalization:', { personalizationData, baseScenario: baseScenario.coreSetup })
+      const personalizedText = replacePlaceholders(baseScenario.coreSetup, personalizationData)
+      console.log('✅ Q1 Result:', personalizedText)
       return NextResponse.json({
         success: true,
-        adaptedText: baseScenario.coreSetup,
+        adaptedText: personalizedText,
         timeMarker: baseScenario.timeMarker
       })
     }
@@ -57,23 +60,28 @@ export async function POST(request: NextRequest) {
 
     // Create the adaptation prompt with optional personality
     const bouncerPersonality = isWednesdayBouncer ? `
-YOU ARE: Bouncer Blob - a fun, whimsical bouncer with personality! You're sassy but never mean. You're funny, direct, and you call things as you see them. Think: velvet rope vibes meets warm personality with a little bite.
+YOU ARE: Bouncer Blob - a fun, whimsical bouncer who's GATEKEEPING Helen's Wednesday event. You're sassy, observant, and evaluating if they're the right fit. You're not mean, but you ARE judging the vibe.
+
+YOUR JOB: Read their answers and make sassy observations about whether they'd fit the vibe.
 
 YOUR TONE:
-- Conversational and warm, like a friend who tells it like it is
-- Playful sass with a bit of edge (but never harsh or judgy)
-- Direct, fun, and a little cheeky about it
-- Use phrases like "Okay okay...", "Mmm...", "Wait hold on...", "Alright alright...", "I see you...", "Oh interesting..."
-- Add occasional light teasing or observations about what they said
-- Keep it light and whimsical - you're Bouncer Blob after all!
+- You're a BOUNCER - you're deciding if they get in, so react with that in mind
+- Make dry, observational comments about their answers (good or sus)
+- Use phrases like "Mmm...", "Interesting choice...", "Wait hold on...", "Okay I see you...", "Noted...", "Hmm..."
+- Sometimes be skeptical: "Hmm not sure about that...", "That's... a take"
+- Sometimes approve: "Okay okay you might be onto something", "Alright I'm listening"
+- Keep it sassy but light - you're Bouncer Blob after all, not a drill sergeant
+- Be honest about what you think of their answer before moving to the next question
+- IMPORTANT: Actually have opinions on their answers. Don't just neutrally acknowledge everything.
 
 Example of YOUR voice:
 Base: "What gets you most excited about coming to this?"
-Adapted: "Okay okay, I see you showing up fashionably late... I like it. So what actually gets you excited about Wednesday night?"
+Adapted: "Mmm showing up fashionably late... classic move. Alright, what actually gets you excited about Wednesday night?"
 
 Another example:
-Base: "Tell me about the best conversation you've had recently."
-Adapted: "Mmm interesting take. Alright, let's dig deeper - tell me about the best conversation you've had recently. And I mean a REAL one, not just pleasantries."
+Base: "Tell me about your conversation style."
+Their answer: "I prefer listening"
+Adapted: "Okay I see you with the listening thing. But can you actually talk too? Tell me about the best conversation you've had recently."
 ` : ''
 
     const prompt = `You are adapting a narrative quiz scene to make it feel continuous and personalized.
@@ -123,7 +131,13 @@ Respond with ONLY the adapted scene text. No JSON, no explanations, just the ada
       }]
     })
 
-    const adaptedText = message.content[0].type === 'text' ? message.content[0].text.trim() : baseScenario.coreSetup
+    let adaptedText = message.content[0].type === 'text' ? message.content[0].text.trim() : baseScenario.coreSetup
+
+    // Remove wrapping quotation marks if AI added them
+    if ((adaptedText.startsWith('"') && adaptedText.endsWith('"')) ||
+        (adaptedText.startsWith("'") && adaptedText.endsWith("'"))) {
+      adaptedText = adaptedText.slice(1, -1).trim()
+    }
 
     return NextResponse.json({
       success: true,

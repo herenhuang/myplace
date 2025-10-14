@@ -2,8 +2,8 @@ import { QuizConfig } from './types'
 
 export const wednesdayBouncerQuiz: QuizConfig = {
   id: 'wednesday-bouncer-quiz',
-  title: 'Are you really in?',
-  description: 'You need the address for Helen\'s event on Wednesday? Let\'s see if Bouncer Blob lets you in.',
+  title: 'Are you really in? 🎟️ ',
+  description: 'You need the address for Helen\'s mingle session x mini launch right? Well first you\'ll have to see what Bouncer Blob thinks.',
   type: 'narrative', // Changed to narrative for conversational flow
 
   theme: {
@@ -14,22 +14,24 @@ export const wednesdayBouncerQuiz: QuizConfig = {
     backgroundImage: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)'
   },
 
+  analyzingMessages: [
+    "Bouncer Blob is thinking...",
+    "Busy deciding...",
+    "Should you be let in?",
+    "Almost done...",
+    "Or is it...",
+    "Ready to judge..."
+  ],
+
   personalizationForm: {
-    instructions: 'First, let us know who you are.',
+    instructions: 'Email please.',
     fields: [
       {
         id: 'email',
-        question: 'Email',
+        question: '',
         type: 'text',
         placeholder: 'your@email.com',
         required: true
-      },
-      {
-        id: 'name',
-        question: 'Name (optional)',
-        type: 'text',
-        placeholder: 'How should we call you?',
-        required: false
       }
     ]
   },
@@ -48,7 +50,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'All you need to do is answer truthfully. There are no right answers! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
+        coreSetup: 'Howdy {{lumaName}}! You\'re on the Luma list... but to get in... I\'ma need to ask you some more questions. There are no *right* answers though, there\'s just *your* answers.\n\nAnyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
@@ -59,7 +61,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 2",
         dimension: "social-approach",
-        coreSetup: 'You\'re standing there, there\'s only like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you?'
+        coreSetup: 'You\'re standing there, there\'s like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you?'
       },
       options: [],
       allowCustomInput: true
@@ -70,7 +72,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 3",
         dimension: "depth",
-        coreSetup: 'OK what\'s an interesting thing about you that you\'d want someone else to know?'
+        coreSetup: 'OK what\'s something about you that you\'d want someone else to know?'
       },
       options: [],
       allowCustomInput: true
@@ -208,60 +210,48 @@ CONTEXT FROM EVALUATION:
 Their full responses:
 {{answers}}
 
-Now write the results page. Structure it with these sections:
+Now write the results explanation.
 
-<section>
-# You're In ✨
+CRITICAL FORMATTING RULES:
+- Use ONLY plain text and markdown (paragraphs, ## headers, **bold**)
+- DO NOT use <section>, <div>, or ANY HTML tags
+- Use --- to separate sections (this will create visual cards)
+- Keep it simple and clean
+
+FORMAT FOR APPROVED:
 
 {{tagline}}
 
 {{reasoning}}
-</section>
 
-<section>
-## What We Noticed About You
+---
 
-Based on your responses, here's what stood out:
+## What to Expect
 
-[List the specific observations from the evaluation - bullet points are fine. Reference actual things they said. Make it feel personal.]
+[Write 1-2 SHORT sentences about what this archetype means for Wednesday night. IMPORTANT: Reference specific details from their answers ONLY ONCE - don't repeat the same facts. Keep it brief and punchy. Focus on the vibe they'll bring.]
 
-These aren't judgments - just observations about your energy and how you show up.
-</section>
+---
 
-<section>
-## Your Wednesday Archetype: {{archetype}}
-
-You're coming in as a {{archetype}}. Here's what that means for Wednesday night:
-
-[Write 2-3 sentences about what this archetype brings to the room. Be specific to their actual answers - reference things they said. Make it feel personal and true.]
-
-[Add 1-2 sentences about what they'll probably get out of the night, based on their archetype.]
-</section>
-
-<section>
-## What to Expect Wednesday
-
-Here's the vibe:
-- **Shoes off, cozy vibes**: This is an intimate living room gathering, not a formal event
-- **Deep conversations**: People come ready to talk about ideas, curiosities, what they're working on
-- **Unstructured mingling**: No agenda, no presentations - just good people connecting organically
-- **Bring your curiosity**: The best nights happen when people are genuinely interested in each other
-
-Based on your {{likelihood}}% likelihood and your {{archetype}} energy, you'll probably vibe well with this format. Come ready to be yourself.
-</section>
-
-<section>
 ## Bottom Line
 
-We're genuinely excited to have you Wednesday. Your {{archetype}} energy is exactly what makes these nights special. See you there.
-</section>
+[Write 1-2 sentences max. Keep it warm but concise. Make it about the OVERALL impression, NOT repeating specific details you already mentioned. Focus on the energy/vibe.]
+
+FORMAT FOR REJECTED (use this if decision is REJECTED):
+
+## Hmmmm... Try Again Maybe?
+
+OK here's the thing... [Write 2-3 sentences explaining that their answers didn't quite show they really wanted to be here. Be honest but kind. Focus on lack of effort/engagement, not on WHO they are. Make it about FIT not WORTH. End with encouragement to try again with more genuine responses.]
+
+But honestly, we might've read you wrong. Feel free to give it another shot if you want - we're always down to give people a second chance.
 
 TONE GUIDELINES:
 - Direct and warm, never corporate
 - Make them feel validated and seen
-- If rejected, emphasize it's about FIT not WORTH
+- If rejected, emphasize it's about FIT not WORTH - they seemed disconnected from the event, not that they're not good enough
 - Use contractions, keep it conversational
-- Be specific to their actual answers - quote or reference them
+- Be specific to their actual answers BUT mention each detail ONLY ONCE across all sections
+- Don't repeat the same facts/observations in multiple sections - it sounds robotic
+- Vary your language - if you mentioned something specific in "What to Expect", DON'T mention it again in "Bottom Line"
 - No generic platitudes - make it feel real and personal`
   }
 }

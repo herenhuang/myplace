@@ -173,6 +173,27 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
   }
 
   const handleShare = async () => {
+    // Log share attempt to Supabase
+    try {
+      await fetch('/api/quiz/log-share-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quizId: config.id,
+          personalityId: result.personalityId,
+          timestamp: new Date().toISOString(),
+          sessionId: result.sessionId
+        })
+      })
+    } catch (error) {
+      console.error('Failed to log share attempt:', error)
+    }
+
+    // Show trick popup
+    alert('HA! Tricked ya, this button doesn\'t work yet! 😄')
+
+    /* Original share code - disabled for now
+    return
     if (!cardRef.current) return
 
     try {
@@ -277,6 +298,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
         console.error('Fallback share also failed:', fallbackError)
       }
     }
+    */
   }
 
   if (!showExplanation) {
@@ -294,30 +316,30 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
             {isWednesdayBouncer ? (
               // Wednesday Bouncer: Show verdict prominently
               <>
-                <h1 className={styles.resultName} style={{ fontSize: isApproved ? '28px' : '24px', marginBottom: '16px' }}>
+                <h1 className={styles.resultName} style={{ fontSize: isApproved ? '28px' : '24px', marginBottom: '16px', color: '#1f2937' }}>
                   {isApproved ? '✅ YOU\'RE IN' : '🤔 NOT QUITE THE VIBE'}
                 </h1>
                 {isApproved ? (
                   <>
-                    <h2 className={styles.resultTagline} style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>
+                    <h2 className={styles.resultTagline} style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px', color: '#1f2937' }}>
                       {displayName}
                     </h2>
                     {likelihood && (
-                      <p className={styles.resultTagline} style={{ fontSize: '14px', opacity: 0.8 }}>
+                      <p className={styles.resultTagline} style={{ fontSize: '14px', opacity: 0.8, color: '#1f2937' }}>
                         {likelihood}% chance of a good time
                       </p>
                     )}
                     {displayTagline && (
-                      <p className={styles.resultTagline} style={{ marginTop: '12px' }}>{displayTagline}</p>
+                      <p className={styles.resultTagline} style={{ marginTop: '12px', color: '#1f2937' }}>{displayTagline}</p>
                     )}
                   </>
                 ) : (
                   <>
-                    <p className={styles.resultTagline} style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                    <p className={styles.resultTagline} style={{ fontSize: '13px', lineHeight: '1.4', color: '#1f2937' }}>
                       (but maybe we read you wrong)
                     </p>
                     {displayTagline && (
-                      <p className={styles.resultTagline} style={{ marginTop: '16px', fontSize: '13px', lineHeight: '1.4' }}>
+                      <p className={styles.resultTagline} style={{ marginTop: '16px', fontSize: '13px', lineHeight: '1.4', color: '#1f2937' }}>
                         {displayTagline}
                       </p>
                     )}
@@ -351,16 +373,18 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
           <div className={styles.actionButtons}>
             {isWednesdayBouncer && !isApproved ? (
-              // Rejected: Show big "Try Again" button
-              <button
-                className={styles.actionButton}
-                onClick={onRestart}
-                style={{ fontSize: '18px' }}
-              >
-                <h2>
-                  Try Again
-                </h2>
-              </button>
+              // Rejected: Show "See Why" button to view explanation
+              result.explanation && (
+                <button
+                  className={styles.actionButton}
+                  onClick={() => setShowExplanation(true)}
+                  style={{ fontSize: '18px' }}
+                >
+                  <h2>
+                    See Why →
+                  </h2>
+                </button>
+              )
             ) : (
               // Approved or regular quiz: Show "See Why" or "Get Details" button
               result.explanation && (
@@ -531,14 +555,14 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                     </a>
                     , 71 Grange Ave #304
                   </p>
-                  <p><strong>Time:</strong> Wednesday 5:45 - 8:45, talk at 6:45</p>
+                  <p><strong>Time:</strong> Wednesday 5:45 - 8:45, try to come before 6:45 pls</p>
                 </div>
               </div>
 
               <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
                 <h2 style={{ marginBottom: '16px', fontSize: '20px' }}>🚪 How to Get In</h2>
                 <p style={{ lineHeight: '1.8', marginBottom: '12px' }}>
-                  Look out for the red door, then go up 3 flights of stairs
+                  Look out for the red door, then go up 3 flights of stairs. Worry not, you will get an email beforehand too.
                 </p>
                 <h3 style={{ fontSize: '18px', marginTop: '20px', marginBottom: '12px' }}>Don't forget:</h3>
                 <p style={{ lineHeight: '1.8' }}>
@@ -551,31 +575,35 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           {/* Page 2: Archetype & Results */}
           {currentPage === 2 && (
             <>
-              <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px', textAlign: 'center' }}>
-                <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600 }}>✨ Your Wednesday Archetype</h2>
+              <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px' }}>
+                <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600, color: '#1f2937' }}>✨ Your Mingle Archetype</h2>
                 <h3 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px', color: '#1f2937', lineHeight: '1.2' }}>
                   {displayName}
                 </h3>
                 {displayTagline && (
-                  <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#4b5563' }}>
+                  <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#1f2937' }}>
                     {displayTagline}
                   </p>
                 )}
                 {likelihood && (
-                  <p style={{ fontSize: '14px', marginTop: '20px', opacity: 0.7, color: '#6b7280' }}>
+                  <p style={{ fontSize: '14px', marginTop: '20px', color: '#1f2937', opacity: 0.8 }}>
                     {likelihood}% chance of having a good time Wednesday
                   </p>
                 )}
               </div>
 
-              {result.explanation && (
-                <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
-                  <h2 style={{ marginBottom: '16px', fontSize: '20px', fontWeight: 600 }}>Why You're In</h2>
-                  <div style={{ lineHeight: '1.8', color: '#4b5563' }}>
-                    <ReactMarkdown>{result.explanation}</ReactMarkdown>
+              {result.explanation && (() => {
+                // Split explanation by --- to create multiple cards
+                const sections = result.explanation.split('---').map(s => s.trim()).filter(Boolean)
+                // Skip the first section (tagline + reasoning) and only show archetype + bottom line
+                return sections.slice(1).map((section, index) => (
+                  <div key={index} className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
+                    <div style={{ lineHeight: '1.8', color: '#1f2937' }}>
+                      <ReactMarkdown>{section}</ReactMarkdown>
+                    </div>
                   </div>
-                </div>
-              )}
+                ))
+              })()}
             </>
           )}
 
@@ -597,14 +625,55 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
               </button>
             )}
 
-            {currentPage < 2 && (
+            {currentPage < 2 ? (
               <button
                 className={styles.paginationButton}
                 onClick={() => setCurrentPage(2)}
               >
                 Next →
               </button>
+            ) : (
+              onShowRecommendation && (
+                <button
+                  className={styles.paginationButton}
+                  onClick={onShowRecommendation}
+                >
+                  More Quizzes →
+                </button>
+              )
             )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Special handling for rejected Wednesday bouncer - show simple explanation + try again
+  if (isWednesdayBouncer && !isApproved) {
+    return (
+      <div className={styles.textContainer}>
+        <div className={styles.explanationContainer} style={{ paddingBottom: '40px' }}>
+          <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px' }}>
+            <div style={{ lineHeight: '1.8', color: '#1f2937' }}>
+              <ReactMarkdown>{result.explanation}</ReactMarkdown>
+            </div>
+          </div>
+
+          <div className={styles.paginationControls}>
+            <button
+              className={styles.paginationButton}
+              onClick={() => setShowExplanation(false)}
+            >
+              ← Back
+            </button>
+
+            <button
+              className={styles.paginationButton}
+              onClick={onRestart}
+              style={{ background: '#1f2937', color: 'white' }}
+            >
+              Try Again →
+            </button>
           </div>
         </div>
       </div>

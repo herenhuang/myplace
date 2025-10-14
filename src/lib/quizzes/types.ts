@@ -169,6 +169,8 @@ export interface QuizConfig {
   aiExplanation?: AIExplanationConfig
   /** Whether to show per-question answer comparison/stats (default: false for speed) */
   showQuestionComparison?: boolean
+  /** Custom analyzing messages to show during result calculation (default: ["Calibrating your answers", "Assessing your behavior", "Analyzing your thoughts"]) */
+  analyzingMessages?: string[]
 }
 
 export interface QuizResponse {
@@ -202,6 +204,7 @@ export interface QuizResult {
   score?: number
   responses: QuizResponse[]
   explanation?: string
+  sessionId?: string // Session ID from quiz state
 }
 
 export interface QuizState {
