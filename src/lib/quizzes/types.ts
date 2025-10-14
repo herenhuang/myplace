@@ -195,6 +195,9 @@ export interface QuizResult {
       fullArchetype: string
       reason: string
     }>
+    decision?: string // For wednesday-bouncer: "APPROVED" or "REJECTED"
+    likelihood?: number // For wednesday-bouncer: 0-100% chance of good time
+    specificObservations?: string[] // For wednesday-bouncer: specific things noticed
   }
   score?: number
   responses: QuizResponse[]

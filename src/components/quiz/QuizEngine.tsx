@@ -174,7 +174,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           baseScenario: question.baseScenario,
           previousResponses: previousResponses,
           storySetup: config.storySetup,
-          personalizationData: personalizationData // Include user's personalization inputs
+          personalizationData: personalizationData, // Include user's personalization inputs
+          quizId: config.id // Pass quiz ID for personality customization
         })
       })
 
@@ -564,7 +565,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
               secondWord,
               fullArchetype,
               tagline,
-              alternatives: alternatives || []
+              alternatives: alternatives || [],
+              decision,
+              likelihood,
+              specificObservations
             },
             responses: quizResponses,
             explanation
@@ -586,7 +590,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                   fullArchetype,
                   tagline,
                   explanation,
-                  alternatives: alternatives || []
+                  alternatives: alternatives || [],
+                  decision,
+                  likelihood,
+                  specificObservations
                 }
               })
             })
