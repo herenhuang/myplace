@@ -26,6 +26,10 @@ export function initializeAmplitude() {
       autocapture: {
         elementInteractions: true,
       },
+      logLevel: amplitude.Types.LogLevel.Warn, // Suppress info/error logs
+      flushIntervalMillis: 1000,
+      flushQueueSize: 30,
+      flushMaxRetries: 3, // Limit retries to prevent spam
     });
 
     isInitialized = true;

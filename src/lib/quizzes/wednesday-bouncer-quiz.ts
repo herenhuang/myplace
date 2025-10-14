@@ -50,7 +50,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'Howdy {{lumaName}}! You\'re on the Luma list... but to get in... I\'ma need to ask you some more questions. There are no *right* answers though, there\'s just *your* answers.\n\nAnyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
+        coreSetup: 'Howdy {{lumaName}}! You\'re on the Luma list... but to get in... I\'ma need to ask you some more questions. There are no *right* answers though, there\'s just *your* answers.\n\nAnyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up? Tell me a bit about why that time works for you.'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
@@ -61,7 +61,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 2",
         dimension: "social-approach",
-        coreSetup: 'You\'re standing there, there\'s like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you?'
+        coreSetup: 'You\'re standing there, there\'s like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you? Walk me through how you usually vibe at these things.'
       },
       options: [],
       allowCustomInput: true
@@ -72,7 +72,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 3",
         dimension: "depth",
-        coreSetup: 'OK what\'s something about you that you\'d want someone else to know?'
+        coreSetup: 'OK what\'s something about you that you\'d want someone else to know? Can be anything - give me a little story or detail.'
       },
       options: [],
       allowCustomInput: true
@@ -94,7 +94,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 5",
         dimension: "contribution",
-        coreSetup: 'Last question. Are you going to bring anything? Slippers? Don\'t forget it\'s a no shoe space! You gonna bring snacks or drinks to share cause it\'s potluck style? There\'s no right or wrong answer here.'
+        coreSetup: 'Last question. Are you going to bring anything? Slippers? Don\'t forget it\'s a no shoe space! You gonna bring snacks or drinks to share cause it\'s potluck style? What\'s your vibe here?'
       },
       options: [],
       allowCustomInput: true
@@ -238,20 +238,19 @@ FORMAT FOR APPROVED:
 
 FORMAT FOR REJECTED (use this if decision is REJECTED):
 
-## Hmmmm... Try Again Maybe?
+## Maybe We Read You Wrong?
 
-OK here's the thing... [Write 2-3 sentences explaining that their answers didn't quite show they really wanted to be here. Be honest but kind. Focus on lack of effort/engagement, not on WHO they are. Make it about FIT not WORTH. End with encouragement to try again with more genuine responses.]
+[Write EXACTLY 2-3 sentences. MAX 350 characters total. Brief, kind, and warm. Note their answers felt a bit light on details/energy, invite them to try again. NO extra sections, NO bullet points, NO additional commentary. JUST the rejection message.]
 
-But honestly, we might've read you wrong. Feel free to give it another shot if you want - we're always down to give people a second chance.
+Example rejection (good):
+"Your answers were pretty brief and didn't give us much to go on. We're looking for folks who are genuinely excited to show up and connect. But hey, maybe we read you wrong - feel free to give it another shot with a bit more of your personality!"
 
-TONE GUIDELINES:
-- Direct and warm, never corporate
-- Make them feel validated and seen
-- If rejected, emphasize it's about FIT not WORTH - they seemed disconnected from the event, not that they're not good enough
-- Use contractions, keep it conversational
-- Be specific to their actual answers BUT mention each detail ONLY ONCE across all sections
-- Don't repeat the same facts/observations in multiple sections - it sounds robotic
-- Vary your language - if you mentioned something specific in "What to Expect", DON'T mention it again in "Bottom Line"
-- No generic platitudes - make it feel real and personal`
+CRITICAL RULES FOR REJECTION:
+- ONLY write the 2-3 sentence rejection message
+- DO NOT add tagline, observations, or any other sections
+- MAX 350 characters
+- Keep it warm and encouraging
+- Focus on lack of detail/effort, not content
+- Always end with invitation to try again`
   }
 }
