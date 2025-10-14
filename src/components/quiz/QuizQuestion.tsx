@@ -166,6 +166,17 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
   // Split adapted text into paragraphs (for Bouncer Blob response + question)
   const textParagraphs = questionText.split('\n').filter(p => p.trim())
 
+  // Helper to render text with markdown italics (*text*)
+  const renderMarkdown = (text: string) => {
+    const parts = text.split(/(\*[^*]+\*)/)
+    return parts.map((part, i) => {
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <em key={i}>{part.slice(1, -1)}</em>
+      }
+      return part
+    })
+  }
+
   return (
     <div className={styles.textContainer}>
       <div className={styles.topText}>
@@ -173,7 +184,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
           {timeMarker && <p className={styles.timeMarker}>{timeMarker}</p>}
           {textParagraphs.map((paragraph, index) => (
             <h2 key={index} style={{ marginBottom: index < textParagraphs.length - 1 ? '1rem' : '0' }}>
-              {paragraph}
+              {renderMarkdown(paragraph)}
             </h2>
           ))}
         </div>
@@ -223,7 +234,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
             {/* Bouncer Blob bubble for Wednesday quiz */}
             {isWednesdayBouncer && (
               <div className={styles.bouncerBubble}>
-                <Image src="/bouncerblob.png" alt="Bouncer Blob" width={48} height={48} />
+                <Image src="/bouncerblob2.png" alt="Bouncer Blob" width={48} height={48} />
               </div>
             )}
             <div className={styles.customInputWrapper}>
@@ -257,14 +268,18 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
                 </span>
               )}
 
-              {/* Submit arrow when typing */}
+              {/* Submit arrow when typing, or spinner when loading */}
               {customInput.trim() && !selectedValue && (
                 <button
                   className={styles.customInputSubmit}
                   onClick={handleCustomSubmit}
                   disabled={isLoading}
                 >
-                  →
+                  {isLoading ? (
+                    <div className={styles.miniSpinner}></div>
+                  ) : (
+                    '→'
+                  )}
                 </button>
               )}
             </div>
