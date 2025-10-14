@@ -40,6 +40,7 @@ export default function AnalyzingScreen({ customMessages, quizId }: AnalyzingScr
         alt="Analyzing"
         width={100}
         height={100}
+        style={{ position: 'relative', zIndex: 20 }}
       />
       <p className={`${styles.analyzingText} ${fadeClass}`}>
         {messages[currentIndex]}

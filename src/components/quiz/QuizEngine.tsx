@@ -454,7 +454,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           personality: matchedPersonality,
           score: highestScore,
           responses: quizResponses,
-          explanation
+          explanation,
+          sessionId: sessionId
         }
 
         // Save complete session to database
@@ -575,7 +576,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
               specificObservations
             },
             responses: quizResponses,
-            explanation
+            explanation,
+            sessionId: sessionId
           }
 
           // Save complete session to database

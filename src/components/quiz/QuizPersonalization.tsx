@@ -91,7 +91,7 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
         )}
 
         <h2 className={styles.personalizationTitle}>
-          {isWednesdayBouncer ? 'First, who are you?' : "Let's Personalize Your Story"}
+          {isWednesdayBouncer ? 'Email please.' : "Let's Personalize Your Story"}
         </h2>
 
         {form.instructions && !isWednesdayBouncer && (
@@ -101,10 +101,12 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
         <div className={styles.personalizationFields}>
           {form.fields.map((field) => (
             <div key={field.id} className={styles.personalizationField}>
-              <label className={styles.personalizationLabel}>
-                {field.question}
-                {field.required !== false && <span className={styles.required}> *</span>}
-              </label>
+              {field.question && (
+                <label className={styles.personalizationLabel}>
+                  {field.question}
+                  {field.required !== false && <span className={styles.required}> *</span>}
+                </label>
+              )}
 
               {field.type === 'text' && (
                 <input
@@ -145,7 +147,7 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
           onClick={handleSubmit}
           disabled={isLoading || isCheckingEmail}
         >
-          {isCheckingEmail ? 'Checking...' : isLoading ? 'Starting...' : 'Start My Story →'}
+          {isCheckingEmail ? 'Checking...' : isLoading ? 'Starting...' : 'Am I on the list? →'}
         </button>
       </div>
     </div>

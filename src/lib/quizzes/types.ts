@@ -204,6 +204,7 @@ export interface QuizResult {
   score?: number
   responses: QuizResponse[]
   explanation?: string
+  sessionId?: string // Session ID from quiz state
 }
 
 export interface QuizState {

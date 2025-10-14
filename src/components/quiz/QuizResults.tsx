@@ -173,6 +173,27 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
   }
 
   const handleShare = async () => {
+    // Log share attempt to Supabase
+    try {
+      await fetch('/api/quiz/log-share-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quizId: config.id,
+          personalityId: result.personalityId,
+          timestamp: new Date().toISOString(),
+          sessionId: result.sessionId
+        })
+      })
+    } catch (error) {
+      console.error('Failed to log share attempt:', error)
+    }
+
+    // Show trick popup
+    alert('HA! Tricked ya, this button doesn\'t work yet! 😄')
+
+    /* Original share code - disabled for now
+    return
     if (!cardRef.current) return
 
     try {
@@ -277,6 +298,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
         console.error('Fallback share also failed:', fallbackError)
       }
     }
+    */
   }
 
   if (!showExplanation) {
