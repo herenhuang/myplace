@@ -648,6 +648,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             form={config.personalizationForm}
             onSubmit={handlePersonalizationSubmit}
             isLoading={isLoading}
+            quizId={config.id}
           />
         ) : null
 
