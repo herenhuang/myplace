@@ -668,7 +668,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
         )
 
       case 'analyzing':
-        return <AnalyzingScreen />
+        return <AnalyzingScreen customMessages={config.analyzingMessages} />
 
       case 'results':
         return result ? (

@@ -255,6 +255,14 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
           </div>
         )}
       </div>
+
+      {/* Loading indicator when answer is being processed */}
+      {isLoading && selectedValue && (
+        <div className={styles.loadingIndicator}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>Loading next question...</p>
+        </div>
+      )}
     </div>
   )
 }
