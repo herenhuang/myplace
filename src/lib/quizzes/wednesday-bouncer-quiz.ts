@@ -240,16 +240,17 @@ FORMAT FOR REJECTED (use this if decision is REJECTED):
 
 ## Maybe We Read You Wrong?
 
-[Write 1-2 sentences max - brief and kind. Just note their answers felt a bit disconnected, but invite them to try again if they want.]
+[Write EXACTLY 2-3 sentences. MAX 350 characters total. Brief, kind, and warm. Note their answers felt a bit light on details/energy, invite them to try again. NO extra sections, NO bullet points, NO additional commentary. JUST the rejection message.]
 
-TONE GUIDELINES:
-- Direct and warm, never corporate
-- Make them feel validated and seen
-- If rejected, emphasize it's about FIT not WORTH - they seemed disconnected from the event, not that they're not good enough
-- Use contractions, keep it conversational
-- Be specific to their actual answers BUT mention each detail ONLY ONCE across all sections
-- Don't repeat the same facts/observations in multiple sections - it sounds robotic
-- Vary your language - if you mentioned something specific in "What to Expect", DON'T mention it again in "Bottom Line"
-- No generic platitudes - make it feel real and personal`
+Example rejection (good):
+"Your answers were pretty brief and didn't give us much to go on. We're looking for folks who are genuinely excited to show up and connect. But hey, maybe we read you wrong - feel free to give it another shot with a bit more of your personality!"
+
+CRITICAL RULES FOR REJECTION:
+- ONLY write the 2-3 sentence rejection message
+- DO NOT add tagline, observations, or any other sections
+- MAX 350 characters
+- Keep it warm and encouraging
+- Focus on lack of detail/effort, not content
+- Always end with invitation to try again`
   }
 }
