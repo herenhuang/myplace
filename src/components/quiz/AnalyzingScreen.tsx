@@ -4,13 +4,18 @@ import { useState, useEffect } from 'react'
 import styles from './quiz.module.scss'
 import Image from 'next/image'
 
-const messages = [
+const defaultMessages = [
   "Calibrating your answers",
   "Assessing your behavior",
   "Analyzing your thoughts"
 ]
 
-export default function AnalyzingScreen() {
+interface AnalyzingScreenProps {
+  customMessages?: string[]
+}
+
+export default function AnalyzingScreen({ customMessages }: AnalyzingScreenProps = {}) {
+  const messages = customMessages || defaultMessages
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fadeClass, setFadeClass] = useState(styles.fadeIn)
 

@@ -554,7 +554,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           {currentPage === 2 && (
             <>
               <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px' }}>
-                <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600, color: '#1f2937' }}>✨ Your Wednesday Archetype</h2>
+                <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600, color: '#1f2937' }}>✨ Your Mingle Archetype</h2>
                 <h3 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px', color: '#1f2937', lineHeight: '1.2' }}>
                   {displayName}
                 </h3>
@@ -564,20 +564,24 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                   </p>
                 )}
                 {likelihood && (
-                  <p style={{ fontSize: '14px', marginTop: '20px', color: '#1f2937', opacity: 0.7 }}>
+                  <p style={{ fontSize: '14px', marginTop: '20px', color: '#1f2937', opacity: 0.8 }}>
                     {likelihood}% chance of having a good time Wednesday
                   </p>
                 )}
               </div>
 
-              {result.explanation && (
-                <div className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
-                  <h2 style={{ marginBottom: '16px', fontSize: '20px', fontWeight: 600, color: '#1f2937' }}>Why You're In</h2>
-                  <div style={{ lineHeight: '1.8', color: '#1f2937' }}>
-                    <ReactMarkdown>{result.explanation}</ReactMarkdown>
+              {result.explanation && (() => {
+                // Split explanation by --- to create multiple cards
+                const sections = result.explanation.split('---').map(s => s.trim()).filter(Boolean)
+                // Skip the first section (tagline + reasoning) and only show archetype + bottom line
+                return sections.slice(1).map((section, index) => (
+                  <div key={index} className={styles.wednesdayDetailsCard} style={{ marginTop: '20px' }}>
+                    <div style={{ lineHeight: '1.8', color: '#1f2937' }}>
+                      <ReactMarkdown>{section}</ReactMarkdown>
+                    </div>
                   </div>
-                </div>
-              )}
+                ))
+              })()}
             </>
           )}
 
@@ -599,13 +603,22 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
               </button>
             )}
 
-            {currentPage < 2 && (
+            {currentPage < 2 ? (
               <button
                 className={styles.paginationButton}
                 onClick={() => setCurrentPage(2)}
               >
                 Next →
               </button>
+            ) : (
+              onShowRecommendation && (
+                <button
+                  className={styles.paginationButton}
+                  onClick={onShowRecommendation}
+                >
+                  More Quizzes →
+                </button>
+              )
             )}
           </div>
         </div>

@@ -14,6 +14,13 @@ export const wednesdayBouncerQuiz: QuizConfig = {
     backgroundImage: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)'
   },
 
+  analyzingMessages: [
+    "Bouncer Blob is thinking...",
+    "Busy deciding...",
+    "Should you be let in?",
+    "Almost done..."
+  ],
+
   personalizationForm: {
     instructions: 'First, let us know who you are.',
     fields: [
@@ -59,7 +66,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 2",
         dimension: "social-approach",
-        coreSetup: 'You\'re standing there, there\'s only like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you?'
+        coreSetup: 'You\'re standing there, there\'s like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you?'
       },
       options: [],
       allowCustomInput: true
@@ -70,7 +77,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 3",
         dimension: "depth",
-        coreSetup: 'OK what\'s an interesting thing about you that you\'d want someone else to know?'
+        coreSetup: 'OK what\'s something about you that you\'d want someone else to know?'
       },
       options: [],
       allowCustomInput: true
@@ -208,7 +215,15 @@ CONTEXT FROM EVALUATION:
 Their full responses:
 {{answers}}
 
-Now write the results page. Use clean markdown without any HTML tags. Structure it with these sections:
+Now write the results explanation.
+
+CRITICAL FORMATTING RULES:
+- Use ONLY plain text and markdown (paragraphs, ## headers, **bold**)
+- DO NOT use <section>, <div>, or ANY HTML tags
+- Use --- to separate sections (this will create visual cards)
+- Keep it simple and clean
+
+FORMAT (follow this EXACTLY):
 
 {{tagline}}
 
@@ -216,19 +231,15 @@ Now write the results page. Use clean markdown without any HTML tags. Structure 
 
 ---
 
-## {{archetype}}
+## What to Expect
 
-You're coming in as a {{archetype}}. Here's what that means for Wednesday night:
-
-[Write 2-3 sentences about what this archetype brings to the room. Be specific to their actual answers - reference things they said. Make it feel personal and true.]
-
-[Add 1-2 sentences about what they'll probably get out of the night, based on their archetype.]
+You're coming in as a {{archetype}}. [Write 1-2 SHORT sentences about what this archetype means for Wednesday night. Be specific to their actual answers. Keep it brief and punchy.]
 
 ---
 
 ## Bottom Line
 
-We're genuinely excited to have you Wednesday. Your {{archetype}} energy is exactly what makes these nights special. See you there.
+[Write 1-2 sentences max. Keep it warm but concise. Reference their {{archetype}} energy.]
 
 TONE GUIDELINES:
 - Direct and warm, never corporate
