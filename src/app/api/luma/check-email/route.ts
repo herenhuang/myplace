@@ -7,6 +7,7 @@ const LUMA_ATTENDEES: Record<string, string> = {
   'meow': 'HelenTest',
   'ade.teleola@gmail.com': 'Teleola',
   'annachangji@gmail.com': 'Anna',
+  'apanthaky@gmail.com': 'Anahita',
   'anunath096@gmail.com': 'Anu',
   'apaar186@gmail.com': 'Apaar',
   'bahatidamien5@gmail.com': 'Bahati',

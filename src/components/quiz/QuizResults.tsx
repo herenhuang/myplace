@@ -632,8 +632,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
       <div className={styles.textContainer}>
         <div className={styles.explanationContainer} style={{ paddingBottom: '40px' }}>
           <div className={styles.wednesdayDetailsCard} style={{ marginTop: '40px' }}>
-            <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 600 }}>Why Not This Time</h2>
-            <div style={{ lineHeight: '1.8', color: '#4b5563' }}>
+            <div style={{ lineHeight: '1.8', color: '#1f2937' }}>
               <ReactMarkdown>{result.explanation}</ReactMarkdown>
             </div>
           </div>

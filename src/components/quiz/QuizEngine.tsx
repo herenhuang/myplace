@@ -513,7 +513,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           }
 
           const { firstWord, secondWord, tagline, reasoning, alternatives, decision, likelihood, specificObservations } = selectData.archetype
-          const fullArchetype = `${firstWord} ${secondWord}`
+          const isRejected = decision === 'REJECTED'
+          const fullArchetype = isRejected ? 'N/A' : `${firstWord} ${secondWord}`
 
           // Format alternatives for the prompt
           const alternativesText = alternatives && alternatives.length > 0
@@ -668,7 +669,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
         )
 
       case 'analyzing':
-        return <AnalyzingScreen customMessages={config.analyzingMessages} />
+        return <AnalyzingScreen customMessages={config.analyzingMessages} quizId={config.id} />
 
       case 'results':
         return result ? (

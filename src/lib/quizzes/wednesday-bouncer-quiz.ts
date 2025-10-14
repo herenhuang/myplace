@@ -32,13 +32,6 @@ export const wednesdayBouncerQuiz: QuizConfig = {
         type: 'text',
         placeholder: 'your@email.com',
         required: true
-      },
-      {
-        id: 'name',
-        question: 'Name (optional)',
-        type: 'text',
-        placeholder: 'How should we call you?',
-        required: false
       }
     ]
   },
@@ -225,7 +218,7 @@ CRITICAL FORMATTING RULES:
 - Use --- to separate sections (this will create visual cards)
 - Keep it simple and clean
 
-FORMAT (follow this EXACTLY):
+FORMAT FOR APPROVED:
 
 {{tagline}}
 
@@ -243,10 +236,18 @@ You're coming in as a {{archetype}}. [Write 1-2 SHORT sentences about what this 
 
 [Write 1-2 sentences max. Keep it warm but concise. Reference their {{archetype}} energy.]
 
+FORMAT FOR REJECTED (use this if decision is REJECTED):
+
+## Hmmmm... Try Again Maybe?
+
+OK here's the thing... [Write 2-3 sentences explaining that their answers didn't quite show they really wanted to be here. Be honest but kind. Focus on lack of effort/engagement, not on WHO they are. Make it about FIT not WORTH. End with encouragement to try again with more genuine responses.]
+
+But honestly, we might've read you wrong. Feel free to give it another shot if you want - we're always down to give people a second chance.
+
 TONE GUIDELINES:
 - Direct and warm, never corporate
 - Make them feel validated and seen
-- If rejected, emphasize it's about FIT not WORTH
+- If rejected, emphasize it's about FIT not WORTH - they seemed disconnected from the event, not that they're not good enough
 - Use contractions, keep it conversational
 - Be specific to their actual answers - quote or reference them
 - No generic platitudes - make it feel real and personal`
