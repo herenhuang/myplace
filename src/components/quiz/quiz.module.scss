@@ -275,6 +275,26 @@
 // Custom Input Styles
 .customInputContainer {
   margin-top: 1rem; // More spacing above to separate from hardcoded options
+  position: relative;
+}
+
+.bouncerBubble {
+  position: absolute;
+  left: 8px;
+  top: -60px;
+  width: 48px;
+  height: 48px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+
+  img {
+    border-radius: 50%;
+  }
 }
 
 .customInputWrapper {
@@ -628,6 +648,38 @@
   z-index: 3;
   overflow-y: auto;
   flex: 1;
+}
+
+.wednesdayDetailsCard {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  h3 {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  p {
+    color: #4b5563;
+    margin: 8px 0;
+  }
+
+  strong {
+    color: #1f2937;
+  }
+}
+
+.mapContainer {
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .stickyHeader {
@@ -1496,6 +1548,32 @@
 .personalizationContent {
   max-width: 500px;
   width: 100%;
+}
+
+.bouncerIntro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.bouncerIntroText {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1f2937;
+  text-align: center;
+  line-height: 1.4;
+  max-width: 400px;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .personalizationTitle {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { QuizConfig } from '@/lib/quizzes/types'
 import styles from './quiz.module.scss'
+import Image from 'next/image'
 
 interface QuizQuestionProps {
   config: QuizConfig
@@ -14,6 +15,7 @@ interface QuizQuestionProps {
 }
 
 export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText }: QuizQuestionProps) {
+  const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
   const [visibleOptions, setVisibleOptions] = useState<number[]>([])
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null)
@@ -140,17 +142,24 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
 
   // Get question text based on quiz type
   // Priority: adaptedText (for narrative) > text (for story-matrix/archetype) > baseScenario.coreSetup (fallback)
-  const questionText = adaptedText || 
-                      question.text || 
+  const questionText = adaptedText ||
+                      question.text ||
                       (question.baseScenario ? question.baseScenario.coreSetup : '')
   const timeMarker = question.baseScenario?.timeMarker
+
+  // Split adapted text into paragraphs (for Bouncer Blob response + question)
+  const textParagraphs = questionText.split('\n').filter(p => p.trim())
 
   return (
     <div className={styles.textContainer}>
       <div className={styles.topText}>
         <div className={styles.questionText}>
           {timeMarker && <p className={styles.timeMarker}>{timeMarker}</p>}
-          <h2>{questionText}</h2>
+          {textParagraphs.map((paragraph, index) => (
+            <h2 key={index} style={{ marginBottom: index < textParagraphs.length - 1 ? '1rem' : '0' }}>
+              {paragraph}
+            </h2>
+          ))}
         </div>
       </div>
       <div className={styles.choicesContainer}>
@@ -195,6 +204,12 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         {/* Custom Input Field */}
         {question.allowCustomInput && (
           <div className={styles.customInputContainer}>
+            {/* Bouncer Blob bubble for Wednesday quiz */}
+            {isWednesdayBouncer && (
+              <div className={styles.bouncerBubble}>
+                <Image src="/bouncerblob.png" alt="Bouncer Blob" width={48} height={48} />
+              </div>
+            )}
             <div className={styles.customInputWrapper}>
               {/* Background fill for custom input when selected (only if comparison enabled) */}
               {isCustomSelected && showComparison && stats && config.showQuestionComparison && (

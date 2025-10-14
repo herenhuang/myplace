@@ -174,7 +174,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           baseScenario: question.baseScenario,
           previousResponses: previousResponses,
           storySetup: config.storySetup,
-          personalizationData: personalizationData // Include user's personalization inputs
+          personalizationData: personalizationData, // Include user's personalization inputs
+          quizId: config.id // Pass quiz ID for personality customization
         })
       })
 
@@ -192,9 +193,35 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   }
 
   // Handle personalization form submission (for narrative quizzes)
-  const handlePersonalizationSubmit = (data: Record<string, string>) => {
+  const handlePersonalizationSubmit = async (data: Record<string, string>) => {
     setPersonalizationData(data)
-    setScreenState('question') // Move to first question (story setup shows automatically)
+    setIsLoading(true)
+
+    try {
+      // Start the session with personalization data
+      const response = await fetch('/api/quiz/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quizId: config.id,
+          sessionId: sessionId,
+          stepsTotal: config.questions.length,
+          personalizationData: data
+        })
+      })
+
+      const responseData = await response.json()
+
+      if (responseData.success && responseData.sessionId) {
+        setDbSessionId(responseData.sessionId)
+        setScreenState('question') // Move to first question
+        setCurrentQuestionIndex(0)
+      }
+    } catch (error) {
+      console.error('Error starting quiz:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Start quiz (from welcome screen)
@@ -439,6 +466,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
               quizId: config.id,
               sessionId: sessionId,
               responses: quizResponses,
+              personalizationData: personalizationData,
               result: {
                 personalityId: topPersonalityId,
                 personalityName: matchedPersonality.name,
@@ -476,12 +504,15 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           })
 
           const selectData = await selectResponse.json()
-          
+
+          console.log('Select archetype response:', selectData)
+
           if (!selectData.success || !selectData.archetype) {
-            throw new Error('Failed to select archetype')
+            console.error('Invalid archetype response:', selectData)
+            throw new Error(`Failed to select archetype: ${selectData.error || 'Unknown error'}`)
           }
 
-          const { firstWord, secondWord, tagline, reasoning, alternatives } = selectData.archetype
+          const { firstWord, secondWord, tagline, reasoning, alternatives, decision, likelihood, specificObservations } = selectData.archetype
           const fullArchetype = `${firstWord} ${secondWord}`
 
           // Format alternatives for the prompt
@@ -508,6 +539,13 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                   archetype: fullArchetype,
                   tagline: tagline,
                   responses: quizResponses,
+                  wordMatrixResult: {
+                    decision,
+                    likelihood,
+                    tagline,
+                    reasoning,
+                    specificObservations
+                  },
                   config: {
                     model: config.aiExplanation.model,
                     promptTemplate: promptWithAlternatives
@@ -530,7 +568,10 @@ export default function QuizEngine({ config }: QuizEngineProps) {
               secondWord,
               fullArchetype,
               tagline,
-              alternatives: alternatives || []
+              alternatives: alternatives || [],
+              decision,
+              likelihood,
+              specificObservations
             },
             responses: quizResponses,
             explanation
@@ -545,13 +586,17 @@ export default function QuizEngine({ config }: QuizEngineProps) {
                 quizId: config.id,
                 sessionId: sessionId,
                 responses: quizResponses,
+                personalizationData: personalizationData,
                 result: {
                   firstWord,
                   secondWord,
                   fullArchetype,
                   tagline,
                   explanation,
-                  alternatives: alternatives || []
+                  alternatives: alternatives || [],
+                  decision,
+                  likelihood,
+                  specificObservations
                 }
               })
             })
@@ -606,6 +651,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             form={config.personalizationForm}
             onSubmit={handlePersonalizationSubmit}
             isLoading={isLoading}
+            quizId={config.id}
           />
         ) : null
 

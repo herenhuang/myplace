@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId, personalityId, personalityName, archetype, responses, config } = await request.json()
+    const { sessionId, personalityId, personalityName, archetype, responses, config, wordMatrixResult } = await request.json()
 
     const supabase = await createClient()
 
@@ -39,12 +39,26 @@ export async function POST(request: NextRequest) {
     
     // Support both archetype (story-matrix) and personality (archetype) quiz types
     const finalPersonality = archetype || personalityName || 'your result'
-    
+
+    // Extract additional data from wordMatrixResult if available
+    const decision = wordMatrixResult?.decision || ''
+    const likelihood = wordMatrixResult?.likelihood || ''
+    const tagline = wordMatrixResult?.tagline || ''
+    const reasoning = wordMatrixResult?.reasoning || ''
+    const specificObservations = Array.isArray(wordMatrixResult?.specificObservations)
+      ? wordMatrixResult.specificObservations.join('\n- ')
+      : ''
+
     const prompt = promptTemplate
       .replace(/\{\{archetype\}\}/g, finalPersonality)
       .replace(/\{\{personality\}\}/g, finalPersonality)
       .replace(/\{\{personalityId\}\}/g, personalityId || '')
       .replace(/\{\{answers\}\}/g, answersText)
+      .replace(/\{\{decision\}\}/g, decision)
+      .replace(/\{\{likelihood\}\}/g, likelihood.toString())
+      .replace(/\{\{tagline\}\}/g, tagline)
+      .replace(/\{\{reasoning\}\}/g, reasoning)
+      .replace(/\{\{specificObservations\}\}/g, specificObservations)
 
     const chatCompletion = await anthropic.messages.create({
       model: config.model || 'claude-3-7-sonnet-latest',
