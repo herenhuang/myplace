@@ -36,6 +36,8 @@ export const wednesdayBouncerQuiz: QuizConfig = {
 
   // Minimal story setup needed for adaptive narrative to work (not displayed as separate screen)
   storySetup: {
+    title: '',
+    timeframe: '',
     premise: 'Bouncer Blob is evaluating you for Helen\'s Wednesday event.',
     characters: []
   },
