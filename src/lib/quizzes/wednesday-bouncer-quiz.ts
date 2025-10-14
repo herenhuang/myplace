@@ -34,15 +34,19 @@ export const wednesdayBouncerQuiz: QuizConfig = {
     ]
   },
 
+  // Minimal story setup needed for adaptive narrative to work (not displayed as separate screen)
+  storySetup: {
+    premise: 'Bouncer Blob is evaluating you for Helen\'s Wednesday event.',
+    characters: []
+  },
+
   questions: [
     {
       id: 'q1-arrival',
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'So, the event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?',
-        imageUrl: '/bouncerblob.png',
-        introText: 'I\'m Bouncer Blob, here to figure out whether you should actually get into Helen\'s event.'
+        coreSetup: 'So, the event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
