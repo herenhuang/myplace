@@ -50,7 +50,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 1",
         dimension: "timing",
-        coreSetup: 'Howdy {{lumaName}}! You\'re on the Luma list... but to get in... I\'ma need to ask you some more questions. There are no *right* answers though, there\'s just *your* answers.\n\nAnyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up?'
+        coreSetup: 'Howdy {{lumaName}}! You\'re on the Luma list... but to get in... I\'ma need to ask you some more questions. There are no *right* answers though, there\'s just *your* answers.\n\nAnyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up? Tell me a bit about why that time works for you.'
       },
       options: [], // No predefined options - open-ended only
       allowCustomInput: true
@@ -61,7 +61,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 2",
         dimension: "social-approach",
-        coreSetup: 'You\'re standing there, there\'s like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you?'
+        coreSetup: 'You\'re standing there, there\'s like {{crowd_size}} people there. What happens? Are you the type to approach someone new or wait for someone to come to you? Walk me through how you usually vibe at these things.'
       },
       options: [],
       allowCustomInput: true
@@ -72,7 +72,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 3",
         dimension: "depth",
-        coreSetup: 'OK what\'s something about you that you\'d want someone else to know?'
+        coreSetup: 'OK what\'s something about you that you\'d want someone else to know? Can be anything - give me a little story or detail.'
       },
       options: [],
       allowCustomInput: true
@@ -94,7 +94,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       baseScenario: {
         timeMarker: "Question 5",
         dimension: "contribution",
-        coreSetup: 'Last question. Are you going to bring anything? Slippers? Don\'t forget it\'s a no shoe space! You gonna bring snacks or drinks to share cause it\'s potluck style? There\'s no right or wrong answer here.'
+        coreSetup: 'Last question. Are you going to bring anything? Slippers? Don\'t forget it\'s a no shoe space! You gonna bring snacks or drinks to share cause it\'s potluck style? What\'s your vibe here?'
       },
       options: [],
       allowCustomInput: true
@@ -238,11 +238,9 @@ FORMAT FOR APPROVED:
 
 FORMAT FOR REJECTED (use this if decision is REJECTED):
 
-## Hmmmm... Try Again Maybe?
+## Maybe We Read You Wrong?
 
-OK here's the thing... [Write 2-3 sentences explaining that their answers didn't quite show they really wanted to be here. Be honest but kind. Focus on lack of effort/engagement, not on WHO they are. Make it about FIT not WORTH. End with encouragement to try again with more genuine responses.]
-
-But honestly, we might've read you wrong. Feel free to give it another shot if you want - we're always down to give people a second chance.
+[Write 1-2 sentences max - brief and kind. Just note their answers felt a bit disconnected, but invite them to try again if they want.]
 
 TONE GUIDELINES:
 - Direct and warm, never corporate
