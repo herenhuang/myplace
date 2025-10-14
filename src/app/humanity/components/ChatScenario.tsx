@@ -286,7 +286,6 @@ export default function ChatScenario({
     <div className={styles.chatPhone}>
       <div className={styles.chatHeader}>
         <button
-          onClick={onBack}
           className={styles.chatHeaderBack}
           aria-label="Back"
         >

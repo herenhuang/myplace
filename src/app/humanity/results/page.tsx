@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { HumanityAnalysisResult, HumanityStepData } from '@/lib/humanity-types'
-import { loadHumanityCache } from '../utils'
+import { loadHumanityCache, clearHumanityCache } from '../utils'
 import { getOrCreateSessionId } from '@/lib/session'
 import styles from '../page.module.scss'
 import resultsStyles from './results-tabs.module.scss'
@@ -403,196 +403,117 @@ function HumanityResultsPage() {
           </div>
         )}
 
-        {/* Slide 4: Breakdown (Long Scrollview) */}
+        {/* Slide 4: Breakdown */}
         {currentSlide === 4 && (
-          <div key="slide-4" className={`${resultsStyles.slideContainer} ${resultsStyles.slideActive} ${resultsStyles.slideScrollable}`}>
-            <div className="max-w-5xl rounded-2xl overflow-y-scroll py-16 w-full bg-white/50">
-              <div className="text-center mb-12">
-                <h2 className="font-[Instrument_Serif] text-7xl font-medium text-gray-900 tracking-tighter mb-2">
+          <div key="slide-4" className={`${resultsStyles.slideContainer} ${resultsStyles.slideActive}`}>
+            <div className="w-screen overflow-visible px-4 flex flex-col items-center justify-start">
+              <div className="text-center mb-8 pt-8">
+                <h2 className="font-[Instrument_Serif] text-5xl font-medium text-gray-900 tracking-tighter mb-2">
                   Breakdown
                 </h2>
+                <p className="text-gray-600 text-sm">
+                  {questionBreakdown.length} responses analyzed
+                </p>
               </div>
 
-              <div className="space-y-6 mb-12">
+              <div className="space-y-4 pb-8">
                 {questionBreakdown.map((item, index) => {
                   const response = responses.find(r => r.stepNumber === item.stepNumber)
                   return (
                     <div
                       key={index}
                       id={`slide-${item.stepNumber}`}
-                      className="p-6 md:p-8 transition-colors flex gap-6"
+                      className={`${resultsStyles.card} p-6`}
                     >
-                      <div className={resultsStyles.qaBlock}>
-                        <div className={resultsStyles.qaItem}>
-                          <div className={resultsStyles.qaLabel}>Question</div>
-                          <p className="text-black text-sm leading-5">
-                            {item.title || response?.title || `Step ${item.stepNumber}`}
-                          </p>
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className={resultsStyles.numberBadge}>{item.stepNumber}</div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-sm">
+                              {item.title || response?.title || `Step ${item.stepNumber}`}
+                            </h3>
+                          </div>
                         </div>
-                        <div className={resultsStyles.qaItem}>
-                          <div className={resultsStyles.qaLabel}>Your Response</div>
-                          <p className="text-black text-sm leading-5">
+                        {item.percentile >= 70 && (
+                          <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium whitespace-nowrap">
+                            {item.percentile}% unusual
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <div className="text-xs font-medium text-gray-500 mb-1">Your Response</div>
+                          <p className="text-sm text-gray-900 leading-5">
                             {response?.userResponse || '—'}
                           </p>
                         </div>
-                      </div>
-                      <div className={resultsStyles.resultBlock}>
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className={resultsStyles.numberBadge}>{item.stepNumber}</div>
-                          </div>
-                          {item.percentile >= 70 && (
-                            <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
-                              {item.percentile}% unusual
-                            </div>
-                          )}
+                        <div>
+                          <div className="text-xs font-medium text-gray-500 mb-1">Analysis</div>
+                          <p className="text-sm text-gray-900 leading-5">{item.insight}</p>
                         </div>
-                        <p className="text-black text-base leading-5 mb-4">{item.insight}</p>
-                        {item.highlight && (
-                          <div className={resultsStyles.highlightBox + ' mb-4'}>
-                            <div className="flex items-start gap-3">
-                              <span className="text-xl">✨</span>
-                              <div className="flex-1">
-                                <p className="text-sm font-bold text-purple-900 mb-1">Notable</p>
-                                <p className="text-sm text-purple-800">{item.highlight}</p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        {item.wasUnexpected && (
-                          <div className={resultsStyles.percentileBox}>
-                            <p className="text-sm text-orange-800">
-                              <span className="font-bold">{item.percentile}% out of the ordinary</span> — Your response stood out from typical patterns!
-                            </p>
-                          </div>
-                        )}
-
-                        {/* Individual Scores */}
-                        {item.individualScores && (
-                          <div className="mt-4 pt-4 border-t border-gray-100">
-                            <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                              Individual Analysis
-                            </h4>
-                            
-                            {/* Core Scores */}
-                            <div className="grid grid-cols-3 gap-3 mb-4">
-                              <div className="text-center p-2 bg-blue-50 rounded-lg">
-                                <div className="text-lg font-bold text-blue-700">
-                                  {item.individualScores?.logicalCoherence || 'N/A'}
-                                </div>
-                                <div className="text-xs text-blue-600">Logical Coherence</div>
-                              </div>
-                              <div className="text-center p-2 bg-purple-50 rounded-lg">
-                                <div className="text-lg font-bold text-purple-700">
-                                  {item.individualScores?.creativity || 'N/A'}
-                                </div>
-                                <div className="text-xs text-purple-600">Creativity</div>
-                              </div>
-                              <div className="text-center p-2 bg-green-50 rounded-lg">
-                                <div className="text-lg font-bold text-green-700">
-                                  {item.individualScores?.insightfulness || 'N/A'}
-                                </div>
-                                <div className="text-xs text-green-600">Insightfulness</div>
-                              </div>
-                            </div>
-
-                            {/* Personality Traits */}
-                            <div className="mb-4 hidden" >
-                              <h5 className="text-xs font-medium text-gray-700 mb-2">
-                                Personality Traits
-                              </h5>
-                              <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Optimism:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.personalityTraits?.optimism || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Spontaneity:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.personalityTraits?.spontaneity || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Social Orientation:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.personalityTraits?.socialOrientation || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Risk Tolerance:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.personalityTraits?.riskTolerance || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Emotional Expression:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.personalityTraits?.emotionalExpression || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Analytical vs Intuitive:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.personalityTraits?.analyticalVsIntuitive || 'N/A'}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Quality Indicators */}
-                            <div className="hidden">
-                              <h5 className="text-xs font-medium text-gray-700 mb-2">
-                                Quality Indicators
-                              </h5>
-                              <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Completeness:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.qualityIndicators?.completeness || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Relevance:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.qualityIndicators?.relevance || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Personalization:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.qualityIndicators?.personalization || 'N/A'}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-600">Authenticity:</span>
-                                  <span className="font-medium">
-                                    {item.individualScores?.qualityIndicators?.authenticity || 'N/A'}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
+
+                      {item.highlight && (
+                        <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                          <div className="flex items-start gap-2">
+                            <span className="text-lg">✨</span>
+                            <div className="flex-1">
+                              <p className="text-xs font-bold text-purple-900 mb-1">Notable</p>
+                              <p className="text-xs text-purple-800">{item.highlight}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {item.wasUnexpected && (
+                        <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
+                          <p className="text-xs text-orange-800">
+                            <span className="font-bold">{item.percentile}% out of the ordinary</span> — Your response stood out from typical patterns!
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Individual Scores */}
+                      {item.individualScores && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="text-center p-2 bg-blue-50 rounded-lg">
+                              <div className="text-base font-bold text-blue-700">
+                                {item.individualScores?.logicalCoherence || 'N/A'}
+                              </div>
+                              <div className="text-[10px] text-blue-600">Logical</div>
+                            </div>
+                            <div className="text-center p-2 bg-purple-50 rounded-lg">
+                              <div className="text-base font-bold text-purple-700">
+                                {item.individualScores?.creativity || 'N/A'}
+                              </div>
+                              <div className="text-[10px] text-purple-600">Creative</div>
+                            </div>
+                            <div className="text-center p-2 bg-green-50 rounded-lg">
+                              <div className="text-base font-bold text-green-700">
+                                {item.individualScores?.insightfulness || 'N/A'}
+                              </div>
+                              <div className="text-[10px] text-green-600">Insightful</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
               </div>
-
-             
             </div>
 
-            <div className="text-center">
-                <button
-                  onClick={() => router.push('/humanity')}
-                  className={resultsStyles.nextButton}
-                >
-                  Return to Simulation
-                </button>
-              </div>
-
+            <button
+              onClick={() => {
+                clearHumanityCache()
+                router.push('/humanity')
+              }}
+              className={resultsStyles.nextButton}
+            >
+              Return to Simulation
+            </button>
           </div>
         )}
       </div>

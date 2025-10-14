@@ -57,14 +57,6 @@ function SortableUseItem({ item, onRemove }: { item: UseItem; onRemove: (id: str
       className={styles.useItem}
     >
       <div className={styles.dragHandle} {...attributes} {...listeners}>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="4" cy="4" r="1.5" fill="currentColor" />
-          <circle cx="4" cy="8" r="1.5" fill="currentColor" />
-          <circle cx="4" cy="12" r="1.5" fill="currentColor" />
-          <circle cx="12" cy="4" r="1.5" fill="currentColor" />
-          <circle cx="12" cy="8" r="1.5" fill="currentColor" />
-          <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-        </svg>
       </div>
       <div className={styles.useText}>
         {item.text}
@@ -75,7 +67,7 @@ function SortableUseItem({ item, onRemove }: { item: UseItem; onRemove: (id: str
         className={styles.removeButton}
         aria-label="Remove use"
       >
-        ×
+        <div className={styles.removeButtonIcon}></div>
       </button>
     </div>
   )
@@ -200,6 +192,8 @@ export default function AlternativeUses({
         </SortableContext>
       </DndContext>
 
+
+<div className={styles.objectPromptContainer}>
       <div className={styles.objectPrompt}>
         I could use <strong>{question.objectName}</strong> to...
       </div>
@@ -215,6 +209,7 @@ export default function AlternativeUses({
         rows={2}
         disabled={uses.length >= (question.maxUses || 20)}
       />
+    </div>
     </div>
   )
 }
