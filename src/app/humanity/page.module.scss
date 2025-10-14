@@ -437,8 +437,9 @@ $body: 'Instrument Sans', 'DM Sans', serif;
     padding: 0 24px;
     padding-bottom: 100px; // Extra space so textarea is visible above sticky buttons
     margin-top: 0;
-    opacity: 1;
-    max-height: none;
+    opacity: 1 !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 }
 
