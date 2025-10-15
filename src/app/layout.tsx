@@ -3,6 +3,7 @@ import { Inter, Instrument_Serif, Lora, Newsreader } from "next/font/google";
 import "./globals.css";
 import 'material-symbols';
 import { AmplitudeProvider } from "@/components/analytics/AmplitudeProvider";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,6 +59,7 @@ export default function RootLayout({
         className={`${inter.variable} ${instrumentSerif.variable} ${lora.variable} ${newsreader.variable} antialiased`}
         suppressHydrationWarning
       >
+        <GoogleAnalytics gaId="G-HHMB010S76" />
         <AmplitudeProvider>
           {children}
         </AmplitudeProvider>
