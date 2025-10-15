@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 // TODO: Replace this with your actual Luma attendee list
 const LUMA_ATTENDEES: Record<string, string> = {
   // Format: 'email@example.com': 'First Name',
+  'vinitpshah99@gmail.com': 'Vinit',
+  'mike.l_42@hotmail.com': 'Michael',
+  'luke_dobush@hotmail.com': 'Luke',
   'meow': 'HelenTest',
   'ade.teleola@gmail.com': 'Teleola',
   'annachangji@gmail.com': 'Anna',
