@@ -398,6 +398,7 @@
   margin: 0 auto;
   text-align: left;
   width: 720px;
+  max-width: 100%;
 
   @media (max-width: 768px) {
     font-size: clamp(1.25rem, 5vw, 1.75rem);
