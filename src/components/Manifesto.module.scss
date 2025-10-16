@@ -440,41 +440,6 @@
   }
 }
 
-.ctaSection {
-  margin-top: 12rem;
-  margin-bottom: 8rem;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    margin-top: 6rem;
-    margin-bottom: 4rem;
-  }
-}
-
-.ctaButton {
-  display: inline-block;
-  padding: 18px 40px;
-  font-size: 22px;
-  font-weight: 650;
-  letter-spacing: -.4px;
-  color: white;
-  background: orangered;
-  border-radius: 9999px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    padding: 18px 48px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  }
-
-  @media (max-width: 768px) {
-    padding: 1rem 2rem;
-    font-size: 1rem;
-  }
-}
-
 .footer {
   background: linear-gradient(to bottom, #1a1919, #06060e);
   padding: 4rem 2rem 3rem;
@@ -505,6 +470,15 @@
   z-index: 1;
 }
 
+.footerContact {
+  margin-bottom: 3rem;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    margin-bottom: 2rem;
+  }
+}
+
 .contactLink {
   display: inline-block;
   padding: 0.875rem 2rem;
@@ -515,7 +489,6 @@
   border-radius: 9999px;
   text-decoration: none;
   transition: all 0.3s ease;
-  margin-bottom: 3rem;
 
   &:hover {
     background: rgba(255, 255, 255, 0.15);
@@ -525,7 +498,6 @@
   @media (max-width: 768px) {
     padding: 0.75rem 1.5rem;
     font-size: 0.875rem;
-    margin-bottom: 2rem;
   }
 }
 
