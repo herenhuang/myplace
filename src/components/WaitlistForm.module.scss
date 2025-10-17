@@ -1,8 +1,8 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  max-width: 500px;
+  gap: 1.25rem;
+  max-width: 450px;
   margin: 0 auto;
   width: 100%;
   padding: 2.5rem;
@@ -14,7 +14,7 @@
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.08),
+    -8px 24px 48px 0 rgba(0, 0, 0, 0.1),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
   
   @media (max-width: 768px) {
@@ -25,18 +25,30 @@
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 48px;
+}
+
+.formTitle {
+  font-family: var(--font-instrument-serif);
+  font-size: 40px;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -2px;
+  color: #29282d;
+  margin: 0;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .input,
 .textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: 12px 20px 14px 20px;
   font-size: 18px;
   font-weight: 500;
   letter-spacing: -0.3px;
   border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
+  border-radius: 60px;
   outline: none;
   transition: all 0.3s ease;
   font-family: inherit;
@@ -46,7 +58,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 
-    0 2px 8px 0 rgba(0, 0, 0, 0.05),
+    -4px 8px 24px 0 rgba(0, 0, 0, 0.08),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
 
   &::placeholder {
@@ -59,11 +71,9 @@
   }
 
   &:focus {
-    border: 1px solid rgba(255, 69, 0, 0.4);
     background: rgba(255, 255, 255, 0.7);
     box-shadow: 
-      0 4px 12px 0 rgba(255, 69, 0, 0.1),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+      -4px 8px 24px rgba(255, 69, 0, 0.2),
   }
 
   &:disabled {
@@ -72,16 +82,11 @@
   }
 }
 
-.textarea {
-  resize: vertical;
-  min-height: 100px;
-  line-height: 1.5;
-}
-
 .button {
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
-  font-weight: 600;
+  padding: 12px 20px 14px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
   color: white;
   background: linear-gradient(135deg, #ff4500 0%, #ff6b35 100%);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -89,7 +94,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 
-    0 4px 20px rgba(255, 69, 0, 0.25),
+    -4px 8px 24px rgba(255, 69, 0, 0.2),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
@@ -124,16 +129,11 @@
 }
 
 .successMessage {
-  padding: 1rem;
-  background: rgba(212, 237, 218, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #155724;
-  border: 1px solid rgba(195, 230, 203, 0.8);
-  border-radius: 12px;
+  color: #059c58;
+  border-radius: 40px;
   text-align: center;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(21, 87, 36, 0.1);
+  font-weight: 600;
+  letter-spacing: -0.3px;
 }
 
 .errorMessage {

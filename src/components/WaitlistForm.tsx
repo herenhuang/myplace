@@ -1,18 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import WaitlistModal from './WaitlistModal';
 import styles from './WaitlistForm.module.scss';
+
+interface BubbleData {
+  bubblesPopped: number;
+  timeElapsed: number;
+  completed: boolean;
+}
+
+// Generate a unique session ID
+const generateSessionId = () => {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  // Fallback for browsers that don't support crypto.randomUUID
+  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+};
 
 export default function WaitlistForm() {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [recordId, setRecordId] = useState<string>('');
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  // Generate session ID on mount
+  useEffect(() => {
+    // Check if we already have a session ID in sessionStorage
+    const existingSessionId = sessionStorage.getItem('waitlist_session_id');
+    if (existingSessionId) {
+      setRecordId(existingSessionId);
+    }
+  }, []);
+
+  const handleOpenModal = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!email) return;
+
     setIsSubmitting(true);
     setStatus('idle');
     setErrorMessage('');
@@ -20,34 +48,35 @@ export default function WaitlistForm() {
     try {
       const supabase = createClient();
 
-      // Format the data as JSON with question/answer structure
-      const data = {
-        question: message || null
-      };
-
-      // Insert into signups table
-      const { error } = await supabase
+      // Create initial entry with email
+      const { data: insertedData, error } = await supabase
         .from('signups')
         .insert([
           {
             email,
-            data
+            data: null
           }
-        ]);
+        ])
+        .select('id')
+        .single();
 
       if (error) {
         throw error;
       }
 
-      // Success
-      setStatus('success');
-      setEmail('');
-      setMessage('');
+      // Store the record ID for later update
+      if (insertedData?.id) {
+        setRecordId(insertedData.id);
+        // Store in sessionStorage as backup
+        sessionStorage.setItem('waitlist_session_id', insertedData.id);
+      }
+
+      // Open modal after successful entry creation
+      setIsModalOpen(true);
     } catch (error: any) {
-      console.error('Error submitting form:', error);
+      console.error('Error creating signup entry:', error);
       setStatus('error');
       
-      // Handle specific error messages
       if (error.code === '23505') {
         setErrorMessage('This email is already on the waitlist.');
       } else {
@@ -58,51 +87,105 @@ export default function WaitlistForm() {
     }
   };
 
+  const handleModalSubmit = async (message: string, bubbleData: BubbleData) => {
+    if (!recordId) {
+      setErrorMessage('Session expired. Please try again.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setStatus('idle');
+    setErrorMessage('');
+
+    try {
+      const supabase = createClient();
+
+      // Format the data as JSON with question/answer and bubble data
+      const data = {
+        question: message || null,
+        bubbleData: {
+          bubblesPopped: bubbleData.bubblesPopped,
+          timeElapsed: bubbleData.timeElapsed,
+          completed: bubbleData.completed,
+        }
+      };
+
+      // Update existing record by ID with bubble data
+      const { error } = await supabase
+        .from('signups')
+        .update({ data })
+        .eq('id', recordId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Success - clear session storage
+      sessionStorage.removeItem('waitlist_session_id');
+      setStatus('success');
+      setEmail('');
+      setRecordId('');
+      setIsModalOpen(false);
+    } catch (error: any) {
+      console.error('Error updating signup:', error);
+      setStatus('error');
+      
+      setErrorMessage(error.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    if (!isSubmitting) {
+      setIsModalOpen(false);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.formGroup}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          required
-          disabled={isSubmitting}
-          className={styles.input}
-        />
-      </div>
-
-      <div className={styles.formGroup}>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Anything you want to tell us?"
-          disabled={isSubmitting}
-          className={styles.textarea}
-          rows={4}
-        />
-      </div>
-
-      <button 
-        type="submit" 
-        disabled={isSubmitting}
-        className={styles.button}
-      >
-        {isSubmitting ? 'Joining...' : 'Join Waitlist'}
-      </button>
-
-      {status === 'success' && (
-        <div className={styles.successMessage}>
-          Thanks for joining! We'll be in touch soon.
+    <>
+      <form onSubmit={handleOpenModal} className={styles.form}>
+        <h2 className={styles.formTitle}>Join the waitlist</h2>
+        <div className={styles.formGroup}>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            required
+            disabled={isSubmitting}
+            className={styles.input}
+          />
         </div>
-      )}
 
-      {status === 'error' && (
-        <div className={styles.errorMessage}>
-          {errorMessage}
-        </div>
-      )}
-    </form>
+        <button 
+          type="submit" 
+          disabled={isSubmitting || !email}
+          className={styles.button}
+        >
+          {isSubmitting ? 'Loading...' : 'Continue →'}
+        </button>
+
+        {status === 'success' && (
+          <div className={styles.successMessage}>
+            Thanks for joining! We'll be in touch soon.
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div className={styles.errorMessage}>
+            {errorMessage}
+          </div>
+        )}
+      </form>
+
+      <WaitlistModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleModalSubmit}
+        isSubmitting={isSubmitting}
+      />
+    </>
   );
 }
 
