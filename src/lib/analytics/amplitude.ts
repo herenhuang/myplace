@@ -6,6 +6,42 @@ const AMPLITUDE_API_KEY = '97ca36cc0d37fe328333ce6f930a71e3';
 let isInitialized = false;
 
 /**
+ * Detects if the page is loaded in an iframe
+ */
+function isInIframe(): boolean {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    // If we get a security error, we're definitely in an iframe from another domain
+    return true;
+  }
+}
+
+/**
+ * Checks if the page has the embed parameter
+ */
+function isEmbedMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.get('embed') === 'true';
+}
+
+/**
+ * Gets the embedding context metadata
+ */
+function getEmbedContext(): Record<string, any> {
+  const inIframe = isInIframe();
+  const embedParam = isEmbedMode();
+  
+  return {
+    is_embedded: inIframe || embedParam,
+    is_iframe: inIframe,
+    embed_param: embedParam,
+    referrer: typeof document !== 'undefined' ? document.referrer : '',
+  };
+}
+
+/**
  * Initialize Amplitude with autocapture and session replay
  * Should be called once when the app loads
  */
@@ -41,10 +77,19 @@ export function initializeAmplitude() {
 
 /**
  * Track a custom event
+ * Automatically includes embed context to distinguish iframe vs direct page views
  */
 export function trackEvent(eventName: string, eventProperties?: Record<string, any>) {
   try {
-    amplitude.track(eventName, eventProperties);
+    const embedContext = getEmbedContext();
+    
+    // Merge embed context with event properties
+    const enrichedProperties = {
+      ...embedContext,
+      ...eventProperties,
+    };
+    
+    amplitude.track(eventName, enrichedProperties);
   } catch (error) {
     console.error(`Failed to track event ${eventName}:`, error);
   }
@@ -78,11 +123,15 @@ export function setUserId(userId: string | undefined) {
 
 /**
  * Track page view (auto-tracked by default, but can be called manually)
+ * Automatically includes embed context to distinguish iframe vs direct page views
  */
 export function trackPageView(pageName?: string, properties?: Record<string, any>) {
   try {
+    const embedContext = getEmbedContext();
+    
     amplitude.track('Page View', {
       page_name: pageName,
+      ...embedContext,
       ...properties,
     });
   } catch (error) {

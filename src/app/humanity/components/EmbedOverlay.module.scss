@@ -1,0 +1,112 @@
+.embedOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.embedBanner {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 146, 60, 0.95) 100%);
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.embedContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.embedIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.embedText {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.025em;
+}
+
+.embedLink {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: white;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+  }
+}
+
+.embedClose {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .embedBanner {
+    padding: 10px 12px;
+  }
+  
+  .embedText {
+    font-size: 12px;
+  }
+  
+  .embedLink {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+  
+  .embedClose {
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
+  }
+}
+
