@@ -7,10 +7,18 @@ import Link from 'next/link';
 import styles from './Manifesto.module.scss';
 import WaitlistForm from '@/components/WaitlistForm';
 import CanvasBackground from '@/components/CanvasBackground';
+import ChatSideCard from '@/components/ChatSideCard';
 
-// Helper function to generate random offset
-const getRandomOffset = (min = -40, max = 40) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+// Helper to generate deterministic offset based on a string seed (title / side)
+const getSeededOffset = (seed: string, min: number, max: number) => {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const charCode = seed.charCodeAt(i);
+    hash = (hash << 5) - hash + charCode;
+    hash |= 0; // Convert to 32-bit int
+  }
+  const range = max - min + 1;
+  return min + (Math.abs(hash) % range);
 };
 
 const ManifestoSection: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => {
@@ -38,8 +46,9 @@ const SideCard: React.FC<{
   gradient: string;
   delay?: number;
 }> = ({ side, title, image, gradient, delay = 0 }) => {
-  const xOffset = useMemo(() => getRandomOffset(-50, 50), []);
-  const rotateOffset = useMemo(() => getRandomOffset(-2, 2), []);
+  // Stable offsets so cards always appear at the same place on every refresh
+  const xOffset = useMemo(() => getSeededOffset(`${title}-${side}`, -40, 40), [title, side]);
+  const rotateOffset = useMemo(() => getSeededOffset(`${title}-rot`, -2, 2), [title, side]);
   
   return (
     <motion.div
@@ -52,9 +61,10 @@ const SideCard: React.FC<{
         delay: delay 
       }}
       className={`${styles.sideCard} ${side === 'left' ? styles.sideCardLeft : styles.sideCardRight}`}
-      style={{ 
-        [side === 'left' ? 'left' : 'right']: `calc(${side === 'left' ? '-350px' : '-350px'} + ${xOffset}px)`,
-        rotate: `${rotateOffset}deg`
+      style={{
+        // Base offset is -280 so a part of the card peeks into view; xOffset fine-tunes position
+        [side === 'left' ? 'left' : 'right']: `calc(-280px + ${xOffset}px)`,
+        rotate: `${rotateOffset}deg`,
       }}
     >
       <div className={styles.sideCardInner}>
@@ -75,7 +85,6 @@ const SideCard: React.FC<{
 export default function Manifesto() {
   return (
     <div className={styles.container}>
-      <CanvasBackground />
       {/* Hero Section */}
       <section className={styles.hero}>
         <motion.div
@@ -97,7 +106,7 @@ export default function Manifesto() {
               delay: 0.4
             }}
           >
-            <Image src='/elevate/blobbert.png' alt='MyPlace Logo' width={140} height={140} className={styles.heroLogo} />
+            <Image src='/blobs.png' alt='MyPlace Logo' width={1000} height={140} className={styles.heroLogo} />
           </motion.div>
           <motion.h1 
             className={styles.title}
@@ -109,7 +118,7 @@ export default function Manifesto() {
               delay: 0.6
             }}
           >
-              Capture your unique <span className={styles.highlight}>human</span> edge
+              Discover your <span className={styles.highlight}>human</span> edge, through play.
           </motion.h1>
         </motion.div>
       </section>
@@ -159,17 +168,34 @@ export default function Manifesto() {
             </p>
           </ManifestoSection>
 
-          <SideCard 
+          <ChatSideCard
             side="right"
+            delay={0.3}
+            npcName="Sam"
+            npcAvatar="🗣️"
+            messages={[
+              { sender: 'npc', text: "What would you do?" },
+              { sender: 'user', text: "I'd probably talk to them first..." },
+              { sender: 'npc', text: "Interesting. Why that approach?" },
+              { sender: 'user', text: "Communication usually helps" },
+            ]}
+          />
+
+          <SideCard 
+            side="left"
             title="Bubble Popper"
             image="/landing/sim-thumbnail-bubble.png"
             gradient="from-purple-400 to-blue-400"
-            delay={0.3}
+            delay={0.2}
           />
 
           <ManifestoSection>
             <p className={styles.paragraph}>
-              Now that AI can mimic our words and even fake our work, the one thing it can&apos;t copy is our judgment, our character, the way we move through the world. That&apos;s ours 🧩 to keep. And it&apos;s worth sharing with each other, and with the tools we rely on.
+              Now that AI can mimic our words and even fake our work, 
+              the one thing it can&apos;t copy is our <span className={styles.highlight}>judgment</span>, 
+              our <span className={styles.highlight}>character</span>, 
+              the way <span className={styles.highlight}>move we through the world </span>. 
+              That&apos;s ours 🧩 to keep. And it&apos;s worth sharing with each other, and with the tools we rely on.
             </p>
           </ManifestoSection>
 
@@ -204,6 +230,15 @@ export default function Manifesto() {
                 className={styles.footerLogoImage}
               />
             </Link>
+          </div>
+
+          <div className={styles.footerText}>  
+            <p>
+              MyPlace is a platform for discovering your human edge, through play.
+            </p>
+            <p>
+              &copy; 2025 Orange. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

@@ -73,8 +73,8 @@
 }
 
 .heroLogo {
-  width: 140px;
   height: 140px;
+  height: auto;
   margin: 0 auto;
   object-fit: contain;
 
@@ -87,11 +87,11 @@
 
 .title {
   font-family: var(--font-instrument-serif);
-  font-size: 120px;
+  font-size: 100px;
   font-weight: 400;
-  letter-spacing: -5.5px;
-  line-height: .9;
-  margin: 0;
+  letter-spacing: -5px;
+  line-height: .8;
+  margin: 24px;
   padding-bottom: 16px;
   background: linear-gradient(135deg, black 50%, #6f82a2 100%);
   -webkit-background-clip: text;
@@ -400,6 +400,13 @@
   text-align: left;
   width: 720px;
   max-width: 100%;
+
+  .highlight{
+    background: rgba(yellow, 0.25);
+    font-weight: 700;
+    padding: 0 4px;
+    border-radius: 4px;
+  }
 
   @media (max-width: 768px) {
     font-size: clamp(1.25rem, 5vw, 1.75rem);
