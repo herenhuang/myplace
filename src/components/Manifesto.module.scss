@@ -2,8 +2,6 @@
 
 .container {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #ffffff 20%, rgb(255, 216, 194) 50%, #000000 90%);
-  background: white;
   position: relative;
   overflow-x: hidden;
 }
@@ -44,7 +42,7 @@
 }
 
 .hero {
-  min-height: 100vh;
+  min-height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,7 +75,7 @@
 .heroLogo {
   width: 140px;
   height: 140px;
-  margin: 0 auto 2rem;
+  margin: 0 auto;
   object-fit: contain;
 
   @media (max-width: 768px) {
@@ -89,20 +87,24 @@
 
 .title {
   font-family: var(--font-instrument-serif);
-  font-size: 100px;
+  font-size: 120px;
   font-weight: 400;
-  font-style: italic;
-  letter-spacing: -0.02em;
-  line-height: 1;
+  letter-spacing: -5.5px;
+  line-height: .9;
   margin: 0;
   padding-bottom: 16px;
-  background: linear-gradient(135deg, #1a1919 0%, #4a5568 100%);
+  background: linear-gradient(135deg, black 50%, #6f82a2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 
+  span{
+    font-style: italic;
+  }
+
   @media (max-width: 768px) {
-    font-size: clamp(3rem, 15vw, 6rem);
+    font-size: 72px;
+    letter-spacing: -4.5px;
   }
 }
 
@@ -121,7 +123,6 @@
 .main {
   max-width: 900px;
   margin: 0 auto;
-  padding: 8rem 2rem 4rem;
   position: relative;
   z-index: 1;
 
@@ -390,7 +391,7 @@
 
 .paragraph {
   font-family: 'DM Sans', serif;
-  font-size: 24px;
+  font-size: 26px;
   line-height: 1.4;
   color: #1a1919;
   font-weight: 550;
@@ -441,21 +442,8 @@
 }
 
 .footer {
-  background: linear-gradient(to bottom, #1a1919, #06060e);
   padding: 4rem 2rem 3rem;
   position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(80, 80, 80, 0.3) 1px, transparent 1px);
-    background-size: 20px 20px;
-    pointer-events: none;
-  }
 
   @media (max-width: 768px) {
     padding: 3rem 1.5rem 2rem;
@@ -502,7 +490,7 @@
 }
 
 .footerLogo {
-  margin-top: 3rem;
+  margin: 40px;
 
   a {
     display: inline-block;
@@ -519,9 +507,10 @@
 }
 
 .footerLogoImage {
-  width: 160px;
+  width: 240px;
   height: auto;
   object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(orangered, 0.25));
 
   @media (max-width: 768px) {
     width: 120px;

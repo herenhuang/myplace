@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './Manifesto.module.scss';
 import WaitlistForm from '@/components/WaitlistForm';
+import CanvasBackground from '@/components/CanvasBackground';
 
 // Helper function to generate random offset
 const getRandomOffset = (min = -40, max = 40) => {
@@ -74,6 +75,7 @@ const SideCard: React.FC<{
 export default function Manifesto() {
   return (
     <div className={styles.container}>
+      <CanvasBackground />
       {/* Hero Section */}
       <section className={styles.hero}>
         <motion.div
@@ -107,7 +109,7 @@ export default function Manifesto() {
               delay: 0.6
             }}
           >
-            Welcome to Myplace.
+              Capture your unique <span className={styles.highlight}>human</span> edge
           </motion.h1>
         </motion.div>
       </section>
@@ -192,21 +194,10 @@ export default function Manifesto() {
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <div className={styles.footerContact}>
-            <a 
-              href="https://tally.so/r/mR91yP" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className={styles.contactLink}
-            >
-              Contact
-            </a>
-          </div>
-          
           <div className={styles.footerLogo}>
             <Link href="/">
               <Image 
-                src='/MyplaceWhite.png' 
+                src='/myplace_text.png' 
                 alt='MyPlace Logo' 
                 width={500}
                 height={300}
