@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'motion/react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import Image from 'next/image';
 import styles from './ChatSideCard.module.scss';
 
-// Deterministic offset helper (same as Manifesto)
+// Deterministic offset helper
 const getSeededOffset = (seed: string, min: number, max: number) => {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
@@ -22,6 +23,8 @@ interface ChatSideCardProps {
   npcName?: string;
   npcAvatar?: string;
   messages?: Array<{ sender: 'user' | 'npc'; text: string }>;
+  isInline?: boolean;
+  associatedSectionId?: string;
 }
 
 const ChatSideCard: React.FC<ChatSideCardProps> = ({
@@ -34,28 +37,32 @@ const ChatSideCard: React.FC<ChatSideCardProps> = ({
     { sender: 'user', text: "Pretty good! Just checking this out" },
     { sender: 'npc', text: "Nice! What do you think so far?" },
   ],
+  isInline = false,
+  associatedSectionId,
 }) => {
+  const [topOffset, setTopOffset] = useState(0);
   const xOffset = useMemo(() => getSeededOffset(`${npcName}-${side}`, -40, 40), [npcName, side]);
   const rotateOffset = useMemo(() => getSeededOffset(`${npcName}-rot`, -2, 2), [npcName, side]);
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: side === 'left' ? -200 : 200, scale: 0.8 }}
-      whileInView={{ opacity: 1, x: 0, scale: 1 }}
-      viewport={{ once: false, margin: "0px 0px -200px 0px" }}
-      transition={{
-        duration: 1,
-        ease: [0.25, 0.1, 0.25, 1],
-        delay: delay,
-      }}
-      className={`${styles.chatSideCard} ${side === 'left' ? styles.chatSideCardLeft : styles.chatSideCardRight}`}
-      style={{
-        [side === 'left' ? 'left' : 'right']: `calc(-280px + ${xOffset}px)`,
-        rotate: `${rotateOffset}deg`,
-      }}
-    >
+  useEffect(() => {
+    if (associatedSectionId) {
+      const section = document.getElementById(associatedSectionId);
+      if (section) {
+        setTopOffset(section.offsetTop);
+      }
+    }
+  }, [associatedSectionId]);
+
+  const phoneContent = (
+    <div className={styles.chatContainer}>
+      <Image 
+        src="/iphone-14.png"
+        alt="iPhone frame"
+        layout="fill"
+        className={styles.phoneFrame}
+      />
       <div className={styles.chatPhone}>
-        {/* Chat Header - iMessage style */}
+
         <div className={styles.chatHeader}>
           <button className={styles.chatHeaderBack} aria-label="Back">
             <svg
@@ -93,8 +100,6 @@ const ChatSideCard: React.FC<ChatSideCardProps> = ({
             </svg>
           </button>
         </div>
-
-        {/* Chat Window */}
         <div className={styles.chatWindow}>
           {messages.map((message, index) => (
             <div
@@ -115,8 +120,6 @@ const ChatSideCard: React.FC<ChatSideCardProps> = ({
             <div className={styles.typingDot}></div>
           </div>
         </div>
-
-        {/* Chat Input */}
         <div className={styles.chatInputWrapper}>
           <div className={styles.chatInput}>
             <span className={styles.chatInputPlaceholder}>iMessage</span>
@@ -128,9 +131,43 @@ const ChatSideCard: React.FC<ChatSideCardProps> = ({
           </button>
         </div>
       </div>
+    </div>
+  );
+
+  if (isInline) {
+    return (
+      <motion.div
+        className={`${styles.chatSideCard} ${styles.isInline}`}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay }}
+      >
+        {phoneContent}
+      </motion.div>
+    );
+  }
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: side === 'left' ? -200 : 200, scale: 0.8 }}
+      whileInView={{ opacity: 1, x: 0, scale: 1 }}
+      viewport={{ once: true, margin: "0px 0px -200px 0px" }}
+      transition={{
+        duration: 1,
+        ease: [0.25, 0.1, 0.25, 1],
+        delay: delay,
+      }}
+      className={`${styles.chatSideCard} ${side === 'left' ? styles.chatSideCardLeft : styles.chatSideCardRight}`}
+      style={{
+        [side === 'left' ? 'left' : 'right']: `calc(-280px + ${xOffset}px)`,
+        top: `${topOffset}px`,
+        rotate: `${rotateOffset}deg`,
+      }}
+    >
+      {phoneContent}
     </motion.div>
   );
 };
 
 export default ChatSideCard;
-

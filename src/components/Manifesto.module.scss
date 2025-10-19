@@ -74,12 +74,10 @@
 
 .heroLogo {
   height: 140px;
-  height: auto;
   margin: 0 auto;
   object-fit: contain;
 
   @media (max-width: 768px) {
-    width: 100px;
     height: 100px;
     margin-bottom: 1.5rem;
   }
@@ -150,13 +148,23 @@
 
 .sideCard {
   position: absolute;
-  width: 280px;
-  height: 320px;
-  will-change: opacity, transform;
-  z-index: 0;
+  top: 0;
+  width: 240px;
+  height: 240px;
+  z-index: 1;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 
-  @media (max-width: 1400px) {
+  @media (max-width: 1500px) {
     display: none;
+  }
+
+  /* For inline mobile version */
+  &.isInline {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    height: auto;
   }
 }
 
@@ -213,6 +221,7 @@
 }
 
 .sideCardTitle {
+  display: none;
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
@@ -391,7 +400,7 @@
 
 .paragraph {
   font-family: 'DM Sans', serif;
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1.4;
   color: #1a1919;
   font-weight: 550;
@@ -410,7 +419,8 @@
 
   @media (max-width: 768px) {
     font-size: clamp(1.25rem, 5vw, 1.75rem);
-    line-height: 1.6;
+    line-height: 1.4;
+    margin: 120px 0;
   }
 }
 
@@ -449,7 +459,7 @@
 }
 
 .footer {
-  padding: 4rem 2rem 3rem;
+  padding-bottom: 48px;
   position: relative;
 
   @media (max-width: 768px) {
@@ -472,6 +482,16 @@
   @media (max-width: 768px) {
     margin-bottom: 2rem;
   }
+}
+
+.footerText {
+  font-family: var(--font-instrument-serif);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #1a1919;
+  font-weight: 550;
+  letter-spacing: -0.3px;
 }
 
 .contactLink {
@@ -497,7 +517,7 @@
 }
 
 .footerLogo {
-  margin: 40px;
+  margin-bottom: 24px;
 
   a {
     display: inline-block;
@@ -514,13 +534,53 @@
 }
 
 .footerLogoImage {
-  width: 240px;
+  width: 160px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 12px rgba(orangered, 0.25));
 
   @media (max-width: 768px) {
     width: 120px;
   }
+}
+
+/* New responsive styles */
+.desktopSideCards {
+  display: block;
+}
+
+.mobileCardContainer {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sideCard, .sideCardLeft, .sideCardRight {
+    pointer-events: none;
+  }
+  
+  .desktopSideCards {
+    display: none;
+  }
+
+  .mobileCardContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    margin: 3rem 0;
+    width: 100%;
+  }
+}
+
+.aiLogoCircle {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
