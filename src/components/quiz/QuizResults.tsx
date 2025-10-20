@@ -26,21 +26,21 @@ interface AnalyticsData {
 // Parse markdown content into sections
 function parseSections(markdown: string): string[] {
   if (!markdown) return ['']
-  
+
   // Try multiple regex patterns to handle different formatting
   const patterns = [
     /<section>\s*([\s\S]*?)\s*<\/section>/gi,  // Case insensitive with optional whitespace
     /\<section\>([\s\S]*?)\<\/section\>/g,      // Standard pattern
     /&lt;section&gt;([\s\S]*?)&lt;\/section&gt;/gi  // HTML encoded tags
   ]
-  
+
   let sections: string[] = []
-  
+
   // Try each pattern
   for (const pattern of patterns) {
     const matches = markdown.matchAll(pattern)
     sections = Array.from(matches, match => match[1].trim()).filter(s => s.length > 0)
-    
+
     if (sections.length > 0) {
       console.log(`✅ Parsed ${sections.length} sections using pattern:`, pattern)
       break
@@ -59,6 +59,9 @@ function parseSections(markdown: string): string[] {
       console.log('📄 Using entire content as one section')
     }
   }
+
+  // Filter out Personality Predictions section - we render it separately with custom UI
+  sections = sections.filter(section => !section.match(/##\s*Personality Predictions/i))
 
   return sections
 }
@@ -506,6 +509,13 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           {sections[3] && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
               <ReactMarkdown>{sections[3]}</ReactMarkdown>
+            </div>
+          )}
+
+          {/* Bottom Line section - always last */}
+          {sections[8] && (
+            <div className={styles.explanationSection} style={{ animationDelay: '0.4s' }}>
+              <ReactMarkdown>{sections[8]}</ReactMarkdown>
             </div>
           )}
         </>

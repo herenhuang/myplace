@@ -503,7 +503,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
         trackComplete({
           quiz_type: config.type,
           result_id: topPersonalityId,
-          result_name: topPersonality?.name
+          result_name: matchedPersonality.name
         })
 
         setResult(finalResult)
