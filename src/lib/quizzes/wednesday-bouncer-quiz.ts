@@ -24,7 +24,7 @@ export const wednesdayBouncerQuiz: QuizConfig = {
   ],
 
   personalizationForm: {
-    instructions: 'Email please.',
+    instructions: 'I\'m Bouncer Blob, here to figure out whether you should actually get into Helen\'s whatever the heck it is.',
     fields: [
       {
         id: 'email',
@@ -35,6 +35,22 @@ export const wednesdayBouncerQuiz: QuizConfig = {
       }
     ]
   },
+
+  // Custom branding for Wednesday quiz
+  customImages: {
+    analyzingScreen: '/bouncerblob.png',
+    questionBubble: '/bouncerblob2.png'
+  },
+
+  // Email validation against Luma guest list
+  emailValidation: {
+    enabled: true,
+    endpoint: '/api/luma/check-email',
+    errorMessage: 'Hmm, I don\'t see this email on the Luma list. Can you double-check?'
+  },
+
+  // Use approval-rejection results layout
+  resultsLayout: 'approval-rejection',
 
   // Minimal story setup needed for adaptive narrative to work (not displayed as separate screen)
   storySetup: {

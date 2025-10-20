@@ -12,14 +12,15 @@ const defaultMessages = [
 
 interface AnalyzingScreenProps {
   customMessages?: string[]
+  customImage?: string // Custom image from quiz config
 }
 
-export default function AnalyzingScreen({ customMessages, quizId }: AnalyzingScreenProps & { quizId?: string } = {}) {
+export default function AnalyzingScreen({ customMessages, customImage }: AnalyzingScreenProps = {}) {
   const messages = customMessages || defaultMessages
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fadeClass, setFadeClass] = useState(styles.fadeIn)
 
-  const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
+  const imageSrc = customImage || "/elevate/blobbert.png"
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,7 +37,7 @@ export default function AnalyzingScreen({ customMessages, quizId }: AnalyzingScr
   return (
     <div className={styles.analyzingScreen}>
       <Image
-        src={isWednesdayBouncer ? "/bouncerblob.png" : "/elevate/blobbert.png"}
+        src={imageSrc}
         alt="Analyzing"
         width={100}
         height={100}

@@ -303,8 +303,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
   if (!showExplanation) {
     // Card view
-    // Special handling for Wednesday bouncer quiz
-    const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
+    const isApprovalRejectionLayout = config.resultsLayout === 'approval-rejection'
     const decision = (result.wordMatrixResult as any)?.decision || 'APPROVED' // Default to approved if missing
     const isApproved = decision === 'APPROVED'
     const likelihood = (result.wordMatrixResult as any)?.likelihood || null
@@ -313,8 +312,8 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
       <div className={styles.textContainer}>
         <div className={styles.resultsScreen}>
           <div ref={cardRef} className={styles.resultCard} data-share-root="result-card">
-            {isWednesdayBouncer ? (
-              // Wednesday Bouncer: Show verdict prominently
+            {isApprovalRejectionLayout ? (
+              // Approval/Rejection layout: Show verdict prominently
               <>
                 <h1 className={styles.resultName} style={{ fontSize: isApproved ? '28px' : '24px', marginBottom: '16px', color: '#1f2937' }}>
                   {isApproved ? '✅ YOU\'RE IN' : '🤔 NOT QUITE THE VIBE'}
@@ -372,7 +371,7 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
           )}
 
           <div className={styles.actionButtons}>
-            {isWednesdayBouncer && !isApproved ? (
+            {isApprovalRejectionLayout && !isApproved ? (
               // Rejected: Show "See Why" button to view explanation
               result.explanation && (
                 <button
@@ -393,13 +392,13 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                   onClick={() => setShowExplanation(true)}
                 >
                   <h2>
-                    {isWednesdayBouncer && isApproved ? 'Get Details →' : 'See Why →'}
+                    {isApprovalRejectionLayout && isApproved ? 'Get Details →' : 'See Why →'}
                   </h2>
                 </button>
               )
             )}
 
-            {!(isWednesdayBouncer && !isApproved) && (
+            {!(isApprovalRejectionLayout && !isApproved) && (
               <button
                 className={styles.actionButtonAlt}
                 onClick={handleShare}
@@ -516,13 +515,13 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     return null
   }
 
-  // Special handling for approved Wednesday bouncer - show event details instead of explanation
-  const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
+  // Special handling for approval-rejection layout with approved status
+  const isApprovalRejectionLayout = config.resultsLayout === 'approval-rejection'
   const decision = (result.wordMatrixResult as any)?.decision || 'APPROVED'
   const isApproved = decision === 'APPROVED'
   const likelihood = (result.wordMatrixResult as any)?.likelihood || null
 
-  if (isWednesdayBouncer && isApproved) {
+  if (isApprovalRejectionLayout && isApproved) {
     return (
       <div className={styles.textContainer}>
         <div className={styles.explanationContainer} style={{ paddingBottom: '40px' }}>
@@ -648,8 +647,8 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     )
   }
 
-  // Special handling for rejected Wednesday bouncer - show simple explanation + try again
-  if (isWednesdayBouncer && !isApproved) {
+  // Special handling for approval-rejection layout with rejected status
+  if (isApprovalRejectionLayout && !isApproved) {
     return (
       <div className={styles.textContainer}>
         <div className={styles.explanationContainer} style={{ paddingBottom: '40px' }}>
