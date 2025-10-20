@@ -9,15 +9,20 @@ interface QuizPersonalizationProps {
   form: PersonalizationForm
   onSubmit: (data: Record<string, string>) => void
   isLoading: boolean
-  quizId?: string
+  emailValidation?: {
+    enabled: boolean
+    endpoint: string
+    errorMessage?: string
+  }
+  customImage?: string
+  customTitle?: string
+  customButtonText?: string
 }
 
-export default function QuizPersonalization({ form, onSubmit, isLoading, quizId }: QuizPersonalizationProps) {
+export default function QuizPersonalization({ form, onSubmit, isLoading, emailValidation, customImage, customTitle, customButtonText }: QuizPersonalizationProps) {
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
-
-  const isWednesdayBouncer = quizId === 'wednesday-bouncer-quiz'
 
   const handleChange = (fieldId: string, value: string) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }))
@@ -47,11 +52,11 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
       return
     }
 
-    // For Wednesday bouncer quiz, check email against Luma database
-    if (isWednesdayBouncer && formData.email) {
+    // Check email validation if configured
+    if (emailValidation?.enabled && formData.email) {
       setIsCheckingEmail(true)
       try {
-        const response = await fetch('/api/luma/check-email', {
+        const response = await fetch(emailValidation.endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: formData.email })
@@ -60,16 +65,17 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
         const data = await response.json()
 
         if (data.success && data.found) {
-          // Email found - add the name from Luma
-          const enrichedData = { ...formData, lumaName: data.name }
+          // Email found - add any extra data from response (e.g., name)
+          const enrichedData = data.name ? { ...formData, lumaName: data.name } : formData
           onSubmit(enrichedData)
         } else {
           // Email not found
-          setErrors({ email: 'Hmm, I don\'t see this email on the Luma list. Can you double-check?' })
+          const errorMessage = emailValidation.errorMessage || 'Email not found. Please check and try again.'
+          setErrors({ email: errorMessage })
           setIsCheckingEmail(false)
         }
       } catch (error) {
-        console.error('Error checking email:', error)
+        console.error('Error validating email:', error)
         // On error, allow them through anyway
         onSubmit(formData)
       }
@@ -81,20 +87,20 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
   return (
     <div className={styles.personalizationContainer}>
       <div className={styles.personalizationContent}>
-        {isWednesdayBouncer && (
+        {customImage && form.instructions && (
           <div className={styles.bouncerIntro}>
-            <Image src="/bouncerblob2.png" alt="Bouncer Blob" width={120} height={120} />
+            <Image src={customImage} alt="Quiz Character" width={120} height={120} />
             <p className={styles.bouncerIntroText}>
-              I&apos;m Bouncer Blob, here to figure out whether you should actually get into Helen&apos;s whatever the heck it is.
+              {form.instructions}
             </p>
           </div>
         )}
 
         <h2 className={styles.personalizationTitle}>
-          {isWednesdayBouncer ? 'Email please.' : "Let's Personalize Your Story"}
+          {customTitle || "Let's Personalize Your Story"}
         </h2>
 
-        {form.instructions && !isWednesdayBouncer && (
+        {form.instructions && !customImage && (
           <p className={styles.personalizationInstructions}>{form.instructions}</p>
         )}
 
@@ -147,7 +153,7 @@ export default function QuizPersonalization({ form, onSubmit, isLoading, quizId 
           onClick={handleSubmit}
           disabled={isLoading || isCheckingEmail}
         >
-          {isCheckingEmail ? 'Checking...' : isLoading ? 'Starting...' : 'Am I on the list? →'}
+          {isCheckingEmail ? 'Checking...' : isLoading ? 'Starting...' : (customButtonText || 'Continue →')}
         </button>
       </div>
     </div>

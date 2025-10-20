@@ -171,6 +171,24 @@ export interface QuizConfig {
   showQuestionComparison?: boolean
   /** Custom analyzing messages to show during result calculation (default: ["Calibrating your answers", "Assessing your behavior", "Analyzing your thoughts"]) */
   analyzingMessages?: string[]
+  /** Custom images for quiz branding/characters */
+  customImages?: {
+    /** Image shown on analyzing/loading screen (default: /elevate/blobbert.png) */
+    analyzingScreen?: string
+    /** Image shown as character bubble in questions (optional) */
+    questionBubble?: string
+  }
+  /** Email validation configuration for personalization forms */
+  emailValidation?: {
+    /** Whether to enable email validation */
+    enabled: boolean
+    /** API endpoint to validate email against */
+    endpoint: string
+    /** Error message to show if email not found */
+    errorMessage?: string
+  }
+  /** Results card layout type (default: 'standard') */
+  resultsLayout?: 'standard' | 'approval-rejection'
 }
 
 export interface QuizResponse {

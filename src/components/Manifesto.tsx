@@ -313,7 +313,7 @@ export default function Manifesto() {
             </p>
           </ManifestoSection>
 
-          <SimCard />
+          <SimCard associatedSectionId="section-simulations" side="right" />
 
           <ManifestoSection>
             <p className={styles.paragraph} style={{ textAlign: 'center' }}>
