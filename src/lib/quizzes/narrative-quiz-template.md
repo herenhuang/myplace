@@ -103,17 +103,75 @@ You're a {{role}} trying to {{goal}}. Through a series of {{interaction_type}}, 
 
 # Questions ✅ REQUIRED
 
+*At least 1 question required. Each question must have a Type.*
+
+## Scene-Setting Before First Real Question
+
+Want to build dramatic tension before the first choice? Use **scene-setting questions** with just a "Continue" button:
+
+```markdown
+## Q1: opening-scene
+**Type:** HARD-CODED
+
+### Narrative:
+You're at your desk when the notification comes through. Alex Chen, the founder you've been tracking for months, just accepted your LinkedIn request. Your heart races.
+
+### Options:
+- **continue** → Q2
+  - "Continue"
+
+---
+
+## Q2: the-message
+**Type:** HARD-CODED
+
+### Narrative:
+Five minutes later: "Hey. Heard you're interested in the round. It's tight but I'm talking to a few folks. Let's see if we're aligned." You have maybe 48 hours before they close allocation.
+
+### Options:
+- **continue** → Q3
+  - "Continue"
+
+---
+
+## Q3: first-real-choice
+**Type:** OPEN-ENDED
+
+### Narrative:
+You decide to respond immediately. What do you write?
+```
+
+**This creates a linear story intro** before the first decision point. Users just click "Continue" through Q1 and Q2 to build tension, then Q3 is their first real answer.
+
+---
+
+## Question Types Explained:
+
+### `OPEN-ENDED`
+User types their own answer in a text box. No pre-written options.
+- **Best for:** Getting genuine, personal responses
+- **Example:** "What's going through your mind right now?"
+
+### `HARD-CODED`
+Multiple choice with 2-4 fixed options. User clicks one.
+- **Best for:** Guiding specific narrative paths or measuring clear choices
+- **Example:** "Do you go to the party?" → "Yes" / "No" / "Maybe later"
+- **Can branch:** Each option can lead to different next questions
+
+### `HYBRID`
+Shows pre-written options AND lets user write their own answer if they want.
+- **Best for:** Flexibility - give options but allow creativity
+- **Example:** Shows 3 response templates + "Or write your own..."
+
 ---
 
 ## Q1: arrival-time
-**Type:** `OPEN-ENDED` *(required - OPEN-ENDED, HARD-CODED, or HYBRID)*
+**Type:** `OPEN-ENDED` *(required - choose OPEN-ENDED, HARD-CODED, or HYBRID)*
 **Dimension:** timing *(optional - internal label for what this tests, not shown to user)*
 **Time Marker:** Day 1, 9:00am *(optional - for narrative continuity, not shown to user)*
 
 ### Narrative:
 Good morning {{name}}! You wake up to a text from {{friendName}}. There's a party tonight at Jordan's place. It starts at 6pm but people will be there until midnight. When are you planning to show up, and why that time?
-
-*Remember: This will be AI-adapted based on previous answers (for Q2+), but Q1 shows exactly as written.*
 
 ---
 
@@ -124,6 +182,8 @@ Good morning {{name}}! You wake up to a text from {{friendName}}. There's a part
 
 ### Narrative:
 You arrive at the party. There are about {{crowd_size}} people scattered around Jordan's apartment. {{friendName}} waves from across the room. What do you do?
+
+*Note: YOU write the full question. For Q2+, AI adds light conversational flavor based on previous answers (e.g., referencing what they said earlier), but your narrative is the foundation. Q1 shows exactly as written since there's no previous context.*
 
 ### Options:
 - **confident** → Q3
@@ -420,6 +480,21 @@ Write as if instructing **the AI about the user** - you're giving analysis instr
 
 This means the AI only analyzes what the **user actually wrote**, not its own embellishments!
 
+### ✍️ How AI Adaptation Works:
+**YOU write the full question every time.** The AI just adds conversational glue.
+
+**Example - What you write for Q3:**
+```
+You get a text from the founder. They want to know more about your background. What do you say?
+```
+
+**What the AI might adapt it to for display:**
+```
+After you mentioned {{previousAnswer}} in your intro, the founder texts: "Tell me more about your experience with {{topic}}." What do you say?
+```
+
+**Key point:** You always write the complete narrative. AI just personalizes the setup slightly based on previous answers. Your question is always the foundation.
+
 ---
 
 ## Question Type Guide:
@@ -436,6 +511,67 @@ This means the AI only analyzes what the **user actually wrote**, not its own em
 - Use `→ Q3` notation to show which question comes next
 - If no branch specified, goes to next question in order
 - Custom inputs can be analyzed for branching too
+
+### Branching Example: Different paths converge later
+
+**Scenario:** Q2 asks "Take the call or text instead?" Both lead to different Q3s, then merge at Q4.
+
+```markdown
+## Q2: call-decision
+**Type:** HARD-CODED
+
+### Narrative:
+The founder's calling. Do you pick up?
+
+### Options:
+- **take-call** → Q3a-phone-conversation
+  - "Pick up the call"
+- **text-instead** → Q3b-text-conversation
+  - "Let it go to voicemail, text back"
+
+---
+
+## Q3a-phone-conversation
+**Type:** OPEN-ENDED
+
+### Narrative:
+You pick up. "Hey! Tell me about your background," they say. What do you tell them?
+
+---
+
+## Q3b-text-conversation
+**Type:** OPEN-ENDED
+
+### Narrative:
+You text: "Sorry, missed your call!" They reply: "No worries. Tell me about your background?" What do you write back?
+
+---
+
+## Q4: investment-thesis
+**Type:** OPEN-ENDED
+
+### Narrative:
+The founder wants to know your investment thesis. What do you tell them?
+
+*Note: Both Q3a and Q3b lead here. AI will adapt framing based on call vs text.*
+```
+
+### Alternative: Same question, AI adapts context
+
+If the question is fundamentally the same (just different medium), you can skip branching:
+
+```markdown
+## Q2: call-decision
+### Options:
+- **take-call** → Q3
+- **text-instead** → Q3
+
+## Q3: background-question
+### Narrative:
+The founder wants to know about your background. What do you tell them?
+
+*AI will adapt: "You pick up..." vs "You text back..." based on Q2.*
+```
 
 ## Dimensions (Optional Metadata):
 Internal labels for what each question tests (e.g., "vulnerability", "conflict-handling").
