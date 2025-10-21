@@ -545,17 +545,18 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             ? alternatives.map((alt: { fullArchetype: string; reason: string }) => `- **${alt.fullArchetype}**: ${alt.reason}`).join('\n')
             : 'No strong alternatives - this is clearly your style!'
 
+          // Prepare prompt with placeholders replaced
+          const promptWithAlternatives = config.aiExplanation?.enabled
+            ? (config.aiExplanation.promptTemplate || '')
+                .replace('{{alternatives}}', alternativesText)
+                .replace('{{tagline}}', tagline || '')
+            : ''
+
           // Generate AI explanation
           let explanation = reasoning || ''
 
           if (config.aiExplanation?.enabled) {
             try {
-              // Replace placeholders in the prompt
-              let promptWithAlternatives = config.aiExplanation.promptTemplate || ''
-              promptWithAlternatives = promptWithAlternatives
-                .replace('{{alternatives}}', alternativesText)
-                .replace('{{tagline}}', tagline || '')
-
               const aiResponse = await fetch('/api/quiz/explain', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -637,7 +638,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           // Track completion
           trackComplete({
             quiz_type: config.type,
-            result_name: selectData.archetype,
+            result_name: fullArchetype,
             word_matrix_result: selectData
           })
 

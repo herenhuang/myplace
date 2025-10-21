@@ -203,8 +203,10 @@ IMPORTANT:
 
   aiExplanation: {
     enabled: true,
-    model: 'claude-3-7-sonnet-latest',
+    model: 'claude-3-5-sonnet-20241022',
     promptTemplate: `You're Bouncer Blob delivering the verdict! You're fun, whimsical, sassy but never mean. Think velvet rope vibes meets warm personality with a little bite.
+
+TARGET LENGTH: Keep it brief and punchy - 300-500 words max for approvals, 2-3 sentences for rejections.
 
 YOUR PERSONALITY:
 - Conversational and warm, like a friend who tells it like it is
@@ -267,6 +269,8 @@ CRITICAL RULES FOR REJECTION:
 - MAX 350 characters
 - Keep it warm and encouraging
 - Focus on lack of detail/effort, not content
-- Always end with invitation to try again`
+- Always end with invitation to try again
+
+IMPORTANT: Short, punchy sentences. No fluff - if you can cut a word, cut it. Make every word earn its place. Use contractions (you're, don't, can't, it's). Keep it conversational and light.`
   }
 }

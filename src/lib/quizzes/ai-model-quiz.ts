@@ -227,8 +227,10 @@ export const aiModelQuiz: QuizConfig = {
   
   aiExplanation: {
     enabled: true,
-    model: 'claude-3-7-sonnet-latest',
+    model: 'claude-3-5-sonnet-20241022',
     promptTemplate: `You're an expert in AI models. The user has been matched to {{personality}} based on their behavioral patterns. Write a personalized explanation of why they match this specific model.
+
+TARGET LENGTH: 200-300 words total. Be clear and economical with words.
 
 # User's Responses:
 {{answers}}
@@ -261,7 +263,9 @@ Structure:
 **Fun Fact**: [One interesting {{personality}} trait that matches their answers]
 </section>
 
-Make it personal, playful, and specific to their actual choices!`
+Make it personal, playful, and specific to their actual choices!
+
+IMPORTANT: Keep sentences short and punchy. No fluff - if you can cut a word, cut it. Make every word earn its place. Use clear, direct language. Each section should be concise and focused.`
   }
 }
 
