@@ -173,8 +173,10 @@ CRITICAL: Do NOT make up names like "Real Crush" or "True Love" or "Strong Feeli
   
   aiExplanation: {
     enabled: true,
-    model: 'claude-3-7-sonnet-latest',
+    model: 'claude-3-5-sonnet-20241022',
     promptTemplate: `You're talking to a friend about their feelings. You get it, you see them, and you're here to help them understand themselves better. They're experiencing "{{archetype}}" - {{tagline}}.
+
+TARGET LENGTH: ~1500-2000 words total. Be conversational but economical with words.
 
 Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
@@ -248,7 +250,7 @@ One real question or insight that helps them think about what they actually want
 Their full answers:
 {{answers}}
 
-IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
+IMPORTANT: 2-3 sentences per section MAX. Use contractions (you're, don't, can't, it's). Short, punchy sentences. No fluff - if you can cut a word, cut it. Make every word earn its place. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
 

@@ -86,7 +86,7 @@ export interface AIExplanationConfig {
   /** Whether to generate AI explanation */
   enabled: boolean
   /** AI model to use */
-  model?: 'claude-3-7-sonnet-latest' | 'gpt-4' | 'gemini-pro'
+  model?: 'claude-3-7-sonnet-latest' | 'claude-3-5-sonnet-20241022' | 'gpt-4' | 'gemini-pro'
   /** Custom prompt template (use {{personality}}, {{answers}} placeholders) */
   promptTemplate?: string
 }

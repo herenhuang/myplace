@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './quiz-recommendation-footer.module.scss'
-import AnalyzingScreen from './AnalyzingScreen'
 import Image from 'next/image'
 
 interface RecommendationData {
@@ -94,7 +93,9 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
       const res = await fetch('/api/quiz/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId })
+        body: JSON.stringify({ sessionId }),
+        // Use cache if available (prefetched from QuizResults)
+        cache: 'default'
       })
 
       const data = await res.json()
@@ -156,11 +157,7 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
     router.push(`/quiz/${recommendation.quizId}`)
   }
 
-  // Don't render if there's an error
-  if (error) {
-    return null
-  }
-
+  // Show loading state instead of hiding completely
   return (
     <motion.div
       ref={recommendationRef}
@@ -173,7 +170,37 @@ export default function QuizRecommendationFooter({ sessionId, onBackToCard, onRe
         <Image src="/elevate/blobbert.png" alt="Analyzing" width={64} height={64} />
 
         {loading ? (
-          <AnalyzingScreen />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className={styles.reasoning}>
+              {loadingMessages[currentMessageIndex]}
+            </p>
+          </motion.div>
+        ) : error ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className={styles.reasoning}>
+              {error}
+            </p>
+            <button
+              onClick={onBackToCard}
+              className={styles.backToAssessment}
+            >
+              Back to Assessment
+            </button>
+            <Link
+              href="/quiz"
+              className={styles.altLink}
+            >
+              See all quizzes
+            </Link>
+          </motion.div>
         ) : recommendation ? (
           <motion.div
             initial={{ opacity: 0 }}

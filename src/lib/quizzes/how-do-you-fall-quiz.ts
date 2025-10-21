@@ -320,8 +320,10 @@ CRITICAL: Do NOT make up names. Only use exact words from the lists provided. Th
   
   aiExplanation: {
     enabled: true,
-    model: 'claude-3-7-sonnet-latest',
+    model: 'claude-3-5-sonnet-20241022',
     promptTemplate: `You're talking to a friend about how they fall in love. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
+
+TARGET LENGTH: ~1500-2000 words total. Be conversational but economical with words.
 
 Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
@@ -394,7 +396,7 @@ One real, affirming truth about how they fall in love. No fluff - just something
 
 Use "{{archetype}}" consistently throughout (never shorten or modify it). Be warm, insightful, specific to their actual choices, and deeply understanding. Use markdown with ## for headers. This should feel like someone who really gets them.
 
-IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
+IMPORTANT: 2-3 sentences per section MAX. Use contractions (you're, don't, can't, it's). Short, punchy sentences. No fluff - if you can cut a word, cut it. Make every word earn its place. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
 

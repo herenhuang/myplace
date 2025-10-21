@@ -60,8 +60,8 @@ function parseSections(markdown: string): string[] {
     }
   }
 
-  // Filter out Personality Predictions section - we render it separately with custom UI
-  sections = sections.filter(section => !section.match(/##\s*Personality Predictions/i))
+  // DON'T filter out Personality Predictions - we need it for parsing
+  // It will be rendered separately but still needs to be in the sections array
 
   return sections
 }
@@ -135,6 +135,18 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
   const displayName = result.personality?.name || result.wordMatrixResult?.fullArchetype || 'Your Result'
   const displayImage = result.personality?.image
   const displayTagline = result.personality?.tagline || result.wordMatrixResult?.tagline
+
+  // Prefetch recommendation data immediately when component mounts
+  useEffect(() => {
+    if (result.sessionId && onShowRecommendation) {
+      // Prefetch recommendation in the background
+      fetch('/api/quiz/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: result.sessionId })
+      }).catch(err => console.error('Prefetch recommendation failed:', err))
+    }
+  }, [result.sessionId, onShowRecommendation])
 
   // Fetch analytics when explanation is shown
   useEffect(() => {
@@ -439,15 +451,15 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
 
   const renderPage = () => {
     if (currentPage === 1) {
-      // Page 1: Blueprint + What I Noticed
+      // Page 1: Blueprint + What I Noticed (but NOT Personality Predictions)
       return (
         <>
-          {sections[1] && (
+          {sections[1] && !sections[1].match(/##\s*Personality Predictions/i) && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
               <ReactMarkdown>{sections[1]}</ReactMarkdown>
             </div>
           )}
-          {sections[2] && (
+          {sections[2] && !sections[2].match(/##\s*Personality Predictions/i) && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
               <ReactMarkdown>{sections[2]}</ReactMarkdown>
             </div>
@@ -457,20 +469,20 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     }
 
     if (currentPage === 2) {
-      // Page 2: What Works + Where It Gets Messy + Tips
+      // Page 2: What Works + Where It Gets Messy + Tips (but NOT Bottom Line or Personality Predictions)
       return (
         <>
-          {sections[4] && (
+          {sections[4] && !sections[4].match(/##\s*(Bottom Line|Personality Predictions)/i) && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
               <ReactMarkdown>{sections[4]}</ReactMarkdown>
             </div>
           )}
-          {sections[5] && (
+          {sections[5] && !sections[5].match(/##\s*(Bottom Line|Personality Predictions)/i) && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
               <ReactMarkdown>{sections[5]}</ReactMarkdown>
             </div>
           )}
-          {sections[6] && (
+          {sections[6] && !sections[6].match(/##\s*(Bottom Line|Personality Predictions)/i) && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.4s' }}>
               <ReactMarkdown>{sections[6]}</ReactMarkdown>
             </div>
@@ -480,10 +492,13 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
     }
 
     if (currentPage === 3) {
-      // Page 3: MBTI/OCEAN + You're Also Close To
-      // For header-based parsing: section 7 is Personality Predictions (if exists)
-      const personalitySection = sections[7] // Section 7 should be "## Personality Predictions"
+      // Page 3: MBTI/OCEAN + You're Also Close To + Bottom Line
+      // Find Personality Predictions section (could be at index 7 or missing)
+      const personalitySection = sections.find(s => s.match(/##\s*Personality Predictions/i))
       const personalityData = personalitySection ? parsePersonalityPredictions(personalitySection) : null
+
+      // Find Bottom Line section (dynamically - could be at different indices)
+      const bottomLineSection = sections.find(s => s.match(/##\s*Bottom Line/i))
 
       return (
         <>
@@ -498,24 +513,19 @@ export default function QuizResults({ config, result, onRestart, onShowRecommend
                 oceanExplanation={personalityData.oceanExplanation}
               />
             </div>
-          ) : (
-            <div className={styles.explanationSection} style={{ animationDelay: '0.1s' }}>
-              <h2>Personality Predictions</h2>
-              <p><em>Take a quiz to see your personality predictions!</em></p>
-            </div>
-          )}
+          ) : null}
 
           {/* You're Also Close To section */}
-          {sections[3] && (
+          {sections[3] && !sections[3].match(/##\s*Personality Predictions/i) && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.25s' }}>
               <ReactMarkdown>{sections[3]}</ReactMarkdown>
             </div>
           )}
 
           {/* Bottom Line section - always last */}
-          {sections[8] && (
+          {bottomLineSection && (
             <div className={styles.explanationSection} style={{ animationDelay: '0.4s' }}>
-              <ReactMarkdown>{sections[8]}</ReactMarkdown>
+              <ReactMarkdown>{bottomLineSection}</ReactMarkdown>
             </div>
           )}
         </>

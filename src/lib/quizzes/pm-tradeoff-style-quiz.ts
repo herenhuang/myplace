@@ -172,8 +172,10 @@ CRITICAL: Only use exact words from lists. Combination is [FirstWord] + [SecondW
 
   aiExplanation: {
     enabled: true,
-    model: 'claude-3-7-sonnet-latest',
+    model: 'claude-3-5-sonnet-20241022',
     promptTemplate: `You're talking to a friend about their PM trade-off style. You get it, you see them, and you're here to help them understand themselves better. They're a "{{archetype}}" - {{tagline}}.
+
+TARGET LENGTH: ~1500-2000 words total. Be conversational but economical with words.
 
 Write like you're having a real conversation - warm, direct, no corporate BS. Think Brené Brown vibes: honest, grounded, human.
 
@@ -242,6 +244,6 @@ One real, empowering sentence about what makes their {{archetype}} style valuabl
 Their full trade-off patterns:
 {{answers}}
 
-IMPORTANT: Use contractions (you're, don't, can't, it's). Keep sentences short and punchy. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
+IMPORTANT: 2-3 sentences per section MAX. Use contractions (you're, don't, can't, it's). Short, punchy sentences. No fluff - if you can cut a word, cut it. Make every word earn its place. Read it out loud - if it sounds weird to say, rewrite it. Use "{{archetype}}" exactly as written. Make them feel seen, not evaluated.`
   }
 }
