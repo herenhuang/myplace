@@ -20,6 +20,7 @@ import { pmPressureStyleQuiz } from './pm-pressure-style-quiz'
 import { productDecisionStyleQuiz } from './product-decision-style-quiz'
 import { pmTradeoffStyleQuiz } from './pm-tradeoff-style-quiz'
 import { wednesdayBouncerQuiz } from './wednesday-bouncer-quiz'
+import { investorAllocationQuiz } from './investor-allocation-quiz'
 import { ALL_QUIZZES } from './all-quizzes-data'
 
 // Registry of all available quizzes
@@ -37,7 +38,8 @@ export const quizRegistry: Record<string, QuizConfig> = {
   'pm-pressure-style': pmPressureStyleQuiz,
   'product-decision-style': productDecisionStyleQuiz,
   'pm-tradeoff-style': pmTradeoffStyleQuiz,
-  'wednesday-bouncer-quiz': wednesdayBouncerQuiz
+  'wednesday-bouncer-quiz': wednesdayBouncerQuiz,
+  'investor-allocation-quiz': investorAllocationQuiz
   // Add new quizzes here:
   // Use the personalization template for narrative quizzes!
 }
