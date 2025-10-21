@@ -154,14 +154,24 @@ export function parseQuizMarkdown(markdown: string): QuizConfig {
 }
 
 function parseSection(lines: string[], header: string): string[] {
-  const startIdx = lines.findIndex(line => line.trim() === header)
+  const startIdx = lines.findIndex(line => line.trim().startsWith(header))
   if (startIdx === -1) return []
 
-  const endIdx = lines.findIndex((line, idx) =>
-    idx > startIdx &&
-    (line.startsWith('##') || line.startsWith('#')) &&
-    !line.startsWith('###')
-  )
+  // Find the next section at the SAME level or higher (# ends at another #, not at ##)
+  const headerLevel = header.match(/^#+/)?.[0].length || 1
+  const endIdx = lines.findIndex((line, idx) => {
+    if (idx <= startIdx) return false
+    const trimmed = line.trim()
+    if (!trimmed.startsWith('#')) return false
+
+    // Count the number of # at the start
+    const match = trimmed.match(/^#+/)
+    if (!match) return false
+    const lineLevel = match[0].length
+
+    // End at same level or higher (fewer #s)
+    return lineLevel <= headerLevel
+  })
 
   return lines.slice(startIdx + 1, endIdx === -1 ? undefined : endIdx)
 }
@@ -173,6 +183,9 @@ function extractValue(lines: string[], key: string): string | undefined {
   return line
     .replace(`**${key}:**`, '')
     .replace(`- **${key}:**`, '')
+    .replace(/^-\s+/, '') // Remove leading "- "
+    .replace(/`/g, '') // Remove backticks
+    .replace(/\(.*?\)$/g, '') // Remove trailing parenthetical comments like "(emerald green - money/success)"
     .trim()
 }
 
@@ -243,7 +256,7 @@ function parseQuestions(lines: string[]): MarkdownQuestion[] {
   let inQuestionsArea = false
 
   for (const line of lines) {
-    if (line.trim() === '# Questions') {
+    if (line.trim().startsWith('# Questions')) {
       inQuestionsArea = true
       continue
     }
@@ -287,16 +300,22 @@ function parseQuestionSection(lines: string[]): MarkdownQuestion | null {
   const dimension = extractValue(lines, 'Dimension') || ''
   const timeMarker = extractValue(lines, 'Time Marker') || ''
 
-  // Extract narrative
-  const narrativeIdx = lines.findIndex(line => line.trim() === '### Narrative:')
+  // Extract narrative (supports both "### Narrative:" and "### Story Narrative:")
+  const narrativeIdx = lines.findIndex(line =>
+    line.trim() === '### Narrative:' || line.trim() === '### Story Narrative:'
+  )
   const optionsIdx = lines.findIndex(line => line.trim() === '### Options:')
+  const aiPromptIdx = lines.findIndex(line => line.trim() === '### AI Prompt:')
 
   let narrative = ''
   if (narrativeIdx !== -1) {
-    const endIdx = optionsIdx !== -1 ? optionsIdx : lines.length
+    // End at options, AI prompt, or end of section (whichever comes first)
+    const endIdx = Math.min(
+      ...[optionsIdx, aiPromptIdx, lines.length].filter(idx => idx > narrativeIdx && idx !== -1)
+    )
     narrative = lines
       .slice(narrativeIdx + 1, endIdx)
-      .filter(line => !line.startsWith('*') && line.trim().length > 0)
+      .filter(line => !line.startsWith('*') && !line.startsWith('###') && line.trim().length > 0)
       .join('\n')
       .trim()
   }
@@ -359,7 +378,7 @@ function parseQuestionSection(lines: string[]): MarkdownQuestion | null {
 }
 
 function parseWordList(section: string[], header: string): string[] {
-  const startIdx = section.findIndex(line => line.trim() === header)
+  const startIdx = section.findIndex(line => line.trim().startsWith(header))
   if (startIdx === -1) return []
 
   const words: string[] = []
@@ -377,16 +396,31 @@ function parseWordList(section: string[], header: string): string[] {
 }
 
 function parseCodeBlock(section: string[], header: string): string {
-  const startIdx = section.findIndex(line => line.trim() === header)
+  const startIdx = section.findIndex(line => line.trim().startsWith(header))
   if (startIdx === -1) return ''
 
   const codeBlockStart = section.findIndex((line, idx) => idx > startIdx && line.trim() === '```')
-  if (codeBlockStart === -1) return ''
 
-  const codeBlockEnd = section.findIndex((line, idx) => idx > codeBlockStart && line.trim() === '```')
-  if (codeBlockEnd === -1) return ''
+  // If there's a code block, extract it
+  if (codeBlockStart !== -1) {
+    const codeBlockEnd = section.findIndex((line, idx) => idx > codeBlockStart && line.trim() === '```')
+    if (codeBlockEnd !== -1) {
+      return section.slice(codeBlockStart + 1, codeBlockEnd).join('\n').trim()
+    }
+  }
 
-  return section.slice(codeBlockStart + 1, codeBlockEnd).join('\n').trim()
+  // Otherwise, extract all content until the next section header
+  const endIdx = section.findIndex((line, idx) =>
+    idx > startIdx &&
+    (line.startsWith('##') || line.startsWith('#'))
+  )
+
+  const content = section.slice(startIdx + 1, endIdx === -1 ? undefined : endIdx)
+    .filter(line => line.trim().length > 0)
+    .join('\n')
+    .trim()
+
+  return content
 }
 
 function convertToQuizQuestion(mdQuestion: MarkdownQuestion): QuizQuestion {
