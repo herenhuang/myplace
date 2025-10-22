@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Use custom prompt template or default
     const promptTemplate = config.promptTemplate || `Write a personalized explanation for why the user matched with {{personality}}. Their answers: {{answers}}`
-    
+
     // Support both archetype (story-matrix) and personality (archetype) quiz types
     const finalPersonality = archetype || personalityName || 'your result'
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const chatCompletion = await anthropic.messages.create({
       model: config.model || 'claude-3-7-sonnet-latest',
-      max_tokens: 1024,
+      max_tokens: 2048, // Increased from 1024 - gives AI room to generate without constraint
       messages: [{ role: 'user', content: prompt }]
     })
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       // Not JSON, use raw text
     }
 
-    // Save result
+    // Save to database
     await supabase
       .from('sessions')
       .update({
@@ -97,4 +97,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to generate explanation.' }, { status: 500 })
   }
 }
-

@@ -86,7 +86,7 @@ export interface AIExplanationConfig {
   /** Whether to generate AI explanation */
   enabled: boolean
   /** AI model to use */
-  model?: 'claude-3-7-sonnet-latest' | 'gpt-4' | 'gemini-pro'
+  model?: 'claude-3-7-sonnet-latest' | 'claude-3-5-sonnet-20241022' | 'gpt-4' | 'gemini-pro'
   /** Custom prompt template (use {{personality}}, {{answers}} placeholders) */
   promptTemplate?: string
 }
@@ -171,6 +171,24 @@ export interface QuizConfig {
   showQuestionComparison?: boolean
   /** Custom analyzing messages to show during result calculation (default: ["Calibrating your answers", "Assessing your behavior", "Analyzing your thoughts"]) */
   analyzingMessages?: string[]
+  /** Custom images for quiz branding/characters */
+  customImages?: {
+    /** Image shown on analyzing/loading screen (default: /elevate/blobbert.png) */
+    analyzingScreen?: string
+    /** Image shown as character bubble in questions (optional) */
+    questionBubble?: string
+  }
+  /** Email validation configuration for personalization forms */
+  emailValidation?: {
+    /** Whether to enable email validation */
+    enabled: boolean
+    /** API endpoint to validate email against */
+    endpoint: string
+    /** Error message to show if email not found */
+    errorMessage?: string
+  }
+  /** Results card layout type (default: 'standard') */
+  resultsLayout?: 'standard' | 'approval-rejection'
 }
 
 export interface QuizResponse {

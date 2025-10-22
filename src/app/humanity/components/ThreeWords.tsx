@@ -51,7 +51,6 @@ export default function ThreeWords({
   return (
     <div className={styles.threeWordsContainer}>
       <div className={styles.wordsPrompt}>
-        <p className={styles.wordsInstructions}>Use all three words in a sentence:</p>
         <div className={styles.wordChips}>
           {wordValidation.map((w, idx) => (
             <div

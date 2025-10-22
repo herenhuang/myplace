@@ -43,3 +43,33 @@ export function clearHumanityCache() {
   }
 }
 
+/**
+ * Detects if the humanity page is loaded in an iframe
+ */
+export function isInIframe(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return window.self !== window.top
+  } catch (e) {
+    // If we get a security error, we're definitely in an iframe from another domain
+    return true
+  }
+}
+
+/**
+ * Checks if the page has the embed parameter
+ */
+export function isEmbedMode(): boolean {
+  if (typeof window === 'undefined') return false
+  const params = new URLSearchParams(window.location.search)
+  return params.get('embed') === 'true'
+}
+
+/**
+ * Checks if the page should be in read-only/preview mode
+ * Returns true if embedded (via iframe or URL parameter)
+ */
+export function isPreviewMode(): boolean {
+  return isInIframe() || isEmbedMode()
+}
+

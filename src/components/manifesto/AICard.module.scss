@@ -1,0 +1,40 @@
+.aiCardContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 0;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  height: 200px;
+}
+
+.aiLogoCircle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-10px);
+  }
+
+  &:nth-child(1) {
+    width: 130px;
+    height: 130px;
+  }
+  &:nth-child(2) {
+    width: 100px;
+    height: 100px;
+  }
+  &:nth-child(3) {
+    width: 140px;
+    height: 140px;
+  }
+}

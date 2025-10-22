@@ -15,7 +15,6 @@ interface QuizQuestionProps {
 }
 
 export default function QuizQuestion({ config, questionIndex, onSelect, isLoading, adaptedText, personalizationData }: QuizQuestionProps) {
-  const isWednesdayBouncer = config.id === 'wednesday-bouncer-quiz'
   const [visibleOptions, setVisibleOptions] = useState<number[]>([])
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null)
@@ -231,10 +230,10 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
         {/* Custom Input Field */}
         {question.allowCustomInput && (
           <div className={styles.customInputContainer}>
-            {/* Bouncer Blob bubble for Wednesday quiz */}
-            {isWednesdayBouncer && (
+            {/* Character bubble for custom input (if configured) */}
+            {config.customImages?.questionBubble && (
               <div className={styles.bouncerBubble}>
-                <Image src="/bouncerblob2.png" alt="Bouncer Blob" width={48} height={48} />
+                <Image src={config.customImages.questionBubble} alt="Quiz Character" width={48} height={48} />
               </div>
             )}
             <div className={styles.customInputWrapper}>

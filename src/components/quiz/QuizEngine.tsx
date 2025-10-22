@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { QuizConfig, QuizResponse, QuizResult, QuizState } from '@/lib/quizzes/types'
 import { getOrCreateSessionId } from '@/lib/session'
+import { useGameTracking } from '@/lib/analytics/useGameTracking'
 import PageContainer from '@/components/layout/PageContainer'
 import QuizWelcome from './QuizWelcome'
 import QuizPersonalization from './QuizPersonalization'
@@ -31,6 +32,14 @@ export default function QuizEngine({ config }: QuizEngineProps) {
   const [adaptedQuestions, setAdaptedQuestions] = useState<Record<number, string>>({}) // Store adapted narrative text
   const [personalizationData, setPersonalizationData] = useState<Record<string, string>>({}) // Store user's personalization inputs
   const recommendationRef = useRef<HTMLDivElement>(null)
+
+  // Analytics tracking
+  const { trackStart, trackStep, trackComplete, trackInteraction } = useGameTracking({
+    gameId: config.id,
+    gameName: config.title,
+    totalSteps: config.questions.length,
+    sessionId: dbSessionId
+  })
 
   const STORAGE_KEY = `quiz-${config.id}-state`
 
@@ -214,6 +223,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
       if (responseData.success && responseData.sessionId) {
         setDbSessionId(responseData.sessionId)
+        trackStart({ quiz_type: config.type, has_personalization: true })
         setScreenState('question') // Move to first question
         setCurrentQuestionIndex(0)
       }
@@ -251,6 +261,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
 
       if (data.success && data.sessionId) {
         setDbSessionId(data.sessionId)
+        trackStart({ quiz_type: config.type })
         setScreenState('question')
         setCurrentQuestionIndex(0)
       }
@@ -305,6 +316,11 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             stepNumber: newResponses.length,
             totalSteps: config.questions.length
           })
+        })
+        // Track progress in Amplitude
+        trackStep(newResponses.length, {
+          question_id: currentQuestion.id,
+          is_custom_input: isCustom
         })
       } catch (error) {
         console.error('Error saving step progress:', error)
@@ -483,6 +499,13 @@ export default function QuizEngine({ config }: QuizEngineProps) {
           console.error('Error saving quiz completion:', error)
         }
 
+        // Track completion
+        trackComplete({
+          quiz_type: config.type,
+          result_id: topPersonalityId,
+          result_name: matchedPersonality.name
+        })
+
         setResult(finalResult)
         setScreenState('results')
       } else {
@@ -522,17 +545,18 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             ? alternatives.map((alt: { fullArchetype: string; reason: string }) => `- **${alt.fullArchetype}**: ${alt.reason}`).join('\n')
             : 'No strong alternatives - this is clearly your style!'
 
+          // Prepare prompt with placeholders replaced
+          const promptWithAlternatives = config.aiExplanation?.enabled
+            ? (config.aiExplanation.promptTemplate || '')
+                .replace('{{alternatives}}', alternativesText)
+                .replace('{{tagline}}', tagline || '')
+            : ''
+
           // Generate AI explanation
           let explanation = reasoning || ''
 
           if (config.aiExplanation?.enabled) {
             try {
-              // Replace placeholders in the prompt
-              let promptWithAlternatives = config.aiExplanation.promptTemplate || ''
-              promptWithAlternatives = promptWithAlternatives
-                .replace('{{alternatives}}', alternativesText)
-                .replace('{{tagline}}', tagline || '')
-
               const aiResponse = await fetch('/api/quiz/explain', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -611,6 +635,13 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             console.error('Error saving quiz completion:', error)
           }
 
+          // Track completion
+          trackComplete({
+            quiz_type: config.type,
+            result_name: fullArchetype,
+            word_matrix_result: selectData
+          })
+
           setResult(finalResult)
           setScreenState('results')
         } catch (error) {
@@ -658,7 +689,8 @@ export default function QuizEngine({ config }: QuizEngineProps) {
             form={config.personalizationForm}
             onSubmit={handlePersonalizationSubmit}
             isLoading={isLoading}
-            quizId={config.id}
+            emailValidation={config.emailValidation}
+            customImage={config.customImages?.questionBubble}
           />
         ) : null
 
@@ -675,7 +707,7 @@ export default function QuizEngine({ config }: QuizEngineProps) {
         )
 
       case 'analyzing':
-        return <AnalyzingScreen customMessages={config.analyzingMessages} quizId={config.id} />
+        return <AnalyzingScreen customMessages={config.analyzingMessages} customImage={config.customImages?.analyzingScreen} />
 
       case 'results':
         return result ? (
