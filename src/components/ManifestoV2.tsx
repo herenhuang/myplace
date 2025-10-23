@@ -20,7 +20,7 @@ const ManifestoSection: React.FC<{
       id={id}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+      viewport={{ once: false, margin: "0px 0px -100px 0px" }}
       transition={{
         duration: 0.8,
         ease: [0.25, 0.1, 0.25, 1],
@@ -98,6 +98,66 @@ function RotatingBox({ scrollProgress }: { scrollProgress: number }) {
   );
 }
 
+// 3D Card component that flies into the center
+function FlyingCard({ 
+  card, 
+  index, 
+  scrollProgress 
+}: { 
+  card: TimelineCard; 
+  index: number; 
+  scrollProgress: number; 
+}) {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    
+    // Calculate card-specific progress with delay
+    const cardDelay = index * 0.1;
+    const cardProgress = THREE.MathUtils.clamp((scrollProgress - cardDelay) * 1.5, 0, 1);
+    
+    // Starting positions (spread around the scene)
+    const startPositions = [
+      [-8, 3, -5],   // Top left
+      [-4, 4, -5],   // Top center-left
+      [0, 5, -5],    // Top center
+      [4, 4, -5],    // Top center-right
+      [8, 3, -5],    // Top right
+      [-6, 0, -5],   // Middle left
+    ];
+    
+    const startPos = startPositions[index % startPositions.length];
+    const targetPos = [0, 0, 0]; // Center of the scene
+    
+    // Interpolate position
+    meshRef.current.position.x = THREE.MathUtils.lerp(startPos[0], targetPos[0], cardProgress);
+    meshRef.current.position.y = THREE.MathUtils.lerp(startPos[1], targetPos[1], cardProgress);
+    meshRef.current.position.z = THREE.MathUtils.lerp(startPos[2], targetPos[2], cardProgress);
+    
+    // Scale down as it approaches center
+    const scale = 1 - cardProgress * 0.8;
+    meshRef.current.scale.setScalar(scale);
+    
+    // Rotate as it flies
+    meshRef.current.rotation.x += 0.01;
+    meshRef.current.rotation.y += 0.01;
+  });
+
+  return (
+    <mesh ref={meshRef} castShadow receiveShadow>
+      <boxGeometry args={[1.2, 0.3, 0.1]} />
+      <meshStandardMaterial 
+        color="#ffffff" 
+        metalness={0.1} 
+        roughness={0.3}
+        transparent
+        opacity={1 - scrollProgress * 0.9}
+      />
+    </mesh>
+  );
+}
+
 function BoxScene({ scrollProgress }: { scrollProgress: number }) {
   return (
     <>
@@ -110,6 +170,17 @@ function BoxScene({ scrollProgress }: { scrollProgress: number }) {
         shadow-mapSize-height={1024}
       />
       <pointLight position={[-5, -2, -5]} intensity={0.3} />
+      
+      {/* Flying cards */}
+      {timelineCards.map((card, index) => (
+        <FlyingCard 
+          key={card.id}
+          card={card} 
+          index={index} 
+          scrollProgress={scrollProgress} 
+        />
+      ))}
+      
       <RotatingBox scrollProgress={scrollProgress} />
     </>
   );
@@ -156,50 +227,18 @@ function TimelineSection() {
             className={styles.timelineTextSection}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false }}
             transition={{ duration: 0.8, delay: 0.1 }}
           >
 
             <p className={styles.paragraph}>
               But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
             </p>
-
-            <div className={styles.cardsContainer}>
-              {timelineCards.map((card, index) => {
-                // Calculate how much each card should move based on scroll
-                const cardDelay = index * 0.1;
-                const cardProgress = THREE.MathUtils.clamp((scrollProgress - cardDelay) * 1.5, 0, 1);
-                
-                // Move downward toward the box (positive translateY)
-                const translateY = cardProgress * 150; // Move 150px downward
-                const scale = 1 - cardProgress * 0.85; // Shrink as absorbed
-                const fadeOpacity = 1 - cardProgress * 0.95; // Fade out
-                
-                return (
-                  <div
-                    key={card.id}
-                    className={styles.timelineCard}
-                    style={{
-                      transform: `translateY(${translateY}px) scale(${scale})`,
-                      opacity: fadeOpacity,
-                    }}
-                  >
-                    {card.label}
-                  </div>
-                );
-              })}
-            </div>
-            
+  
           </motion.div>
           
           <div className={styles.timelineVisualization}>
-            {/* Horizontal cards in the middle that move downward into the box */}
-            
-            <p className={styles.paragraph}>
-              Yet we're far more multi-dimensional than that.
-            </p>
-            
-            {/* 3D Box at bottom */}
+            {/* 3D Canvas with flying cards and rotating box */}
             <div className={styles.boxContainer}>
               <Canvas 
                 shadows
@@ -211,6 +250,13 @@ function TimelineSection() {
               </Canvas>
             </div>
           </div>
+
+          <p className={styles.paragraph}>
+              Yet we're far more multi-dimensional than that.
+            </p>
+            
+
+
         </div>
       </div>
     </ManifestoSection>
@@ -253,26 +299,33 @@ function HeroSection() {
     }
 
     const nodes: Node[] = [
-      // Fixed title node at center
+      // Title node at center with strong repulsion
       { 
         id: 'title', 
         type: 'title',
         text: 'Discover yourself through play.',
         fx: width / 2, 
         fy: height / 2,
-        size: 300  // Large collision radius to keep icons away
+        size: 400  // Larger collision radius for stronger repulsion
       },
-      // Icon nodes
-      { id: 'icon1', type: 'icon', icon: '/manifesto/s-01.png', size: 40 },
-      { id: 'icon2', type: 'icon', icon: '/manifesto/s-02.png', size: 35 },
-      { id: 'icon3', type: 'icon', icon: '/manifesto/s-03.png', size: 50 },
-      { id: 'icon4', type: 'icon', icon: '/manifesto/s-04.png', size: 45 },
-      { id: 'icon5', type: 'icon', icon: '/manifesto/s-05.png', size: 40 },
-      { id: 'icon6', type: 'icon', icon: '/manifesto/s-06.png', size: 55 },
-      { id: 'icon7', type: 'icon', icon: '/manifesto/s-07.png', size: 42 },
-      { id: 'icon8', type: 'icon', icon: '/manifesto/s-08.png', size: 38 },
-      { id: 'icon9', type: 'icon', icon: '/manifesto/s-09.png', size: 48 },
-      { id: 'icon10', type: 'icon', icon: '/manifesto/s-10.png', size: 44 }
+      // Icon nodes with varied sizes
+      { id: 'icon1', type: 'icon', icon: '/manifesto/s-01.png', size: 60 },
+      { id: 'icon2', type: 'icon', icon: '/manifesto/s-02.png', size: 65 },
+      { id: 'icon3', type: 'icon', icon: '/manifesto/s-03.png', size: 60 },
+      { id: 'icon4', type: 'icon', icon: '/manifesto/s-04.png', size: 58 },
+      { id: 'icon5', type: 'icon', icon: '/manifesto/s-05.png', size: 35 },
+      { id: 'icon6', type: 'icon', icon: '/manifesto/s-06.png', size: 72 },
+      { id: 'icon7', type: 'icon', icon: '/manifesto/s-07.png', size: 120 },
+      { id: 'icon8', type: 'icon', icon: '/manifesto/s-08.png', size: 52 },
+      { id: 'icon9', type: 'icon', icon: '/manifesto/s-09.png', size: 80 },
+      { id: 'icon10', type: 'icon', icon: '/manifesto/s-10.png', size: 31 },
+      { id: 'icon11', type: 'icon', icon: '/manifesto/s-11.png', size: 31 },
+      { id: 'icon12', type: 'icon', icon: '/manifesto/s-12.png', size: 35 },
+      { id: 'icon13', type: 'icon', icon: '/manifesto/s-13.png', size: 72 },
+      { id: 'icon14', type: 'icon', icon: '/manifesto/s-14.png', size: 38 },
+      { id: 'icon15', type: 'icon', icon: '/manifesto/s-15.png', size: 52 },
+      { id: 'icon16', type: 'icon', icon: '/manifesto/s-16.png', size: 45 },
+      { id: 'icon17', type: 'icon', icon: '/manifesto/s-17.png', size: 40 }
     ];
 
     // Define links: connect title to each icon, plus icon-icon links
@@ -283,6 +336,7 @@ function HeroSection() {
 
     const links: Link[] = [
       // Title → each icon (hub-and-spoke)
+      /*
       { source: 'title', target: 'icon1' },
       { source: 'title', target: 'icon2' },
       { source: 'title', target: 'icon3' },
@@ -309,23 +363,65 @@ function HeroSection() {
       { source: 'icon3', target: 'icon7' },
       { source: 'icon2', target: 'icon8' },
       { source: 'icon4', target: 'icon9' },
+       */
     ];
 
-    // Create force simulation with link force
+    // Create force simulation with enhanced title repulsion
     const simulation = d3.forceSimulation(nodes)
       .force('link', d3.forceLink<Node, Link>(links)
         .id(d => d.id)
-        .distance(l => (typeof l.source !== 'string' && l.source.id === 'title') ? 220 : 120)
-        .strength(l => (typeof l.source !== 'string' && l.source.id === 'title') ? 0.35 : 0.25))
-      .force('charge', d3.forceManyBody().strength(-220))
+        .distance(l => {
+          const source = l.source as Node;
+          const target = l.target as Node;
+          // Title connections have longer distance
+          if (source.id === 'title' || target.id === 'title') return 250;
+          return 120;
+        })
+        .strength(l => {
+          const source = l.source as Node;
+          const target = l.target as Node;
+          // Title connections have stronger force
+          if (source.id === 'title' || target.id === 'title') return 0.4;
+          return 0.25;
+        }))
+      .force('charge', d3.forceManyBody().strength(d => {
+        const node = d as Node;
+        // Title has strong negative charge (repulsion)
+        if (node.type === 'title') return -800;
+        return -220;
+      }))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('collision', d3.forceCollide().radius((d: d3.SimulationNodeDatum) => {
         const node = d as Node;
-        if (node.type === 'title') return node.size! / 2; // participates in collision like a normal node
+        if (node.type === 'title') return node.size! / 2; // Large collision radius for title
         return node.size! / 2 + 15;
       }))
       .force('x', d3.forceX(width / 2).strength(0.05))
-      .force('y', d3.forceY(height / 2).strength(0.05));
+      .force('y', d3.forceY(height / 2).strength(0.05))
+      // Add custom repulsion force from title
+      .force('titleRepulsion', () => {
+        const titleNode = nodes.find(n => n.type === 'title');
+        if (!titleNode) return;
+        
+        nodes.forEach(node => {
+          if (node.type === 'icon' && node.x !== undefined && node.y !== undefined) {
+            const dx = node.x - titleNode.fx!;
+            const dy = node.y - titleNode.fy!;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = 200; // Minimum distance from title
+            
+            if (distance < minDistance && distance > 0) {
+              const force = (minDistance - distance) / minDistance * 0.3;
+              const angle = Math.atan2(dy, dx);
+              const fx = Math.cos(angle) * force;
+              const fy = Math.sin(angle) * force;
+              
+              node.vx = (node.vx || 0) + fx;
+              node.vy = (node.vy || 0) + fy;
+            }
+          }
+        });
+      });
 
     // Define drag behavior (only for icons)
     const drag = d3.drag<SVGImageElement, Node>()
@@ -363,7 +459,7 @@ function HeroSection() {
       .data(links)
       .enter()
       .append('line')
-      .attr('stroke', 'rgba(147, 197, 253, 0.3)')
+      .attr('stroke', 'rgba(147, 197, 253, 0.1)')
       .attr('stroke-width', 2)
       .attr('opacity', 0);
 
@@ -513,17 +609,106 @@ function SpeechBubblesSection() {
   )
 }
 
+// Cloud Section Component
+function CloudSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = React.useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      
+      const rect = sectionRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate progress: 0 when section enters viewport, 1 when it's centered/past
+      const sectionCenter = rect.top + rect.height;
+      const progress = THREE.MathUtils.clamp(
+        1 - (sectionCenter / viewportHeight),
+        0,
+        1
+      );
+      
+      setScrollProgress(progress);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  return (
+    <ManifestoSection delay={0.1}>
+      <div ref={sectionRef} className={styles.cloudSection}>
+        
+        <motion.div 
+          className={styles.cloud1}
+          style={{
+            transform: `translate(${scrollProgress * 500 + 150}px, ${scrollProgress * 120}px)`,
+            opacity: 1 - scrollProgress * 0.3
+          }}
+        >
+          <Image src="/manifesto/cloud-1.png" alt="Cloud 1" width={400} height={200} />
+        </motion.div>
+        
+        <motion.div 
+          className={styles.cloud2}
+          style={{
+            transform: `translate(${scrollProgress * -600 - 400}px, ${scrollProgress * 80}px)`,
+            opacity: 1 - scrollProgress * 0.2
+          }}
+        >
+          <Image src="/manifesto/cloud-2.png" alt="Cloud 2" width={400} height={200} />
+        </motion.div>
+        
+        <motion.div 
+          className={styles.cloud3}
+          style={{
+            transform: `translate(${scrollProgress * 750 - 150}px, ${scrollProgress * 80}px)`,
+            opacity: 1 - scrollProgress * 0.4
+          }}
+        >
+          <Image src="/manifesto/cloud-3.png" alt="Cloud 3" width={400} height={200} />
+        </motion.div>
+        
+        <motion.div 
+          className={styles.cloud4}
+          style={{
+            transform: `translate(${scrollProgress * -400}px, ${scrollProgress * -40}px)`,
+            opacity: 1 - scrollProgress * 0.25
+          }}
+        >
+          <Image src="/manifesto/cloud-4.png" alt="Cloud 4" width={400} height={200} />
+        </motion.div>
+      </div>
+    </ManifestoSection>
+  )
+}
+
 // Text Content Section Component
 function GreekSection() {
   return (
     <ManifestoSection delay={0.1}>
       <div className={styles.greekSection}>
-        <p className={styles.paragraph}>
-          This isn't new. Ancient Greeks carved 'Know thyself' above their temples — even they knew this was the hardest command.
-        </p>
-        <p className={styles.paragraph}>
-          Every generation since has built new mirrors trying to solve it — astrology, Myers-Briggs, Enneagram, whatever's next.
-        </p>
+
+        <div className={styles.greekContent}>
+          <p className={styles.paragraph}>
+            This isn't new. Ancient Greeks carved 'Know thyself' above their temples — even they knew this was the hardest command.
+          </p>
+          <p className={styles.paragraph}>
+            Every generation since has built new mirrors trying to solve it — astrology, Myers-Briggs, Enneagram, whatever's next.
+          </p>
+        </div>
+
+        <Image src="/manifesto/greece-4.png" className={styles.greekBackground} alt="Greek" width={720} height={500} />
+        <Image src="/manifesto/greece-3.png" className={styles.greekForeground} alt="Greek" width={720} height={500} />
+        <Image src="/manifesto/greece-2.png" className={styles.greekImage} alt="Greek" width={720} height={500} />
+        
       </div>
     </ManifestoSection>
   )
@@ -532,12 +717,6 @@ function GreekSection() {
 
 // Conversation Section Component
 function ConversationSection() {
-  const chatMessages = [
-    "In the future, every hire is a personality hire.",
-    "Every connection starts with character.",
-    "Every relationship begins with the real."
-  ];
-
   return (
     <ManifestoSection delay={0.3}>
       <div className={styles.conversation}>
@@ -546,32 +725,77 @@ function ConversationSection() {
         </p>
         
         <div className={styles.stackedBubbles}>
-          {chatMessages.map((message, index) => (
-            <motion.div
-              key={index}
-              className={styles.stackedBubble}
-              initial={{ opacity: 0, y: 60, scale: 0.8 }}
-              whileInView={{ 
-                opacity: 1, 
-                y: 0, 
-                scale: 1,
-                transition: {
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 15,
-                  delay: index * 0.3
-                }
-              }}
-              viewport={{ once: true, amount: 0.2 }}
-              whileHover={{ 
-                scale: 1.02,
-                y: -2,
-                transition: { duration: 0.2 }
-              }}
-            >
-              {message}
-            </motion.div>
-          ))}
+          <motion.div
+            className={`${styles.stackedBubble} ${styles.bubble1}`}
+            initial={{ opacity: 0, y: 60, scale: 0.8 }}
+            whileInView={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              transition: {
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+                delay: 0
+              }
+            }}
+            viewport={{ once: false, amount: 0.2 }}
+            whileHover={{ 
+              scale: 1.02,
+              y: -2,
+              transition: { duration: 0.2 }
+            }}
+          >
+            In the future, every hire is a personality hire.
+          </motion.div>
+          
+          <motion.div
+            className={`${styles.stackedBubble} ${styles.bubble2}`}
+            initial={{ opacity: 0, y: 60, scale: 0.8 }}
+            whileInView={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              transition: {
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+                delay: 0.3
+              }
+            }}
+            viewport={{ once: false, amount: 0.2 }}
+            whileHover={{ 
+              scale: 1.02,
+              y: -2,
+              transition: { duration: 0.2 }
+            }}
+          >
+            Every connection starts with character.
+          </motion.div>
+          
+          <motion.div
+            className={`${styles.stackedBubble} ${styles.bubble3}`}
+            initial={{ opacity: 0, y: 60, scale: 0.8 }}
+            whileInView={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              transition: {
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+                delay: 0.6
+              }
+            }}
+            viewport={{ once: false, amount: 0.2 }}
+            whileHover={{ 
+              scale: 1.02,
+              y: -2,
+              transition: { duration: 0.2 }
+            }}
+          >
+            Every relationship begins with the real.
+          </motion.div>
         </div>
         
         <p className={styles.paragraph}>
@@ -608,11 +832,19 @@ function PhoneSection() {
         <p className={styles.paragraph}>
           Every day, a new game. A new chance to discover who you could through the simple building a silly moment of who you really are.
         </p>
+
+
+<div className={styles.phoneContent}>
+
+  <div className={styles.gameCard}></div>
+  <div className={styles.gameCard}></div>
+
+
         <motion.div 
           className={styles.phoneContainer}
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <div className={styles.chatContainer}>
@@ -665,7 +897,7 @@ function PhoneSection() {
                   className={styles.chatBubbleNpc}
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.3, delay: 0.6 }}
                 >
                   <p>Oh nice!!!</p>
@@ -674,7 +906,7 @@ function PhoneSection() {
                   className={styles.chatBubbleUser}
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.3, delay: 0.7 }}
                 >
                   <p>I did say my shrimp dinner</p>
@@ -683,7 +915,7 @@ function PhoneSection() {
                   className={styles.typingIndicator}
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: false }}
                   transition={{ duration: 0.4, delay: 0.8 }}
                 >
                   <div className={styles.typingDot}></div>
@@ -705,6 +937,11 @@ function PhoneSection() {
           </div>
           <div className={styles.phoneLabel}>WHAT WOULD YOU MAKE?</div>
         </motion.div>
+
+        <div className={styles.gameCard}></div>
+        <div className={styles.gameCard}></div>
+
+        </div>
      
         <p className={styles.paragraph}>
           We’re more than just a label. 
@@ -733,7 +970,7 @@ function BottomSection() {
           className={styles.bottomIcons}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+                  viewport={{ once: false }}
           transition={{ duration: 0.8 }}
         >
           {[
@@ -752,7 +989,7 @@ function BottomSection() {
               initial={{ opacity: 0, scale: 0.5, rotate: Math.random() * 360 - 180 }}
               whileInView={{ opacity: 0.8, scale: 1, rotate: 0 }}
               whileHover={{ opacity: 1, scale: 1.1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 0.6, delay: icon.delay }}
             >
               <Image src={icon.src} alt="Icon" className={styles.bottomIcon} width={[40, 35, 45, 50, 42, 38, 48, 44, 46][index]} height={[40, 35, 45, 50, 42, 38, 48, 44, 46][index]} />
@@ -763,10 +1000,10 @@ function BottomSection() {
           className={styles.branding}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+                  viewport={{ once: false }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <Image src="/myplace_text.png" alt="myPlace Logo" width={200} height={200} />
+          <Image className={styles.brandName} src="/myplace_text.png" alt="myPlace Logo" width={200} height={200} />
         </motion.div>
       </div>
     </ManifestoSection>
@@ -779,8 +1016,8 @@ export default function ManifestoV2() {
     <div className={styles.container}>
       <HeroSection />
       <IntroSection />
+      <CloudSection />
       <GreekSection />
-      <SpeechBubblesSection />
       <TimelineSection />
       <ConversationSection />
       <PlaySection />
