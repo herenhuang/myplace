@@ -92,6 +92,12 @@ $bg:#f3fcff;
 
 // Text Content Sections
 .introSection {
+  padding: 60px 0;
+  margin: 0 auto;
+  text-align: center !important;
+}
+
+.greekSection {
   background-image: url('/manifesto/greece-1.png');
   background-size: cover;
   background-position: center;
@@ -108,7 +114,6 @@ $bg:#f3fcff;
   font-weight: 550;
   letter-spacing: -0.75px;
   margin: 72px auto;
-  text-align: left;
   width: 720px;
   max-width: 100%;
 
@@ -135,11 +140,13 @@ $bg:#f3fcff;
 
 .timelineContainer {
   display: flex;
-  gap: 60px;
+  flex-direction: column;
+  gap: 0px;
   align-items: center;
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
+  text-align: center;
   
   @media (max-width: 968px) {
     flex-direction: column;
@@ -150,12 +157,77 @@ $bg:#f3fcff;
 .timelineTextSection {
   flex: 1;
   min-width: 300px;
+  padding: 80px 0;
   
   @media (max-width: 968px) {
     text-align: center;
   }
 }
 
+.timelineVisualization {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  
+  @media (max-width: 968px) {
+    gap: 60px;
+    padding: 40px 0;
+  }
+}
+
+.cardsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  padding: 80px auto;
+  position: relative;
+  
+  @media (max-width: 968px) {
+    gap: 12px;
+    padding: 0 10px;
+  }
+}
+
+.boxContainer {
+  width: 720px;
+  height: 720px;
+  position: relative;
+  flex-shrink: 0;
+  margin: -60px;
+  
+  @media (max-width: 968px) {
+    width: min(90vw, 400px);
+    height: min(90vw, 400px);
+  }
+}
+
+.timelineCard {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  will-change: transform, opacity;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+    padding: 10px 16px;
+  }
+}
 
 .timelineCanvasSection {
   flex: 1;
@@ -170,11 +242,18 @@ $bg:#f3fcff;
   }
 }
 
+.speechBubblesSection {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .d3Canvas {
   height: 80vh;
   aspect-ratio: 1/1;
   height: auto;
-  
+
   @media (max-width: 968px) {
     width: 100%;
     height: auto;
@@ -270,14 +349,15 @@ $bg:#f3fcff;
   color: black;
   padding: 24px 36px;
   border-radius: 48px;
-  font-size: 18px;
-  font-weight: 550;
+  font-size: 22px;
+  font-weight: 600;
   letter-spacing: -.5px;
+  line-height: 1.2;
   text-align: center;
-  box-shadow: 4px 12px 32px rgba(#030025, 0.15), -8px -12px 24px rgba(white, 1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 12px 32px rgba(black, 0.1), -8px -12px 24px rgba(white, 1);
+  border: 3px solid rgba(white, 1);
   backdrop-filter: blur(10px);
-  max-width: 500px;
+  max-width: 720px;
   width: fit-content;
   position: relative;
 
@@ -287,10 +367,10 @@ $bg:#f3fcff;
 
 // Phone Section
 .phoneSection {
-  padding: 80px 0;
+  padding: 0px 0;
   text-align: center;
   border-radius: 30px;
-  margin: 40px 0;
+  margin: 0;
 }
 
 

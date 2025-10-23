@@ -4,6 +4,8 @@ import { motion } from 'motion/react';
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import * as d3 from 'd3';
+import { Canvas, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import styles from './ManifestoV2.module.scss';
 import SpeechBubbles from '@/components/manifesto/SpeechBubbles';
 import WaitlistForm from '@/components/manifesto/WaitlistForm';
@@ -31,6 +33,190 @@ const ManifestoSection: React.FC<{
   );
 };
 
+// Combined Timeline + Box Section: Cards absorbed into rotating 3D box
+interface TimelineCard {
+  id: string;
+  label: string;
+}
+
+const timelineCards: TimelineCard[] = [
+  { id: 'pm', label: 'Product Manager' },
+  { id: 'enfj', label: 'ENFJ' },
+  { id: 'percent', label: '92%' },
+  { id: 'vc', label: 'VC' },
+  { id: 'exp', label: '5 Years of Experience' },
+  { id: 'uni', label: '[X] University' }
+];
+
+function RotatingBox({ scrollProgress }: { scrollProgress: number }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    const targetX = scrollProgress * Math.PI * 2;
+    const targetY = scrollProgress * Math.PI * 2.5;
+    const targetZ = scrollProgress * Math.PI * 1.5;
+    meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, targetX, 0.1);
+    meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, targetY, 0.1);
+    meshRef.current.rotation.z = THREE.MathUtils.lerp(meshRef.current.rotation.z, targetZ, 0.1);
+  });
+
+  // Create gradient texture using canvas
+  const gradientTexture = React.useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      // Create a multi-color gradient
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#ff6b6b');    // Red
+      gradient.addColorStop(0.25, '#f06595'); // Pink
+      gradient.addColorStop(0.5, '#cc5de8');  // Purple
+      gradient.addColorStop(0.75, '#339af0'); // Blue
+      gradient.addColorStop(1, '#51cf66');    // Green
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }, []);
+
+  return (
+    <mesh ref={meshRef} castShadow receiveShadow>
+      <boxGeometry args={[1.5, 1.5, 1.5]} />
+      <meshStandardMaterial 
+        map={gradientTexture}
+        metalness={0.3} 
+        roughness={0.4}
+      />
+    </mesh>
+  );
+}
+
+function BoxScene({ scrollProgress }: { scrollProgress: number }) {
+  return (
+    <>
+      <ambientLight intensity={0.6} />
+      <directionalLight
+        position={[3, 5, 5]}
+        intensity={1.1}
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
+      <pointLight position={[-5, -2, -5]} intensity={0.3} />
+      <RotatingBox scrollProgress={scrollProgress} />
+    </>
+  );
+}
+
+function TimelineSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = React.useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      
+      const rect = sectionRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate progress: 0 when section enters viewport, 1 when it's centered/past
+      const sectionCenter = rect.top + rect.height / 2;
+      const progress = THREE.MathUtils.clamp(
+        1 - (sectionCenter / viewportHeight),
+        0,
+        1
+      );
+      
+      setScrollProgress(progress);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  return (
+    <ManifestoSection delay={0.2}>
+      <div ref={sectionRef} className={styles.timeline}>
+        <div className={styles.timelineContainer}>
+          {/* Text section at top */}
+          <motion.div 
+            className={styles.timelineTextSection}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
+
+            <p className={styles.paragraph}>
+              But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
+            </p>
+
+            <div className={styles.cardsContainer}>
+              {timelineCards.map((card, index) => {
+                // Calculate how much each card should move based on scroll
+                const cardDelay = index * 0.1;
+                const cardProgress = THREE.MathUtils.clamp((scrollProgress - cardDelay) * 1.5, 0, 1);
+                
+                // Move downward toward the box (positive translateY)
+                const translateY = cardProgress * 150; // Move 150px downward
+                const scale = 1 - cardProgress * 0.85; // Shrink as absorbed
+                const fadeOpacity = 1 - cardProgress * 0.95; // Fade out
+                
+                return (
+                  <div
+                    key={card.id}
+                    className={styles.timelineCard}
+                    style={{
+                      transform: `translateY(${translateY}px) scale(${scale})`,
+                      opacity: fadeOpacity,
+                    }}
+                  >
+                    {card.label}
+                  </div>
+                );
+              })}
+            </div>
+            
+          </motion.div>
+          
+          <div className={styles.timelineVisualization}>
+            {/* Horizontal cards in the middle that move downward into the box */}
+            
+            <p className={styles.paragraph}>
+              Yet we're far more multi-dimensional than that.
+            </p>
+            
+            {/* 3D Box at bottom */}
+            <div className={styles.boxContainer}>
+              <Canvas 
+                shadows
+                gl={{ alpha: true, antialias: true }}
+                style={{ width: '100%', height: '100%', background: 'transparent' }} 
+                camera={{ position: [0, 0, 5], fov: 50 }}
+              >
+                <BoxScene scrollProgress={scrollProgress} />
+              </Canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ManifestoSection>
+  );
+}
+
 // Hero Section Component with D3 Force Simulation
 function HeroSection() {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -53,35 +239,61 @@ function HeroSection() {
       .attr('viewBox', `0 0 ${width} ${height}`)
       .attr('preserveAspectRatio', 'xMidYMid meet');
 
-    // Define icon data
-    interface IconNode extends d3.SimulationNodeDatum {
+    // Define node data including title as fixed center node
+    interface Node extends d3.SimulationNodeDatum {
       id: string;
-      icon: string;
-      size: number;
+      type: 'title' | 'icon';
+      icon?: string;
+      size?: number;
+      text?: string;
+      fx?: number;
+      fy?: number;
       x?: number;
       y?: number;
     }
 
-    const icons: IconNode[] = [
-      { id: 'icon1', icon: '/manifesto/s-01.png', size: 40 },
-      { id: 'icon2', icon: '/manifesto/s-02.png', size: 35 },
-      { id: 'icon3', icon: '/manifesto/s-03.png', size: 50 },
-      { id: 'icon4', icon: '/manifesto/s-04.png', size: 45 },
-      { id: 'icon5', icon: '/manifesto/s-05.png', size: 40 },
-      { id: 'icon6', icon: '/manifesto/s-06.png', size: 55 },
-      { id: 'icon7', icon: '/manifesto/s-07.png', size: 42 },
-      { id: 'icon8', icon: '/manifesto/s-08.png', size: 38 },
-      { id: 'icon9', icon: '/manifesto/s-09.png', size: 48 },
-      { id: 'icon10', icon: '/manifesto/s-10.png', size: 44 }
+    const nodes: Node[] = [
+      // Fixed title node at center
+      { 
+        id: 'title', 
+        type: 'title',
+        text: 'Discover yourself through play.',
+        fx: width / 2, 
+        fy: height / 2,
+        size: 300  // Large collision radius to keep icons away
+      },
+      // Icon nodes
+      { id: 'icon1', type: 'icon', icon: '/manifesto/s-01.png', size: 40 },
+      { id: 'icon2', type: 'icon', icon: '/manifesto/s-02.png', size: 35 },
+      { id: 'icon3', type: 'icon', icon: '/manifesto/s-03.png', size: 50 },
+      { id: 'icon4', type: 'icon', icon: '/manifesto/s-04.png', size: 45 },
+      { id: 'icon5', type: 'icon', icon: '/manifesto/s-05.png', size: 40 },
+      { id: 'icon6', type: 'icon', icon: '/manifesto/s-06.png', size: 55 },
+      { id: 'icon7', type: 'icon', icon: '/manifesto/s-07.png', size: 42 },
+      { id: 'icon8', type: 'icon', icon: '/manifesto/s-08.png', size: 38 },
+      { id: 'icon9', type: 'icon', icon: '/manifesto/s-09.png', size: 48 },
+      { id: 'icon10', type: 'icon', icon: '/manifesto/s-10.png', size: 44 }
     ];
 
-    // Define links between icons (creating a network)
-    interface IconLink extends d3.SimulationLinkDatum<IconNode> {
-      source: string | IconNode;
-      target: string | IconNode;
+    // Define links: connect title to each icon, plus icon-icon links
+    interface Link extends d3.SimulationLinkDatum<Node> {
+      source: string | Node;
+      target: string | Node;
     }
 
-    const links: IconLink[] = [
+    const links: Link[] = [
+      // Title → each icon (hub-and-spoke)
+      { source: 'title', target: 'icon1' },
+      { source: 'title', target: 'icon2' },
+      { source: 'title', target: 'icon3' },
+      { source: 'title', target: 'icon4' },
+      { source: 'title', target: 'icon5' },
+      { source: 'title', target: 'icon6' },
+      { source: 'title', target: 'icon7' },
+      { source: 'title', target: 'icon8' },
+      { source: 'title', target: 'icon9' },
+      { source: 'title', target: 'icon10' },
+      // Icon ring + cross connections
       { source: 'icon1', target: 'icon2' },
       { source: 'icon2', target: 'icon3' },
       { source: 'icon3', target: 'icon4' },
@@ -100,23 +312,25 @@ function HeroSection() {
     ];
 
     // Create force simulation with link force
-    const simulation = d3.forceSimulation(icons)
-      .force('link', d3.forceLink<IconNode, IconLink>(links)
+    const simulation = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink<Node, Link>(links)
         .id(d => d.id)
-        .distance(100)
-        .strength(0.3))
-      .force('charge', d3.forceManyBody().strength(-150))
+        .distance(l => (typeof l.source !== 'string' && l.source.id === 'title') ? 220 : 120)
+        .strength(l => (typeof l.source !== 'string' && l.source.id === 'title') ? 0.35 : 0.25))
+      .force('charge', d3.forceManyBody().strength(-220))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('collision', d3.forceCollide().radius((d: d3.SimulationNodeDatum) => {
-        const node = d as IconNode;
-        return node.size / 2 + 15;
+        const node = d as Node;
+        if (node.type === 'title') return node.size! / 2; // participates in collision like a normal node
+        return node.size! / 2 + 15;
       }))
       .force('x', d3.forceX(width / 2).strength(0.05))
       .force('y', d3.forceY(height / 2).strength(0.05));
 
-    // Define drag behavior
-    const drag = d3.drag<SVGImageElement, IconNode>()
+    // Define drag behavior (only for icons)
+    const drag = d3.drag<SVGImageElement, Node>()
       .on('start', function(event, d) {
+        if (d.type === 'title') return; // Don't allow dragging title
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
@@ -127,13 +341,15 @@ function HeroSection() {
           .attr('opacity', 1);
       })
       .on('drag', function(event, d) {
+        if (d.type === 'title') return;
         d.fx = event.x;
         d.fy = event.y;
       })
       .on('end', function(event, d) {
+        if (d.type === 'title') return;
         if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+        d.fx = undefined;
+        d.fy = undefined;
         d3.select(this)
           .style('cursor', 'grab')
           .transition()
@@ -158,15 +374,74 @@ function HeroSection() {
       .delay(200)
       .attr('opacity', 1);
 
-    // Create icon elements
+    // Create title text element (fixed at center)
+    const titleNode = nodes.find(n => n.type === 'title');
+    
+    // Add gradient for title
+    const defs = svg.append('defs');
+    const gradient = defs.append('linearGradient')
+      .attr('id', 'titleGradient')
+      .attr('x1', '0%')
+      .attr('y1', '0%')
+      .attr('x2', '100%')
+      .attr('y2', '100%');
+    
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', 'black');
+    
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', '#6f82a2');
+
+    const titleElement = svg
+      .append('text')
+      .datum(titleNode!)
+      .attr('class', 'd3-title')
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .attr('x', titleNode!.fx!)
+      .attr('y', titleNode!.fy!)
+      .attr('opacity', 0)
+      .style('font-family', 'var(--font-instrument-serif)')
+      .style('font-size', '96px')
+      .style('font-weight', '400')
+      .style('letter-spacing', '-4px')
+      .style('line-height', '1')
+      .style('fill', 'url(#titleGradient)')
+      .style('pointer-events', 'none')
+      .style('white-space', 'nowrap');
+
+    // Single-line title with max-width 1200px: measure and scale down if wider
+    const fullTitle = titleNode!.text!;
+    titleElement.text(fullTitle);
+    const tmpBBox = (titleElement.node() as SVGTextElement).getBBox();
+    const maxWidth = 1200;
+    if (tmpBBox.width > maxWidth) {
+      const scale = maxWidth / tmpBBox.width;
+      titleElement
+        .attr('transform', `translate(${titleNode!.fx!},${titleNode!.fy!}) scale(${scale}) translate(${-titleNode!.fx!},${-titleNode!.fy!})`);
+      // Increase collision radius proportionally so icons keep distance
+      titleNode!.size = (titleNode!.size || 300) / scale;
+    }
+
+    // Animate title in
+    titleElement
+      .transition()
+      .duration(1200)
+      .delay(600)
+      .attr('opacity', 1);
+
+    // Create icon elements (filter out title node)
+    const iconNodes = nodes.filter(n => n.type === 'icon');
     const iconElements = svg
       .selectAll('image')
-      .data(icons)
+      .data(iconNodes)
       .enter()
       .append('image')
-      .attr('href', d => d.icon)
-      .attr('width', d => d.size)
-      .attr('height', d => d.size)
+      .attr('href', d => d.icon!)
+      .attr('width', d => d.size!)
+      .attr('height', d => d.size!)
       .attr('opacity', 0)
       .style('cursor', 'grab')
       .call(drag);
@@ -182,15 +457,17 @@ function HeroSection() {
     simulation.on('tick', () => {
       // Update link positions
       linkElements
-        .attr('x1', d => (d.source as IconNode).x || 0)
-        .attr('y1', d => (d.source as IconNode).y || 0)
-        .attr('x2', d => (d.target as IconNode).x || 0)
-        .attr('y2', d => (d.target as IconNode).y || 0);
+        .attr('x1', d => (d.source as Node).x || 0)
+        .attr('y1', d => (d.source as Node).y || 0)
+        .attr('x2', d => (d.target as Node).x || 0)
+        .attr('y2', d => (d.target as Node).y || 0);
 
       // Update icon positions
       iconElements
-        .attr('x', d => (d.x || 0) - d.size / 2)
-        .attr('y', d => (d.y || 0) - d.size / 2);
+        .attr('x', d => (d.x || 0) - d.size! / 2)
+        .attr('y', d => (d.y || 0) - d.size! / 2);
+
+      // Title stays fixed, no need to update
     });
 
     // Cleanup
@@ -209,33 +486,38 @@ function HeroSection() {
       <div ref={containerRef} className={styles.scatteredIcons}>
         <svg ref={svgRef} className={styles.d3IconCanvas}></svg>
       </div>
-      <motion.h1 
-        className={styles.heroTitle}
-        initial={{ opacity: 0, y: 60 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ 
-          duration: 1.2, 
-          ease: [0.16, 1, 0.3, 1],
-          delay: 0.6
-        }}
-      >
-        Discover yourself through <em>play</em>.
-      </motion.h1>
     </motion.section>
   )
 }
 
-// Text Content Section Component
-function TextContentSection() {
+function IntroSection() {
   return (
     <ManifestoSection delay={0.1}>
       <div className={styles.introSection}>
-        <p className={styles.paragraph}>
+      <p className={styles.paragraph}>
           You're more than just a label.
         </p>
         <p className={styles.paragraph}>
           You're a living, moving, and sometimes oftentimes contradictory story.
         </p>
+      </div>
+    </ManifestoSection>
+  )
+}
+
+function SpeechBubblesSection() {
+  return (
+    <div className={styles.speechBubblesSection}>
+      <SpeechBubbles />
+    </div>
+  )
+}
+
+// Text Content Section Component
+function GreekSection() {
+  return (
+    <ManifestoSection delay={0.1}>
+      <div className={styles.greekSection}>
         <p className={styles.paragraph}>
           This isn't new. Ancient Greeks carved 'Know thyself' above their temples — even they knew this was the hardest command.
         </p>
@@ -247,216 +529,6 @@ function TextContentSection() {
   )
 }
 
-// Timeline Section Component with D3 Force Visualization
-function TimelineSection() {
-  const svgRef = useRef<SVGSVGElement>(null);
-
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    const svg = d3.select(svgRef.current);
-    const width = 500;
-    const height = 400;
-
-    // Clear any existing content
-    svg.selectAll('*').remove();
-
-    svg
-      .attr('width', width)
-      .attr('height', height)
-      .attr('viewBox', `0 0 ${width} ${height}`)
-      .attr('preserveAspectRatio', 'xMidYMid meet');
-
-    // Define nodes and links
-    interface Node extends d3.SimulationNodeDatum {
-      id: string;
-      label: string;
-      isCenter?: boolean;
-      x?: number;
-      y?: number;
-      width?: number;
-      height?: number;
-    }
-
-    interface Link extends d3.SimulationLinkDatum<Node> {
-      source: string | Node;
-      target: string | Node;
-    }
-
-    const nodes: Node[] = [
-      { id: 'center', label: '👤', isCenter: true },
-      { id: 'pm', label: 'Product Manager' },
-      { id: 'enfj', label: 'ENFJ' },
-      { id: 'percent', label: '92%' },
-      { id: 'vc', label: 'VC' },
-      { id: 'exp', label: '5 Years of Experience' },
-      { id: 'uni', label: '[X] University' }
-    ];
-
-    const links: Link[] = [
-      { source: 'center', target: 'pm' },
-      { source: 'center', target: 'enfj' },
-      { source: 'center', target: 'percent' },
-      { source: 'center', target: 'vc' },
-      { source: 'center', target: 'exp' },
-      { source: 'center', target: 'uni' }
-    ];
-
-    // Create force simulation (collision will be updated after measuring text)
-    const simulation = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink<Node, Link>(links)
-        .id(d => d.id)
-        .distance(140))
-      .force('charge', d3.forceManyBody().strength(-400))
-      .force('center', d3.forceCenter(width / 2, height / 2));
-
-    // Create container for links and nodes
-    const linkGroup = svg.append('g').attr('class', 'links');
-    const nodeGroup = svg.append('g').attr('class', 'nodes');
-
-    // Draw links
-    const link = linkGroup
-      .selectAll('line')
-      .data(links)
-      .enter()
-      .append('line')
-      .attr('stroke', 'rgba(0,0,0, 0.4)')
-      .attr('stroke-width', 2);
-
-    // Define drag behavior
-    const drag = d3.drag<SVGGElement, Node>()
-      .on('start', function(event, d) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-        d3.select(this)
-          .style('cursor', 'grabbing')
-          .select('rect')
-          .transition()
-          .duration(200)
-          .attr('fill', 'rgba(0,0,0, 0.15)');
-      })
-      .on('drag', function(event, d) {
-        d.fx = event.x;
-        d.fy = event.y;
-      })
-      .on('end', function(event, d) {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
-        d3.select(this)
-          .style('cursor', 'grab')
-          .select('rect')
-          .transition()
-          .duration(200)
-          .attr('fill', d.isCenter ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.9)');
-      });
-
-    // Draw nodes
-    const node = nodeGroup
-      .selectAll('g')
-      .data(nodes)
-      .enter()
-      .append('g')
-      .attr('class', 'node')
-      .call(drag);
-
-    // Add text labels first to measure dimensions
-    node
-      .append('text')
-      .text(d => d.label)
-      .attr('text-anchor', 'middle')
-      .attr('dy', '.35em')
-      .attr('font-size', d => d.isCenter ? '20px' : '18px')
-      .attr('fill', 'black')
-      .attr('font-weight', d => d.isCenter ? '400' : '500')
-      .attr('pointer-events', 'none')
-      .style('user-select', 'none');
-
-    // Calculate text dimensions and add rectangles
-    node.each(function(d) {
-      const textElement = d3.select(this).select('text').node() as SVGTextElement;
-      if (textElement) {
-        const bbox = textElement.getBBox();
-        const padding = d.isCenter ? 16 : 12;
-        d.width = bbox.width + padding * 2;
-        d.height = bbox.height + padding * 2;
-        
-        // Insert rectangle before text
-        d3.select(this)
-          .insert('rect', 'text')
-          .attr('width', d.width)
-          .attr('height', d.height)
-          .attr('x', -d.width / 2)
-          .attr('y', -d.height / 2)
-          .attr('rx', d.isCenter ? 50 : 4)
-          .attr('ry', d.isCenter ? 50 : 4)
-          .attr('fill', d.isCenter ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.9)')
-          .attr('stroke', d.isCenter ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.6)')
-          .attr('stroke-width', d.isCenter ? 3 : 2);
-      }
-    });
-
-    // Update collision force now that we have dimensions
-    simulation.force('collision', d3.forceCollide().radius((d) => {
-      const node = d as Node;
-      const maxDimension = Math.max(node.width || 50, node.height || 30);
-      return maxDimension / 2 + 10;
-    }));
-
-    // Update positions on each tick
-    simulation.on('tick', () => {
-      link
-        .attr('x1', d => (d.source as Node).x || 0)
-        .attr('y1', d => (d.source as Node).y || 0)
-        .attr('x2', d => (d.target as Node).x || 0)
-        .attr('y2', d => (d.target as Node).y || 0);
-
-      node.attr('transform', d => `translate(${d.x || 0},${d.y || 0})`);
-    });
-
-    // Set initial cursor style
-    node.style('cursor', 'grab');
-
-    // Cleanup
-    return () => {
-      simulation.stop();
-    };
-  }, []);
-
-  return (
-    <ManifestoSection delay={0.2}>
-      <div className={styles.timeline}>
-        <div className={styles.timelineContainer}>
-          <motion.div 
-            className={styles.timelineTextSection}
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-          >
-            <p className={styles.paragraph}>
-              But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
-            </p>
-            <p className={styles.paragraph}>
-              Yet we're far more multi-dimensional than that.
-            </p>
-          </motion.div>
-          
-          <motion.div 
-            className={styles.timelineCanvasSection}
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <svg ref={svgRef} className={styles.d3Canvas}></svg>
-          </motion.div>
-        </div>
-      </div>
-    </ManifestoSection>
-  )
-}
 
 // Conversation Section Component
 function ConversationSection() {
@@ -706,15 +778,14 @@ export default function ManifestoV2() {
   return (
     <div className={styles.container}>
       <HeroSection />
-      <TextContentSection />
-      <SpeechBubbles />
+      <IntroSection />
+      <GreekSection />
+      <SpeechBubblesSection />
       <TimelineSection />
       <ConversationSection />
       <PlaySection />
       <PhoneSection />
       <BottomSection />
-
-
     </div>
   )
 }
