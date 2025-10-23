@@ -9,7 +9,6 @@ import WaitlistForm from '@/components/manifesto/WaitlistForm';
 import ChatSideCard from '@/components/manifesto/ChatSideCard';
 import SpeechBubbles from '@/components/manifesto/SpeechBubbles';
 import SimCard from '@/components/manifesto/SimCard';
-// Removed separate AICard component; will embed logos directly
 import BouncerSim from '@/components/manifesto/BouncerSim';
 
 const getSeededOffset = (seed: string, min: number, max: number) => {
