@@ -280,7 +280,7 @@ function HeroSection() {
     // Define node data including title as fixed center node
     interface Node extends d3.SimulationNodeDatum {
       id: string;
-      type: 'title' | 'icon';
+      type: 'title' | 'icon' | 'repulsion';
       icon?: string;
       size?: number;
       text?: string;
@@ -295,29 +295,59 @@ function HeroSection() {
       { 
         id: 'title', 
         type: 'title',
-        text: 'Discover yourself through play.',
-        fx: width / 2, 
+        fx: width * 0.2, 
         fy: height / 2,
-        size: 400  // Larger collision radius for stronger repulsion
+        size: 200  // Larger collision radius for stronger repulsion
       },
-      // Icon nodes with varied sizes
-      { id: 'icon1', type: 'icon', icon: '/manifesto/s-01.png', size: 60 },
-      { id: 'icon2', type: 'icon', icon: '/manifesto/s-02.png', size: 65 },
-      { id: 'icon3', type: 'icon', icon: '/manifesto/s-03.png', size: 60 },
-      { id: 'icon4', type: 'icon', icon: '/manifesto/s-04.png', size: 58 },
-      { id: 'icon5', type: 'icon', icon: '/manifesto/s-05.png', size: 35 },
-      { id: 'icon6', type: 'icon', icon: '/manifesto/s-06.png', size: 72 },
-      { id: 'icon7', type: 'icon', icon: '/manifesto/s-07.png', size: 120 },
-      { id: 'icon8', type: 'icon', icon: '/manifesto/s-08.png', size: 52 },
-      { id: 'icon9', type: 'icon', icon: '/manifesto/s-09.png', size: 80 },
-      { id: 'icon10', type: 'icon', icon: '/manifesto/s-10.png', size: 31 },
-      { id: 'icon11', type: 'icon', icon: '/manifesto/s-11.png', size: 31 },
-      { id: 'icon12', type: 'icon', icon: '/manifesto/s-12.png', size: 35 },
-      { id: 'icon13', type: 'icon', icon: '/manifesto/s-13.png', size: 72 },
-      { id: 'icon14', type: 'icon', icon: '/manifesto/s-14.png', size: 38 },
-      { id: 'icon15', type: 'icon', icon: '/manifesto/s-15.png', size: 52 },
-      { id: 'icon16', type: 'icon', icon: '/manifesto/s-16.png', size: 45 },
-      { id: 'icon17', type: 'icon', icon: '/manifesto/s-17.png', size: 40 }
+      // Additional repulsion points to protect text area
+      { 
+        id: 'repulsionLeft', 
+        type: 'repulsion',
+        fx: width * 0.4, 
+        fy: height / 2,
+        size: 200  // Medium repulsion radius
+      },
+      { 
+        id: 'repulsionRight', 
+        type: 'repulsion',
+        fx: width * 0.5, 
+        fy: height / 2,
+        size: 200  // Medium repulsion radius
+      },
+      { 
+        id: 'repulsionLeft', 
+        type: 'repulsion',
+        fx: width * 0.6, 
+        fy: height / 2,
+        size: 200  // Medium repulsion radius
+      },
+      { 
+        id: 'repulsionRight', 
+        type: 'repulsion',
+        fx: width * 0.8, 
+        fy: height / 2,
+        size: 200  // Medium repulsion radius
+      },
+      // Icon nodes with varied sizes and initial positions
+      { id: 'icon1', type: 'icon', icon: '/manifesto/s-01.png', size: 60, x: width * 0.1, y: height * 0.2 },
+      { id: 'icon2', type: 'icon', icon: '/manifesto/s-02.png', size: 65, x: width * 0.9, y: height * 0.15 },
+      { id: 'icon3', type: 'icon', icon: '/manifesto/s-03.png', size: 60, x: width * 0.15, y: height * 0.8 },
+      { id: 'icon4', type: 'icon', icon: '/manifesto/s-04.png', size: 58, x: width * 0.85, y: height * 0.75 },
+      { id: 'icon5', type: 'icon', icon: '/manifesto/s-05.png', size: 35, x: width * 0.05, y: height * 0.5 },
+      { id: 'icon6', type: 'icon', icon: '/manifesto/s-06.png', size: 72, x: width * 0.95, y: height * 0.45 },
+      { id: 'icon7', type: 'icon', icon: '/manifesto/s-07.png', size: 120, x: width * 0.3, y: height * 0.1 },
+      { id: 'icon8', type: 'icon', icon: '/manifesto/s-08.png', size: 52, x: width * 0.7, y: height * 0.9 },
+      { id: 'icon9', type: 'icon', icon: '/manifesto/s-09.png', size: 80, x: width * 0.25, y: height * 0.9 },
+      { id: 'icon10', type: 'icon', icon: '/manifesto/s-10.png', size: 31, x: width * 0.75, y: height * 0.1 },
+      { id: 'icon11', type: 'icon', icon: '/manifesto/s-11.png', size: 31, x: width * 0.1, y: height * 0.6 },
+      { id: 'icon12', type: 'icon', icon: '/manifesto/s-12.png', size: 35, x: width * 0.9, y: height * 0.6 },
+      { id: 'icon13', type: 'icon', icon: '/manifesto/s-13.png', size: 72, x: width * 0.4, y: height * 0.05 },
+      { id: 'icon14', type: 'icon', icon: '/manifesto/s-14.png', size: 38, x: width * 0.6, y: height * 0.95 },
+      { id: 'icon15', type: 'icon', icon: '/manifesto/s-15.png', size: 52, x: width * 0.35, y: height * 0.7 },
+      { id: 'icon16', type: 'icon', icon: '/manifesto/s-16.png', size: 45, x: width * 0.65, y: height * 0.3 },
+      { id: 'icon17', type: 'icon', icon: '/manifesto/s-17.png', size: 40, x: width * 0.2, y: height * 0.4 },
+      { id: 'icon18', type: 'icon', icon: '/manifesto/s-18.png', size: 45, x: width * 0.8, y: height * 0.4 },
+      { id: 'icon19', type: 'icon', icon: '/manifesto/s-19.png', size: 40, x: width * 0.5, y: height * 0.1 }
     ];
 
     // Define links: connect title to each icon, plus icon-icon links
@@ -380,37 +410,41 @@ function HeroSection() {
         const node = d as Node;
         // Title has strong negative charge (repulsion)
         if (node.type === 'title') return -800;
+        // Repulsion points have medium negative charge
+        if (node.type === 'repulsion') return -400;
         return -220;
       }))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('collision', d3.forceCollide().radius((d: d3.SimulationNodeDatum) => {
         const node = d as Node;
         if (node.type === 'title') return node.size! / 2; // Large collision radius for title
+        if (node.type === 'repulsion') return node.size! / 2; // Medium collision radius for repulsion points
         return node.size! / 2 + 15;
       }))
       .force('x', d3.forceX(width / 2).strength(0.05))
       .force('y', d3.forceY(height / 2).strength(0.05))
-      // Add custom repulsion force from title
+      // Add custom repulsion force from title and repulsion points
       .force('titleRepulsion', () => {
-        const titleNode = nodes.find(n => n.type === 'title');
-        if (!titleNode) return;
+        const repulsionNodes = nodes.filter(n => n.type === 'title' || n.type === 'repulsion');
         
         nodes.forEach(node => {
           if (node.type === 'icon' && node.x !== undefined && node.y !== undefined) {
-            const dx = node.x - titleNode.fx!;
-            const dy = node.y - titleNode.fy!;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = 200; // Minimum distance from title
-            
-            if (distance < minDistance && distance > 0) {
-              const force = (minDistance - distance) / minDistance * 0.3;
-              const angle = Math.atan2(dy, dx);
-              const fx = Math.cos(angle) * force;
-              const fy = Math.sin(angle) * force;
+            repulsionNodes.forEach(repulsionNode => {
+              const dx = node.x! - repulsionNode.fx!;
+              const dy = node.y! - repulsionNode.fy!;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              const minDistance = repulsionNode.type === 'title' ? 200 : 120; // Different distances for title vs repulsion points
               
-              node.vx = (node.vx || 0) + fx;
-              node.vy = (node.vy || 0) + fy;
-            }
+              if (distance < minDistance && distance > 0) {
+                const force = (minDistance - distance) / minDistance * (repulsionNode.type === 'title' ? 0.3 : 0.2);
+                const angle = Math.atan2(dy, dx);
+                const fx = Math.cos(angle) * force;
+                const fy = Math.sin(angle) * force;
+                
+                node.vx = (node.vx || 0) + fx;
+                node.vy = (node.vy || 0) + fy;
+              }
+            });
           }
         });
       });
@@ -418,7 +452,7 @@ function HeroSection() {
     // Define drag behavior (only for icons)
     const drag = d3.drag<SVGImageElement, Node>()
       .on('start', function(event, d) {
-        if (d.type === 'title') return; // Don't allow dragging title
+        if (d.type === 'title' || d.type === 'repulsion') return; // Don't allow dragging title or repulsion points
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
@@ -429,12 +463,12 @@ function HeroSection() {
           .attr('opacity', 1);
       })
       .on('drag', function(event, d) {
-        if (d.type === 'title') return;
+        if (d.type === 'title' || d.type === 'repulsion') return;
         d.fx = event.x;
         d.fy = event.y;
       })
       .on('end', function(event, d) {
-        if (d.type === 'title') return;
+        if (d.type === 'title' || d.type === 'repulsion') return;
         if (!event.active) simulation.alphaTarget(0);
         d.fx = undefined;
         d.fy = undefined;
@@ -572,8 +606,10 @@ function HeroSection() {
       transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
     >
       <div ref={containerRef} className={styles.scatteredIcons}>
-        <svg ref={svgRef} className={styles.d3IconCanvas}></svg>
+        <svg ref={svgRef} className={styles.d3IconCanvas}>
+        </svg>
       </div>
+      <h1 className={styles.heroTitle}>Discover yourself through play.</h1>
     </motion.section>
   )
 }
@@ -816,14 +852,14 @@ function BoxSection() {
     { id: 'uni', label: '[X] University' }
   ];
 
-  // Starting positions for cards (spread around the viewport)
+  // Starting positions for cards (horizontal row above the cube)
   const startPositions = [
-    { x: 10, y: 20 },   // Top left
-    { x: 75, y: 15 },   // Top right
-    { x: 5, y: 60 },    // Middle left  
-    { x: 80, y: 65 },   // Middle right
-    { x: 20, y: 85 },   // Bottom left
-    { x: 70, y: 90 },   // Bottom right
+    { x: 25, y: 5 },    // Left side
+    { x: 36, y: 5 },    // Left-center
+    { x: 44, y: 5 },    // Center-left
+    { x: 51, y: 5 },    // Center-right
+    { x: 63, y: 5 },    // Right-center
+    { x: 78, y: 5 },    // Right side
   ];
 
   useEffect(() => {
@@ -833,22 +869,35 @@ function BoxSection() {
       const rect = sectionRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       
-      // Calculate progress: 0 when section enters viewport, 1 when it's centered/past
-      const sectionCenter = rect.top + rect.height / 2;
-      const progress = Math.max(0, Math.min(1, 
-        1 - (sectionCenter / viewportHeight)
-      ));
+      // Animation only starts when container reaches top 25% of viewport
+      const animationStartThreshold = viewportHeight * 0;
+      const containerTop = rect.top;
+      
+      // Calculate progress: 0 until container hits top 25%, then animate
+      let progress = 0;
+      if (containerTop <= animationStartThreshold) {
+        // Once animation starts, calculate progress based on how far past the threshold
+        const animationDistance = animationStartThreshold - containerTop;
+        const maxAnimationDistance = viewportHeight * 0.8; // Animation completes over next 80% of viewport (slower)
+        progress = Math.min(1, animationDistance / maxAnimationDistance);
+      }
       
       setScrollProgress(progress);
     };
 
+    const handleResize = () => {
+      handleScroll();
+    };
+
+    // Initial calculation
     handleScroll();
+    
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
+    window.addEventListener('resize', handleResize);
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -864,20 +913,20 @@ function BoxSection() {
           {/* Timeline cards that move toward center */}
           {cards.map((card, index) => {
             const startPos = startPositions[index];
-            const cardDelay = index * 0.1;
-            const cardProgress = Math.max(0, Math.min(1, (scrollProgress - cardDelay) * 1.2));
+            // Direct progress calculation - no delays or multipliers
+            const cardProgress = Math.max(0, Math.min(1, scrollProgress));
             
-            // Target position (center of container)
-            const targetX = 50; // 50% - center
-            const targetY = 50; // 50% - center
+            // Target position (cube's actual position)
+            const targetX = 50; // 50% - matches cube's left: 50%
+            const targetY = 75; // 75% - matches cube's bottom: -50% (which is 75% from top)
             
-            // Interpolate position
+            // Direct linear interpolation for immediate response
             const currentX = startPos.x + (targetX - startPos.x) * cardProgress;
             const currentY = startPos.y + (targetY - startPos.y) * cardProgress;
             
-            // Scale and opacity based on progress
-            const scale = 1 - cardProgress * 0.7; // Cards get smaller as they approach center
-            const opacity = 1 - cardProgress * 0.8; // Cards fade as they approach center
+            // Scale and opacity - direct calculation
+            const scale = 1 - cardProgress * 0.8;
+            const opacity = Math.max(0, 1 - cardProgress * 0.9);
             
             return (
               <div
@@ -886,9 +935,9 @@ function BoxSection() {
                 style={{
                   left: `${currentX}%`,
                   top: `${currentY}%`,
-                  transform: `translate(-50%, -50%) scale(${scale})`,
+                  transform: `translate3d(-50%, -50%, 0) scale(${scale})`,
                   opacity: opacity,
-                  zIndex: 10 - index, // Cards behind have lower z-index
+                  zIndex: 10 - index,
                 }}
               >
                 <h3>{card.label}</h3>
@@ -1070,7 +1119,7 @@ function PhoneSection() {
           We’re more than just a label. 
         </p>
         <p className={styles.paragraph}>
-          We're a living, moving and oftentimes contradictory story.
+          We are all made up of living, breathing stories.
         </p>
         <p className={styles.paragraph}>
           So, what's your story?
