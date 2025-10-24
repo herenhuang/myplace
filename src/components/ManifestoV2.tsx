@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import styles from './ManifestoV2.module.scss';
 import SpeechBubbles from '@/components/manifesto/SpeechBubbles';
 import WaitlistForm from '@/components/manifesto/WaitlistForm';
+import PentagonChart from '@/components/word-association/PentagonChart';
 
 const ManifestoSection: React.FC<{
   children: React.ReactNode;
@@ -622,7 +623,7 @@ function IntroSection() {
           You're more than just a label.
         </p>
         <p className={styles.paragraph}>
-          You're a living, moving, and sometimes oftentimes contradictory story.
+          You're a <b>living</b>,  <i>moving</i>, and oftentimes <span className={styles.highlight}>contradictory</span> story.
         </p>
       </div>
     </ManifestoSection>
@@ -1000,11 +1001,9 @@ function PhoneSection() {
     <ManifestoSection delay={0.4}>
       <div className={styles.phoneSection}>
 
-
         <p className={styles.paragraph}>
-          Every day, a new game. A new chance to discover who you could through the simple building a silly moment of who you really are.
+          1) Play - Quick daily stories, different scenarios each time.
         </p>
-
 
 <div className={styles.phoneContent}>
 
@@ -1114,17 +1113,315 @@ function PhoneSection() {
         <div className={styles.gameCard}></div>
 
         </div>
-     
+    
+      </div>
+    </ManifestoSection>
+  )
+}
+
+function BuildSection() {
+  const [selectedTrait, setSelectedTrait] = React.useState(0);
+  
+  const personalityTraits = [
+    { 
+      id: 'navigator', 
+      name: 'The Navigator', 
+      icon: '/manifesto/s-01.png',
+      description: 'Guides others through complex decisions',
+      color: '#3B82F6',
+      tags: ['Leadership', 'Strategy'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    { 
+      id: 'freethinker', 
+      name: 'The Freethinker', 
+      icon: '/manifesto/s-02.png',
+      description: 'Challenges conventional wisdom',
+      color: '#8B5CF6',
+      tags: ['Creativity', 'Innovation'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    { 
+      id: 'visionary', 
+      name: 'The Visionary', 
+      icon: '/manifesto/s-05.png',
+      description: 'Sees possibilities others miss',
+      color: '#EF4444',
+      tags: ['Innovation', 'Future'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    { 
+      id: 'stabilizer', 
+      name: 'The Stabilizer', 
+      icon: '/manifesto/s-06.png',
+      description: 'Provides grounding and balance',
+      color: '#6B7280',
+      tags: ['Balance', 'Support'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    // Add more traits to fill the grid
+    { 
+      id: 'explorer', 
+      name: 'The Explorer', 
+      icon: '/manifesto/s-07.png',
+      description: 'Seeks new experiences',
+      color: '#EC4899',
+      tags: ['Adventure', 'Curiosity'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'mentor', 
+      name: 'The Mentor', 
+      icon: '/manifesto/s-08.png',
+      description: 'Guides and teaches others',
+      color: '#14B8A6',
+      tags: ['Teaching', 'Wisdom'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'analyst', 
+      name: 'The Analyst', 
+      icon: '/manifesto/s-09.png',
+      description: 'Examines data and patterns',
+      color: '#F97316',
+      tags: ['Analysis', 'Logic'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'collaborator', 
+      name: 'The Collaborator', 
+      icon: '/manifesto/s-10.png',
+      description: 'Works well with teams',
+      color: '#6366F1',
+      tags: ['Teamwork', 'Cooperation'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'realist', 
+      name: 'The Realist', 
+      icon: '/manifesto/s-12.png',
+      description: 'Grounded in practical thinking',
+      color: '#64748B',
+      tags: ['Practical', 'Grounded'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    /*
+    { 
+      id: 'diplomat', 
+      name: 'The Diplomat', 
+      icon: '/manifesto/s-14.png',
+      description: 'Resolves conflicts peacefully',
+      color: '#059669',
+      tags: ['Diplomacy', 'Peace'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'perfectionist', 
+      name: 'The Perfectionist', 
+      icon: '/manifesto/s-15.png',
+      description: 'Strives for excellence',
+      color: '#7C3AED',
+      tags: ['Excellence', 'Quality'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'adapter', 
+      name: 'The Adapter', 
+      icon: '/manifesto/s-16.png',
+      description: 'Adjusts to changing situations',
+      color: '#0891B2',
+      tags: ['Flexibility', 'Adaptation'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    }
+      */
+  ];
+
+  return (
+    <ManifestoSection delay={0.4}>
+      <div className={styles.buildSection}>
         <p className={styles.paragraph}>
-          We’re more than just a label. 
-        </p>
-        <p className={styles.paragraph}>
-          We are all made up of living, breathing stories.
-        </p>
-        <p className={styles.paragraph}>
-          So, what's your story?
+          2) Build - Your profile grows with every choice you make
         </p>
         
+        <div className={styles.stampbook}>
+          {/* Icon Grid */}
+
+        
+          <div className={styles.iconGrid}>
+          <h2 className={styles.stampbookTitle}>STAMPBOOK</h2>
+            <div className={styles.gridContainer}>
+              {personalityTraits.map((trait, index) => (
+                <motion.div
+                  key={trait.id}
+                  className={`${styles.iconCard} ${trait.collected ? styles.collected : styles.uncollected} ${selectedTrait === index ? styles.selected : ''}`}
+                  onClick={() => setSelectedTrait(index)}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <Image 
+                    src={trait.icon} 
+                    alt={trait.name}
+                    width={50}
+                    height={50}
+                  />
+                </motion.div>
+              ))}
+            </div>
+            <h1 className={styles.placeholder}> Hello </h1>
+             <h1 className={styles.placeholder}> Hello </h1>
+    
+          </div>
+
+       
+
+          {/* Magnified Card View */}
+          <div className={styles.magnifiedView}>
+            <div className={styles.detailCard}>
+              <div className={styles.cardHeader}>
+                <span className={styles.cardDate}>{personalityTraits[selectedTrait].date}</span>
+                <span className={styles.cardLevel}>LV. {personalityTraits[selectedTrait].level}</span>
+              </div>
+              
+              <div className={styles.cardIconLarge}>
+                <Image 
+                  src={personalityTraits[selectedTrait].icon} 
+                  alt={personalityTraits[selectedTrait].name}
+                  width={70}
+                  height={70}
+                />
+              </div>
+              
+              <h3 className={styles.cardTitleLarge}>{personalityTraits[selectedTrait].name}</h3>
+              
+              <div className={styles.cardTags}>
+                {personalityTraits[selectedTrait].tags.map((tag, index) => (
+                  <span key={index} className={styles.tag}>{tag}</span>
+                ))}
+              </div>
+              
+              <p className={styles.cardDescription}>
+                {personalityTraits[selectedTrait].description}
+              </p>
+              
+              <div className={styles.cardIdentifier}>
+                <span>SIM XX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ManifestoSection>
+  )
+}
+
+function DiscoverSection() {
+  // Sample user results data
+  const userResults = {
+    personalityScores: [8, 6, 7, 9, 5], // Sample pentagon chart data
+    metascore: 87,
+    archetype: 'The Navigator',
+    insights: [
+      'You show 92% creativity in problem-solving',
+      'Your responses indicate strong analytical thinking',
+      'You tend to approach challenges systematically'
+    ]
+  };
+
+  return (
+    <ManifestoSection delay={0.4}>
+      <div className={styles.discoverSection}>
+        <p className={styles.paragraph}>
+          3) Discover - See patterns you never knew existed
+        </p>
+        
+        <div className={styles.resultsContainer}>
+          {/* Pentagon Chart */}
+          <motion.div 
+            className={`${styles.resultCard} ${styles.pentagonCard}`}
+            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className={styles.pentagonContainer}>
+              <PentagonChart 
+                scores={userResults.personalityScores}
+                size={280}
+              />
+            </div>
+          </motion.div>
+
+          {/* Metascore */}
+          <motion.div 
+            className={`${styles.resultCard} ${styles.metascoreCard}`}
+            initial={{ opacity: 0, scale: 0.8, rotate: 3 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <h3 className={styles.resultTitle}>Your Metascore</h3>
+            <div className={styles.metascoreDisplay}>
+              <span className={styles.metascoreNumber}>{userResults.metascore}</span>
+              <span className={styles.metascoreLabel}>/100</span>
+            </div>
+            <p className={styles.metascoreDescription}>
+              Based on your responses, you show high levels of creativity and analytical thinking.
+            </p>
+          </motion.div>
+
+          {/* Insights */}
+          <motion.div 
+            className={`${styles.resultCard} ${styles.insightsCard}`}
+            initial={{ opacity: 0, scale: 0.8, rotate: -2 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
+            <h3 className={styles.resultTitle}>Key Insights</h3>
+            <div className={styles.insightsList}>
+              {userResults.insights.map((insight, index) => (
+                <motion.div
+                  key={index}
+                  className={styles.insightItem}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
+                >
+                  <span className={styles.insightBullet}>•</span>
+                  <span className={styles.insightText}>{insight}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </div>
     </ManifestoSection>
   )
@@ -1135,6 +1432,17 @@ function BottomSection() {
   return (
     <ManifestoSection delay={0.5}>
       <div className={styles.bottomSection}>
+
+      <p className={styles.paragraph}>
+          We’re more than just a label. 
+        </p>
+        <p className={styles.paragraph}>
+          We are all made up of living, breathing stories.
+        </p>
+        <p className={styles.paragraph}>
+          So, what's your story?
+        </p>
+        
 
       <WaitlistForm />
 
@@ -1196,6 +1504,8 @@ export default function ManifestoV2() {
       <BelieveSection />
       <PlaySection />
       <PhoneSection />
+      <BuildSection />
+      <DiscoverSection />
       <BottomSection />
     </div>
   )
