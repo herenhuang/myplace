@@ -156,15 +156,15 @@ export default function WaitlistForm() {
             disabled={isSubmitting}
             className={styles.input}
           />
-        </div>
 
-        <button 
-          type="submit" 
-          disabled={isSubmitting || !email}
-          className={styles.button}
-        >
-          {isSubmitting ? 'Loading...' : 'Continue →'}
+          <button 
+            type="submit" 
+            disabled={isSubmitting || !email}
+            className={styles.button}
+          >
+          {isSubmitting ? 'Loading...' : "Let's Play →"}
         </button>
+        </div>
 
         {status === 'success' && (
           <div className={styles.successMessage}>
