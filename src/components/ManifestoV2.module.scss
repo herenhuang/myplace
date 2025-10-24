@@ -14,7 +14,7 @@ $bg:#f3fcff;
 }
 
 .hero {
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,6 +35,10 @@ $bg:#f3fcff;
   @media (max-width: 768px) {
     padding: 0 1.5rem;
   }
+}
+
+.cube{
+  margin: auto;
 }
 
 .heroTitle {
@@ -153,6 +157,11 @@ $bg:#f3fcff;
   left: 0;
 }
 
+.believeSection {
+  text-align: center;
+  padding: 80px 0;
+}
+
 .greekImage {
   margin-top: 0px;
   margin-left: -100px;
@@ -182,6 +191,63 @@ $bg:#f3fcff;
 
 .greekContent {
   padding: 80px 0;
+}
+
+.boxSection {
+  padding: 60px 0;
+  text-align: center;
+}
+
+.timelineCards {
+  position: relative;
+  height: 400px;
+  margin: 40px 0;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: visible;
+}
+
+.timelineCard {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #333;
+  }
+  
+  p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.cubeContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px 0;
+  z-index: 1;
+}
+
+.cube {
+  max-width: 100%;
+  height: auto;
 }
 
 .paragraph {

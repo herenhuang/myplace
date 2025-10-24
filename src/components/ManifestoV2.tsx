@@ -61,39 +61,30 @@ function RotatingBox({ scrollProgress }: { scrollProgress: number }) {
     meshRef.current.rotation.z = THREE.MathUtils.lerp(meshRef.current.rotation.z, targetZ, 0.1);
   });
 
-  // Create gradient texture using canvas
-  const gradientTexture = React.useMemo(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d');
+  // Load all 6 square textures
+  const squareTextures = React.useMemo(() => {
+    const loader = new THREE.TextureLoader();
+    const textures = [];
     
-    if (ctx) {
-      // Create a multi-color gradient
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      gradient.addColorStop(0, '#ff6b6b');    // Red
-      gradient.addColorStop(0.25, '#f06595'); // Pink
-      gradient.addColorStop(0.5, '#cc5de8');  // Purple
-      gradient.addColorStop(0.75, '#339af0'); // Blue
-      gradient.addColorStop(1, '#51cf66');    // Green
-      
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (let i = 1; i <= 6; i++) {
+      const texture = loader.load(`/square-${i}.png`);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.needsUpdate = true;
+      textures.push(texture);
     }
     
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.needsUpdate = true;
-    return texture;
+    return textures;
   }, []);
 
+  // Create materials array for each face
+  const materials = React.useMemo(() => {
+    return squareTextures.map(texture => new THREE.MeshBasicMaterial({ map: texture }));
+  }, [squareTextures]);
+
   return (
-    <mesh ref={meshRef} castShadow receiveShadow>
+    <mesh ref={meshRef} castShadow receiveShadow material={materials}>
       <boxGeometry args={[1.5, 1.5, 1.5]} />
-      <meshStandardMaterial 
-        map={gradientTexture}
-        metalness={0.3} 
-        roughness={0.4}
-      />
     </mesh>
   );
 }
@@ -161,15 +152,16 @@ function FlyingCard({
 function BoxScene({ scrollProgress }: { scrollProgress: number }) {
   return (
     <>
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={1.0} />
       <directionalLight
         position={[3, 5, 5]}
-        intensity={1.1}
+        intensity={1.5}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
-      <pointLight position={[-5, -2, -5]} intensity={0.3} />
+      <pointLight position={[-5, -2, -5]} intensity={0.8} />
+      <pointLight position={[5, 2, 5]} intensity={0.8} />
       
       {/* Flying cards */}
       {timelineCards.map((card, index) => (
@@ -721,7 +713,10 @@ function ConversationSection() {
     <ManifestoSection delay={0.3}>
       <div className={styles.conversation}>
         <p className={styles.paragraph}>
-          And now, as AI can mimic our words and even fake our work, the one thing it can't copy is our judgment, our character, the way we move through the world and build trust with others.
+          And now, as AI can mimic our words and even fake our work, the one thing it can't copy is our <span className={styles.highlight}>judgment</span>, our <span className={styles.highlight}>character</span>, the way we <span className={styles.highlight}>move</span> through the world and build trust with others.
+        </p>
+        <p className={styles.paragraph}>
+          That's ours 🧩 to keep. And it's worth sharing with each other, and with the tools we rely on.
         </p>
         
         <div className={styles.stackedBubbles}>
@@ -746,7 +741,7 @@ function ConversationSection() {
               transition: { duration: 0.2 }
             }}
           >
-            In the future, every hire is a personality hire.
+            In the future, <i>every</i> hire is a personality hire.
           </motion.div>
           
           <motion.div
@@ -770,7 +765,7 @@ function ConversationSection() {
               transition: { duration: 0.2 }
             }}
           >
-            Every connection starts with character.
+            Every connection starts with <i> character </i>.
           </motion.div>
           
           <motion.div
@@ -794,12 +789,158 @@ function ConversationSection() {
               transition: { duration: 0.2 }
             }}
           >
-            Every relationship begins with the real.
+            Every relationship begins with the <i>real</i>.
           </motion.div>
         </div>
         
         <p className={styles.paragraph}>
         But how do we capture that? How do we reveal who we really are without forcing ourselves back into boxes? Without right or wrong answers? Without performing?
+        </p>
+      </div>
+    </ManifestoSection>
+  )
+}
+
+// Box Section Component - Scroll-based animated timeline cards
+function BoxSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const cubeRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = React.useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current || !cubeRef.current) return;
+      
+      const sectionRect = sectionRef.current.getBoundingClientRect();
+      const cubeRect = cubeRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate progress based on section visibility
+      const sectionCenter = sectionRect.top + sectionRect.height / 2;
+      const sectionProgress = THREE.MathUtils.clamp(
+        1 - (sectionCenter / viewportHeight),
+        0,
+        1
+      );
+      
+      // Calculate progress based on cube visibility
+      const cubeCenter = cubeRect.top + cubeRect.height / 2;
+      const cubeProgress = THREE.MathUtils.clamp(
+        1 - (cubeCenter / viewportHeight),
+        0,
+        1
+      );
+      
+      // Combine both progress values
+      const combinedProgress = Math.max(sectionProgress, cubeProgress * 0.5);
+      setScrollProgress(combinedProgress);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  const cards = [
+    { id: 'pm', label: 'Product Manager', side: 'left' },
+    { id: 'enfj', label: 'ENFJ', side: 'right' },
+    { id: 'vc', label: 'VC', side: 'left' },
+    { id: 'exp', label: '5 Years of Experience', side: 'right' },
+    { id: 'uni', label: '[X] University', side: 'left' }
+  ];
+
+  return (
+    <ManifestoSection delay={0.2}>
+      <div ref={sectionRef} className={styles.boxSection}>
+
+      <p className={styles.paragraph}>
+          But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
+        </p>
+        
+
+        <div className={styles.timelineCards}>
+          {cards.map((card, index) => {
+            // Calculate positions based on scroll progress
+            const flyInProgress = THREE.MathUtils.clamp(scrollProgress * 2, 0, 1);
+            const centerProgress = THREE.MathUtils.clamp((scrollProgress - 0.3) * 2, 0, 1);
+            
+            // Starting positions (off-screen to the sides)
+            const startX = card.side === 'left' ? -300 : 300;
+            const startY = index * 80 - 160; // Vertical spacing
+            
+            // Horizontal row positions
+            const rowX = (index - 2) * 120; // Centered horizontal row
+            const rowY = 0;
+            
+            // Center positions (toward cube)
+            const centerX = 0;
+            const centerY = 0;
+            
+            // Interpolate between positions
+            const currentX = THREE.MathUtils.lerp(
+              THREE.MathUtils.lerp(startX, rowX, flyInProgress),
+              centerX,
+              centerProgress
+            );
+            const currentY = THREE.MathUtils.lerp(
+              THREE.MathUtils.lerp(startY, rowY, flyInProgress),
+              centerY,
+              centerProgress
+            );
+            
+            // Scale based on progress
+            const scale = THREE.MathUtils.lerp(0.8, 1, flyInProgress) * 
+                         THREE.MathUtils.lerp(1, 0.6, centerProgress);
+            
+            // Opacity based on progress
+            const opacity = THREE.MathUtils.lerp(0, 1, flyInProgress) * 
+                           THREE.MathUtils.lerp(1, 0.3, centerProgress);
+
+            return (
+              <motion.div
+                key={card.id}
+                className={styles.timelineCard}
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  top: '50%',
+                  transform: `translate(${currentX}px, ${currentY}px) scale(${scale})`,
+                  opacity: opacity,
+                  zIndex: 10 - Math.abs(centerProgress * 5)
+                }}
+                initial={false}
+                animate={{}}
+              >
+                <h3>{card.label}</h3>
+              </motion.div>
+            );
+          })}
+        </div>
+        
+        <p className={styles.paragraph}>
+          Yet we're far more multi-dimensional than that.
+        </p>
+
+        <div ref={cubeRef} className={styles.cubeContainer}>
+          <Image src="/manifesto/cube.png" className={styles.cube} alt="Timeline" width={400} height={200} />
+        </div>
+
+      </div>
+    </ManifestoSection>
+  )
+}
+
+function BelieveSection() {
+  return (
+    <ManifestoSection delay={0.3}>
+      <div className={styles.believeSection}>
+        <p className={styles.paragraph}>
+          We believe the answer is in <i>play</i>.
         </p>
       </div>
     </ManifestoSection>
@@ -1018,8 +1159,10 @@ export default function ManifestoV2() {
       <IntroSection />
       <CloudSection />
       <GreekSection />
-      <TimelineSection />
+      {/* <TimelineSection /> */}
+      <BoxSection />
       <ConversationSection />
+      <BelieveSection />
       <PlaySection />
       <PhoneSection />
       <BottomSection />
