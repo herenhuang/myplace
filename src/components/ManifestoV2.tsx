@@ -801,39 +801,45 @@ function ConversationSection() {
   )
 }
 
-// Box Section Component - Scroll-based animated timeline cards
+// Box Section Component - Animated timeline cards moving into center
 function BoxSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const cubeRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = React.useState(0);
+
+  // Timeline cards data
+  const cards = [
+    { id: 'pm', label: 'Product Manager' },
+    { id: 'enfj', label: 'ENFJ' },
+    { id: 'percent', label: '92%' },
+    { id: 'vc', label: 'VC' },
+    { id: 'exp', label: '5 Years of Experience' },
+    { id: 'uni', label: '[X] University' }
+  ];
+
+  // Starting positions for cards (spread around the viewport)
+  const startPositions = [
+    { x: 10, y: 20 },   // Top left
+    { x: 75, y: 15 },   // Top right
+    { x: 5, y: 60 },    // Middle left  
+    { x: 80, y: 65 },   // Middle right
+    { x: 20, y: 85 },   // Bottom left
+    { x: 70, y: 90 },   // Bottom right
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!sectionRef.current || !cubeRef.current) return;
+      if (!sectionRef.current) return;
       
-      const sectionRect = sectionRef.current.getBoundingClientRect();
-      const cubeRect = cubeRef.current.getBoundingClientRect();
+      const rect = sectionRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       
-      // Calculate progress based on section visibility
-      const sectionCenter = sectionRect.top + sectionRect.height / 2;
-      const sectionProgress = THREE.MathUtils.clamp(
-        1 - (sectionCenter / viewportHeight),
-        0,
-        1
-      );
+      // Calculate progress: 0 when section enters viewport, 1 when it's centered/past
+      const sectionCenter = rect.top + rect.height / 2;
+      const progress = Math.max(0, Math.min(1, 
+        1 - (sectionCenter / viewportHeight)
+      ));
       
-      // Calculate progress based on cube visibility
-      const cubeCenter = cubeRect.top + cubeRect.height / 2;
-      const cubeProgress = THREE.MathUtils.clamp(
-        1 - (cubeCenter / viewportHeight),
-        0,
-        1
-      );
-      
-      // Combine both progress values
-      const combinedProgress = Math.max(sectionProgress, cubeProgress * 0.5);
-      setScrollProgress(combinedProgress);
+      setScrollProgress(progress);
     };
 
     handleScroll();
@@ -846,89 +852,65 @@ function BoxSection() {
     };
   }, []);
 
-  const cards = [
-    { id: 'pm', label: 'Product Manager', side: 'left' },
-    { id: 'enfj', label: 'ENFJ', side: 'right' },
-    { id: 'vc', label: 'VC', side: 'left' },
-    { id: 'exp', label: '5 Years of Experience', side: 'right' },
-    { id: 'uni', label: '[X] University', side: 'left' }
-  ];
-
   return (
     <ManifestoSection delay={0.2}>
       <div ref={sectionRef} className={styles.boxSection}>
 
-      <p className={styles.paragraph}>
+        <p className={styles.paragraph}>
           But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
         </p>
         
-
-        <div className={styles.timelineCards}>
+        <div className={styles.animatedTimelineContainer}>
+          {/* Timeline cards that move toward center */}
           {cards.map((card, index) => {
-            // Calculate positions based on scroll progress
-            const flyInProgress = THREE.MathUtils.clamp(scrollProgress * 2, 0, 1);
-            const centerProgress = THREE.MathUtils.clamp((scrollProgress - 0.3) * 2, 0, 1);
+            const startPos = startPositions[index];
+            const cardDelay = index * 0.1;
+            const cardProgress = Math.max(0, Math.min(1, (scrollProgress - cardDelay) * 1.2));
             
-            // Starting positions (off-screen to the sides)
-            const startX = card.side === 'left' ? -300 : 300;
-            const startY = index * 80 - 160; // Vertical spacing
+            // Target position (center of container)
+            const targetX = 50; // 50% - center
+            const targetY = 50; // 50% - center
             
-            // Horizontal row positions
-            const rowX = (index - 2) * 120; // Centered horizontal row
-            const rowY = 0;
+            // Interpolate position
+            const currentX = startPos.x + (targetX - startPos.x) * cardProgress;
+            const currentY = startPos.y + (targetY - startPos.y) * cardProgress;
             
-            // Center positions (toward cube)
-            const centerX = 0;
-            const centerY = 0;
+            // Scale and opacity based on progress
+            const scale = 1 - cardProgress * 0.7; // Cards get smaller as they approach center
+            const opacity = 1 - cardProgress * 0.8; // Cards fade as they approach center
             
-            // Interpolate between positions
-            const currentX = THREE.MathUtils.lerp(
-              THREE.MathUtils.lerp(startX, rowX, flyInProgress),
-              centerX,
-              centerProgress
-            );
-            const currentY = THREE.MathUtils.lerp(
-              THREE.MathUtils.lerp(startY, rowY, flyInProgress),
-              centerY,
-              centerProgress
-            );
-            
-            // Scale based on progress
-            const scale = THREE.MathUtils.lerp(0.8, 1, flyInProgress) * 
-                         THREE.MathUtils.lerp(1, 0.6, centerProgress);
-            
-            // Opacity based on progress
-            const opacity = THREE.MathUtils.lerp(0, 1, flyInProgress) * 
-                           THREE.MathUtils.lerp(1, 0.3, centerProgress);
-
             return (
-              <motion.div
+              <div
                 key={card.id}
-                className={styles.timelineCard}
+                className={styles.animatedTimelineCard}
                 style={{
-                  position: 'absolute',
-                  left: '50%',
-                  top: '50%',
-                  transform: `translate(${currentX}px, ${currentY}px) scale(${scale})`,
+                  left: `${currentX}%`,
+                  top: `${currentY}%`,
+                  transform: `translate(-50%, -50%) scale(${scale})`,
                   opacity: opacity,
-                  zIndex: 10 - Math.abs(centerProgress * 5)
+                  zIndex: 10 - index, // Cards behind have lower z-index
                 }}
-                initial={false}
-                animate={{}}
               >
                 <h3>{card.label}</h3>
-              </motion.div>
+              </div>
             );
           })}
+          
+          {/* Cube in center */}
+          <div className={styles.cubeContainer}>
+            <Image 
+              src="/manifesto/cube.png" 
+              className={styles.cube} 
+              alt="Multidimensional cube" 
+              width={400} 
+              height={300} 
+            />
+          </div>
         </div>
         
         <p className={styles.paragraph}>
           Yet we're far more multi-dimensional than that.
         </p>
-
-        <div ref={cubeRef} className={styles.cubeContainer}>
-          <Image src="/manifesto/cube.png" className={styles.cube} alt="Timeline" width={400} height={200} />
-        </div>
 
       </div>
     </ManifestoSection>
