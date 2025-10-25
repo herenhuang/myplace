@@ -36,6 +36,9 @@ export const investorAllocationQuiz: QuizConfig = {
         "coreSetup": "Their email reads: \"Hey! It's been a busy few weeks closing this round though we're finally at the end. Free for a quick call at 3PM?\"\nThe issue is that you have a conflict at that time already. How do you respond?"
       },
       "options": [],
+      "uiConfig": {
+        "useMessageUI": true
+      },
       "allowCustomInput": true
     },
     {
@@ -51,7 +54,10 @@ export const investorAllocationQuiz: QuizConfig = {
           "value": "continue",
           "nextQuestionId": "text-convo"
         }
-      ]
+      ],
+      "uiConfig": {
+        "useMessageUI": true
+      },
     },
     {
       "id": "text-convo",
@@ -61,6 +67,9 @@ export const investorAllocationQuiz: QuizConfig = {
         "coreSetup": "Later that afternoon, you get a text from Alex: \"Hey sorry — crazy day. Just got Sequoia to lead. Could maybe squeeze you in for a small allocation if you're quick. How fast can you make a decision?\""
       },
       "options": [],
+      "uiConfig": {
+        "useMessageUI": true
+      },
       "allowCustomInput": true
     },
     {
@@ -71,6 +80,9 @@ export const investorAllocationQuiz: QuizConfig = {
         "coreSetup": "Alex texts back about your timeline. Then: \"Makes sense. What check size do you normally write?\""
       },
       "options": [],
+      "uiConfig": {
+        "useMessageUI": true
+      },
       "allowCustomInput": true
     },
     {
@@ -81,6 +93,9 @@ export const investorAllocationQuiz: QuizConfig = {
         "coreSetup": "Alex responds to your check size info. Then: \"One last thing — what do you think your founders would say about working with you?\""
       },
       "options": [],
+      "uiConfig": {
+        "useMessageUI": true
+      },
       "allowCustomInput": true
     },
     {
@@ -96,7 +111,10 @@ export const investorAllocationQuiz: QuizConfig = {
           "value": "continue",
           "nextQuestionId": "sam-twist"
         }
-      ]
+      ],
+      "uiConfig": {
+        "useMessageUI": true
+      },
     },
     {
       "id": "sam-twist",

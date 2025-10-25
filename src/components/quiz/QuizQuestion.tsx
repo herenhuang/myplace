@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { QuizConfig } from '@/lib/quizzes/types'
 import styles from './quiz.module.scss'
 import Image from 'next/image'
+import MessageUI from '@/components/quiz/QuestionUI/MessageUI';
 
 interface QuizQuestionProps {
   config: QuizConfig
@@ -23,6 +24,7 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
   const [isCustomSelected, setIsCustomSelected] = useState(false)
   
   const question = config.questions[questionIndex]
+  const useMessageUI = !!question.uiConfig?.useMessageUI;
 
   // Animate options in from bottom to top
   useEffect(() => {
@@ -174,6 +176,25 @@ export default function QuizQuestion({ config, questionIndex, onSelect, isLoadin
       }
       return part
     })
+  }
+
+  if (useMessageUI) {
+    return (
+      <MessageUI
+        className="relative"
+        offsetProgressBar
+        isLoading={isLoading}
+        onUserMessage={(message: string) => {
+          handleSelect(`custom_${Date.now()}`, message.trim(), true)
+        }}
+        conversationComplete={!question.allowCustomInput}
+        userResponseOptions={question.options.map(option => ({
+          ...option,
+          onClick: () => handleSelect(option.value, option.label, false),
+        }))}
+        conversationHistory={[{ sender: 'bot', message: adaptedText ?? questionText ?? ''}]}
+      />
+    );
   }
 
   return (

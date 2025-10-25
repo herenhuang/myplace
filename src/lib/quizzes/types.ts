@@ -36,6 +36,10 @@ export interface QuizQuestion {
   options: QuizOption[]
   /** Whether to show custom input field */
   allowCustomInput?: boolean
+  uiConfig?: {
+    /** Whether to use conversational message UI (for narrative quizzes) */
+    useMessageUI?: boolean
+  }
 }
 
 export interface QuizPersonality {
