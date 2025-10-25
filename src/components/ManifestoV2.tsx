@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import styles from './ManifestoV2.module.scss';
 import SpeechBubbles from '@/components/manifesto/SpeechBubbles';
 import WaitlistForm from '@/components/manifesto/WaitlistForm';
+import PentagonChart from '@/components/word-association/PentagonChart';
 
 const ManifestoSection: React.FC<{
   children: React.ReactNode;
@@ -22,7 +23,7 @@ const ManifestoSection: React.FC<{
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, margin: "0px 0px -100px 0px" }}
       transition={{
-        duration: 0.8,
+        duration: 0.5,
         ease: [0.25, 0.1, 0.25, 1],
         delay: delay,
       }}
@@ -220,7 +221,7 @@ function TimelineSection() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
-            transition={{ duration: 0.8, delay: 0.1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
 
             <p className={styles.paragraph}>
@@ -432,18 +433,18 @@ function HeroSection() {
             repulsionNodes.forEach(repulsionNode => {
               const dx = node.x! - repulsionNode.fx!;
               const dy = node.y! - repulsionNode.fy!;
-              const distance = Math.sqrt(dx * dx + dy * dy);
+            const distance = Math.sqrt(dx * dx + dy * dy);
               const minDistance = repulsionNode.type === 'title' ? 200 : 120; // Different distances for title vs repulsion points
-              
-              if (distance < minDistance && distance > 0) {
+            
+            if (distance < minDistance && distance > 0) {
                 const force = (minDistance - distance) / minDistance * (repulsionNode.type === 'title' ? 0.3 : 0.2);
-                const angle = Math.atan2(dy, dx);
-                const fx = Math.cos(angle) * force;
-                const fy = Math.sin(angle) * force;
-                
-                node.vx = (node.vx || 0) + fx;
-                node.vy = (node.vy || 0) + fy;
-              }
+              const angle = Math.atan2(dy, dx);
+              const fx = Math.cos(angle) * force;
+              const fy = Math.sin(angle) * force;
+              
+              node.vx = (node.vx || 0) + fx;
+              node.vy = (node.vy || 0) + fy;
+            }
             });
           }
         });
@@ -603,7 +604,7 @@ function HeroSection() {
       className={styles.hero}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       <div ref={containerRef} className={styles.scatteredIcons}>
         <svg ref={svgRef} className={styles.d3IconCanvas}>
@@ -622,7 +623,7 @@ function IntroSection() {
           You're more than just a label.
         </p>
         <p className={styles.paragraph}>
-          You're a living, moving, and sometimes oftentimes contradictory story.
+          You're a <b>living</b>,  <i>moving</i>, and oftentimes <span className={styles.highlight}>contradictory</span> story.
         </p>
       </div>
     </ManifestoSection>
@@ -1000,24 +1001,18 @@ function PhoneSection() {
     <ManifestoSection delay={0.4}>
       <div className={styles.phoneSection}>
 
-
         <p className={styles.paragraph}>
-          Every day, a new game. A new chance to discover who you could through the simple building a silly moment of who you really are.
+          1) Play - Quick daily stories, different scenarios each time.
         </p>
 
-
 <div className={styles.phoneContent}>
-
-  <div className={styles.gameCard}></div>
-  <div className={styles.gameCard}></div>
-
 
         <motion.div 
           className={styles.phoneContainer}
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <div className={styles.chatContainer}>
             <Image 
@@ -1070,7 +1065,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: 0.6 }}
+                  transition={{ duration: 0.2, delay: 0.3 }}
                 >
                   <p>Oh nice!!!</p>
                 </motion.div>
@@ -1079,7 +1074,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: 0.7 }}
+                  transition={{ duration: 0.2, delay: 0.4 }}
                 >
                   <p>I did say my shrimp dinner</p>
                 </motion.div>
@@ -1088,7 +1083,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.4, delay: 0.8 }}
+                  transition={{ duration: 0.2, delay: 0.5 }}
                 >
                   <div className={styles.typingDot}></div>
                   <div className={styles.typingDot}></div>
@@ -1110,21 +1105,476 @@ function PhoneSection() {
           <div className={styles.phoneLabel}>WHAT WOULD YOU MAKE?</div>
         </motion.div>
 
-        <div className={styles.gameCard}></div>
-        <div className={styles.gameCard}></div>
-
+        {/* Elevate Simulation Phone */}
+        <motion.div 
+          className={styles.phoneContainer}
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+        >
+          <div className={styles.elevateContainer}>
+            <Image 
+              src="/iphone-14.png"
+              alt="iPhone frame"
+              layout="fill"
+              className={styles.phoneFrame}
+            />
+            <div className={styles.elevatePhone}>
+              {/* Background Image */}
+              <div 
+                className={styles.elevateBackground}
+                style={{ backgroundImage: 'url(/elevate/orange-2.png)' }}
+              />
+              
+              {/* Text Content */}
+              <div className={styles.elevateTextContent}>
+                <div className={styles.elevateStoryText}>
+                  <p>You hesitantly move toward the crowded networking area, glancing at your conference schedule to find your bearings. As you look up to scan the room for familiar faces, you suddenly trip, dropping your bag and scattering its contents everywhere!</p>
         </div>
      
+                <div className={styles.elevateQuestion}>
+                  <h2>What ends up falling out?</h2>
+                </div>
+              </div>
+              
+              {/* Choice Buttons at Bottom */}
+              <div className={styles.elevateChoices}>
+                <motion.button
+                  className={styles.elevateChoiceButton}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
+                >
+                  <span>🤷 I came empty-handed</span>
+                  <span className={styles.elevateArrow}>→</span>
+                </motion.button>
+                
+                <motion.button
+                  className={styles.elevateChoiceButton}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
+                >
+                  <span>💻 My work laptop</span>
+                  <span className={styles.elevateArrow}>→</span>
+                </motion.button>
+                
+                <motion.button
+                  className={styles.elevateChoiceButton}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.3, delay: 0.6 }}
+                >
+                  <span>📓 Notebook and some pens</span>
+                  <span className={styles.elevateArrow}>→</span>
+                </motion.button>
+              </div>
+            </div>
+          </div>
+          <div className={styles.phoneLabel}>WHAT WOULD YOU DO???</div>
+        </motion.div>
+
+        {/* Bouncer Simulation Phone */}
+        <motion.div 
+          className={styles.phoneContainer}
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+        >
+          <div className={styles.bouncerContainer}>
+            <Image 
+              src="/iphone-14.png"
+              alt="iPhone frame"
+              layout="fill"
+              className={styles.phoneFrame}
+            />
+            <div className={styles.bouncerPhone}>
+              {/* Dark Background with Gradient */}
+              <div className={styles.bouncerBackground} />
+              
+              {/* Bouncer Blob Character */}
+              <motion.div 
+                className={styles.bouncerBlobContainer}
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: false }}
+                transition={{ duration: 0.3, delay: 0.4 }}
+              >
+                <Image 
+                  src="/bouncerblob.png"
+                  alt="Bouncer Blob"
+                  width={120}
+                  height={120}
+                  className={styles.bouncerBlob}
+                />
+              </motion.div>
+              
+              {/* Question Bubble */}
+              <motion.div 
+                className={styles.bouncerQuestionBubble}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false }}
+                transition={{ duration: 0.3, delay: 0.5 }}
+              >
+                <p>Howdy! You&apos;re on the Luma list... but to get in... I&apos;ma need to ask you some more questions. There are no <i>right</i> answers though, there&apos;s just <i>your</i> answers.</p>
+                <p className={styles.bouncerQuestion}>Anyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up? Tell me a bit about why that time works for you.</p>
+              </motion.div>
+              
+              {/* Text Input at Bottom */}
+              <motion.div 
+                className={styles.bouncerInputContainer}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false }}
+                transition={{ duration: 0.3, delay: 0.6 }}
+              >
+                <div className={styles.bouncerInputWrapper}>
+                  <input
+                    type="text"
+                    placeholder="Type your answer..."
+                    disabled
+                    className={styles.bouncerInput}
+                  />
+                  <button
+                    disabled
+                    className={styles.bouncerSubmitButton}
+                  >
+                    <span>→</span>
+                  </button>
+                </div>
+                <div className={styles.bouncerProgressIndicator}>
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                </div>
+              </motion.div>
+            </div>
+          </div>
+          <div className={styles.phoneLabel}>ARE YOU REALLY IN? 🎟️</div>
+        </motion.div>
+        
+        </div>
+     
+      </div>
+    </ManifestoSection>
+  )
+}
+
+function BuildSection() {
+  const [selectedTrait, setSelectedTrait] = React.useState(0);
+  
+  const personalityTraits = [
+    { 
+      id: 'navigator', 
+      name: 'The Navigator', 
+      icon: '/manifesto/s-01.png',
+      description: 'Guides others through complex decisions',
+      color: '#3B82F6',
+      tags: ['Leadership', 'Strategy'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    { 
+      id: 'freethinker', 
+      name: 'The Freethinker', 
+      icon: '/manifesto/s-02.png',
+      description: 'Challenges conventional wisdom',
+      color: '#8B5CF6',
+      tags: ['Creativity', 'Innovation'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    { 
+      id: 'visionary', 
+      name: 'The Visionary', 
+      icon: '/manifesto/s-05.png',
+      description: 'Sees possibilities others miss',
+      color: '#EF4444',
+      tags: ['Innovation', 'Future'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    { 
+      id: 'stabilizer', 
+      name: 'The Stabilizer', 
+      icon: '/manifesto/s-06.png',
+      description: 'Provides grounding and balance',
+      color: '#6B7280',
+      tags: ['Balance', 'Support'],
+      level: 1,
+      date: '11/03/2025',
+      collected: true
+    },
+    // Add more traits to fill the grid
+    { 
+      id: 'explorer', 
+      name: 'The Explorer', 
+      icon: '/manifesto/s-07.png',
+      description: 'Seeks new experiences',
+      color: '#EC4899',
+      tags: ['Adventure', 'Curiosity'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'mentor', 
+      name: 'The Mentor', 
+      icon: '/manifesto/s-08.png',
+      description: 'Guides and teaches others',
+      color: '#14B8A6',
+      tags: ['Teaching', 'Wisdom'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'analyst', 
+      name: 'The Analyst', 
+      icon: '/manifesto/s-09.png',
+      description: 'Examines data and patterns',
+      color: '#F97316',
+      tags: ['Analysis', 'Logic'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'collaborator', 
+      name: 'The Collaborator', 
+      icon: '/manifesto/s-10.png',
+      description: 'Works well with teams',
+      color: '#6366F1',
+      tags: ['Teamwork', 'Cooperation'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'realist', 
+      name: 'The Realist', 
+      icon: '/manifesto/s-12.png',
+      description: 'Grounded in practical thinking',
+      color: '#64748B',
+      tags: ['Practical', 'Grounded'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    /*
+    { 
+      id: 'diplomat', 
+      name: 'The Diplomat', 
+      icon: '/manifesto/s-14.png',
+      description: 'Resolves conflicts peacefully',
+      color: '#059669',
+      tags: ['Diplomacy', 'Peace'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'perfectionist', 
+      name: 'The Perfectionist', 
+      icon: '/manifesto/s-15.png',
+      description: 'Strives for excellence',
+      color: '#7C3AED',
+      tags: ['Excellence', 'Quality'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    },
+    { 
+      id: 'adapter', 
+      name: 'The Adapter', 
+      icon: '/manifesto/s-16.png',
+      description: 'Adjusts to changing situations',
+      color: '#0891B2',
+      tags: ['Flexibility', 'Adaptation'],
+      level: 1,
+      date: '11/03/2025',
+      collected: false
+    }
+      */
+  ];
+
+  return (
+    <ManifestoSection delay={0.4}>
+      <div className={styles.buildSection}>
         <p className={styles.paragraph}>
-          We’re more than just a label. 
-        </p>
-        <p className={styles.paragraph}>
-          We are all made up of living, breathing stories.
-        </p>
-        <p className={styles.paragraph}>
-          So, what's your story?
+          2) Build - Your profile grows with every choice you make
         </p>
         
+        <div className={styles.stampbook}>
+          {/* Icon Grid */}
+
+        
+          <div className={styles.iconGrid}>
+          <h2 className={styles.stampbookTitle}>STAMPBOOK</h2>
+            <div className={styles.gridContainer}>
+              {personalityTraits.map((trait, index) => (
+                <motion.div
+                  key={trait.id}
+                  className={`${styles.iconCard} ${trait.collected ? styles.collected : styles.uncollected} ${selectedTrait === index ? styles.selected : ''}`}
+                  onClick={() => setSelectedTrait(index)}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <Image 
+                    src={trait.icon} 
+                    alt={trait.name}
+                    width={50}
+                    height={50}
+                  />
+                </motion.div>
+              ))}
+            </div>
+            <h1 className={styles.placeholder}> Hello </h1>
+             <h1 className={styles.placeholder}> Hello </h1>
+    
+          </div>
+
+       
+
+          {/* Magnified Card View */}
+          <div className={styles.magnifiedView}>
+            <div className={styles.detailCard}>
+              <div className={styles.cardHeader}>
+                <span className={styles.cardDate}>{personalityTraits[selectedTrait].date}</span>
+                <span className={styles.cardLevel}>LV. {personalityTraits[selectedTrait].level}</span>
+              </div>
+              
+              <div className={styles.cardIconLarge}>
+                <Image 
+                  src={personalityTraits[selectedTrait].icon} 
+                  alt={personalityTraits[selectedTrait].name}
+                  width={70}
+                  height={70}
+                />
+              </div>
+              
+              <h3 className={styles.cardTitleLarge}>{personalityTraits[selectedTrait].name}</h3>
+              <p className={styles.cardDescription}>
+                {personalityTraits[selectedTrait].description}
+              </p>
+              
+              <div className={styles.cardIdentifier}>
+                <span>SIM XX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ManifestoSection>
+  )
+}
+
+function DiscoverSection() {
+  // Sample user results data
+  const userResults = {
+    personalityScores: [8, 6, 7, 9, 5], // Sample pentagon chart data
+    metascore: 87,
+    archetype: 'The Navigator',
+    summary: 'Based on your responses, you show high levels of creativity and analytical thinking. You tend to approach challenges systematically while maintaining innovative problem-solving strategies.'
+  };
+
+  return (
+    <ManifestoSection delay={0.4}>
+      <div className={styles.discoverSection}>
+        <p className={styles.paragraph}>
+          3) Discover - See patterns you never knew existed
+        </p>
+        
+        <div className={styles.resultsContainer}>
+          {/* Pentagon Chart */}
+          <motion.div 
+            className={`${styles.resultCard} ${styles.pentagonCard}`}
+                  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <div className={styles.pentagonContainer}>
+              <PentagonChart 
+                scores={userResults.personalityScores}
+                size={260}
+              />
+            </div>
+          </motion.div>
+
+          {/* Metascore */}
+          <motion.div 
+            className={`${styles.resultCard} ${styles.metascoreCard}`}
+            initial={{ opacity: 0, scale: 0.8, rotate: 3 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            {/* SVG Circular Progress Border */}
+            <svg 
+              className={styles.progressRing}
+              width="296" 
+              height="296"
+              style={{ transform: 'rotate(-90deg)' }}
+            >
+              {/* Background circle */}
+              <circle
+                cx="148"
+                cy="148"
+                r={140}
+                stroke="rgba(229, 231, 235, 1)"
+                strokeWidth="8"
+                fill="none"
+              />
+              {/* Progress circle */}
+              <circle
+                cx="148"
+                cy="148"
+                r={140}
+                stroke="#3B82F6"
+                strokeWidth="8"
+                fill="none"
+                strokeDasharray={2 * Math.PI * 140}
+                strokeDashoffset={2 * Math.PI * 140 * (1 - userResults.metascore / 100)}
+                strokeLinecap="round"
+              />
+            </svg>
+            
+            <h3 className={styles.resultTitle}>Your Metascore</h3>
+            <div className={styles.metascoreDisplay}>
+              <span className={styles.metascoreNumber}>{userResults.metascore}</span>
+              <span className={styles.metascoreLabel}></span>
+            </div>
+          </motion.div>
+
+          {/* Insights */}
+          <motion.div 
+            className={`${styles.resultCard} ${styles.insightsCard}`}
+            initial={{ opacity: 0, scale: 0.8, rotate: -2 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <h3 className={styles.resultTitle}>Key Insights</h3>
+            <p className={styles.insightSummary}>
+              {userResults.summary}
+            </p>
+          </motion.div>
+        </div>
       </div>
     </ManifestoSection>
   )
@@ -1136,6 +1586,17 @@ function BottomSection() {
     <ManifestoSection delay={0.5}>
       <div className={styles.bottomSection}>
 
+      <p className={styles.paragraph}>
+          We’re more than just a label. 
+        </p>
+        <p className={styles.paragraph}>
+          We are all made up of living, breathing stories.
+        </p>
+        <p className={styles.paragraph}>
+          So, what's your story?
+        </p>
+        
+
       <WaitlistForm />
 
         <motion.div 
@@ -1143,7 +1604,7 @@ function BottomSection() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.5 }}
         >
           {[
             { src: "/manifesto/s-11.png", delay: 0.1 },
@@ -1162,7 +1623,7 @@ function BottomSection() {
               whileInView={{ opacity: 0.8, scale: 1, rotate: 0 }}
               whileHover={{ opacity: 1, scale: 1.1 }}
               viewport={{ once: false }}
-              transition={{ duration: 0.6, delay: icon.delay }}
+              transition={{ duration: 0.4, delay: icon.delay }}
             >
               <Image src={icon.src} alt="Icon" className={styles.bottomIcon} width={[40, 35, 45, 50, 42, 38, 48, 44, 46][index]} height={[40, 35, 45, 50, 42, 38, 48, 44, 46][index]} />
             </motion.div>
@@ -1173,7 +1634,7 @@ function BottomSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Image className={styles.brandName} src="/myplace_text.png" alt="myPlace Logo" width={200} height={200} />
         </motion.div>
@@ -1196,6 +1657,8 @@ export default function ManifestoV2() {
       <BelieveSection />
       <PlaySection />
       <PhoneSection />
+      <BuildSection />
+      <DiscoverSection />
       <BottomSection />
     </div>
   )
