@@ -28,29 +28,50 @@ interface GenerateDavidResponseRequest {
 }
 
 // Build dynamic context based on negotiation state
-function getNegotiationStageContext(state: NegotiationState, userTurns: number): string {
-  if (!state.hasAskedForAmount && userTurns >= 1) {
-    return `CURRENT STAGE: After a bit of natural chat, you need to casually ask how much they're thinking of investing. Be casual and friendly. Don't seem too eager or formal. Examples: "so how much were you thinking?" or "what were you hoping to put in?"`;
+function getNegotiationStageContext(negotiationState: NegotiationState, currentTurn: number): string {
+  const contextLines: string[] = [];
+
+  const formatAmountForAI = (amount: number | null): string => {
+    if (amount === null) return '$0';
+    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1).replace('.0', '')}M`;
+    if (amount >= 1000) return `$${amount / 1000}k`;
+    return `$${amount}`;
   }
-  
-  if (state.userAskAmount && !state.hasOffered) {
-    return `CURRENT STAGE: User wants to invest $${state.userAskAmount}k. You need to offer EXACTLY $${state.davidOfferAmount}k (half of their ask). Frame it like you fought hard for this. Blame Sequoia for taking most of the allocation. Use phrases like "I fought for you!" or "I managed to get you".".
-    
-Example: "I fought for you!got you $${state.davidOfferAmount}k" or "actually Sequoia took way more but I got you $${state.davidOfferAmount}k!!"`;
-  }
-  
-  if (state.hasOffered && state.davidOfferAmount) {
-    const maxOffer = state.davidOfferAmount + state.maxNegotiationIncrease;
-    const canStillNegotiate = state.negotiationCount < 2;
-    
-    if (canStillNegotiate) {
-      return `CURRENT STAGE: You offered $${state.davidOfferAmount}k. They're negotiating. You can increase slightly (max $${maxOffer}k total). Be reluctant but say you'll "try" or "see what you can do". Use soft language. Negotiation attempts so far: ${state.negotiationCount}`;
-    } else {
-      return `CURRENT STAGE: You've already negotiated. This is your final offer around $${maxOffer}k. You can't go higher. Politely but firmly say this is all you have. Maybe hint that you need to close the round soon.`;
+
+  if (negotiationState.hasAskedForAmount) {
+    if (negotiationState.userAskAmount) {
+      contextLines.push(`- The user has asked to invest ${formatAmountForAI(negotiationState.userAskAmount)}.`);
     }
+    if (negotiationState.davidOfferAmount) {
+      contextLines.push(`- You have offered the user an allocation of ${formatAmountForAI(negotiationState.davidOfferAmount)}.`);
+      if (negotiationState.userAskAmount) {
+        const gap = negotiationState.userAskAmount - negotiationState.davidOfferAmount;
+        contextLines.push(`- This is a gap of ${formatAmountForAI(gap)}.`);
+      }
+    }
+    if (negotiationState.hasOffered) {
+      contextLines.push(`- You have made your first offer.`);
+    }
+    if (negotiationState.negotiationCount > 0) {
+      contextLines.push(`- The user has tried to negotiate ${negotiationState.negotiationCount} time(s). You can increase your offer up to 2 times.`);
+      const newOffer = negotiationState.davidOfferAmount 
+        ? Math.min(
+            negotiationState.davidOfferAmount + negotiationState.maxNegotiationIncrease, 
+            negotiationState.davidOfferAmount + 5000 // A small arbitrary increase for the AI's context
+          )
+        : 0;
+      contextLines.push(`- If you negotiate, you could offer something like ${formatAmountForAI(newOffer)}.`);
+    }
+  } else {
+    contextLines.push('- You are in the initial stages of conversation.');
+    contextLines.push('- Your immediate goal is to determine how much the user wants to invest.');
   }
-  
-  return `CURRENT STAGE: Natural conversation. Be friendly and casual.`;
+
+  if (currentTurn >= 8) {
+    contextLines.push('- The conversation is nearing its end. Try to close the deal, either by getting a "yes" or a "no".');
+  }
+
+  return contextLines.join('\n');
 }
 
 export async function POST(request: NextRequest) {

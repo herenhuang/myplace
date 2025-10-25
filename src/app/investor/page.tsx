@@ -2,49 +2,23 @@
 
 import { useEffect, useRef, useState } from 'react'
 import styles from './page.module.scss'
-
-interface ChatMessage {
-  id: string
-  sender: 'user' | 'npc'
-  text: string
-  elapsedMs: number
-}
-
-interface NegotiationState {
-  userAskAmount: number | null
-  davidOfferAmount: number | null
-  hasAskedForAmount: boolean
-  hasOffered: boolean
-  negotiationCount: number
-  maxNegotiationIncrease: number // 15% of the offer
-  allocationPercentage: number // Current equity allocation (starts at 7%)
-}
+import { useRouter } from 'next/navigation'
+import { saveInvestorCache, parseAmount, formatAmount } from './utils'
+import { ChatMessage, NegotiationState } from './types'
 
 const NPC_DELAY_MS = 800;
 const MAX_USER_TURNS = 10;
 
 
 export default function InvestorPage() {
-  const [transcript, setTranscript] = useState<ChatMessage[]>([
-    {
-      id: 'initial-1',
-      sender: 'npc',
-      text: "Hey hey [name], thanks sm for your help these past few months. ",
-      elapsedMs: 0,
-    },
-    {
-      id: 'initial-2',
-      sender: 'npc',
-      text: "Guess what, after months of talking about it, i’m finally fundraising!",
-      elapsedMs: 1200,
-    },
-    {
-      id: 'initial-3',
-      sender: 'npc',
-      text: "Actually the round is almost full, but i wanted to see if you’re still interested? How much were you thinking of putting in?",
-      elapsedMs: 1200,
-    },
-  ]);
+  const [view, setView] = useState<'intro' | 'scenario' | 'chat'>('intro');
+  const [showNotification, setShowNotification] = useState(false);
+  const [streamedText, setStreamedText] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [showMessagesIcon, setShowMessagesIcon] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
+  const router = useRouter();
+  const [transcript, setTranscript] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [userTurns, setUserTurns] = useState(0);
   const [startTime] = useState<number>(() => performance.now());
@@ -56,11 +30,65 @@ export default function InvestorPage() {
     hasOffered: false,
     negotiationCount: 0,
     maxNegotiationIncrease: 0,
-    allocationPercentage: 7.0, // Starting allocation percentage
+    allocationPercentage: 7.0,
+    dealClosed: false,
   });
   const pendingTimeout = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (view === 'scenario') {
+      const fullText = "David Ahn is building the startup everyone's talking about. For six months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text.";
+      
+      setIsStreaming(true);
+      setStreamedText('');
+      
+      let currentIndex = 0;
+      const streamInterval = setInterval(() => {
+        if (currentIndex < fullText.length) {
+          setStreamedText(fullText.slice(0, currentIndex + 1));
+          currentIndex++;
+        } else {
+          clearInterval(streamInterval);
+          setIsStreaming(false);
+          // Show messages icon after streaming completes
+          setTimeout(() => setShowMessagesIcon(true), 300);
+          // Show badge after icon appears
+          setTimeout(() => setShowBadge(true), 800);
+          setTimeout(() => setShowNotification(true), 500);
+        }
+      }, 30);
+      
+      return () => clearInterval(streamInterval);
+    }
+  }, [view]);
+
+  // Reset transcript when chat view is entered
+  useEffect(() => {
+    if (view === 'chat' && transcript.length === 0) {
+      setTranscript([
+        {
+          id: 'initial-1',
+          sender: 'npc',
+          text: "Hey hey, thanks sm for your help these past few months.",
+          elapsedMs: 0,
+        },
+        {
+          id: 'initial-2',
+          sender: 'npc',
+          text: "Guess what, after months of talking about it, i’m finally fundraising!",
+          elapsedMs: 1200,
+        },
+        {
+          id: 'initial-3',
+          sender: 'npc',
+          text: "Actually the round is almost full, but i wanted to see if you’re still interested? How much were you thinking of putting in?",
+          elapsedMs: 1200,
+        },
+      ]);
+    }
+  }, [view, transcript.length]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -92,6 +120,15 @@ export default function InvestorPage() {
 
   const canRespond = userTurns < MAX_USER_TURNS;
 
+  useEffect(() => {
+    if (!canRespond && view === 'chat') {
+      setTimeout(() => {
+        saveInvestorCache({ negotiationState, transcript });
+        router.push('/investor/results');
+      }, 1500);
+    }
+  }, [canRespond, negotiationState, transcript, router, view]);
+
   const sendMessage = async () => {
     if (!input.trim()) return
     if (!canRespond) return
@@ -110,30 +147,43 @@ export default function InvestorPage() {
     setUserTurns((count) => count + 1)
     setInput('')
 
+    // Check if user is accepting the offer
+    const userMessageLower = userMessage.toLowerCase();
+    const strongAcceptanceKeywords = [
+      'i accept', 'i\'ll take it', 'that works', 'deal', 'let\'s do it'
+    ];
+    const weakAcceptanceKeywords = ['ok', 'okay', 'fine', 'sounds good'];
+    
+    let userAccepts = false;
+    if (negotiationState.hasOffered) {
+      if (strongAcceptanceKeywords.some(keyword => userMessageLower.includes(keyword))) {
+        userAccepts = true;
+      } else if (weakAcceptanceKeywords.includes(userMessageLower)) {
+        userAccepts = true;
+      }
+    }
+
+    if (userAccepts) {
+      const finalState = { ...negotiationState, dealClosed: true };
+      setNegotiationState(finalState);
+      setUserTurns(MAX_USER_TURNS);
+      return;
+    }
+
     // Check if user mentioned an investment amount
     let updatedNegotiationState = { ...negotiationState };
-    const amountMatch = userMessage.match(/\$?([\d,]+)k?/i);
+    const userAsk = parseAmount(userMessage);
     
-    if (amountMatch && !negotiationState.userAskAmount) {
-      // User stated their investment amount
-      const rawAmount = amountMatch[1].replace(/,/g, '');
-      let amount = parseInt(rawAmount);
-      
-      // If they said "25k", interpret as 25, not 25000
-      if (userMessage.toLowerCase().includes('k') && amount > 1000) {
-        amount = Math.floor(amount / 1000);
-      }
-      
-      // David will offer exactly half of what user asked for
-      const davidOffer = Math.floor(amount / 2);
+    if (userAsk !== null && !negotiationState.userAskAmount) {
+      const davidOffer = Math.floor(userAsk / 2);
       
       updatedNegotiationState = {
         ...negotiationState,
-        userAskAmount: amount,
+        userAskAmount: userAsk,
         davidOfferAmount: davidOffer,
-        maxNegotiationIncrease: Math.floor(davidOffer * 0.15), // Can increase by up to 15% of his offer
+        maxNegotiationIncrease: Math.floor(davidOffer * 0.15),
         hasAskedForAmount: true,
-        allocationPercentage: negotiationState.allocationPercentage, // Keep for backwards compatibility
+        allocationPercentage: negotiationState.allocationPercentage,
       };
       setNegotiationState(updatedNegotiationState);
     }
@@ -187,7 +237,7 @@ export default function InvestorPage() {
           // Check if David asked about investment amount or made an offer
           const davidResponseText = data.response;
           const davidResponseLower = davidResponseText.toLowerCase();
-          const davidOfferMatch = davidResponseText.match(/\$?([\d,]+)k/i);
+          const mentionedOffer = parseAmount(davidResponseText);
           
           // Check if David asked about investment amount
           if (!updatedNegotiationState.hasAskedForAmount && 
@@ -204,25 +254,24 @@ export default function InvestorPage() {
           }
           
           // Check if David mentioned a dollar amount in his response
-          if (davidOfferMatch && updatedNegotiationState.userAskAmount) {
-            const mentionedAmount = parseInt(davidOfferMatch[1].replace(/,/g, ''));
+          if (mentionedOffer !== null && updatedNegotiationState.userAskAmount) {
             
             // If this is his first offer (hasn't offered yet)
             if (!updatedNegotiationState.hasOffered) {
               updatedNegotiationState = {
                 ...updatedNegotiationState,
-                davidOfferAmount: mentionedAmount,
+                davidOfferAmount: mentionedOffer,
                 hasOffered: true,
               };
               setNegotiationState(updatedNegotiationState);
             }
             // If he's already made an offer and this is a different amount (negotiation counter-offer)
             else if (updatedNegotiationState.hasOffered && 
-                     mentionedAmount !== updatedNegotiationState.davidOfferAmount &&
-                     mentionedAmount > 0) {
+                     mentionedOffer !== updatedNegotiationState.davidOfferAmount &&
+                     mentionedOffer > 0) {
               updatedNegotiationState = {
                 ...updatedNegotiationState,
-                davidOfferAmount: mentionedAmount,
+                davidOfferAmount: mentionedOffer,
               };
               setNegotiationState(updatedNegotiationState);
             }
@@ -256,178 +305,233 @@ export default function InvestorPage() {
 
   return (
     <div className={styles.simulationContainer}>
-      <div className={styles.layoutWrapper}>
-
-        <div className={styles.textPanel}>
-            <p className={styles.textPanelText}>
-                David Ahn is building the startup everyone's talking about. For six months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.
-            </p>
+      <div className={`${styles.viewContainer} ${view !== 'intro' ? styles.chatViewActive : ''}`}>
+        
+        {/* Onboarding Intro */}
+        <div className={styles.onboardingContainer}>
+          {view === 'intro' && (
+            <div className={styles.introContainer}>
+              <h1 className={styles.introTitle}>How Much Allocation Can You Get?</h1>
+              <button onClick={() => setView('scenario')} className={styles.startButton}>
+                Begin
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Main Content (Slides up) */}
+        <div className={styles.chatView}>
+          <div className={styles.layoutWrapper}>
+            <div className={styles.textPanel}>
+                <p className={styles.textPanelText}>
+                    David Ahn is building the startup everyone's talking about. For six months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.
+                </p>
+            </div>
+        
+            <div className={styles.chatPhone}>
+              
+              {/* Scenario view inside the phone */}
+               <div className={`${styles.phoneContentView} ${view === 'scenario' ? styles.visible : ''}`}>
+                 <div className={styles.scenarioTextContent}>
+                   <div className={styles.scenarioText}>
+                     {streamedText}
+                     {isStreaming && <span className={styles.cursor}>|</span>}
+                   </div>
+                   <div className={styles.messagesIconWrapper}>
+                   {!isStreaming && streamedText && (
+                     
+                       <div className={`${styles.messagesIcon} ${showMessagesIcon ? styles.messagesIconVisible : ''}`} onClick={() => setView('chat')}>
+                         <img src="/imessage.svg" alt="Messages" className={styles.messagesIconImage} />
+                         {showBadge && <div className={`${styles.notificationBadge} ${styles.badgeVisible}`}>1</div>}
+                       </div>
+                    
+                   )}
+                    </div>
+                 </div>
+                <div className={`${styles.notification} ${showNotification ? styles.notificationActive : ''}`} onClick={() => setView('chat')}>
+                  <div className={styles.notificationContent}>
+                    <div className={styles.notificationAppIcon}></div>
+                    <div className={styles.notificationTextContainer}>
+                      <div className={styles.notificationHeader}>
+                        <span className={styles.notificationAppName}>iMessage</span>
+                        <span className={styles.notificationTime}>now</span>
+                      </div>
+                      <div className={styles.notificationBody}>
+                        <span className={styles.notificationSender}>David</span>
+                        <p className={styles.notificationMessage}>Hey hey, thanks sm for your help these past few months.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat view inside the phone */}
+              <div className={`${styles.phoneContentView} ${view === 'chat' ? styles.visible : ''}`}>
+                <div className={styles.chatHeader}>
+                  <button
+                    className={styles.chatHeaderBack}
+                    aria-label="Back"
+                    onClick={() => window.history.back()}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </button>
+                  <div className={styles.chatHeaderContact}>
+                    <div className={styles.chatHeaderAvatar}></div>
+                    <span className={styles.chatHeaderName}>David</span>
+                  </div>
+                  <button className={styles.chatHeaderVideo} aria-label="Video call">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m22 8-6 4 6 4V8Z" />
+                      <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+                    </svg>
+                  </button>
+                </div>
+                <div ref={scrollRef} className={styles.chatWindow}>
+                  {transcript.map((message) => (
+                    <div
+                      key={message.id}
+                      className={
+                        message.sender === 'user'
+                          ? styles.chatBubbleUser
+                          : styles.chatBubbleNpc
+                      }
+                    >
+                      <p>{message.text}</p>
+                    </div>
+                  ))}
+                  {isNpcTyping && (
+                    <div className={styles.typingIndicator}>
+                      <div className={styles.typingDot}></div>
+                      <div className={styles.typingDot}></div>
+                      <div className={styles.typingDot}></div>
+                    </div>
+                  )}
+                </div>
+      
+                <div className={styles.chatInputWrapper}>
+                  <textarea
+                    ref={textareaRef}
+                    className={styles.chatInput}
+                    disabled={!canRespond}
+                    value={input}
+                    placeholder={
+                      canRespond
+                        ? 'Type your reply...'
+                        : 'Conversation complete'
+                    }
+                    onChange={(event) => setInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        sendMessage();
+                      }
+                    }}
+                    maxLength={220}
+                    rows={1}
+                  />
+                  <button
+                    type="button"
+                    onClick={sendMessage}
+                    disabled={!canRespond || !input.trim()}
+                    className={styles.chatSendButton}
+                    aria-label="Send message"
+                  >
+                    <svg
+                      className={styles.iconSend}
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
     
-        <div className={styles.chatPhone}>
-        <div className={styles.chatHeader}>
-          <button
-            className={styles.chatHeaderBack}
-            aria-label="Back"
-            onClick={() => window.history.back()}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-          <div className={styles.chatHeaderContact}>
-            <div className={styles.chatHeaderAvatar}></div>
-            <span className={styles.chatHeaderName}>David</span>
-          </div>
-          <button className={styles.chatHeaderVideo} aria-label="Video call">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m22 8-6 4 6 4V8Z" />
-              <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
-            </svg>
-          </button>
-        </div>
-        <div ref={scrollRef} className={styles.chatWindow}>
-          {transcript.map((message) => (
-            <div
-              key={message.id}
-              className={
-                message.sender === 'user'
-                  ? styles.chatBubbleUser
-                  : styles.chatBubbleNpc
-              }
-            >
-              <p>{message.text}</p>
-            </div>
-          ))}
-          {isNpcTyping && (
-            <div className={styles.typingIndicator}>
-              <div className={styles.typingDot}></div>
-              <div className={styles.typingDot}></div>
-              <div className={styles.typingDot}></div>
-            </div>
-          )}
-        </div>
-
-        <div className={styles.chatInputWrapper}>
-          <textarea
-            ref={textareaRef}
-            className={styles.chatInput}
-            disabled={!canRespond}
-            value={input}
-            placeholder={
-              canRespond
-                ? 'Type your reply...'
-                : 'Conversation complete'
-            }
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-              }
-            }}
-            maxLength={220}
-            rows={1}
-          />
-          <button
-            type="button"
-            onClick={sendMessage}
-            disabled={!canRespond || !input.trim()}
-            className={styles.chatSendButton}
-            aria-label="Send message"
-          >
-            <svg
-              className={styles.iconSend}
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-            </svg>
-          </button>
-        </div>
-        </div>
-
-        <div className={styles.statePanel}>
-        <div className={styles.statePanelHeader}>
-          <h3>Investment Tracker</h3>
-        </div>
-        <div className={styles.allocationDisplay}>
-          <div className={styles.allocationNumber}>
-            {negotiationState.davidOfferAmount 
-              ? `$${negotiationState.davidOfferAmount}k`
-              : negotiationState.userAskAmount
-              ? '...'
-              : '$0'
-            }
-          </div>
-          <div className={styles.allocationLabel}>
-            {negotiationState.davidOfferAmount 
-              ? "David's Current Offer"
-              : negotiationState.userAskAmount
-              ? 'Calculating offer...'
-              : 'No offer yet'
-            }
-          </div>
-        </div>
-        <div className={styles.statePanelDetails}>
-          <div className={styles.stateRow}>
-            <span className={styles.stateLabel}>Stage:</span>
-            <span className={styles.stateValue}>
-              {!negotiationState.hasAskedForAmount && 'Small Talk'}
-              {negotiationState.hasAskedForAmount && !negotiationState.hasOffered && 'Awaiting Offer'}
-              {negotiationState.hasOffered && negotiationState.negotiationCount === 0 && 'Initial Offer'}
-              {negotiationState.hasOffered && negotiationState.negotiationCount > 0 && 'Negotiating'}
-            </span>
-          </div>
-          {negotiationState.userAskAmount && (
-            <div className={styles.stateRow}>
-              <span className={styles.stateLabel}>You Asked:</span>
-              <span className={styles.stateValue}>${negotiationState.userAskAmount}k</span>
-            </div>
-          )}
-          {negotiationState.davidOfferAmount && negotiationState.hasOffered && negotiationState.userAskAmount && (
-            <>
-              <div className={styles.stateRow}>
-                <span className={styles.stateLabel}>David Offered:</span>
-                <span className={styles.stateValue}>${negotiationState.davidOfferAmount}k</span>
+            <div className={styles.statePanel}>
+              <div className={styles.statePanelHeader}>
+                <h3>Investment Tracker</h3>
               </div>
-              <div className={styles.stateRow}>
-                <span className={styles.stateLabel}>Gap:</span>
-                <span className={styles.stateValue} style={{ color: '#e63946' }}>
-                  -${negotiationState.userAskAmount - negotiationState.davidOfferAmount}k
-                </span>
+              <div className={styles.allocationDisplay}>
+                <div className={styles.allocationNumber}>
+                  {negotiationState.davidOfferAmount 
+                    ? formatAmount(negotiationState.davidOfferAmount)
+                    : negotiationState.userAskAmount
+                    ? '...'
+                    : '$0'
+                  }
+                </div>
+                <div className={styles.allocationLabel}>
+                  {negotiationState.davidOfferAmount 
+                    ? "David's Current Offer"
+                    : negotiationState.userAskAmount
+                    ? 'Calculating offer...'
+                    : 'No offer yet'
+                  }
+                </div>
               </div>
-            </>
-          )}
-          {negotiationState.negotiationCount > 0 && (
-            <div className={styles.stateRow}>
-              <span className={styles.stateLabel}>Negotiations:</span>
-              <span className={styles.stateValue}>{negotiationState.negotiationCount}/2</span>
+              <div className={styles.statePanelDetails}>
+                <div className={styles.stateRow}>
+                  <span className={styles.stateLabel}>Stage:</span>
+                  <span className={styles.stateValue}>
+                    {!negotiationState.hasAskedForAmount && 'Small Talk'}
+                    {negotiationState.hasAskedForAmount && !negotiationState.hasOffered && 'Awaiting Offer'}
+                    {negotiationState.hasOffered && negotiationState.negotiationCount === 0 && 'Initial Offer'}
+                    {negotiationState.hasOffered && negotiationState.negotiationCount > 0 && 'Negotiating'}
+                  </span>
+                </div>
+                {negotiationState.userAskAmount && (
+                  <div className={styles.stateRow}>
+                    <span className={styles.stateLabel}>You Asked:</span>
+                    <span className={styles.stateValue}>{formatAmount(negotiationState.userAskAmount)}</span>
+                  </div>
+                )}
+                {negotiationState.davidOfferAmount && negotiationState.hasOffered && negotiationState.userAskAmount && (
+                  <>
+                    <div className={styles.stateRow}>
+                      <span className={styles.stateLabel}>David Offered:</span>
+                      <span className={styles.stateValue}>{formatAmount(negotiationState.davidOfferAmount)}</span>
+                    </div>
+                    <div className={styles.stateRow}>
+                      <span className={styles.stateLabel}>Gap:</span>
+                      <span className={styles.stateValue} style={{ color: '#e63946' }}>
+                        -{formatAmount(negotiationState.userAskAmount - negotiationState.davidOfferAmount)}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {negotiationState.negotiationCount > 0 && (
+                  <div className={styles.stateRow}>
+                    <span className={styles.stateLabel}>Negotiations:</span>
+                    <span className={styles.stateValue}>{negotiationState.negotiationCount}/2</span>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
-        </div>
-
       </div>
     </div>
   );
