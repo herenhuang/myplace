@@ -23,7 +23,7 @@ const ManifestoSection: React.FC<{
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, margin: "0px 0px -100px 0px" }}
       transition={{
-        duration: 0.8,
+        duration: 0.5,
         ease: [0.25, 0.1, 0.25, 1],
         delay: delay,
       }}
@@ -221,7 +221,7 @@ function TimelineSection() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
-            transition={{ duration: 0.8, delay: 0.1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
 
             <p className={styles.paragraph}>
@@ -604,7 +604,7 @@ function HeroSection() {
       className={styles.hero}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       <div ref={containerRef} className={styles.scatteredIcons}>
         <svg ref={svgRef} className={styles.d3IconCanvas}>
@@ -1012,7 +1012,7 @@ function PhoneSection() {
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <div className={styles.chatContainer}>
             <Image 
@@ -1065,7 +1065,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: 0.6 }}
+                  transition={{ duration: 0.2, delay: 0.3 }}
                 >
                   <p>Oh nice!!!</p>
                 </motion.div>
@@ -1074,7 +1074,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: 0.7 }}
+                  transition={{ duration: 0.2, delay: 0.4 }}
                 >
                   <p>I did say my shrimp dinner</p>
                 </motion.div>
@@ -1083,7 +1083,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.4, delay: 0.8 }}
+                  transition={{ duration: 0.2, delay: 0.5 }}
                 >
                   <div className={styles.typingDot}></div>
                   <div className={styles.typingDot}></div>
@@ -1111,7 +1111,7 @@ function PhoneSection() {
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
         >
           <div className={styles.elevateContainer}>
             <Image 
@@ -1131,8 +1131,8 @@ function PhoneSection() {
               <div className={styles.elevateTextContent}>
                 <div className={styles.elevateStoryText}>
                   <p>You hesitantly move toward the crowded networking area, glancing at your conference schedule to find your bearings. As you look up to scan the room for familiar faces, you suddenly trip, dropping your bag and scattering its contents everywhere!</p>
-                </div>
-                
+        </div>
+     
                 <div className={styles.elevateQuestion}>
                   <h2>What ends up falling out?</h2>
                 </div>
@@ -1145,7 +1145,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.4, delay: 0.8 }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
                 >
                   <span>🤷 I came empty-handed</span>
                   <span className={styles.elevateArrow}>→</span>
@@ -1156,7 +1156,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.4, delay: 0.9 }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
                 >
                   <span>💻 My work laptop</span>
                   <span className={styles.elevateArrow}>→</span>
@@ -1167,7 +1167,7 @@ function PhoneSection() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.4, delay: 1.0 }}
+                  transition={{ duration: 0.3, delay: 0.6 }}
                 >
                   <span>📓 Notebook and some pens</span>
                   <span className={styles.elevateArrow}>→</span>
@@ -1184,7 +1184,7 @@ function PhoneSection() {
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
         >
           <div className={styles.bouncerContainer}>
             <Image 
@@ -1203,7 +1203,7 @@ function PhoneSection() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: false }}
-                transition={{ duration: 0.6, delay: 0.8 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
               >
                 <Image 
                   src="/bouncerblob.png"
@@ -1220,7 +1220,7 @@ function PhoneSection() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false }}
-                transition={{ duration: 0.5, delay: 1.0 }}
+                transition={{ duration: 0.3, delay: 0.5 }}
               >
                 <p>Howdy! You&apos;re on the Luma list... but to get in... I&apos;ma need to ask you some more questions. There are no <i>right</i> answers though, there&apos;s just <i>your</i> answers.</p>
                 <p className={styles.bouncerQuestion}>Anyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up? Tell me a bit about why that time works for you.</p>
@@ -1232,7 +1232,7 @@ function PhoneSection() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false }}
-                transition={{ duration: 0.4, delay: 1.2 }}
+                transition={{ duration: 0.3, delay: 0.6 }}
               >
                 <div className={styles.bouncerInputWrapper}>
                   <input
@@ -1431,7 +1431,7 @@ function BuildSection() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
                   whileHover={{ scale: 1.1 }}
                 >
                   <Image 
@@ -1503,10 +1503,10 @@ function DiscoverSection() {
           {/* Pentagon Chart */}
           <motion.div 
             className={`${styles.resultCard} ${styles.pentagonCard}`}
-            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
             viewport={{ once: false }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
           >
             <div className={styles.pentagonContainer}>
               <PentagonChart 
@@ -1522,7 +1522,7 @@ function DiscoverSection() {
             initial={{ opacity: 0, scale: 0.8, rotate: 3 }}
             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
             viewport={{ once: false }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
           >
             {/* SVG Circular Progress Border */}
             <svg 
@@ -1567,7 +1567,7 @@ function DiscoverSection() {
             initial={{ opacity: 0, scale: 0.8, rotate: -2 }}
             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
             viewport={{ once: false }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
           >
             <h3 className={styles.resultTitle}>Key Insights</h3>
             <p className={styles.insightSummary}>
@@ -1604,7 +1604,7 @@ function BottomSection() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.5 }}
         >
           {[
             { src: "/manifesto/s-11.png", delay: 0.1 },
@@ -1623,7 +1623,7 @@ function BottomSection() {
               whileInView={{ opacity: 0.8, scale: 1, rotate: 0 }}
               whileHover={{ opacity: 1, scale: 1.1 }}
               viewport={{ once: false }}
-              transition={{ duration: 0.6, delay: icon.delay }}
+              transition={{ duration: 0.4, delay: icon.delay }}
             >
               <Image src={icon.src} alt="Icon" className={styles.bottomIcon} width={[40, 35, 45, 50, 42, 38, 48, 44, 46][index]} height={[40, 35, 45, 50, 42, 38, 48, 44, 46][index]} />
             </motion.div>
@@ -1634,7 +1634,7 @@ function BottomSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Image className={styles.brandName} src="/myplace_text.png" alt="myPlace Logo" width={200} height={200} />
         </motion.div>
