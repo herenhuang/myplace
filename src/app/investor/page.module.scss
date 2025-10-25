@@ -13,6 +13,8 @@
   padding: 2rem;
   padding-top: 3rem;
   background: #f7fbff;
+
+  overflow: hidden;
 }
 
 // Layout wrapper for phone + state panel
@@ -40,7 +42,7 @@
 
   @media (max-width: 768px) {
     border-radius: 0;
-    width: 100%;
+    width: 100vw;
     height: 100dvh;
   }
 }
@@ -217,11 +219,12 @@
   left: 0;
   right: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   margin: 16px;
   border-radius: 24px;
   box-sizing: border-box;
   border: 1px solid #e5e5ea;
+  max-height: 320px; // 300px content + padding
 }
 
 .chatInput {
@@ -229,17 +232,21 @@
   width: 50% !important;
   border-radius: 22px;
   padding: 12px 16px;
+  padding-right: 48px; // Space for send button
   box-sizing: border-box;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.3;
-  letter-spacing: -0.25px;
+  letter-spacing: -0.3px;
   background: #ffffff;
   resize: none;
   min-width: 40px;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-  min-height: auto;
+  transition: height 0.1s ease;
+  min-height: 40px;
+  max-height: 300px;
   border: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
 
   &:disabled {
     background: #f0f0f0;
@@ -254,6 +261,7 @@
 .chatSendButton {
   position: absolute;
   right: 6px;
+  bottom: 6px;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -275,8 +283,8 @@
 }
 
 .iconSend {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   transform: translateX(1px);
 }
 
@@ -319,7 +327,7 @@
 
 .allocationDisplay {
   border-radius: 12px;
-  padding: 32px 24px;
+  padding: 8px;
   text-align: center;
   color: black;
 }
@@ -343,7 +351,7 @@
 .statePanelDetails {
   display: none;
   flex-direction: column;
-  gap: 12px;
+  gap: 0px;
 }
 
 .stateRow {

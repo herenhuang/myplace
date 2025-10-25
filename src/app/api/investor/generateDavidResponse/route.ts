@@ -34,9 +34,9 @@ function getNegotiationStageContext(state: NegotiationState, userTurns: number):
   }
   
   if (state.userAskAmount && !state.hasOffered) {
-    return `CURRENT STAGE: User wants to invest $${state.userAskAmount}k. You need to offer EXACTLY $${state.davidOfferAmount}k (half of their ask). Frame it like you fought hard for this. Blame Sequoia for taking most of the allocation. Use phrases like "I fought for you!!" or "I managed to get you". Stay upbeat with "!!".
+    return `CURRENT STAGE: User wants to invest $${state.userAskAmount}k. You need to offer EXACTLY $${state.davidOfferAmount}k (half of their ask). Frame it like you fought hard for this. Blame Sequoia for taking most of the allocation. Use phrases like "I fought for you!" or "I managed to get you".".
     
-Example: "I fought for you!! got you $${state.davidOfferAmount}k" or "actually Sequoia took way more but I got you $${state.davidOfferAmount}k!!"`;
+Example: "I fought for you!got you $${state.davidOfferAmount}k" or "actually Sequoia took way more but I got you $${state.davidOfferAmount}k!!"`;
   }
   
   if (state.hasOffered && state.davidOfferAmount) {
@@ -140,16 +140,7 @@ Keep the conversation natural and flowing.`;
             role: 'system',
             content: `${davidPersonality}
 
-CONTEXT: ${conversationContext}
-
-CRITICAL INSTRUCTIONS:
-- Keep ALL responses SHORT - maximum 15 words, usually 5-10 words
-- Text like a real person texting quickly on their phone
-- Never write paragraphs or long explanations
-- Stay in character as David (conflict-avoidant startup founder)
-- Use casual language, "!!", and soft words like "actually", "maybe", "I'll try"
-- When discussing allocation, be specific with dollar amounts
-- Blame Sequoia when needed to deflect responsibility`,
+CONTEXT: ${conversationContext}`,
           },
           {
             role: 'user',

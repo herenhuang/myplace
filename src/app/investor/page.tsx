@@ -60,6 +60,7 @@ export default function InvestorPage() {
   });
   const pendingTimeout = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -74,6 +75,20 @@ export default function InvestorPage() {
       }
     }
   }, [])
+
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to recalculate
+      textarea.style.height = 'auto';
+      // Set height to scrollHeight, but not more than 300px
+      const newHeight = Math.min(textarea.scrollHeight, 300);
+      textarea.style.height = `${newHeight}px`;
+      // Add scrollbar if content exceeds 300px
+      textarea.style.overflowY = textarea.scrollHeight > 300 ? 'scroll' : 'hidden';
+    }
+  }, [input])
 
   const canRespond = userTurns < MAX_USER_TURNS;
 
@@ -130,19 +145,14 @@ export default function InvestorPage() {
        userMessage.toLowerCase().includes('increase') ||
        userMessage.match(/can you/i) ||
        userMessage.match(/what about/i) ||
+       userMessage.toLowerCase().includes('i said') ||
        userMessage.match(/but /i));
     
-    if (isNegotiating && negotiationState.negotiationCount < 2 && updatedNegotiationState.davidOfferAmount) {
-      // David might increase his offer slightly (3-8k typically for a 25k initial offer)
-      const increaseAmount = Math.floor(2 + (Math.random() * 6)); // Random increase of 2-8k
-      const newOffer = Math.min(
-        updatedNegotiationState.davidOfferAmount + updatedNegotiationState.maxNegotiationIncrease,
-        updatedNegotiationState.davidOfferAmount + increaseAmount
-      );
-      
+    if (isNegotiating && negotiationState.negotiationCount < 2) {
+      // User is negotiating - increment the counter
+      // The actual offer amount will be updated when David responds
       updatedNegotiationState = {
         ...updatedNegotiationState,
-        davidOfferAmount: newOffer,
         negotiationCount: updatedNegotiationState.negotiationCount + 1,
       };
       setNegotiationState(updatedNegotiationState);
@@ -193,14 +203,29 @@ export default function InvestorPage() {
             setNegotiationState(updatedNegotiationState);
           }
           
-          // Check if David made his offer
-          if (davidOfferMatch && updatedNegotiationState.davidOfferAmount && !updatedNegotiationState.hasOffered) {
-            // David just made his offer
-            updatedNegotiationState = {
-              ...updatedNegotiationState,
-              hasOffered: true,
-            };
-            setNegotiationState(updatedNegotiationState);
+          // Check if David mentioned a dollar amount in his response
+          if (davidOfferMatch && updatedNegotiationState.userAskAmount) {
+            const mentionedAmount = parseInt(davidOfferMatch[1].replace(/,/g, ''));
+            
+            // If this is his first offer (hasn't offered yet)
+            if (!updatedNegotiationState.hasOffered) {
+              updatedNegotiationState = {
+                ...updatedNegotiationState,
+                davidOfferAmount: mentionedAmount,
+                hasOffered: true,
+              };
+              setNegotiationState(updatedNegotiationState);
+            }
+            // If he's already made an offer and this is a different amount (negotiation counter-offer)
+            else if (updatedNegotiationState.hasOffered && 
+                     mentionedAmount !== updatedNegotiationState.davidOfferAmount &&
+                     mentionedAmount > 0) {
+              updatedNegotiationState = {
+                ...updatedNegotiationState,
+                davidOfferAmount: mentionedAmount,
+              };
+              setNegotiationState(updatedNegotiationState);
+            }
           }
           
           pendingTimeout.current = setTimeout(() => {
@@ -305,6 +330,7 @@ export default function InvestorPage() {
 
         <div className={styles.chatInputWrapper}>
           <textarea
+            ref={textareaRef}
             className={styles.chatInput}
             disabled={!canRespond}
             value={input}
