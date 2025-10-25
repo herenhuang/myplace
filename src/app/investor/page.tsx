@@ -261,7 +261,7 @@ export default function InvestorPage() {
             </svg>
           </button>
           <div className={styles.chatHeaderContact}>
-            <div className={styles.chatHeaderAvatar}>👨‍💼</div>
+            <div className={styles.chatHeaderAvatar}></div>
             <span className={styles.chatHeaderName}>David</span>
           </div>
           <button className={styles.chatHeaderVideo} aria-label="Video call">
