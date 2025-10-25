@@ -433,18 +433,18 @@ function HeroSection() {
             repulsionNodes.forEach(repulsionNode => {
               const dx = node.x! - repulsionNode.fx!;
               const dy = node.y! - repulsionNode.fy!;
-              const distance = Math.sqrt(dx * dx + dy * dy);
+            const distance = Math.sqrt(dx * dx + dy * dy);
               const minDistance = repulsionNode.type === 'title' ? 200 : 120; // Different distances for title vs repulsion points
-              
-              if (distance < minDistance && distance > 0) {
+            
+            if (distance < minDistance && distance > 0) {
                 const force = (minDistance - distance) / minDistance * (repulsionNode.type === 'title' ? 0.3 : 0.2);
-                const angle = Math.atan2(dy, dx);
-                const fx = Math.cos(angle) * force;
-                const fy = Math.sin(angle) * force;
-                
-                node.vx = (node.vx || 0) + fx;
-                node.vy = (node.vy || 0) + fy;
-              }
+              const angle = Math.atan2(dy, dx);
+              const fx = Math.cos(angle) * force;
+              const fy = Math.sin(angle) * force;
+              
+              node.vx = (node.vx || 0) + fx;
+              node.vy = (node.vy || 0) + fy;
+            }
             });
           }
         });
@@ -1007,10 +1007,6 @@ function PhoneSection() {
 
 <div className={styles.phoneContent}>
 
-  <div className={styles.gameCard}></div>
-  <div className={styles.gameCard}></div>
-
-
         <motion.div 
           className={styles.phoneContainer}
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
@@ -1109,11 +1105,164 @@ function PhoneSection() {
           <div className={styles.phoneLabel}>WHAT WOULD YOU MAKE?</div>
         </motion.div>
 
-        <div className={styles.gameCard}></div>
-        <div className={styles.gameCard}></div>
+        {/* Elevate Simulation Phone */}
+        <motion.div 
+          className={styles.phoneContainer}
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+        >
+          <div className={styles.elevateContainer}>
+            <Image 
+              src="/iphone-14.png"
+              alt="iPhone frame"
+              layout="fill"
+              className={styles.phoneFrame}
+            />
+            <div className={styles.elevatePhone}>
+              {/* Background Image */}
+              <div 
+                className={styles.elevateBackground}
+                style={{ backgroundImage: 'url(/elevate/orange-2.png)' }}
+              />
+              
+              {/* Text Content */}
+              <div className={styles.elevateTextContent}>
+                <div className={styles.elevateStoryText}>
+                  <p>You hesitantly move toward the crowded networking area, glancing at your conference schedule to find your bearings. As you look up to scan the room for familiar faces, you suddenly trip, dropping your bag and scattering its contents everywhere!</p>
+                </div>
+                
+                <div className={styles.elevateQuestion}>
+                  <h2>What ends up falling out?</h2>
+                </div>
+              </div>
+              
+              {/* Choice Buttons at Bottom */}
+              <div className={styles.elevateChoices}>
+                <motion.button
+                  className={styles.elevateChoiceButton}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.4, delay: 0.8 }}
+                >
+                  <span>🤷 I came empty-handed</span>
+                  <span className={styles.elevateArrow}>→</span>
+                </motion.button>
+                
+                <motion.button
+                  className={styles.elevateChoiceButton}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.4, delay: 0.9 }}
+                >
+                  <span>💻 My work laptop</span>
+                  <span className={styles.elevateArrow}>→</span>
+                </motion.button>
+                
+                <motion.button
+                  className={styles.elevateChoiceButton}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.4, delay: 1.0 }}
+                >
+                  <span>📓 Notebook and some pens</span>
+                  <span className={styles.elevateArrow}>→</span>
+                </motion.button>
+              </div>
+            </div>
+          </div>
+          <div className={styles.phoneLabel}>WHAT WOULD YOU DO???</div>
+        </motion.div>
 
+        {/* Bouncer Simulation Phone */}
+        <motion.div 
+          className={styles.phoneContainer}
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
+        >
+          <div className={styles.bouncerContainer}>
+            <Image 
+              src="/iphone-14.png"
+              alt="iPhone frame"
+              layout="fill"
+              className={styles.phoneFrame}
+            />
+            <div className={styles.bouncerPhone}>
+              {/* Dark Background with Gradient */}
+              <div className={styles.bouncerBackground} />
+              
+              {/* Bouncer Blob Character */}
+              <motion.div 
+                className={styles.bouncerBlobContainer}
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: false }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                <Image 
+                  src="/bouncerblob.png"
+                  alt="Bouncer Blob"
+                  width={120}
+                  height={120}
+                  className={styles.bouncerBlob}
+                />
+              </motion.div>
+              
+              {/* Question Bubble */}
+              <motion.div 
+                className={styles.bouncerQuestionBubble}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false }}
+                transition={{ duration: 0.5, delay: 1.0 }}
+              >
+                <p>Howdy! You&apos;re on the Luma list... but to get in... I&apos;ma need to ask you some more questions. There are no <i>right</i> answers though, there&apos;s just <i>your</i> answers.</p>
+                <p className={styles.bouncerQuestion}>Anyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up? Tell me a bit about why that time works for you.</p>
+              </motion.div>
+              
+              {/* Text Input at Bottom */}
+              <motion.div 
+                className={styles.bouncerInputContainer}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false }}
+                transition={{ duration: 0.4, delay: 1.2 }}
+              >
+                <div className={styles.bouncerInputWrapper}>
+                  <input
+                    type="text"
+                    placeholder="Type your answer..."
+                    disabled
+                    className={styles.bouncerInput}
+                  />
+                  <button
+                    disabled
+                    className={styles.bouncerSubmitButton}
+                  >
+                    <span>→</span>
+                  </button>
+                </div>
+                <div className={styles.bouncerProgressIndicator}>
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                  <span className={styles.bouncerProgressDot} />
+                </div>
+              </motion.div>
+            </div>
+          </div>
+          <div className={styles.phoneLabel}>ARE YOU REALLY IN? 🎟️</div>
+        </motion.div>
+        
         </div>
-    
+     
       </div>
     </ManifestoSection>
   )
@@ -1319,13 +1468,6 @@ function BuildSection() {
               </div>
               
               <h3 className={styles.cardTitleLarge}>{personalityTraits[selectedTrait].name}</h3>
-              
-              <div className={styles.cardTags}>
-                {personalityTraits[selectedTrait].tags.map((tag, index) => (
-                  <span key={index} className={styles.tag}>{tag}</span>
-                ))}
-              </div>
-              
               <p className={styles.cardDescription}>
                 {personalityTraits[selectedTrait].description}
               </p>
@@ -1347,11 +1489,7 @@ function DiscoverSection() {
     personalityScores: [8, 6, 7, 9, 5], // Sample pentagon chart data
     metascore: 87,
     archetype: 'The Navigator',
-    insights: [
-      'You show 92% creativity in problem-solving',
-      'Your responses indicate strong analytical thinking',
-      'You tend to approach challenges systematically'
-    ]
+    summary: 'Based on your responses, you show high levels of creativity and analytical thinking. You tend to approach challenges systematically while maintaining innovative problem-solving strategies.'
   };
 
   return (
@@ -1373,7 +1511,7 @@ function DiscoverSection() {
             <div className={styles.pentagonContainer}>
               <PentagonChart 
                 scores={userResults.personalityScores}
-                size={280}
+                size={260}
               />
             </div>
           </motion.div>
@@ -1386,14 +1524,41 @@ function DiscoverSection() {
             viewport={{ once: false }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
+            {/* SVG Circular Progress Border */}
+            <svg 
+              className={styles.progressRing}
+              width="296" 
+              height="296"
+              style={{ transform: 'rotate(-90deg)' }}
+            >
+              {/* Background circle */}
+              <circle
+                cx="148"
+                cy="148"
+                r={140}
+                stroke="rgba(229, 231, 235, 1)"
+                strokeWidth="8"
+                fill="none"
+              />
+              {/* Progress circle */}
+              <circle
+                cx="148"
+                cy="148"
+                r={140}
+                stroke="#3B82F6"
+                strokeWidth="8"
+                fill="none"
+                strokeDasharray={2 * Math.PI * 140}
+                strokeDashoffset={2 * Math.PI * 140 * (1 - userResults.metascore / 100)}
+                strokeLinecap="round"
+              />
+            </svg>
+            
             <h3 className={styles.resultTitle}>Your Metascore</h3>
             <div className={styles.metascoreDisplay}>
               <span className={styles.metascoreNumber}>{userResults.metascore}</span>
-              <span className={styles.metascoreLabel}>/100</span>
+              <span className={styles.metascoreLabel}></span>
             </div>
-            <p className={styles.metascoreDescription}>
-              Based on your responses, you show high levels of creativity and analytical thinking.
-            </p>
           </motion.div>
 
           {/* Insights */}
@@ -1405,21 +1570,9 @@ function DiscoverSection() {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <h3 className={styles.resultTitle}>Key Insights</h3>
-            <div className={styles.insightsList}>
-              {userResults.insights.map((insight, index) => (
-                <motion.div
-                  key={index}
-                  className={styles.insightItem}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
-                >
-                  <span className={styles.insightBullet}>•</span>
-                  <span className={styles.insightText}>{insight}</span>
-                </motion.div>
-              ))}
-            </div>
+            <p className={styles.insightSummary}>
+              {userResults.summary}
+            </p>
           </motion.div>
         </div>
       </div>
