@@ -1735,9 +1735,19 @@ $bg:#f3fcff;
   .bottomIcons {
     gap: 20px;
   }
-  
-  .container {
+
+  .section {
     padding: 0 15px;
+  }
+
+  .greekSection {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+
+  .greekContent {
+    padding-left: 15px;
+    padding-right: 15px;
   }
 
   .timeline,
