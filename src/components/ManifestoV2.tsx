@@ -10,6 +10,7 @@ import styles from './ManifestoV2.module.scss';
 import SpeechBubbles from '@/components/manifesto/SpeechBubbles';
 import WaitlistForm from '@/components/manifesto/WaitlistForm';
 import PentagonChart from '@/components/word-association/PentagonChart';
+import useMediaQuery from '@/lib/hooks/useMediaQuery';
 
 const ManifestoSection: React.FC<{
   children: React.ReactNode;
@@ -842,6 +843,7 @@ function ConversationSection() {
 function BoxSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = React.useState(0);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // Timeline cards data
   const cards = [
@@ -854,14 +856,22 @@ function BoxSection() {
   ];
 
   // Starting positions for cards (horizontal row above the cube)
-  const startPositions = [
-    { x: 25, y: 5 },    // Left side
-    { x: 36, y: 5 },    // Left-center
-    { x: 44, y: 5 },    // Center-left
-    { x: 51, y: 5 },    // Center-right
-    { x: 63, y: 5 },    // Right-center
-    { x: 78, y: 5 },    // Right side
-  ];
+  const startPositions = isMobile
+    ? [
+      { x: 50, y: -5 },
+      { x: 50, y: 7 },
+      { x: 50, y: 19 },
+      { x: 50, y: 31 },
+      { x: 50, y: 43 },
+      { x: 50, y: 55 },
+    ] : [
+      { x: 25, y: 5 },    // Left side
+      { x: 36, y: 5 },    // Left-center
+      { x: 44, y: 5 },    // Center-left
+      { x: 51, y: 5 },    // Center-right
+      { x: 63, y: 5 },    // Right-center
+      { x: 78, y: 5 },    // Right side
+    ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -919,7 +929,7 @@ function BoxSection() {
             
             // Target position (cube's actual position)
             const targetX = 50; // 50% - matches cube's left: 50%
-            const targetY = 75; // 75% - matches cube's bottom: -50% (which is 75% from top)
+            const targetY = isMobile ? 90 : 75; // 75% - matches cube's bottom: -50% (which is 75% from top)
             
             // Direct linear interpolation for immediate response
             const currentX = startPos.x + (targetX - startPos.x) * cardProgress;
@@ -945,19 +955,18 @@ function BoxSection() {
               </div>
             );
           })}
-          
           {/* Cube in center */}
           <div className={styles.cubeContainer}>
-            <Image 
-              src="/manifesto/cube.png" 
-              className={styles.cube} 
-              alt="Multidimensional cube" 
-              width={400} 
-              height={300} 
+            <Image
+              src="/manifesto/cube.png"
+              className={styles.cube}
+              alt="Multidimensional cube"
+              width={400}
+              height={300}
             />
           </div>
         </div>
-        
+
         <p className={styles.paragraph}>
           Yet we're far more multi-dimensional than that.
         </p>

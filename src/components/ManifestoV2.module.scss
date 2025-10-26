@@ -392,7 +392,7 @@ $bg:#f3fcff;
   -webkit-backface-visibility: hidden;
   
   @media (max-width: 768px) {
-    height: 400px;
+    height: 500px;
     margin: 60px 0;
   }
 }
@@ -453,8 +453,7 @@ $bg:#f3fcff;
   
   @media (max-width: 768px) {
     .cube {
-      width: 250px !important;
-      height: 187px !important;
+      width: 250px;
     }
   }
 }
