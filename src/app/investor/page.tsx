@@ -206,16 +206,23 @@ export default function InvestorPage() {
           setTimeout(() => {
             setDisplayedFinalTranscript(prev => [...prev, finalMessages[messageIndex]]);
             setIsTypingMessage(false);
+
+            // Show button with second-to-last message
+            if (messageIndex === finalMessages.length - 2) {
+              setShowContinueButton(true);
+            }
+            
             messageIndex++;
-            setTimeout(typeNextMessage, 1000); // Wait 1 second before next message
-          }, finalMessages[messageIndex].text.length * 30); // Typing speed
+            setTimeout(typeNextMessage, 1000); 
+          }, finalMessages[messageIndex].text.length * 30); 
         } else {
-          // All messages are displayed
-          setShowContinueButton(true);
+          if (finalMessages.length < 2 && !showContinueButton) {
+            setShowContinueButton(true);
+          }
         }
       };
       
-      setTimeout(typeNextMessage, 500); // Start after 500ms
+      setTimeout(typeNextMessage, 500); 
     }
   }, [view, finalTranscript.length, negotiationState]);
 
@@ -223,7 +230,7 @@ export default function InvestorPage() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [transcript, isNpcTyping])
+  }, [displayedTranscript, displayedFinalTranscript, isNpcTyping, isTypingMessage])
 
   useEffect(() => {
     return () => {

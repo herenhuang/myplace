@@ -67,7 +67,7 @@ export default function InvestorResultsPage() {
   };
 
   return (
-    <div className={investorStyles.simulationContainer}>
+    <div className={styles.container}>
         <div className={styles.resultsContainer}>
             <div className={`${styles.card} ${styles.offerCard}`}>
                 <div className={styles.finalOffer}>

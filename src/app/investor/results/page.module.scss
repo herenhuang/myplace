@@ -1,12 +1,28 @@
+.container {
+
+  @media (max-width: 768px) {
+    height: 100dvh;
+    padding: 36px 0 72px 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: scroll;
+  }
+}
+
 .resultsContainer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   width: 100%;
   max-width: 1000px;
+  padding: 32px;
   align-items: stretch;
 
   filter: drop-shadow(-24px 120px 120px rgba(black, 0.15));
+
 }
 
 .card {
