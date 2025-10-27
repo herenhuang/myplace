@@ -185,6 +185,8 @@ function TimelineSection() {
   const [scrollProgress, setScrollProgress] = React.useState(0);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => {
       if (!sectionRef.current) return;
       
@@ -263,7 +265,7 @@ function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current) return;
+    if (!svgRef.current || !containerRef.current || typeof window === 'undefined') return;
 
     const container = containerRef.current;
     const svg = d3.select(svgRef.current);
@@ -645,6 +647,8 @@ function CloudSection() {
   const [scrollProgress, setScrollProgress] = React.useState(0);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => {
       if (!sectionRef.current) return;
       
@@ -874,6 +878,8 @@ function BoxSection() {
     ];
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => {
       if (!sectionRef.current) return;
       
