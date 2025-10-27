@@ -18,16 +18,7 @@ export interface NegotiationState {
   dealClosed: boolean;
 }
 
-export type UserIntent =
-  | 'unknown'
-  | 'provide_amount'
-  | 'counter_offer'
-  | 'accept_offer'
-  | 'decline_offer'
-  | 'small_talk';
-
 export interface DavidResponseAnalysis {
-  userIntent: UserIntent;
   userAskAmount: number | null;
   davidAskedForAmount: boolean;
   incrementNegotiationCount: boolean;

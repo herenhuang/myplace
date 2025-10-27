@@ -7,7 +7,7 @@ import { saveInvestorCache, formatAmount } from './utils'
 import { ChatMessage, NegotiationState, DavidResponseAnalysis } from './types'
 
 const NPC_DELAY_MS = 800;
-const MAX_USER_TURNS = 1;
+const MAX_USER_TURNS = 10;
 
 interface GenerateDavidResponsePayload {
   success: boolean;
@@ -17,7 +17,6 @@ interface GenerateDavidResponsePayload {
 }
 
 const fallbackAnalysis: DavidResponseAnalysis = {
-  userIntent: 'unknown',
   userAskAmount: null,
   davidAskedForAmount: false,
   incrementNegotiationCount: false,
@@ -37,6 +36,7 @@ export default function InvestorPage() {
   const [displayedTranscript, setDisplayedTranscript] = useState<ChatMessage[]>([]);
   const [displayedFinalTranscript, setDisplayedFinalTranscript] = useState<ChatMessage[]>([]);
   const [isTypingMessage, setIsTypingMessage] = useState(false);
+  const [showContinueButton, setShowContinueButton] = useState(false);
   const router = useRouter();
   const [transcript, setTranscript] = useState<ChatMessage[]>([]);
   const [finalTranscript, setFinalTranscript] = useState<ChatMessage[]>([]);
@@ -209,6 +209,9 @@ export default function InvestorPage() {
             messageIndex++;
             setTimeout(typeNextMessage, 1000); // Wait 1 second before next message
           }, finalMessages[messageIndex].text.length * 30); // Typing speed
+        } else {
+          // All messages are displayed
+          setShowContinueButton(true);
         }
       };
       
@@ -317,13 +320,13 @@ export default function InvestorPage() {
             nextState.maxNegotiationIncrease = Math.floor(offerAmount * 0.15)
           }
 
-          if (analysis.incrementNegotiationCount || analysis.userIntent === 'counter_offer') {
+          if (analysis.incrementNegotiationCount) {
             if (nextState.negotiationCount < 2) {
               nextState.negotiationCount += 1
             }
           }
 
-          if (analysis.markDealClosed || analysis.userIntent === 'accept_offer') {
+          if (analysis.markDealClosed) {
             nextState.dealClosed = true
           }
 
@@ -692,15 +695,17 @@ export default function InvestorPage() {
       
                 <div className={styles.chatInputContainer}>
                   <div className={styles.continueButtonContainer}>
-                    <button
-                      className={styles.continueButton}
-                      onClick={() => {
-                        saveInvestorCache({ negotiationState, transcript: finalTranscript });
-                        router.push('/investor/results');
-                      }}
-                    >
-                      Continue to Results
-                    </button>
+                    {showContinueButton &&
+                      <button
+                        className={styles.continueButton}
+                        onClick={() => {
+                          saveInvestorCache({ negotiationState, transcript: finalTranscript });
+                          router.push('/investor/results');
+                        }}
+                      >
+                        Continue to Results
+                      </button>
+                    }
                   </div>
                 </div>
               </div>
