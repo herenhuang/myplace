@@ -234,10 +234,8 @@ export default function InvestorPage() {
       if (response.ok) {
         const data = await response.json()
         if (data.success && data.response) {
-          // Check if David asked about investment amount or made an offer
           const davidResponseText = data.response;
           const davidResponseLower = davidResponseText.toLowerCase();
-          const mentionedOffer = parseAmount(davidResponseText);
           
           // Check if David asked about investment amount
           if (!updatedNegotiationState.hasAskedForAmount && 
@@ -253,25 +251,26 @@ export default function InvestorPage() {
             setNegotiationState(updatedNegotiationState);
           }
           
-          // Check if David mentioned a dollar amount in his response
-          if (mentionedOffer !== null && updatedNegotiationState.userAskAmount) {
+          // Check if David made an explicit offer (from AI response)
+          if (data.offer_amount !== null && data.offer_amount !== undefined) {
+            const offerAmount = data.offer_amount;
             
             // If this is his first offer (hasn't offered yet)
             if (!updatedNegotiationState.hasOffered) {
               updatedNegotiationState = {
                 ...updatedNegotiationState,
-                davidOfferAmount: mentionedOffer,
+                davidOfferAmount: offerAmount,
                 hasOffered: true,
               };
               setNegotiationState(updatedNegotiationState);
             }
             // If he's already made an offer and this is a different amount (negotiation counter-offer)
             else if (updatedNegotiationState.hasOffered && 
-                     mentionedOffer !== updatedNegotiationState.davidOfferAmount &&
-                     mentionedOffer > 0) {
+                     offerAmount !== updatedNegotiationState.davidOfferAmount &&
+                     offerAmount > 0) {
               updatedNegotiationState = {
                 ...updatedNegotiationState,
-                davidOfferAmount: mentionedOffer,
+                davidOfferAmount: offerAmount,
               };
               setNegotiationState(updatedNegotiationState);
             }
@@ -430,42 +429,44 @@ export default function InvestorPage() {
                   )}
                 </div>
       
-                <div className={styles.chatInputWrapper}>
-                  <textarea
-                    ref={textareaRef}
-                    className={styles.chatInput}
-                    disabled={!canRespond}
-                    value={input}
-                    placeholder={
-                      canRespond
-                        ? 'Type your reply...'
-                        : 'Conversation complete'
-                    }
-                    onChange={(event) => setInput(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' && !event.shiftKey) {
-                        event.preventDefault();
-                        sendMessage();
-                      }
-                    }}
-                    maxLength={220}
-                    rows={1}
-                  />
-                  <button
-                    type="button"
-                    onClick={sendMessage}
-                    disabled={!canRespond || !input.trim()}
-                    className={styles.chatSendButton}
-                    aria-label="Send message"
-                  >
-                    <svg
-                      className={styles.iconSend}
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
+                <div className={styles.chatInputContainer}>
+                    <div className={styles.chatInputWrapper}>
+                    <textarea
+                        ref={textareaRef}
+                        className={styles.chatInput}
+                        disabled={!canRespond}
+                        value={input}
+                        placeholder={
+                        canRespond
+                            ? 'Type your reply...'
+                            : 'Conversation complete'
+                        }
+                        onChange={(event) => setInput(event.target.value)}
+                        onKeyDown={(event) => {
+                        if (event.key === 'Enter' && !event.shiftKey) {
+                            event.preventDefault();
+                            sendMessage();
+                        }
+                        }}
+                        maxLength={220}
+                        rows={1}
+                    />
+                    <button
+                        type="button"
+                        onClick={sendMessage}
+                        disabled={!canRespond || !input.trim()}
+                        className={styles.chatSendButton}
+                        aria-label="Send message"
                     >
-                      <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                    </svg>
-                  </button>
+                        <svg
+                        className={styles.iconSend}
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        >
+                        <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                        </svg>
+                    </button>
+                    </div>
                 </div>
               </div>
             </div>
