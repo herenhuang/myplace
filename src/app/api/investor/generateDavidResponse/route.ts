@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-interface ChatMessage {
-  id: string
-  sender: 'user' | 'npc'
-  text: string
-  elapsedMs: number
-}
-
-interface NegotiationState {
-  userAskAmount: number | null
-  davidOfferAmount: number | null
-  hasAskedForAmount: boolean
-  hasOffered: boolean
-  negotiationCount: number
-  maxNegotiationIncrease: number
-  allocationPercentage: number
-}
+import type {
+  ChatMessage,
+  NegotiationState,
+  DavidResponseAnalysis,
+  UserIntent,
+} from '../../../investor/types'
 
 interface GenerateDavidResponseRequest {
   npcName: string
@@ -25,6 +14,66 @@ interface GenerateDavidResponseRequest {
   maxUserTurns: number
   currentTurn: number
   negotiationState: NegotiationState
+  isFinalTerms?: boolean
+}
+
+function parseNumber(value: unknown): number | null {
+  if (typeof value === 'number' && !Number.isNaN(value)) {
+    return value
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value.replace(/[^0-9.-]/g, ''))
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
+
+function parseBoolean(value: unknown): boolean {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') {
+    return ['true', '1', 'yes'].includes(value.toLowerCase())
+  }
+  if (typeof value === 'number') {
+    return value !== 0
+  }
+  return false
+}
+
+function normalizeIntent(value: unknown): UserIntent {
+  if (typeof value !== 'string') return 'unknown'
+  const normalized = value.toLowerCase().replace(/\s+/g, '_') as UserIntent
+  if (
+    normalized === 'provide_amount' ||
+    normalized === 'counter_offer' ||
+    normalized === 'accept_offer' ||
+    normalized === 'decline_offer' ||
+    normalized === 'small_talk'
+  ) {
+    return normalized
+  }
+  return 'unknown'
+}
+
+// Build context for final terms discussion
+function getFinalTermsContext(negotiationState: NegotiationState): string {
+  const formatAmountForAI = (amount: number | null): string => {
+    if (amount === null) return '$0';
+    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1).replace('.0', '')}M`;
+    if (amount >= 1000) return `$${amount / 1000}k`;
+    return `$${amount}`;
+  }
+
+  return `
+FINAL TERMS CONTEXT:
+- The negotiation is complete and a deal has been reached
+- Final investment amount: ${formatAmountForAI(negotiationState.davidOfferAmount)}
+- Equity percentage: ${negotiationState.allocationPercentage}%
+- You have already sent the term sheet as an attachment
+- The user is now asking questions about the final terms
+- Be helpful, professional, and ready to clarify any details
+- Keep responses concise and focused on term sheet details
+- You can reference specific terms like liquidation preference, board rights, etc.
+`;
 }
 
 // Build dynamic context based on negotiation state
@@ -61,6 +110,9 @@ function getNegotiationStageContext(negotiationState: NegotiationState, currentT
           )
         : 0;
       contextLines.push(`- If you negotiate, you could offer something like ${formatAmountForAI(newOffer)}.`);
+    }
+    if (negotiationState.dealClosed) {
+      contextLines.push('- The user already committed to the current offer. Reassure them and move toward next steps.');
     }
   } else {
     contextLines.push('- You are in the initial stages of conversation.');
@@ -145,14 +197,24 @@ HUMAN-LIKE BEHAVIOR:
 - If their response is completely off-topic or nonsensical, gently guide them back to the investment discussion.
 
 RESPONSE FORMAT:
-- You must respond with a JSON object containing your message and any offer amount.
-- If you are making an offer, include the exact dollar amount as a number in the "offer_amount" field.
-- Format: {"content": "your message text", "offer_amount": 5000} (only include offer_amount when making an offer)
-- If not making an offer, just use: {"content": "your message text"}
-- The offer_amount should be the exact number (e.g., 5000 for $5k, 1000000 for $1M)
+- You must respond with a JSON object containing your message, any offer amount, and an analysis block.
+- Required fields:
+  - "content": string containing your reply
+  - "analysis": {
+      "userIntent": one of ["unknown","provide_amount","counter_offer","accept_offer","decline_offer","small_talk"],
+      "userAskAmount": number in dollars or null,
+      "davidAskedForAmount": boolean,
+      "incrementNegotiationCount": boolean,
+      "markDealClosed": boolean
+    }
+- Include "offer_amount" (number) only when you are explicitly making an offer. Use raw numbers (e.g. 5000 for $5k).
+- Example without offer:
+  {"content":"Got it, how much were you thinking?","analysis":{"userIntent":"small_talk","userAskAmount":null,"davidAskedForAmount":true,"incrementNegotiationCount":false,"markDealClosed":false}}
+- Example with offer:
+  {"content":"I can do 50k max. Sequoia boxed me in.","offer_amount":50000,"analysis":{"userIntent":"counter_offer","userAskAmount":null,"davidAskedForAmount":false,"incrementNegotiationCount":false,"markDealClosed":false}}
 - IMPORTANT: Return ONLY the raw JSON object. Do NOT wrap it in markdown code blocks or any other formatting. Just the pure JSON.
 
-${getNegotiationStageContext(negotiationState, currentTurn)}`;
+${body.isFinalTerms ? getFinalTermsContext(negotiationState) : getNegotiationStageContext(negotiationState, currentTurn)}`;
 
     const conversationContext = `Story: David's AI startup is raising a seed round. Sequoia is leading and took most of the allocation. David already soft-committed most of the remaining allocation to other people (former boss, advisor). The user has been helping David for 6 months expecting meaningful allocation, but David is now trying to squeeze them into whatever scraps remain.
 
@@ -257,7 +319,46 @@ CONTEXT: ${conversationContext}`,
 
     // Extract content and offer_amount
     const content = responseData.content || davidResponse.trim();
-    const offerAmount = responseData.offer_amount || null;
+    const offerAmount = responseData.offer_amount ?? responseData.offerAmount ?? null;
+
+    const defaultAnalysis: DavidResponseAnalysis = {
+      userIntent: 'unknown',
+      userAskAmount: null,
+      davidAskedForAmount: false,
+      incrementNegotiationCount: false,
+      markDealClosed: false,
+    }
+
+    let analysis: DavidResponseAnalysis = { ...defaultAnalysis }
+    const rawAnalysis = responseData.analysis ?? responseData.state_updates ?? null
+
+    if (rawAnalysis && typeof rawAnalysis === 'object') {
+      analysis = {
+        userIntent: normalizeIntent(
+          (rawAnalysis as Record<string, unknown>).userIntent ??
+            (rawAnalysis as Record<string, unknown>).user_intent
+        ),
+        userAskAmount:
+          parseNumber(
+            (rawAnalysis as Record<string, unknown>).userAskAmount ??
+              (rawAnalysis as Record<string, unknown>).user_ask_amount
+          ) ?? null,
+        davidAskedForAmount: parseBoolean(
+          (rawAnalysis as Record<string, unknown>).davidAskedForAmount ??
+            (rawAnalysis as Record<string, unknown>).david_asked_for_amount
+        ),
+        incrementNegotiationCount: parseBoolean(
+          (rawAnalysis as Record<string, unknown>).incrementNegotiationCount ??
+            (rawAnalysis as Record<string, unknown>).increment_negotiation_count ??
+            (rawAnalysis as Record<string, unknown>).userIsNegotiating
+        ),
+        markDealClosed: parseBoolean(
+          (rawAnalysis as Record<string, unknown>).markDealClosed ??
+            (rawAnalysis as Record<string, unknown>).mark_deal_closed ??
+            (rawAnalysis as Record<string, unknown>).userAccepted
+        ),
+      }
+    }
 
     console.log('✅ [Investor] David response generated successfully:', {
       npcName,
@@ -267,12 +368,14 @@ CONTEXT: ${conversationContext}`,
       fullLength: content.length,
       hasOffer: offerAmount !== null,
       offerAmount: offerAmount,
+      intent: analysis.userIntent,
     })
 
     return NextResponse.json({
       success: true,
       response: content,
       offer_amount: offerAmount,
+      analysis,
     })
   } catch (error) {
     console.error('❌ [Investor] Fatal error in generateDavidResponse:', {
@@ -291,4 +394,3 @@ CONTEXT: ${conversationContext}`,
     )
   }
 }
-

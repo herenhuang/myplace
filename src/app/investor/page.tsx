@@ -3,24 +3,46 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './page.module.scss'
 import { useRouter } from 'next/navigation'
-import { saveInvestorCache, parseAmount, formatAmount } from './utils'
-import { ChatMessage, NegotiationState } from './types'
+import { saveInvestorCache, formatAmount } from './utils'
+import { ChatMessage, NegotiationState, DavidResponseAnalysis } from './types'
 
 const NPC_DELAY_MS = 800;
-const MAX_USER_TURNS = 10;
+const MAX_USER_TURNS = 1;
+
+interface GenerateDavidResponsePayload {
+  success: boolean;
+  response: string;
+  offer_amount: number | null;
+  analysis?: DavidResponseAnalysis;
+}
+
+const fallbackAnalysis: DavidResponseAnalysis = {
+  userIntent: 'unknown',
+  userAskAmount: null,
+  davidAskedForAmount: false,
+  incrementNegotiationCount: false,
+  markDealClosed: false,
+};
 
 
 export default function InvestorPage() {
-  const [view, setView] = useState<'intro' | 'scenario' | 'chat'>('intro');
+  const [view, setView] = useState<'intro' | 'scenario' | 'chat' | 'terms' | 'final-chat'>('intro');
   const [showNotification, setShowNotification] = useState(false);
   const [streamedText, setStreamedText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [showMessagesIcon, setShowMessagesIcon] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
+  const [termsStreamedText, setTermsStreamedText] = useState('');
+  const [isTermsStreaming, setIsTermsStreaming] = useState(false);
+  const [displayedTranscript, setDisplayedTranscript] = useState<ChatMessage[]>([]);
+  const [displayedFinalTranscript, setDisplayedFinalTranscript] = useState<ChatMessage[]>([]);
+  const [isTypingMessage, setIsTypingMessage] = useState(false);
   const router = useRouter();
   const [transcript, setTranscript] = useState<ChatMessage[]>([]);
+  const [finalTranscript, setFinalTranscript] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [userTurns, setUserTurns] = useState(0);
+  const [finalUserTurns, setFinalUserTurns] = useState(0);
   const [startTime] = useState<number>(() => performance.now());
   const [isNpcTyping, setIsNpcTyping] = useState(false);
   const [negotiationState, setNegotiationState] = useState<NegotiationState>({
@@ -64,31 +86,135 @@ export default function InvestorPage() {
     }
   }, [view]);
 
+  useEffect(() => {
+    if (view === 'terms') {
+      const fullText = "After your conversation with David, you've reached an agreement. The negotiation has concluded with David offering you a specific allocation amount.\n\nDavid is now preparing the final term sheet with all the details. He'll be sending it over shortly with the complete investment terms.";
+      
+      setIsTermsStreaming(true);
+      setTermsStreamedText('');
+      
+      let currentIndex = 0;
+      const streamInterval = setInterval(() => {
+        if (currentIndex < fullText.length) {
+          setTermsStreamedText(fullText.slice(0, currentIndex + 1));
+          currentIndex++;
+        } else {
+          clearInterval(streamInterval);
+          setIsTermsStreaming(false);
+        }
+      }, 30);
+      
+      return () => clearInterval(streamInterval);
+    }
+  }, [view]);
+
   // Reset transcript when chat view is entered
   useEffect(() => {
     if (view === 'chat' && transcript.length === 0) {
-      setTranscript([
+      const initialMessages = [
         {
           id: 'initial-1',
-          sender: 'npc',
+          sender: 'npc' as const,
           text: "Hey hey, thanks sm for your help these past few months.",
           elapsedMs: 0,
         },
         {
           id: 'initial-2',
-          sender: 'npc',
-          text: "Guess what, after months of talking about it, i’m finally fundraising!",
+          sender: 'npc' as const,
+          text: "Guess what, after months of talking about it, i'm finally fundraising!",
           elapsedMs: 1200,
         },
         {
           id: 'initial-3',
-          sender: 'npc',
-          text: "Actually the round is almost full, but i wanted to see if you’re still interested? How much were you thinking of putting in?",
+          sender: 'npc' as const,
+          text: "Actually the round is almost full, but i wanted to see if you're still interested? How much were you thinking of putting in?",
           elapsedMs: 1200,
         },
-      ]);
+      ];
+      
+      setTranscript(initialMessages);
+      setDisplayedTranscript([]);
+      
+      // Start typing animation
+      let messageIndex = 0;
+      const typeNextMessage = () => {
+        if (messageIndex < initialMessages.length && initialMessages[messageIndex]) {
+          // Only show typing indicator if there are more messages after this one
+          if (messageIndex + 1 < initialMessages.length) {
+            setIsTypingMessage(true);
+          }
+          setTimeout(() => {
+            setDisplayedTranscript(prev => [...prev, initialMessages[messageIndex]]);
+            setIsTypingMessage(false);
+            messageIndex++;
+            setTimeout(typeNextMessage, 1000); // Wait 1 second before next message
+          }, initialMessages[messageIndex].text.length * 30); // Typing speed
+        }
+      };
+      
+      setTimeout(typeNextMessage, 500); // Start after 500ms
     }
   }, [view, transcript.length]);
+
+  // Initialize final transcript when final-chat view is entered
+  useEffect(() => {
+    if (view === 'final-chat' && finalTranscript.length === 0) {
+      const finalMessages = [
+        {
+          id: 'final-1',
+          sender: 'npc' as const,
+          text: "Perfect! I've got everything ready on my end.",
+          elapsedMs: 0,
+        },
+        {
+          id: 'final-2',
+          sender: 'npc' as const,
+          text: "Here are the final terms for your investment:",
+          elapsedMs: 1200,
+        },
+        {
+          id: 'final-3',
+          sender: 'npc' as const,
+          text: `• Investment Amount: ${negotiationState.davidOfferAmount ? formatAmount(negotiationState.davidOfferAmount) : '$0'}\n• Equity: ${negotiationState.allocationPercentage}%\n• Liquidation Preference: 1x non-participating\n• Board Observer Rights\n• Pro-rata rights for future rounds`,
+          elapsedMs: 1200,
+        },
+        {
+          id: 'final-4',
+          sender: 'npc' as const,
+          text: "Perfect! I'm excited to have you on board. Before we finalize everything, I need your verbal commitment to move forward with this investment.",
+          elapsedMs: 1200,
+        },
+        {
+          id: 'final-5',
+          sender: 'npc' as const,
+          text: "Can you confirm that you're ready to commit to this investment? Just say 'yes' or 'I commit' and we'll get everything finalized.",
+          elapsedMs: 1200,
+        },
+      ];
+      
+      setFinalTranscript(finalMessages);
+      setDisplayedFinalTranscript([]);
+      
+      // Start typing animation
+      let messageIndex = 0;
+      const typeNextMessage = () => {
+        if (messageIndex < finalMessages.length && finalMessages[messageIndex]) {
+          // Only show typing indicator if there are more messages after this one
+          if (messageIndex + 1 < finalMessages.length) {
+            setIsTypingMessage(true);
+          }
+          setTimeout(() => {
+            setDisplayedFinalTranscript(prev => [...prev, finalMessages[messageIndex]]);
+            setIsTypingMessage(false);
+            messageIndex++;
+            setTimeout(typeNextMessage, 1000); // Wait 1 second before next message
+          }, finalMessages[messageIndex].text.length * 30); // Typing speed
+        }
+      };
+      
+      setTimeout(typeNextMessage, 500); // Start after 500ms
+    }
+  }, [view, finalTranscript.length, negotiationState]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -124,17 +250,17 @@ export default function InvestorPage() {
     if (!canRespond && view === 'chat') {
       setTimeout(() => {
         saveInvestorCache({ negotiationState, transcript });
-        router.push('/investor/results');
+        setView('terms');
       }, 1500);
     }
-  }, [canRespond, negotiationState, transcript, router, view]);
+  }, [canRespond, negotiationState, transcript, view]);
 
   const sendMessage = async () => {
     if (!input.trim()) return
     if (!canRespond) return
 
     const now = performance.now()
-    const userMessage = input.trim();
+    const userMessage = input.trim()
     const newUserTurn: ChatMessage = {
       id: `user-${userTurns + 1}`,
       sender: 'user',
@@ -144,76 +270,14 @@ export default function InvestorPage() {
 
     const updatedTranscript = [...transcript, newUserTurn]
     setTranscript(updatedTranscript)
+    setDisplayedTranscript((prev) => [...prev, newUserTurn])
     setUserTurns((count) => count + 1)
     setInput('')
 
-    // Check if user is accepting the offer
-    const userMessageLower = userMessage.toLowerCase();
-    const strongAcceptanceKeywords = [
-      'i accept', 'i\'ll take it', 'that works', 'deal', 'let\'s do it'
-    ];
-    const weakAcceptanceKeywords = ['ok', 'okay', 'fine', 'sounds good'];
-    
-    let userAccepts = false;
-    if (negotiationState.hasOffered) {
-      if (strongAcceptanceKeywords.some(keyword => userMessageLower.includes(keyword))) {
-        userAccepts = true;
-      } else if (weakAcceptanceKeywords.includes(userMessageLower)) {
-        userAccepts = true;
-      }
-    }
-
-    if (userAccepts) {
-      const finalState = { ...negotiationState, dealClosed: true };
-      setNegotiationState(finalState);
-      setUserTurns(MAX_USER_TURNS);
-      return;
-    }
-
-    // Check if user mentioned an investment amount
-    let updatedNegotiationState = { ...negotiationState };
-    const userAsk = parseAmount(userMessage);
-    
-    if (userAsk !== null && !negotiationState.userAskAmount) {
-      const davidOffer = Math.floor(userAsk / 2);
-      
-      updatedNegotiationState = {
-        ...negotiationState,
-        userAskAmount: userAsk,
-        davidOfferAmount: davidOffer,
-        maxNegotiationIncrease: Math.floor(davidOffer * 0.15),
-        hasAskedForAmount: true,
-        allocationPercentage: negotiationState.allocationPercentage,
-      };
-      setNegotiationState(updatedNegotiationState);
-    }
-    
-    // Check if user is pushing back or negotiating after receiving an offer
-    const isNegotiating = negotiationState.hasOffered && 
-      (userMessage.toLowerCase().includes('more') || 
-       userMessage.toLowerCase().includes('higher') ||
-       userMessage.toLowerCase().includes('increase') ||
-       userMessage.match(/can you/i) ||
-       userMessage.match(/what about/i) ||
-       userMessage.toLowerCase().includes('i said') ||
-       userMessage.match(/but /i));
-    
-    if (isNegotiating && negotiationState.negotiationCount < 2) {
-      // User is negotiating - increment the counter
-      // The actual offer amount will be updated when David responds
-      updatedNegotiationState = {
-        ...updatedNegotiationState,
-        negotiationCount: updatedNegotiationState.negotiationCount + 1,
-      };
-      setNegotiationState(updatedNegotiationState);
-    }
-
-    // Show typing indicator
     setTimeout(() => {
       setIsNpcTyping(true)
     }, 500)
 
-    // Generate AI response using specialized David endpoint
     try {
       const response = await fetch('/api/investor/generateDavidResponse', {
         method: 'POST',
@@ -224,71 +288,63 @@ export default function InvestorPage() {
           npcName: 'David',
           npcAvatar: '👨‍💼',
           conversationHistory: updatedTranscript,
-          userMessage: userMessage,
+          userMessage,
           maxUserTurns: MAX_USER_TURNS,
           currentTurn: userTurns + 1,
-          negotiationState: updatedNegotiationState,
+          negotiationState,
         }),
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const data: GenerateDavidResponsePayload = await response.json()
         if (data.success && data.response) {
-          const davidResponseText = data.response;
-          const davidResponseLower = davidResponseText.toLowerCase();
-          
-          // Check if David asked about investment amount
-          if (!updatedNegotiationState.hasAskedForAmount && 
-              (davidResponseLower.includes('how much') || 
-               davidResponseLower.includes('what were you') ||
-               davidResponseLower.includes('thinking') ||
-               davidResponseLower.includes('put in') ||
-               davidResponseLower.includes('hoping to'))) {
-            updatedNegotiationState = {
-              ...updatedNegotiationState,
-              hasAskedForAmount: true,
-            };
-            setNegotiationState(updatedNegotiationState);
+          const analysis = data.analysis ?? fallbackAnalysis
+          const offerAmount = data.offer_amount ?? null
+          const nextState: NegotiationState = { ...negotiationState }
+
+          if (analysis.userAskAmount !== null) {
+            nextState.userAskAmount = analysis.userAskAmount
+            nextState.hasAskedForAmount = true
           }
-          
-          // Check if David made an explicit offer (from AI response)
-          if (data.offer_amount !== null && data.offer_amount !== undefined) {
-            const offerAmount = data.offer_amount;
-            
-            // If this is his first offer (hasn't offered yet)
-            if (!updatedNegotiationState.hasOffered) {
-              updatedNegotiationState = {
-                ...updatedNegotiationState,
-                davidOfferAmount: offerAmount,
-                hasOffered: true,
-              };
-              setNegotiationState(updatedNegotiationState);
-            }
-            // If he's already made an offer and this is a different amount (negotiation counter-offer)
-            else if (updatedNegotiationState.hasOffered && 
-                     offerAmount !== updatedNegotiationState.davidOfferAmount &&
-                     offerAmount > 0) {
-              updatedNegotiationState = {
-                ...updatedNegotiationState,
-                davidOfferAmount: offerAmount,
-              };
-              setNegotiationState(updatedNegotiationState);
+
+          if (analysis.davidAskedForAmount) {
+            nextState.hasAskedForAmount = true
+          }
+
+          if (offerAmount !== null) {
+            nextState.davidOfferAmount = offerAmount
+            nextState.hasOffered = true
+            nextState.maxNegotiationIncrease = Math.floor(offerAmount * 0.15)
+          }
+
+          if (analysis.incrementNegotiationCount || analysis.userIntent === 'counter_offer') {
+            if (nextState.negotiationCount < 2) {
+              nextState.negotiationCount += 1
             }
           }
-          
+
+          if (analysis.markDealClosed || analysis.userIntent === 'accept_offer') {
+            nextState.dealClosed = true
+          }
+
+          setNegotiationState(nextState)
+
           pendingTimeout.current = setTimeout(() => {
             setIsNpcTyping(false)
-            const withNpc: ChatMessage[] = [
-              ...updatedTranscript,
-              {
-                id: `npc-${userTurns + 1}`,
-                sender: 'npc',
-                text: davidResponseText,
-                elapsedMs: Math.round(performance.now() - startTime),
-              },
-            ]
+            const npcResponse: ChatMessage = {
+              id: `npc-${userTurns + 1}`,
+              sender: 'npc',
+              text: data.response,
+              elapsedMs: Math.round(performance.now() - startTime),
+            }
+            const withNpc: ChatMessage[] = [...updatedTranscript, npcResponse]
             setTranscript(withNpc)
+            setDisplayedTranscript((prev) => [...prev, npcResponse])
           }, NPC_DELAY_MS)
+
+          if (nextState.dealClosed) {
+            setUserTurns(MAX_USER_TURNS)
+          }
         } else {
           setIsNpcTyping(false)
         }
@@ -298,6 +354,87 @@ export default function InvestorPage() {
       }
     } catch (error) {
       console.error('Error generating response:', error)
+      setIsNpcTyping(false)
+    }
+  }
+
+  const sendFinalMessage = async () => {
+    if (!input.trim()) return
+    if (finalUserTurns >= 3) return
+
+    const now = performance.now()
+    const userMessage = input.trim();
+    const newUserTurn: ChatMessage = {
+      id: `final-user-${finalUserTurns + 1}`,
+      sender: 'user',
+      text: userMessage,
+      elapsedMs: Math.round(now - startTime),
+    }
+
+    const updatedFinalTranscript = [...finalTranscript, newUserTurn]
+    setFinalTranscript(updatedFinalTranscript)
+    setFinalUserTurns((count) => count + 1)
+    setInput('')
+
+    // Show typing indicator
+    setTimeout(() => {
+      setIsNpcTyping(true)
+    }, 500)
+
+    // Generate AI response for final terms discussion
+    try {
+      const response = await fetch('/api/investor/generateDavidResponse', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          npcName: 'David',
+          npcAvatar: '👨‍💼',
+          conversationHistory: updatedFinalTranscript,
+          userMessage: userMessage,
+          maxUserTurns: 3,
+          currentTurn: finalUserTurns + 1,
+          negotiationState: { ...negotiationState, dealClosed: true },
+          isFinalTerms: true,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.response) {
+          const davidResponseText = data.response;
+          
+          pendingTimeout.current = setTimeout(() => {
+            setIsNpcTyping(false)
+            const withNpc: ChatMessage[] = [
+              ...updatedFinalTranscript,
+              {
+                id: `final-npc-${finalUserTurns + 1}`,
+                sender: 'npc',
+                text: davidResponseText,
+                elapsedMs: Math.round(performance.now() - startTime),
+              },
+            ]
+            setFinalTranscript(withNpc)
+            
+            // After final response, navigate to results
+            if (finalUserTurns >= 2) {
+              setTimeout(() => {
+                saveInvestorCache({ negotiationState, transcript: finalTranscript });
+                router.push('/investor/results');
+              }, 2000);
+            }
+          }, NPC_DELAY_MS)
+        } else {
+          setIsNpcTyping(false)
+        }
+      } else {
+        console.error('Failed to generate final response')
+        setIsNpcTyping(false)
+      }
+    } catch (error) {
+      console.error('Error generating final response:', error)
       setIsNpcTyping(false)
     }
   }
@@ -408,7 +545,7 @@ export default function InvestorPage() {
                   </button>
                 </div>
                 <div ref={scrollRef} className={styles.chatWindow}>
-                  {transcript.map((message) => (
+                  {displayedTranscript.filter(message => message && message.sender).map((message) => (
                     <div
                       key={message.id}
                       className={
@@ -420,7 +557,7 @@ export default function InvestorPage() {
                       <p>{message.text}</p>
                     </div>
                   ))}
-                  {isNpcTyping && (
+                  {(isNpcTyping || isTypingMessage) && (
                     <div className={styles.typingIndicator}>
                       <div className={styles.typingDot}></div>
                       <div className={styles.typingDot}></div>
@@ -467,6 +604,104 @@ export default function InvestorPage() {
                         </svg>
                     </button>
                     </div>
+                </div>
+              </div>
+
+              {/* Terms explanation view */}
+              <div className={`${styles.phoneContentView} ${view === 'terms' ? styles.visible : ''}`}>
+                <div className={styles.scenarioTextContent}>
+                  <div className={styles.scenarioText}>
+                    {termsStreamedText}
+                    {isTermsStreaming && <span className={styles.cursor}>|</span>}
+                  </div>
+                  <div className={styles.messagesIconWrapper}>
+                    {!isTermsStreaming && termsStreamedText && (
+                      <div className={`${styles.messagesIcon} ${styles.messagesIconVisible}`} onClick={() => setView('final-chat')}>
+                        <img src="/imessage.svg" alt="Messages" className={styles.messagesIconImage} />
+                        <div className={`${styles.notificationBadge} ${styles.badgeVisible}`}>1</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Final chat view */}
+              <div className={`${styles.phoneContentView} ${view === 'final-chat' ? styles.visible : ''}`}>
+                <div className={styles.chatHeader}>
+                  <button
+                    className={styles.chatHeaderBack}
+                    aria-label="Back"
+                    onClick={() => setView('terms')}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </button>
+                  <div className={styles.chatHeaderContact}>
+                    <div className={styles.chatHeaderAvatar}></div>
+                    <span className={styles.chatHeaderName}>David</span>
+                  </div>
+                  <button className={styles.chatHeaderVideo} aria-label="Video call">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m22 8-6 4 6 4V8Z" />
+                      <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+                    </svg>
+                  </button>
+                </div>
+                <div ref={scrollRef} className={styles.chatWindow}>
+                  {displayedFinalTranscript.filter(message => message && message.sender).map((message) => (
+                    <div
+                      key={message.id}
+                      className={
+                        message.sender === 'user'
+                          ? styles.chatBubbleUser
+                          : styles.chatBubbleNpc
+                      }
+                    >
+                      <p>{message.text}</p>
+                    </div>
+                  ))}
+                  {(isNpcTyping || isTypingMessage) && (
+                    <div className={styles.typingIndicator}>
+                      <div className={styles.typingDot}></div>
+                      <div className={styles.typingDot}></div>
+                      <div className={styles.typingDot}></div>
+                    </div>
+                  )}
+                </div>
+      
+                <div className={styles.chatInputContainer}>
+                  <div className={styles.continueButtonContainer}>
+                    <button
+                      className={styles.continueButton}
+                      onClick={() => {
+                        saveInvestorCache({ negotiationState, transcript: finalTranscript });
+                        router.push('/investor/results');
+                      }}
+                    >
+                      Continue to Results
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -537,4 +772,3 @@ export default function InvestorPage() {
     </div>
   );
 }
-
