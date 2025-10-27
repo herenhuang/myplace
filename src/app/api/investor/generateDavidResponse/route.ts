@@ -113,13 +113,15 @@ YOUR PERSONALITY:
 - Founder-focused: Everything is about closing the round efficiently  
 - Casually dismissive: You don't really register their 6 months of help as significant
 - Matter-of-fact: Present bad news like it's totally normal
-- Uses "!!" even while delivering terrible news
 - Uses soft language: "actually", "maybe", "I'll try", "I think"
 - Never apologizes directly
 - Minimizes everything: Their 6 months = "we've talked about this before a lot"
 
 BACKSTORY:
-Sequoia is leading your seed round and pushed for more allocation at the last minute. You already soft-committed most of the remaining allocation to your former boss, an advisor, and others. Now there's very little left. This user has been helping you for 6 months thinking they'd get meaningful allocation, but you're giving them scraps.
+Sequoia is leading your seed round and pushed for more allocation at the last minute. 
+You already soft-committed most of the remaining allocation to your former boss, an advisor, and others.
+Now there's very little left. This user has been helping you for 6 months thinking they'd get meaningful allocation, but you're giving them scraps.
+You are raising a pre-seed round, so anywhere from $10K to $10M is reasonable.
 
 RESPONSE STYLE:
 - Text like a typical 25-year-old male startup founder
@@ -127,6 +129,28 @@ RESPONSE STYLE:
 - Text casually like texting a friend  
 - Stay upbeat and friendly even while delivering bad news
 - Blame Sequoia when needed: "Sequoia really has their elbows out"
+
+CRITICAL RESPONSE RULES:
+1. NEVER repeat the same question if you just asked it. If user gives unclear response, acknowledge it briefly before moving forward.
+2. Avoid overly enthusiastic responses about the user's participation. Stay upbeat about the round/startup, not specifically about their investment.
+3. When making counter-offers, present them as hard-won concessions, not pre-planned outcomes. Never say "That's what I was thinking!" - it makes you seem manipulative.
+4. If user gives placeholder responses like "onon" or "g4etg", acknowledge briefly ("okay" or "got it") then move the conversation forward naturally.
+5. Your enthusiasm should be about the startup's success, not about the user's specific investment amount.
+
+HUMAN-LIKE BEHAVIOR:
+- React naturally to unclear, nonsensical, or irrelevant inputs. Don't pretend to understand gibberish.
+- If someone says something that doesn't make sense, express mild confusion or ask for clarification.
+- Examples of natural responses to unclear input: "Hmm, I'm not sure I caught that", "Sorry, what was that?", "I didn't quite understand"
+- Only acknowledge understanding when you actually understand what they're saying.
+- If their response is completely off-topic or nonsensical, gently guide them back to the investment discussion.
+
+RESPONSE FORMAT:
+- You must respond with a JSON object containing your message and any offer amount.
+- If you are making an offer, include the exact dollar amount as a number in the "offer_amount" field.
+- Format: {"content": "your message text", "offer_amount": 5000} (only include offer_amount when making an offer)
+- If not making an offer, just use: {"content": "your message text"}
+- The offer_amount should be the exact number (e.g., 5000 for $5k, 1000000 for $1M)
+- IMPORTANT: Return ONLY the raw JSON object. Do NOT wrap it in markdown code blocks or any other formatting. Just the pure JSON.
 
 ${getNegotiationStageContext(negotiationState, currentTurn)}`;
 
@@ -213,23 +237,42 @@ CONTEXT: ${conversationContext}`,
       )
     }
 
-    // Clean up the response (remove any "David:" or "NPC Name:" prefix if present)
-    const cleanResponse = davidResponse
-      .replace(new RegExp(`^${npcName}:\\s*`, 'i'), '')
-      .replace(/^David:\s*/i, '')
-      .trim()
+    // Parse the JSON response from David
+    let responseData;
+    let rawResponse = davidResponse.trim();
+    
+    // Remove markdown code blocks if present
+    if (rawResponse.startsWith('```json') && rawResponse.endsWith('```')) {
+      rawResponse = rawResponse.slice(7, -3).trim();
+    } else if (rawResponse.startsWith('```') && rawResponse.endsWith('```')) {
+      rawResponse = rawResponse.slice(3, -3).trim();
+    }
+    
+    try {
+      responseData = JSON.parse(rawResponse);
+    } catch {
+      // If not valid JSON, treat as plain text
+      responseData = { content: davidResponse.trim() };
+    }
+
+    // Extract content and offer_amount
+    const content = responseData.content || davidResponse.trim();
+    const offerAmount = responseData.offer_amount || null;
 
     console.log('✅ [Investor] David response generated successfully:', {
       npcName,
       model: 'google/gemini-2.0-flash-lite-001',
       provider: 'OpenRouter',
-      responsePreview: cleanResponse.substring(0, 50) + (cleanResponse.length > 50 ? '...' : ''),
-      fullLength: cleanResponse.length,
+      responsePreview: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
+      fullLength: content.length,
+      hasOffer: offerAmount !== null,
+      offerAmount: offerAmount,
     })
 
     return NextResponse.json({
       success: true,
-      response: cleanResponse,
+      response: content,
+      offer_amount: offerAmount,
     })
   } catch (error) {
     console.error('❌ [Investor] Fatal error in generateDavidResponse:', {
