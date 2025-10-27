@@ -18,13 +18,6 @@ export interface NegotiationState {
   dealClosed: boolean;
 }
 
-export interface DavidResponseAnalysis {
-  userAskAmount: number | null;
-  davidAskedForAmount: boolean;
-  incrementNegotiationCount: boolean;
-  markDealClosed: boolean;
-}
-
 export interface AnalysisResult {
   archetype: string;
   summary: string;

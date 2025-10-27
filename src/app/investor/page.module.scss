@@ -160,6 +160,7 @@
 }
 
 .cursor {
+    display: none;
   animation: blink 1s infinite;
 }
 
@@ -956,5 +957,95 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+// Email & Welcome screen styles
+.emailContainer,
+.welcomeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  height: 100%;
+  width: 100%;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.emailTitle,
+.welcomeTitle {
+  font-family: var(--font-instrument-serif);
+  font-size: 40px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  letter-spacing: -1.5px;
+}
+
+.emailForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 300px;
+}
+
+.emailInput {
+  border: 1px solid #e5e5ea;
+  border-radius: 32px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.emailSubmitButton {
+  background: #6355FF;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 32px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #0056b3;
+  }
+}
+
+.emailError {
+  color: #ff3b30;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.welcomeText {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.welcomeButton {
+  background: #007aff;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #0056b3;
   }
 }
