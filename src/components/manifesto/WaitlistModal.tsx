@@ -129,7 +129,7 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
         {stage === 'game' && (
           <div className={styles.gameStage}>
             <div className={styles.gameHeader}>
-              <h2 className={styles.gameTitle}>pop the bubbles below to get on the list~</h2>
+              <h2 className={styles.gameTitle}>you're on the list! pop some bubbles for fun~</h2>
               <div className={styles.gameStats}>
                 <div className={styles.stat}>
                   <span className={styles.statValue}>{bubblesPopped}</span>
