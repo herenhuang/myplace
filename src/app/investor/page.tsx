@@ -18,7 +18,7 @@ const StreamingText = ({
 }) => {
   const [displayed, setDisplayed] = useState('')
   const indexRef = useRef(0)
-  const onCompleteRef = useRef<(() => void) | undefined>()
+  const onCompleteRef = useRef<(() => void) | undefined>(undefined)
 
   useEffect(() => {
     onCompleteRef.current = onComplete
@@ -291,7 +291,7 @@ const ChatInput = ({
   setInput,
   sendMessage,
 }: {
-  textareaRef: React.RefObject<HTMLTextAreaElement>
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>
   canRespond: boolean
   input: string
   setInput: (value: string) => void
@@ -430,7 +430,7 @@ export default function InvestorPage() {
   // Scenario streaming setup: provide the full text and let StreamingText handle typing
   useEffect(() => {
     if (view === 'scenario') {
-      const fullText = "David Ahn is building the startup everyone's talking about. For six months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text."
+      const fullText = "David Ahn is building the startup everyone's talking about. For three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text."
 
       setIsStreaming(true)
       setShowMessagesIcon(false)
@@ -779,7 +779,7 @@ export default function InvestorPage() {
           <div className={styles.layoutWrapper}>
             <div className={styles.textPanel}>
                 <p className={styles.textPanelText}>
-                    David Ahn is building the startup everyone's talking about. For six months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.
+                    David Ahn is building the startup everyone's talking about. For three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.
                 </p>
             </div>
         
