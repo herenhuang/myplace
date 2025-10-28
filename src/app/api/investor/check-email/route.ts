@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (error) {
       console.error('Error reading investor list:', error);
-      if (error.code === 'ENOENT') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
         return NextResponse.json({ success: false, message: 'Investor list not found' }, { status: 404 });
       }
       return NextResponse.json({ error: 'Internal server error while checking email' }, { status: 500 });

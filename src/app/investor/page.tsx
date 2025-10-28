@@ -18,7 +18,7 @@ const StreamingText = ({
 }) => {
   const [displayed, setDisplayed] = useState('')
   const indexRef = useRef(0)
-  const onCompleteRef = useRef<(() => void) | undefined>()
+  const onCompleteRef = useRef<(() => void) | undefined>(undefined)
 
   useEffect(() => {
     onCompleteRef.current = onComplete
@@ -291,7 +291,7 @@ const ChatInput = ({
   setInput,
   sendMessage,
 }: {
-  textareaRef: React.RefObject<HTMLTextAreaElement>
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>
   canRespond: boolean
   input: string
   setInput: (value: string) => void
