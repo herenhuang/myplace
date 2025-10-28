@@ -149,13 +149,13 @@ $bg:#f3fcff;
 
 .greekSection {
   //background-image: url('/manifesto/greece-1.png');
-  background-image: linear-gradient(to bottom, rgba(white, 0), #caedff);
+  background-image: linear-gradient(to bottom, rgba(white, 0), #94d5f5);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   min-height: 100vh;
   padding-bottom: 50px;
-  margin: 0 auto;
+  margin: -300px auto 0 auto;
   text-align: center;
   position: relative;
 
@@ -180,7 +180,7 @@ $bg:#f3fcff;
 }
 
 .greekImage {
-  margin-top: 0px;
+  margin-top: -150px;
   margin-left: -100px;
   margin-bottom: -75px;
   width: 800px;
@@ -210,7 +210,9 @@ $bg:#f3fcff;
 }
 
 .greekContent {
-  padding: 0 0 80px 0;
+  position: inherit;
+  margin-top: 200px;
+  z-index: 11;
 }
 
 .boxSection {
@@ -256,6 +258,22 @@ $bg:#f3fcff;
   }
 }
 
+.heading {
+  font-family: 'Instrument Serif', serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: #1a1919;
+  // letter-spacing: -1.5px;
+  margin: 0 auto;
+  max-width: 800px;
+
+  @media (max-width: 768px) {
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+    line-height: 1.2;
+    margin: 0 20px;
+  }
+}
+
 .paragraph {
   font-family: 'DM Sans', serif;
   font-size: 22px;
@@ -263,9 +281,35 @@ $bg:#f3fcff;
   color: #1a1919;
   font-weight: 550;
   letter-spacing: -0.75px;
-  margin: 72px auto;
+  margin: 60px auto;
   width: 620px;
   max-width: 100%;
+
+  .highlight{
+    background: rgba(yellow, 0.25);
+    font-weight: 700;
+    padding: 0 4px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+    line-height: 1.4;
+    margin: 120px 0;
+  }
+}
+
+.listItem {
+  font-family: 'DM Sans', serif;
+  font-size: 22px;
+  line-height: 1.4;
+  color: #1a1919;
+  font-weight: 550;
+  letter-spacing: -0.75px;
+  margin: 20px 60px auto 20px;
+  width: 620px;
+  max-width: 100%;
+  align-self: flex-start;
 
   .highlight{
     background: rgba(yellow, 0.25);
@@ -637,9 +681,8 @@ $bg:#f3fcff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3rem;
+  gap: 1rem;
   padding: 4rem 2rem;
-  min-height: 100vh;
   position: relative;
   text-align: center;
 }
@@ -655,10 +698,13 @@ $bg:#f3fcff;
 }
 
 .stampbook {
+  position: absolute;
+  right: -10%;
+  top: 15%;
   display: flex;
   gap: 0;
   width: 100%;
-  max-width: 700px;
+  max-width: 550px;
   margin: 0 auto;
   min-height: 420px;
   perspective: 1400px;
@@ -1737,6 +1783,11 @@ $bg:#f3fcff;
 
   .section {
     padding: 0 15px;
+  }
+
+  .stampbook {
+    position: unset;
+    max-width: 700px;
   }
 
   .greekSection {
