@@ -5,6 +5,7 @@ import styles from './page.module.scss'
 import { useRouter } from 'next/navigation'
 import { saveInvestorCache, formatAmount } from './utils'
 import { ChatMessage, NegotiationState } from './types'
+import NumberFlow from '@number-flow/react'
 
 // Shared streaming text component (reuses exact typing cadence)
 const StreamingText = ({
@@ -53,14 +54,33 @@ const StreamingText = ({
 
 // --- View Components ---
 
-const IntroView = ({ onBegin }: { onBegin: () => void }) => (
-  <div className={styles.introContainer}>
-    <h1 className={styles.introTitle}>How Much Allocation Can You Get?</h1>
-    <button onClick={onBegin} className={styles.startButton}>
-      Begin
-    </button>
-  </div>
-)
+const IntroView = ({ onBegin }: { onBegin: () => void }) => {
+  const allocations = [5000, 10000, 25000, 50000, 100000, 250000]
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((prev) => (prev + 1) % allocations.length)
+    }, 1800)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div className={styles.introContainer}>
+      <h1 className={styles.introTitle}>How Much Allocation Can You Get?</h1>
+      <div className={styles.introAllocation}>
+          <NumberFlow 
+            format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
+            value={allocations[index]}
+            className={styles.introAllocationValue}
+          />
+      </div>
+      <button onClick={onBegin} className={styles.startButton}>
+        Begin
+      </button>
+    </div>
+  )
+}
 
 const EmailView = ({
   emailInput,
@@ -418,7 +438,7 @@ export default function InvestorPage() {
       if (response.ok) {
         setWelcomeMessage(data.message)
         setView('welcome')
-      } else {
+        } else {
         setEmailError(data.message || 'This email is not on our investor list.')
       }
     } catch (error) {
@@ -819,7 +839,7 @@ export default function InvestorPage() {
                 <ChatHeader onBack={() => window.history.back()} />
                 <div ref={scrollRef} className={styles.chatWindow}>
                   <ChatMessages messages={displayedTranscript} isTyping={isNpcTyping || isTypingMessage} />
-                </div>
+                    </div>
                 <ChatInput
                   textareaRef={textareaRef}
                   canRespond={canRespond}
@@ -843,7 +863,7 @@ export default function InvestorPage() {
                 <ChatHeader onBack={() => setView('terms')} />
                 <div ref={scrollRef} className={styles.chatWindow}>
                   <ChatMessages messages={displayedFinalTranscript} isTyping={isNpcTyping || isTypingMessage} />
-                </div>
+                    </div>
                 <FinalChatInput
                   showContinueButton={showContinueButton}
                   onContinue={() => {
