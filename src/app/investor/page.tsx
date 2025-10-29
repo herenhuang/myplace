@@ -1,6 +1,8 @@
 "use client"
+// Disable static optimization because we rely on runtime search params
+export const dynamic = 'force-dynamic'
 
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, Suspense } from 'react'
 import styles from './page.module.scss'
 import { useSearchParams } from 'next/navigation'
 import { saveInvestorCache, formatAmount, clearInvestorCache, loadInvestorCache } from './utils'
@@ -458,7 +460,7 @@ interface GenerateDavidResponsePayload {
   negotiationState: NegotiationState | null
 }
 
-export default function InvestorPage() {
+function InvestorPageContent() {
   const searchParams = useSearchParams()
   const stepParam = searchParams.get('step')
   
@@ -1185,5 +1187,17 @@ export default function InvestorPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function InvestorPage() {
+  return (
+    <Suspense fallback={
+      <div className={styles.simulationContainer}>
+        <div className={styles.loadingBox}>Loading...</div>
+      </div>
+    }>
+      <InvestorPageContent />
+    </Suspense>
   )
 }
