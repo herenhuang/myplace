@@ -626,18 +626,23 @@ $bg:#f3fcff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 60px;
+  gap: 20px;
   margin: 180px 0;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }
 
+.stackedBubblesRow {
+  display: flex;
+  justify-content: space-between;
+}
+
 .stackedBubble {
   font-family: 'DM Sans', serif;
   background: $bg;
   color: black;
-  padding: 24px 36px;
+  padding: 20px 24px;
   border-radius: 48px;
   font-size: 22px;
   font-weight: 600;
@@ -649,6 +654,9 @@ $bg:#f3fcff;
   backdrop-filter: blur(10px);
   max-width: 720px;
   width: fit-content;
+  height: 66px;
+  min-width: 345px;
+  white-space: nowrap;
   position: relative;
   cursor: pointer;
 }
@@ -662,10 +670,37 @@ $bg:#f3fcff;
 }
 
 .bubble3 {
-  margin-left: -80px;
+  margin-left: -20px;
+}
+
+.fillerBubble1 {
+  margin: 33px -400px 0 38px;
+  background: linear-gradient(135deg, #6AAEFF 2%, #0074FF 100%);
+  border-width: 0;
+}
+
+.fillerBubble2 {
+  margin: 0 112px 0 -400px;
+  background: linear-gradient(135deg, #6AAEFF 2%, #0074FF 100%);
+  border-width: 0;
+}
+
+.fillerBubble3 {
+  margin: 33px -200px 0 38px;
+  background: linear-gradient(135deg, #6AAEFF 2%, #0074FF 100%);
+  border-width: 0;
+}
+
+.fillerBubble4 {
+  margin-left: -40px;
+  background: linear-gradient(135deg, #6AAEFF 2%, #0074FF 100%);
+  border-width: 0;
 }
 
 @media screen and (max-width: 768px) {
+  .stackedBubble {
+    height: 54px;
+  }
   .bubble1{
     margin-left: -20px;
   }
@@ -674,6 +709,12 @@ $bg:#f3fcff;
   }
   .bubble3{
     margin-left: -20px;
+  }
+  .stackedBubblesRow {
+    flex-direction: column;
+  }
+  .fillerBubble2, .fillerBubble3 {
+    display: none;
   }
 }
 
