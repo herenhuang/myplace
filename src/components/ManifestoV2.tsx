@@ -731,13 +731,16 @@ function GreekSection() {
                 You're more than just a label.
               </h3>
               <p className={styles.paragraph}>
-                You're a <b>living</b>,  <i>moving</i>, and oftentimes <span className={styles.highlight}>contradictory</span> story.
+                You're a <b>living</b>,  <i>moving</i>, and {' '}
+                <span className={styles.strikeThrough}>
+                  sometimes
+                </span> {' '} oftentimes <span className={styles.highlight}>contradictory</span> story.
               </p>
               <p className={styles.paragraph}>
-                This isn't new. Ancient Greeks carved 'Know thyself' above their temples — even they knew this was the hardest command.
+                We as humans have been obsessed with understanding ourselves and others since the beginning of time.
               </p>
               <p className={styles.paragraph}>
-                Every generation since has built new mirrors trying to solve it — astrology, Myers-Briggs, Enneagram, whatever's next.
+                The Ancient Greeks carved 'Know thyself' above their temples, and every generation since has built new mirrors trying to solve it — astrology, Myers-Briggs, Enneagram, whatever's next.
               </p>
             </div>
 
@@ -758,13 +761,16 @@ function ConversationSection() {
     <ManifestoSection delay={0.3}>
       <div className={styles.conversation}>
         <h3 className={styles.heading}>
-          But who are we?
+          But who are we really?
         </h3>
         <p className={styles.paragraph}>
-          Are we really just what we fill out on a form, or what we write in our LinkedIn bios?
+          We are not what we fill out on a form. We are not what we write in our LinkedIn or Tinder bios.
         </p>
         <p className={styles.paragraph}>
-          And now, as AI can mimic our words and even fake our work, the one thing it can't copy is our <span className={styles.highlight}>judgment</span>, our <span className={styles.highlight}>character</span>, the way we <span className={styles.highlight}>move</span> through the world and build trust with others.
+          The systems we have today only capture our answers, and not our actions. Everything is based on what you say, not what you actually do.
+        </p>
+        <p className={styles.paragraph}>
+          And now, as AI can mimic your words and even fake your work, the one thing it can't copy is your <span className={styles.highlight}>character</span>, the way you build trust with others, the way you uniquely <span className={styles.highlight}>move</span> through the world.
         </p>
         
         <div className={styles.stackedBubbles}>
@@ -1429,7 +1435,7 @@ function BuildSection() {
         </h3>
         {/* TODO: Style Updates */}
         <p className={styles.listItem}>
-          1. Play - Quick daily stories, different scenarios each time
+          1. Play - Quick daily games, different scenarios each time
         </p>
         <p className={styles.listItem}>
           2. Build - Your profile grows with every choice you make
