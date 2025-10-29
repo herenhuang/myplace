@@ -436,7 +436,8 @@ export default function InvestorPage() {
       const data = await response.json()
 
       if (response.ok) {
-        setWelcomeMessage(data.message)
+        let welcomeText = "Based on your profile, here's a story that might interest you... \n \nPlay as yourself! There are no wrong answers."
+        setWelcomeMessage(data.message + ' \n \n' + welcomeText)
         setView('welcome')
         } else {
         setEmailError(data.message || 'This email is not on our investor list.')
@@ -450,7 +451,7 @@ export default function InvestorPage() {
   // Scenario streaming setup: provide the full text and let StreamingText handle typing
   useEffect(() => {
     if (view === 'scenario') {
-      const fullText = "David Ahn is building the startup everyone's talking about. For three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text."
+      const fullText = "David Ahn is building the startup everyone's talking about.  \n \n For three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text."
 
       setIsStreaming(true)
       setShowMessagesIcon(false)
