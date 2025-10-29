@@ -266,6 +266,7 @@ $bg:#f3fcff;
   // letter-spacing: -1.5px;
   margin: 0 auto;
   max-width: 800px;
+  text-align: center;
 
   @media (max-width: 768px) {
     font-size: clamp(2.5rem, 8vw, 3.5rem);
@@ -290,6 +291,10 @@ $bg:#f3fcff;
     font-weight: 700;
     padding: 0 4px;
     border-radius: 4px;
+  }
+
+  .strikeThrough{
+    text-decoration: line-through;
   }
 
   @media (max-width: 768px) {
@@ -552,11 +557,15 @@ $bg:#f3fcff;
 }
 
 .playSection{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
+  // display: flex;
+  // flex-direction: column;
+  // align-items: center;
+  // justify-content: center;
+  // gap: 20px;
+
+  img {
+    margin: 0 auto;
+  }
 }
 
 .userProfile {
