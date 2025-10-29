@@ -1780,8 +1780,8 @@ $bg:#f3fcff;
 @media (max-width: 768px) {
 
   .hero{
-    height: 70vh;
-    min-height: 70vh;
+    height: 75vh;
+    min-height: 75vh;
   }
   .heroTitle {
     font-size: 72px;
@@ -1841,11 +1841,13 @@ $bg:#f3fcff;
   }
 
   .greekSection {
+    margin-top: 0;
     margin-left: -15px;
     margin-right: -15px;
   }
 
   .greekContent {
+    margin-top: 0;
     padding-left: 15px;
     padding-right: 15px;
   }
