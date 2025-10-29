@@ -754,7 +754,29 @@ function GreekSection() {
   )
 }
 
-
+type TMotionBubbleSettings = {
+  delay: number;
+}
+const getConversationMotionBubbleSettings = ({ delay = 0 }: TMotionBubbleSettings) => ({
+  initial: { opacity: 0, y: 60, scale: 0.8 },
+  whileInView: {
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 15,
+      delay,
+    }
+  },
+  whileHover: { 
+    scale: 1.02,
+    y: -2,
+    transition: { duration: 0.2 }
+  },
+  viewport: { once: false, amount: 0.2 }
+});
 // Conversation Section Component
 function ConversationSection() {
   return (
@@ -774,76 +796,49 @@ function ConversationSection() {
         </p>
         
         <div className={styles.stackedBubbles}>
+          <div className={styles.stackedBubblesRow}>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.bubble1}`}
+              {...getConversationMotionBubbleSettings({ delay: 0 })}
+            >
+              In the future, <i>every</i> hire is a personality hire.
+            </motion.div>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble1}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.1 })}
+            >
+            </motion.div>
+          </div>
+          <div className={styles.stackedBubblesRow}>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble2}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.2 })}
+            >
+            </motion.div>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.bubble2}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.3 })}
+            >
+              Every connection starts with <i> character </i>.
+            </motion.div>
+          </div>
+          <div className={styles.stackedBubblesRow}>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.bubble3}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.4 })}
+            >
+              Every relationship begins with the <i>real</i>.
+            </motion.div>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble3}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.5 })}
+            >
+            </motion.div>
+          </div>
           <motion.div
-            className={`${styles.stackedBubble} ${styles.bubble1}`}
-            initial={{ opacity: 0, y: 60, scale: 0.8 }}
-            whileInView={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
-                delay: 0
-              }
-            }}
-            viewport={{ once: false, amount: 0.2 }}
-            whileHover={{ 
-              scale: 1.02,
-              y: -2,
-              transition: { duration: 0.2 }
-            }}
+            className={`${styles.stackedBubble} ${styles.fillerBubble4}`}
+            {...getConversationMotionBubbleSettings({ delay: 0.6 })}
           >
-            In the future, <i>every</i> hire is a personality hire.
-          </motion.div>
-          
-          <motion.div
-            className={`${styles.stackedBubble} ${styles.bubble2}`}
-            initial={{ opacity: 0, y: 60, scale: 0.8 }}
-            whileInView={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
-                delay: 0.3
-              }
-            }}
-            viewport={{ once: false, amount: 0.2 }}
-            whileHover={{ 
-              scale: 1.02,
-              y: -2,
-              transition: { duration: 0.2 }
-            }}
-          >
-            Every connection starts with <i> character </i>.
-          </motion.div>
-          
-          <motion.div
-            className={`${styles.stackedBubble} ${styles.bubble3}`}
-            initial={{ opacity: 0, y: 60, scale: 0.8 }}
-            whileInView={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
-                delay: 0.6
-              }
-            }}
-            viewport={{ once: false, amount: 0.2 }}
-            whileHover={{ 
-              scale: 1.02,
-              y: -2,
-              transition: { duration: 0.2 }
-            }}
-          >
-            Every relationship begins with the <i>real</i>.
           </motion.div>
         </div>
         
