@@ -62,7 +62,7 @@ YOUR TASK:
 COMPANY CONTEXT:
 - Building: AI-powered code review platform that catches bugs before deployment
 - Traction: 2,500 developers on waitlist, 8 paying beta customers ($500/mo each), $4k MRR, 40% MoM growth
-- Round: Raising $2M at $8M post-money ($6M pre-money), SAFE with standard terms
+- Round: Raising $2M at $10M post-money, SAFE with standard terms
 - Lead: Sequoia took $1.2M of the round
 - Team: You (ex-Stripe eng), CTO (ex-Meta), design lead (ex-Airbnb), 1 contractor
 
