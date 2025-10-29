@@ -1,11 +1,13 @@
 "use client"
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
 import styles from './page.module.scss'
-import { useRouter } from 'next/navigation'
-import { saveInvestorCache, formatAmount } from './utils'
-import { ChatMessage, NegotiationState } from './types'
+import { useSearchParams } from 'next/navigation'
+import { saveInvestorCache, formatAmount, clearInvestorCache, loadInvestorCache } from './utils'
+import { ChatMessage, NegotiationState, AnalysisResult } from './types'
 import NumberFlow from '@number-flow/react'
+import Image from 'next/image'
+import PentagonChart from './components/PentagonChart'
 
 // Shared streaming text component (reuses exact typing cadence)
 const StreamingText = ({
@@ -63,7 +65,7 @@ const IntroView = ({ onBegin }: { onBegin: () => void }) => {
       setIndex((prev) => (prev + 1) % allocations.length)
     }, 1800)
     return () => clearInterval(id)
-  }, [])
+  }, [allocations.length])
 
   return (
     <div className={styles.introContainer}>
@@ -94,7 +96,7 @@ const EmailView = ({
   emailError: string
 }) => (
   <div className={styles.emailContainer}>
-    <h2 className={styles.emailTitle}>What's Your Email?</h2>
+    <h2 className={styles.emailTitle}>What&apos;s Your Email?</h2>
     <form onSubmit={handleEmailSubmit} className={styles.emailForm}>
       <input
         type="email"
@@ -106,6 +108,7 @@ const EmailView = ({
       />
       <button type="submit" className={styles.emailSubmitButton}>
         Continue
+        <span className="material-symbols-outlined">arrow_forward</span>
       </button>
     </form>
     {emailError && <p className={styles.emailError}>{emailError}</p>}
@@ -121,7 +124,8 @@ const WelcomeView = ({
 }) => (
   <div className={styles.welcomeContainer}>
     <div className={styles.scenarioText}>
-      <StreamingText text={welcomeMessage} />
+        <Image src="/elevate/blobbert.png" alt="Messages" width={120} height={120} className={styles.welcomeImage} />
+        <StreamingText text={welcomeMessage} />
     </div>
     <div className={styles.chatInputContainer}>
       <div className={styles.continueButtonContainer}>
@@ -163,9 +167,11 @@ const ScenarioView = ({
             }`}
             onClick={onBeginChat}
           >
-            <img
+            <Image
               src="/imessage.svg"
               alt="Messages"
+              width={60}
+              height={60}
               className={styles.messagesIconImage}
             />
             {showBadge && (
@@ -222,9 +228,11 @@ const TermsView = ({
           className={`${styles.messagesIcon} ${styles.messagesIconVisible}`}
           onClick={onBeginFinalChat}
         >
-          <img
+          <Image
             src="/imessage.svg"
             alt="Messages"
+            width={60}
+            height={60}
             className={styles.messagesIconImage}
           />
           <div className={`${styles.notificationBadge} ${styles.badgeVisible}`}>
@@ -282,27 +290,38 @@ const ChatMessages = ({
 }: {
   messages: ChatMessage[]
   isTyping: boolean
-}) => (
-  <>
-    {messages.filter((message) => message && message.sender).map((message) => (
-      <div
-        key={message.id}
-        className={
-          message.sender === 'user' ? styles.chatBubbleUser : styles.chatBubbleNpc
-        }
-      >
-        <p>{message.text}</p>
-      </div>
-    ))}
-    {isTyping && (
-      <div className={styles.typingIndicator}>
-        <div className={styles.typingDot}></div>
-        <div className={styles.typingDot}></div>
-        <div className={styles.typingDot}></div>
-      </div>
-    )}
-  </>
-)
+}) => {
+  // Filter out duplicates by ID to prevent React key errors
+  const seenIds = new Set<string>()
+  const uniqueMessages = messages.filter((message) => {
+    if (!message || !message.sender || !message.id) return false
+    if (seenIds.has(message.id)) return false
+    seenIds.add(message.id)
+    return true
+  })
+
+  return (
+    <>
+      {uniqueMessages.map((message) => (
+        <div
+          key={message.id}
+          className={
+            message.sender === 'user' ? styles.chatBubbleUser : styles.chatBubbleNpc
+          }
+        >
+          <p>{message.text}</p>
+        </div>
+      ))}
+      {isTyping && (
+        <div className={styles.typingIndicator}>
+          <div className={styles.typingDot}></div>
+          <div className={styles.typingDot}></div>
+          <div className={styles.typingDot}></div>
+        </div>
+      )}
+    </>
+  )
+}
 
 const ChatInput = ({
   textareaRef,
@@ -368,6 +387,68 @@ const FinalChatInput = ({
   </div>
 )
 
+const ResultsView = ({
+  analysis,
+  isLoading,
+  onRestart,
+}: {
+  analysis: AnalysisResult | null
+  isLoading: boolean
+  onRestart: () => void
+}) => {
+  const finalOfferAmount = analysis?.finalAgreedAmount
+
+  if (isLoading) {
+    return (
+      <div className={styles.phoneContentView}>
+        <div className={styles.loadingBox}>Analyzing your negotiation...</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.resultsContainer}>
+      <div className={`${styles.card} ${styles.offerCard}`}>
+        <div className={styles.finalOffer}>
+          <div className={styles.offerAmount}>
+            {finalOfferAmount !== undefined && finalOfferAmount !== null ? formatAmount(finalOfferAmount) : 'No deal'}
+          </div>
+          <div className={styles.offerLabel}>Final Agreed Allocation</div>
+        </div>
+      </div>
+
+      {analysis && (
+        <>
+          <div className={styles.card}>
+            <div className={styles.analysisSection}>
+              <h3>Your Negotiating Style</h3>
+              <p className={styles.archetypeTitle}>{analysis.archetype}</p>
+              <p className={styles.analysisFeedback}>{analysis.summary}</p>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles.chartContainer}>
+              <PentagonChart 
+                scores={analysis.pentagonScores}
+                labels={analysis.pentagonLabels}
+                size={300}
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className={styles.actions}>
+        <button onClick={onRestart} className={styles.restartButton}>
+          <span className={`material-symbols-outlined ${styles.replayIcon}`}>replay</span>
+          Replay
+        </button>
+      </div>
+    </div>
+  )
+}
+
 const NPC_DELAY_MS = 800
 const MAX_USER_TURNS = 10
 
@@ -378,7 +459,10 @@ interface GenerateDavidResponsePayload {
 }
 
 export default function InvestorPage() {
-  const [view, setView] = useState<'intro' | 'email' | 'welcome' | 'scenario' | 'chat' | 'terms' | 'final-chat'>('intro')
+  const searchParams = useSearchParams()
+  const stepParam = searchParams.get('step')
+  
+  const [view, setView] = useState<'intro' | 'email' | 'welcome' | 'scenario' | 'chat' | 'terms' | 'final-chat' | 'results'>('intro')
   const [showNotification, setShowNotification] = useState(false)
   const [streamedText, setStreamedText] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
@@ -390,7 +474,6 @@ export default function InvestorPage() {
   const [displayedFinalTranscript, setDisplayedFinalTranscript] = useState<ChatMessage[]>([])
   const [isTypingMessage, setIsTypingMessage] = useState(false)
   const [showContinueButton, setShowContinueButton] = useState(false)
-  const router = useRouter()
   const [transcript, setTranscript] = useState<ChatMessage[]>([])
   const [finalTranscript, setFinalTranscript] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
@@ -401,6 +484,8 @@ export default function InvestorPage() {
   const [finalUserTurns, setFinalUserTurns] = useState(0)
   const [startTime] = useState<number>(() => performance.now())
   const [isNpcTyping, setIsNpcTyping] = useState(false)
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false)
   const [negotiationState, setNegotiationState] = useState<NegotiationState>({
     userAskAmount: null,
     davidOfferAmount: null,
@@ -413,7 +498,87 @@ export default function InvestorPage() {
   })
   const pendingTimeout = useRef<NodeJS.Timeout | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
+  const finalScrollRef = useRef<HTMLDivElement | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const chatInitialized = useRef(false)
+  const finalChatInitialized = useRef(false)
+  const hasLoadedCache = useRef(false)
+
+  const updateUrlStep = useCallback((step: string) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('step', step)
+    window.history.pushState({}, '', url.toString())
+  }, [])
+
+  const navigateToStep = useCallback(
+    (step: typeof view) => {
+      setView(step)
+      updateUrlStep(step)
+      saveInvestorCache({ currentStep: step })
+    },
+    [updateUrlStep],
+  )
+
+  const scrollToBottom = useCallback(() => {
+    const el = view === 'final-chat' ? finalScrollRef.current : scrollRef.current
+    if (!el) return
+
+    // Force scroll with multiple attempts to ensure it works
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight
+      requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight
+      })
+    })
+  }, [view])
+
+  // Load cache on mount
+  useEffect(() => {
+    if (hasLoadedCache.current) return
+    hasLoadedCache.current = true
+
+    const cached = loadInvestorCache()
+    if (!cached) return
+
+    // Restore all cached state
+    if (cached.negotiationState) setNegotiationState(cached.negotiationState)
+    if (cached.transcript) {
+      setTranscript(cached.transcript)
+      setDisplayedTranscript(cached.transcript)
+    }
+    if (cached.finalTranscript) {
+      setFinalTranscript(cached.finalTranscript)
+      setDisplayedFinalTranscript(cached.finalTranscript)
+    }
+    if (cached.emailInput) setEmailInput(cached.emailInput)
+    if (cached.welcomeMessage) setWelcomeMessage(cached.welcomeMessage)
+    if (cached.userTurns !== undefined) setUserTurns(cached.userTurns)
+    if (cached.finalUserTurns !== undefined) setFinalUserTurns(cached.finalUserTurns)
+    if (cached.analysis) setAnalysis(cached.analysis)
+
+    // Determine which view to show based on URL param or cached step
+    const targetStep = stepParam || cached.currentStep
+    if (targetStep && ['intro', 'email', 'welcome', 'scenario', 'chat', 'terms', 'final-chat', 'results'].includes(targetStep)) {
+      setView(targetStep as typeof view)
+    }
+  }, [stepParam])
+
+  // Handle URL parameter changes
+  useEffect(() => {
+    if (!hasLoadedCache.current) return
+    if (!stepParam) return
+
+    const validSteps = ['intro', 'email', 'welcome', 'scenario', 'chat', 'terms', 'final-chat', 'results']
+    if (validSteps.includes(stepParam)) {
+      setView(stepParam as typeof view)
+    }
+  }, [stepParam])
+
+  // Save current step to cache whenever view changes
+  useEffect(() => {
+    if (!hasLoadedCache.current) return
+    saveInvestorCache({ currentStep: view })
+  }, [view])
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -436,9 +601,12 @@ export default function InvestorPage() {
       const data = await response.json()
 
       if (response.ok) {
-        let welcomeText = "Based on your profile, here's a story that might interest you... \n \nPlay as yourself! There are no wrong answers."
-        setWelcomeMessage(data.message + ' \n \n' + welcomeText)
-        setView('welcome')
+        const welcomeText =
+          "Based on your profile, here's a story that might interest you... \n \nPlay as yourself! There are no wrong answers."
+        const fullWelcomeMessage = data.message + ' \n \n' + welcomeText
+        setWelcomeMessage(fullWelcomeMessage)
+        saveInvestorCache({ emailInput, welcomeMessage: fullWelcomeMessage })
+        navigateToStep('welcome')
         } else {
         setEmailError(data.message || 'This email is not on our investor list.')
       }
@@ -451,7 +619,7 @@ export default function InvestorPage() {
   // Scenario streaming setup: provide the full text and let StreamingText handle typing
   useEffect(() => {
     if (view === 'scenario') {
-      const fullText = "David Ahn is building the startup everyone's talking about.  \n \n For three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text."
+      const fullText = "David Ahn is building the startup everyone's talking about.  \n \nFor three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text."
 
       setIsStreaming(true)
       setShowMessagesIcon(false)
@@ -486,7 +654,8 @@ export default function InvestorPage() {
 
   // Reset transcript when chat view is entered
   useEffect(() => {
-    if (view === 'chat' && transcript.length === 0) {
+    if (view === 'chat' && transcript.length === 0 && !chatInitialized.current) {
+      chatInitialized.current = true
       const initialMessages = [
         {
           id: 'initial-1',
@@ -515,25 +684,48 @@ export default function InvestorPage() {
       let messageIndex = 0
       const typeNextMessage = () => {
         if (messageIndex < initialMessages.length && initialMessages[messageIndex]) {
-          if (messageIndex + 1 < initialMessages.length) {
+          // Capture the current message and index before setTimeout
+          const currentMessage = initialMessages[messageIndex]
+          const currentIndex = messageIndex
+          
+          if (currentIndex + 1 < initialMessages.length) {
             setIsTypingMessage(true)
           }
           setTimeout(() => {
-            setDisplayedTranscript((prev) => [...prev, initialMessages[messageIndex]])
+            // Verify the message still exists before adding
+            if (!currentMessage || !currentMessage.id) {
+              setIsTypingMessage(false)
+              return
+            }
+            
+            setDisplayedTranscript((prev) => {
+              // Prevent duplicates by checking if message already exists
+              if (prev.some(msg => msg.id === currentMessage.id)) {
+                return prev
+              }
+              return [...prev, currentMessage]
+            })
             setIsTypingMessage(false)
+            setTimeout(() => scrollToBottom(), 100)
             messageIndex++
             setTimeout(typeNextMessage, 1000)
-          }, initialMessages[messageIndex].text.length * 30)
+          }, currentMessage.text.length * 30)
         }
       }
 
       setTimeout(typeNextMessage, 500)
     }
-  }, [view, transcript.length])
+    
+    // Only reset initialization flag when explicitly leaving for intro (starting fresh)
+    if (view === 'intro' || view === 'email' || view === 'welcome' || view === 'scenario') {
+      chatInitialized.current = false
+    }
+  }, [view, transcript.length, scrollToBottom])
 
   // Initialize final transcript when final-chat view is entered
   useEffect(() => {
-    if (view === 'final-chat' && finalTranscript.length === 0) {
+    if (view === 'final-chat' && finalTranscript.length === 0 && !finalChatInitialized.current) {
+      finalChatInitialized.current = true
       const finalMessages = [
         {
           id: 'final-1',
@@ -556,13 +748,7 @@ export default function InvestorPage() {
         {
           id: 'final-4',
           sender: 'npc' as const,
-          text: "Perfect! I'm excited to have you on board. Before we finalize everything, I need your verbal commitment to move forward with this investment.",
-          elapsedMs: 1200,
-        },
-        {
-          id: 'final-5',
-          sender: 'npc' as const,
-          text: "Can you confirm that you're ready to commit to this investment? Just say 'yes' or 'I commit' and we'll get everything finalized.",
+          text: "Awesome! Great to have you onboard.",
           elapsedMs: 1200,
         },
       ]
@@ -574,20 +760,37 @@ export default function InvestorPage() {
       let messageIndex = 0
       const typeNextMessage = () => {
         if (messageIndex < finalMessages.length && finalMessages[messageIndex]) {
-          if (messageIndex + 1 < finalMessages.length) {
+          // Capture the current message and index before setTimeout
+          const currentMessage = finalMessages[messageIndex]
+          const currentIndex = messageIndex
+          
+          if (currentIndex + 1 < finalMessages.length) {
             setIsTypingMessage(true)
           }
           setTimeout(() => {
-            setDisplayedFinalTranscript((prev) => [...prev, finalMessages[messageIndex]])
+            // Verify the message still exists before adding
+            if (!currentMessage || !currentMessage.id) {
+              setIsTypingMessage(false)
+              return
+            }
+            
+            setDisplayedFinalTranscript((prev) => {
+              // Prevent duplicates by checking if message already exists
+              if (prev.some(msg => msg.id === currentMessage.id)) {
+                return prev
+              }
+              return [...prev, currentMessage]
+            })
             setIsTypingMessage(false)
+            setTimeout(() => scrollToBottom(), 100)
 
-            if (messageIndex === finalMessages.length - 2) {
+            if (currentIndex === finalMessages.length - 2) {
               setShowContinueButton(true)
             }
 
             messageIndex++
             setTimeout(typeNextMessage, 1000)
-          }, finalMessages[messageIndex].text.length * 30)
+          }, currentMessage.text.length * 30)
         } else {
           if (finalMessages.length < 2 && !showContinueButton) {
             setShowContinueButton(true)
@@ -597,13 +800,52 @@ export default function InvestorPage() {
 
       setTimeout(typeNextMessage, 500)
     }
-  }, [view, finalTranscript.length, negotiationState])
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    
+    // Only reset initialization flag when explicitly leaving for intro (starting fresh)
+    if (view === 'intro' || view === 'email' || view === 'welcome' || view === 'scenario') {
+      finalChatInitialized.current = false
     }
-  }, [displayedTranscript, displayedFinalTranscript, isNpcTyping, isTypingMessage])
+  }, [view, finalTranscript.length, negotiationState, scrollToBottom, showContinueButton])
+
+  // Scroll to bottom whenever messages are added or typing state changes
+  useLayoutEffect(() => {
+    // Only scroll if we're in a chat view
+    if (view !== 'chat' && view !== 'final-chat') return
+    
+    const el = view === 'final-chat' ? finalScrollRef.current : scrollRef.current
+    if (!el) return
+    
+    // Immediate scroll
+    el.scrollTop = el.scrollHeight
+  }, [
+    displayedTranscript.length,
+    displayedFinalTranscript.length,
+    isNpcTyping,
+    isTypingMessage,
+    view,
+    scrollToBottom,
+  ])
+
+  // Backup scroll with requestAnimationFrame for async updates
+  useEffect(() => {
+    if (view !== 'chat' && view !== 'final-chat') return
+    
+    const el = view === 'final-chat' ? finalScrollRef.current : scrollRef.current
+    if (!el) return
+    
+    const rafId = requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight
+    })
+    
+    return () => cancelAnimationFrame(rafId)
+  }, [
+    displayedTranscript.length,
+    displayedFinalTranscript.length,
+    isNpcTyping,
+    isTypingMessage,
+    view,
+    scrollToBottom,
+  ])
 
   useEffect(() => {
     return () => {
@@ -629,11 +871,43 @@ export default function InvestorPage() {
   useEffect(() => {
     if (!canRespond && view === 'chat') {
       setTimeout(() => {
-        saveInvestorCache({ negotiationState, transcript })
-        setView('terms')
+        saveInvestorCache({ 
+          negotiationState, 
+          transcript,
+          userTurns,
+        })
+        navigateToStep('terms')
       }, 1500)
     }
-  }, [canRespond, negotiationState, transcript, view])
+  }, [canRespond, negotiationState, transcript, view, navigateToStep, userTurns])
+
+  // Fetch analysis when results view is entered
+  useEffect(() => {
+    if (view === 'results' && !analysis && !isLoadingAnalysis) {
+      const fetchAnalysis = async () => {
+        setIsLoadingAnalysis(true)
+        try {
+          const response = await fetch('/api/investor/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ negotiationState, transcript: finalTranscript.length > 0 ? finalTranscript : transcript }),
+          })
+          if (response.ok) {
+            const data = await response.json()
+            if (data.success) {
+              setAnalysis(data.analysis)
+              saveInvestorCache({ analysis: data.analysis })
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch analysis:', error)
+        } finally {
+          setIsLoadingAnalysis(false)
+        }
+      }
+      fetchAnalysis()
+    }
+  }, [view, negotiationState, transcript, finalTranscript, analysis, isLoadingAnalysis])
 
   const sendMessage = async () => {
     if (!input.trim()) return
@@ -651,8 +925,12 @@ export default function InvestorPage() {
     const updatedTranscript = [...transcript, newUserTurn]
     setTranscript(updatedTranscript)
     setDisplayedTranscript((prev) => [...prev, newUserTurn])
-    setUserTurns((count) => count + 1)
+    const newUserTurns = userTurns + 1
+    setUserTurns(newUserTurns)
     setInput('')
+    saveInvestorCache({ transcript: updatedTranscript, userTurns: newUserTurns })
+    // Scroll after user message is added - delay to ensure DOM update
+    setTimeout(() => scrollToBottom(), 100)
 
     setTimeout(() => {
       setIsNpcTyping(true)
@@ -691,6 +969,12 @@ export default function InvestorPage() {
             const withNpc: ChatMessage[] = [...updatedTranscript, npcResponse]
             setTranscript(withNpc)
             setDisplayedTranscript((prev) => [...prev, npcResponse])
+            saveInvestorCache({ 
+              transcript: withNpc, 
+              negotiationState: data.negotiationState || undefined 
+            })
+            // Scroll after message is added - delay to ensure DOM update
+            setTimeout(() => scrollToBottom(), 150)
           }, NPC_DELAY_MS)
 
           if (data.negotiationState.dealClosed) {
@@ -709,102 +993,28 @@ export default function InvestorPage() {
     }
   }
 
-  const sendFinalMessage = async () => {
-    if (!input.trim()) return
-    if (finalUserTurns >= 3) return
-
-    const now = performance.now()
-    const userMessage = input.trim()
-    const newUserTurn: ChatMessage = {
-      id: `final-user-${finalUserTurns + 1}`,
-      sender: 'user',
-      text: userMessage,
-      elapsedMs: Math.round(now - startTime),
-    }
-
-    const updatedFinalTranscript = [...finalTranscript, newUserTurn]
-    setFinalTranscript(updatedFinalTranscript)
-    setFinalUserTurns((count) => count + 1)
-    setInput('')
-
-    setTimeout(() => {
-      setIsNpcTyping(true)
-    }, 500)
-
-    try {
-      const response = await fetch('/api/investor/generateDavidResponse', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          npcName: 'David',
-          npcAvatar: '👨‍💼',
-          conversationHistory: updatedFinalTranscript,
-          userMessage: userMessage,
-          maxUserTurns: 3,
-          currentTurn: finalUserTurns + 1,
-          negotiationState: { ...negotiationState, dealClosed: true },
-          isFinalTerms: true,
-        }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success && data.response) {
-          const davidResponseText = data.response
-          
-          pendingTimeout.current = setTimeout(() => {
-            setIsNpcTyping(false)
-            const withNpc: ChatMessage[] = [
-              ...updatedFinalTranscript,
-              {
-                id: `final-npc-${finalUserTurns + 1}`,
-                sender: 'npc',
-                text: davidResponseText,
-                elapsedMs: Math.round(performance.now() - startTime),
-              },
-            ]
-            setFinalTranscript(withNpc)
-            
-            if (finalUserTurns >= 2) {
-              setTimeout(() => {
-                saveInvestorCache({ negotiationState, transcript: finalTranscript })
-                router.push('/investor/results')
-              }, 2000)
-            }
-          }, NPC_DELAY_MS)
-        } else {
-          setIsNpcTyping(false)
-        }
-      } else {
-        console.error('Failed to generate final response')
-        setIsNpcTyping(false)
-      }
-    } catch (error) {
-      console.error('Error generating final response:', error)
-      setIsNpcTyping(false)
-    }
-  }
-
   return (
     <div className={styles.simulationContainer}>
-      <div className={`${styles.viewContainer} ${view !== 'intro' ? styles.chatViewActive : ''}`}>
-        
-        <div className={styles.onboardingContainer}>
-          {view === 'intro' && <IntroView onBegin={() => setView('email')} />}
-        </div>
+      <div className={`${styles.viewContainer} ${styles.chatViewActive}`}>
 
         {/* Main Content (Slides up) */}
         <div className={styles.chatView}>
           <div className={styles.layoutWrapper}>
             <div className={styles.textPanel}>
                 <p className={styles.textPanelText}>
-                    David Ahn is building the startup everyone's talking about. For three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.
+                David Ahn is building the startup everyone&apos;s talking about.
+                For three months, you&apos;ve been their unofficial advisor -
+                taking calls, making intros, reviewing pitch decks. Every time
+                you brought up investment, David said they weren&apos;t
+                fundraising yet. You kept helping anyway.
                 </p>
             </div>
         
             <div className={styles.chatPhone}>
+              <div className={`${styles.phoneContentView} ${view === 'intro' ? styles.visible : ''}`}>
+                <IntroView onBegin={() => navigateToStep('email')} />
+              </div>
+
               <div className={`${styles.phoneContentView} ${view === 'email' ? styles.visible : ''}`}>
                 <EmailView
                   emailInput={emailInput}
@@ -815,7 +1025,7 @@ export default function InvestorPage() {
                    </div>
                      
               <div className={`${styles.phoneContentView} ${view === 'welcome' ? styles.visible : ''}`}>
-                <WelcomeView welcomeMessage={welcomeMessage} onBegin={() => setView('scenario')} />
+                <WelcomeView welcomeMessage={welcomeMessage} onBegin={() => navigateToStep('scenario')} />
                        </div>
                     
               <div className={`${styles.phoneContentView} ${view === 'scenario' ? styles.visible : ''}`}>
@@ -831,7 +1041,7 @@ export default function InvestorPage() {
                   showMessagesIcon={showMessagesIcon}
                   showBadge={showBadge}
                   showNotification={showNotification}
-                  onBeginChat={() => setView('chat')}
+                  onBeginChat={() => navigateToStep('chat')}
                 />
               </div>
 
@@ -855,21 +1065,57 @@ export default function InvestorPage() {
                 <TermsView
                   termsStreamedText={termsStreamedText}
                   isTermsStreaming={isTermsStreaming}
-                  onBeginFinalChat={() => setView('final-chat')}
+                  onBeginFinalChat={() => navigateToStep('final-chat')}
                 />
               </div>
 
               {/* Final chat view */}
               <div className={`${styles.phoneContentView} ${view === 'final-chat' ? styles.visible : ''}`}>
-                <ChatHeader onBack={() => setView('terms')} />
-                <div ref={scrollRef} className={styles.chatWindow}>
+                <ChatHeader onBack={() => navigateToStep('terms')} />
+                <div ref={finalScrollRef} className={styles.chatWindow}>
                   <ChatMessages messages={displayedFinalTranscript} isTyping={isNpcTyping || isTypingMessage} />
                     </div>
                 <FinalChatInput
                   showContinueButton={showContinueButton}
                   onContinue={() => {
-                    saveInvestorCache({ negotiationState, transcript: finalTranscript })
-                    router.push('/investor/results')
+                    saveInvestorCache({ negotiationState, finalTranscript })
+                    navigateToStep('results')
+                  }}
+                />
+              </div>
+
+              {/* Results view */}
+              <div className={`${styles.phoneContentView} ${view === 'results' ? styles.visible : ''}`}>
+                <ResultsView
+                  analysis={analysis}
+                  isLoading={isLoadingAnalysis}
+                  onRestart={() => {
+                    clearInvestorCache()
+                    setTranscript([])
+                    setDisplayedTranscript([])
+                    setFinalTranscript([])
+                    setDisplayedFinalTranscript([])
+                    setUserTurns(0)
+                    setFinalUserTurns(0)
+                    setAnalysis(null)
+                    setIsLoadingAnalysis(false)
+                    setShowContinueButton(false)
+                    setEmailInput('')
+                    setWelcomeMessage('')
+                    setNegotiationState({
+                      userAskAmount: null,
+                      davidOfferAmount: null,
+                      hasAskedForAmount: false,
+                      hasOffered: false,
+                      negotiationCount: 0,
+                      maxNegotiationIncrease: 0,
+                      allocationPercentage: 7.0,
+                      dealClosed: false,
+                    })
+                    chatInitialized.current = false
+                    finalChatInitialized.current = false
+                    hasLoadedCache.current = false
+                    navigateToStep('intro')
                   }}
                 />
               </div>

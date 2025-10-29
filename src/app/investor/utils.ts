@@ -1,17 +1,27 @@
 "use client"
 
-import { NegotiationState, ChatMessage } from './types';
+import { NegotiationState, ChatMessage, AnalysisResult } from './types';
 
 export interface InvestorCache {
   negotiationState: NegotiationState;
   transcript: ChatMessage[];
+  finalTranscript?: ChatMessage[];
+  emailInput?: string;
+  welcomeMessage?: string;
+  userTurns?: number;
+  finalUserTurns?: number;
+  analysis?: AnalysisResult | null;
+  currentStep?: string;
 }
 
 const CACHE_KEY = 'investor-negotiation-cache';
 
-export function saveInvestorCache(data: InvestorCache) {
+export function saveInvestorCache(data: Partial<InvestorCache>) {
   try {
-    const serialized = JSON.stringify(data);
+    // Load existing cache and merge with new data
+    const existing = loadInvestorCache() || {};
+    const merged = { ...existing, ...data };
+    const serialized = JSON.stringify(merged);
     localStorage.setItem(CACHE_KEY, serialized);
   } catch (error) {
     console.error('Failed to save investor cache:', error);
