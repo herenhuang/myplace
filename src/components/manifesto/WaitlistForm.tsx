@@ -125,7 +125,6 @@ export default function WaitlistForm() {
       setStatus('success');
       setEmail('');
       setRecordId('');
-      setIsModalOpen(false);
     } catch (error: any) {
       console.error('Error updating signup:', error);
       setStatus('error');
