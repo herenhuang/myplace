@@ -20,7 +20,6 @@ $bg:#f3fcff;
     &:nth-child(2) {
       border-radius: 1rem;
       background: linear-gradient(135deg, #e0330cce 5%, #ff6b35bb 100%);
-      color: white;
     }
   }
 
@@ -183,7 +182,7 @@ $bg:#f3fcff;
   min-height: 100vh;
   padding-bottom: 50px;
   margin: -300px auto 0 auto;
-  text-align: center;
+  // text-align: center;
   position: relative;
 
   overflow: hidden;
@@ -207,7 +206,7 @@ $bg:#f3fcff;
 }
 
 .greekImage {
-  margin-top: -150px;
+  margin-top: -100px;
   margin-left: -100px;
   margin-bottom: -75px;
   width: 800px;
@@ -238,7 +237,7 @@ $bg:#f3fcff;
 
 .greekContent {
   position: inherit;
-  margin-top: 200px;
+  margin-top: 300px;
   z-index: 11;
 }
 
@@ -288,9 +287,9 @@ $bg:#f3fcff;
 .heading {
   font-family: 'Instrument Serif', serif;
   font-size: 30px;
-  font-weight: 600;
+  font-weight: 400;
   color: #1a1919;
-  // letter-spacing: -1.5px;
+  letter-spacing: -1.5px;
   margin: 0 auto;
   max-width: 800px;
   text-align: center;
@@ -314,8 +313,7 @@ $bg:#f3fcff;
   max-width: 100%;
 
   .highlight{
-    background: linear-gradient(135deg, #E0340C 0%, #ff6b35 100%);
-    color: white;
+    background: rgba(yellow, 0.25);
     font-weight: 700;
     padding: 0 4px;
     border-radius: 4px;
@@ -728,9 +726,16 @@ $bg:#f3fcff;
   border-width: 0;
 }
 
+.fillerBubble5 {
+  display: none;
+  background: linear-gradient(135deg, #6AAEFF 2%, #0074FF 100%);
+  border-width: 0;
+}
+
 @media screen and (max-width: 768px) {
   .stackedBubble {
     height: 54px;
+    min-width: 250px;
   }
   .bubble1{
     margin-left: -20px;
@@ -744,8 +749,12 @@ $bg:#f3fcff;
   .stackedBubblesRow {
     flex-direction: column;
   }
-  .fillerBubble2, .fillerBubble3 {
+  .fillerBubble2, .fillerBubble3, .fillerBubble4 {
     display: none;
+  }
+  .fillerBubble5 {
+    display: block;
+    margin: 0 0 33px 120px;
   }
 }
 
@@ -1819,8 +1828,8 @@ $bg:#f3fcff;
 @media (max-width: 768px) {
 
   .hero{
-    height: 75vh;
-    min-height: 75vh;
+    height: 70vh;
+    min-height: 70vh;
   }
   .heroTitle {
     font-size: 72px;
@@ -1871,23 +1880,28 @@ $bg:#f3fcff;
   }
 
   .section {
-    padding: 0 15px;
+    padding: 0 1.8rem;
   }
 
   .stampbook {
     position: unset;
+    margin-top: 70px;
   }
 
   .greekSection {
     margin-top: 0;
-    margin-left: -15px;
-    margin-right: -15px;
+    margin-left: -1.8rem;
+    margin-right: -1.8rem;
   }
 
   .greekContent {
-    margin-top: 0;
+    margin-top: 100px;
     padding-left: 15px;
     padding-right: 15px;
+  }
+
+  .greekImage {
+    margin-top: -50px;
   }
 
   .timeline,

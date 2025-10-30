@@ -824,6 +824,11 @@ function ConversationSection() {
           </div>
           <div className={styles.stackedBubblesRow}>
             <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble5}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.5 })}
+            >
+            </motion.div>
+            <motion.div
               className={`${styles.stackedBubble} ${styles.bubble3}`}
               {...getConversationMotionBubbleSettings({ delay: 0.4 })}
             >
