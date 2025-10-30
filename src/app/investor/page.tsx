@@ -142,11 +142,7 @@ const WelcomeView = ({
 
 const LoadingView = ({ message }: { message: string }) => (
   <div className={styles.loadingContainer}>
-    <div className={styles.loadingSpinner}>
-      <div className={styles.spinnerRing}></div>
-      <div className={styles.spinnerRing}></div>
-      <div className={styles.spinnerRing}></div>
-    </div>
+    <div className={styles.loadingSpinner}></div>
     <p className={styles.loadingMessage}>{message}</p>
   </div>
 )
@@ -520,6 +516,7 @@ function InvestorPageContent() {
   const chatInitialized = useRef(false)
   const finalChatInitialized = useRef(false)
   const hasLoadedCache = useRef(false)
+  const latestNegotiationStateRef = useRef<NegotiationState>(negotiationState)
 
   const updateUrlStep = useCallback((step: string) => {
     const url = new URL(window.location.href)
@@ -850,21 +847,9 @@ function InvestorPageContent() {
           elapsedMs: 0,
         },
         {
-          id: 'final-2',
-          sender: 'npc' as const,
-          text: 'Here are the final terms for your investment:',
-          elapsedMs: 1200,
-        },
-        {
-          id: 'final-3',
-          sender: 'npc' as const,
-          text: `• Investment Amount: ${negotiationState.davidOfferAmount ? formatAmount(negotiationState.davidOfferAmount) : '$0'}\n• Equity: ${negotiationState.allocationPercentage}%\n• Liquidation Preference: 1x non-participating\n• Board Observer Rights\n• Pro-rata rights for future rounds`,
-          elapsedMs: 1200,
-        },
-        {
           id: 'final-4',
           sender: 'npc' as const,
-          text: "Awesome! Great to have you onboard.",
+          text: "Great to have you onboard!",
           elapsedMs: 1200,
         },
       ] : [
@@ -1009,22 +994,30 @@ function InvestorPageContent() {
 
   const canRespond = userTurns < MAX_USER_TURNS
 
+  // Keep ref updated with latest negotiationState
+  useEffect(() => {
+    latestNegotiationStateRef.current = negotiationState
+  }, [negotiationState])
+
   useEffect(() => {
     if (!canRespond && view === 'chat') {
       setTimeout(() => {
+        // Use the latest negotiationState from ref to avoid stale closure
+        const currentNegotiationState = latestNegotiationStateRef.current
+        
         // If chat ended but no deal was closed, mark dealReached as false
-        if (!negotiationState.dealClosed) {
+        if (!currentNegotiationState.dealClosed) {
           setNegotiationState(prev => ({ ...prev, dealReached: false }))
         }
         saveInvestorCache({ 
-          negotiationState, 
+          negotiationState: currentNegotiationState, 
           transcript,
           userTurns,
         })
         navigateToStep('terms')
       }, 4000)
     }
-  }, [canRespond, negotiationState, transcript, view, navigateToStep, userTurns])
+  }, [canRespond, transcript, view, navigateToStep, userTurns])
 
   // Fallback: Fetch analysis when results view is entered directly (e.g., from cache/URL)
   useEffect(() => {
@@ -1053,6 +1046,73 @@ function InvestorPageContent() {
       fetchAnalysis()
     }
   }, [view, negotiationState, transcript, finalTranscript, analysis, isLoadingAnalysis])
+
+  const handleReset = () => {
+    clearInvestorCache()
+    
+    // Clear any pending timeouts
+    if (pendingTimeout.current) {
+      clearTimeout(pendingTimeout.current)
+      pendingTimeout.current = null
+    }
+    
+    // Reset all state
+    setTranscript([])
+    setDisplayedTranscript([])
+    setFinalTranscript([])
+    setDisplayedFinalTranscript([])
+    setUserTurns(0)
+    setFinalUserTurns(0)
+    setAnalysis(null)
+    setIsLoadingAnalysis(false)
+    setShowContinueButton(false)
+    setEmailInput('')
+    setEmailError('')
+    setWelcomeMessage('')
+    setInput('')
+    setTermsFullText('')
+    setTermsDisplayedText('')
+    setIsTermsStreaming(false)
+    setIsLoadingTermsMessage(false)
+    setIsNpcTyping(false)
+    setIsTypingMessage(false)
+    setShowNotification(false)
+    setStreamedText('')
+    setIsStreaming(false)
+    setShowMessagesIcon(false)
+    setShowBadge(false)
+    setNegotiationState({
+      userAskAmount: null,
+      davidOfferAmount: null,
+      hasAskedForAmount: false,
+      hasOffered: false,
+      negotiationCount: 0,
+      maxNegotiationIncrease: 0,
+      allocationPercentage: 7.0,
+      dealClosed: false,
+      dealReached: false,
+      userExpressedDisinterest: false,
+    })
+    
+    // Reset refs
+    chatInitialized.current = false
+    finalChatInitialized.current = false
+    hasLoadedCache.current = false
+    latestNegotiationStateRef.current = {
+      userAskAmount: null,
+      davidOfferAmount: null,
+      hasAskedForAmount: false,
+      hasOffered: false,
+      negotiationCount: 0,
+      maxNegotiationIncrease: 0,
+      allocationPercentage: 7.0,
+      dealClosed: false,
+      dealReached: false,
+      userExpressedDisinterest: false,
+    }
+    
+    navigateToStep('intro')
+  }
 
   const sendMessage = async () => {
     if (!input.trim()) return
@@ -1124,7 +1184,7 @@ function InvestorPageContent() {
 
           if (data.negotiationState.dealClosed) {
             setUserTurns(MAX_USER_TURNS)
-            setNegotiationState(prev => ({ ...prev, dealReached: true }))
+            // Use the dealReached value from the API response, don't override it
           }
         } else {
           setIsNpcTyping(false)
@@ -1154,6 +1214,9 @@ function InvestorPageContent() {
                 you brought up investment, David said they weren&apos;t
                 fundraising yet. You kept helping anyway.
                 </p>
+                <button onClick={handleReset} className={styles.resetButton}>
+                  Start Over
+                </button>
             </div>
         
             <div className={styles.chatPhone}>
@@ -1196,7 +1259,7 @@ function InvestorPageContent() {
               </div>
 
               {/* Chat view inside the phone */}
-              <div className={`${styles.phoneContentView} ${view === 'chat' ? styles.visible : ''}`}>
+              <div className={`${styles.phoneContentView} ${view === 'chat' ? `${styles.visible} ${styles.chatZoomIn}` : ''}`}>
                 <ChatHeader onBack={() => window.history.back()} />
                 <div ref={scrollRef} className={styles.chatWindow}>
                   <ChatMessages messages={displayedTranscript} isTyping={isNpcTyping || isTypingMessage} />
@@ -1220,7 +1283,7 @@ function InvestorPageContent() {
               </div>
 
               {/* Final chat view */}
-              <div className={`${styles.phoneContentView} ${view === 'final-chat' ? styles.visible : ''}`}>
+              <div className={`${styles.phoneContentView} ${view === 'final-chat' ? `${styles.visible} ${styles.chatZoomIn}` : ''}`}>
                 <ChatHeader onBack={() => navigateToStep('terms')} />
                 <div ref={finalScrollRef} className={styles.chatWindow}>
                   <ChatMessages messages={displayedFinalTranscript} isTyping={isNpcTyping || isTypingMessage} />
@@ -1244,40 +1307,7 @@ function InvestorPageContent() {
                 <ResultsView
                   analysis={analysis}
                   isLoading={isLoadingAnalysis}
-                  onRestart={() => {
-                    clearInvestorCache()
-                    setTranscript([])
-                    setDisplayedTranscript([])
-                    setFinalTranscript([])
-                    setDisplayedFinalTranscript([])
-                    setUserTurns(0)
-                    setFinalUserTurns(0)
-                    setAnalysis(null)
-                    setIsLoadingAnalysis(false)
-                    setShowContinueButton(false)
-                    setEmailInput('')
-                    setWelcomeMessage('')
-                    setTermsFullText('')
-                    setTermsDisplayedText('')
-                    setIsTermsStreaming(false)
-                    setIsLoadingTermsMessage(false)
-                    setNegotiationState({
-                      userAskAmount: null,
-                      davidOfferAmount: null,
-                      hasAskedForAmount: false,
-                      hasOffered: false,
-                      negotiationCount: 0,
-                      maxNegotiationIncrease: 0,
-                      allocationPercentage: 7.0,
-                      dealClosed: false,
-                      dealReached: false,
-                      userExpressedDisinterest: false,
-                    })
-                    chatInitialized.current = false
-                    finalChatInitialized.current = false
-                    hasLoadedCache.current = false
-                    navigateToStep('intro')
-                  }}
+                  onRestart={handleReset}
                 />
               </div>
             </div>

@@ -12,6 +12,7 @@ $orange: rgb(255, 114, 63);
   height: 100dvh;
   width: 100vw;
   background: #f7fbff;
+  background: rgb(255, 238, 191);
   overflow: hidden;
   position: relative;
   font-family: 'Radio Canada Big', sans-serif;
@@ -268,7 +269,7 @@ $orange: rgb(255, 114, 63);
   justify-content: center;
   font-size: 12px;
   font-weight: 600;
-  border: 2px solid white;
+  border: 2px solid black;
   transform: scale(0);
   opacity: 0;
   animation: pulse 2s infinite;
@@ -379,6 +380,24 @@ $orange: rgb(255, 114, 63);
   to { opacity: 1; }
 }
 
+@keyframes chatZoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chatZoomIn {
+  animation: chatZoomIn .6s ease-in forwards;
+}
 
 // Layout wrapper for phone + state panel
 .layoutWrapper {
@@ -399,9 +418,9 @@ $orange: rgb(255, 114, 63);
   height: 700px;
   position: relative;
   overflow: hidden;
-  background: white;
+  background: black;
   border-radius: 8px;
-  box-shadow: -24px 120px 120px rgba(#030025, 0.18);
+  box-shadow: -12px 100px 100px rgba(#030025, 0.25);
 
   @media (max-width: 768px) {
     position: fixed;
@@ -739,8 +758,8 @@ $orange: rgb(255, 114, 63);
   position: absolute;
   right: 22px;
   bottom: 22px;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background-color: #007aff;
   color: white;
@@ -767,6 +786,39 @@ $orange: rgb(255, 114, 63);
 
 .textPanel{
     width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.resetButton {
+  background: transparent;
+  color: black;
+  border: 1px solid black;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  
+  .material-symbols-rounded {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #ccc;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 // State Panel (Allocation Display)
@@ -1154,6 +1206,39 @@ $orange: rgb(255, 114, 63);
   color: rgba(black, 0.6);
 }
 
+.loadingSpinner {
+  display: inline-grid;
+  width: 90px;
+  transform: scale(2);
+  aspect-ratio: 1;
+  margin-bottom: 48px;
+  filter: drop-shadow(-4px 8px 8px rgba(black, 0.5));
+  clip-path: polygon(100% 50%,85.36% 85.36%,50% 100%,14.64% 85.36%,0% 50%,14.64% 14.64%,50% 0%,85.36% 14.64%);
+  background: rgba(white, 0.5);
+  animation: l2 6s infinite linear;
+}
+.loadingSpinner:before,
+.loadingSpinner:after {
+  content:"";
+  grid-area: 1/1;
+  background: rgba(white, 0.5);
+  filter: drop-shadow(-4px 8px 8px rgba(black, 0.5));
+  clip-path: polygon(100% 50%,81.17% 89.09%,38.87% 98.75%,4.95% 71.69%,4.95% 28.31%,38.87% 1.25%,81.17% 10.91%);
+  margin: 10%;
+  animation: inherit;
+  animation-duration: 10s;
+}
+.loadingSpinner:after {
+  background: rgba(white, 0.5);
+  filter: drop-shadow(-4px 8px 8px rgba(black, 0.5));
+  clip-path: polygon(100% 50%,75% 93.3%,25% 93.3%,0% 50%,25% 6.7%,75% 6.7%);
+  margin: 20%;
+  animation-duration: 3s;
+  animation-direction: reverse;
+}
+
+@keyframes l2 {to{rotate: 1turn}}
+
 .resultsContainer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1315,6 +1400,7 @@ $orange: rgb(255, 114, 63);
   width: 100%;
   padding: 40px;
   gap: 24px;
+  background: $orange;
 }
 
 .loadingSpinner {
@@ -1359,7 +1445,7 @@ $orange: rgb(255, 114, 63);
 .loadingMessage {
   font-size: 18px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: white;
   text-align: center;
   margin: 0;
   letter-spacing: -0.3px;
