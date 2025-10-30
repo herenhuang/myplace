@@ -19,6 +19,7 @@ interface WaitlistModalProps {
 
 type TBubbleStats = {
   poppedMoreThan: number;
+  beatsTimePercent: number;
 };
 
 export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting }: WaitlistModalProps) {
@@ -27,6 +28,7 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isGameActive, setIsGameActive] = useState(true);
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [bubbleData, setBubbleData] = useState<BubbleData | null>(null);
   const [bubbleStats, setBubbleStats] = useState<TBubbleStats | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -85,6 +87,7 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
   };
 
   const handleGameComplete = async (completed: boolean) => {
+    setIsLoading(true);
     setIsGameActive(false);
     const bubblesPopped = bubbles.filter((b) => b).length;
     
@@ -97,17 +100,33 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
     setBubbleData(data);
     await onSubmit(message, data);
     const supabase = createClient();
-    const { count: bubbleStats } = await supabase
-      .from('signups')
-      .select('*', { count: 'exact', head: true })
-      .lt('data->bubbleData->>bubblesPopped', bubblesPopped);
-    if (bubbleStats !== null) {
-      setBubbleStats({ poppedMoreThan: bubbleStats });
+    // can be optimized to a single query using supabase rpc
+    const [poppedMoreThan, hadGreaterTime, total] = await Promise.all([
+      supabase
+        .from('signups')
+        .select('*', { count: 'exact', head: true })
+        .lt('data->bubbleData->>bubblesPopped', bubblesPopped),
+      supabase
+        .from('signups')
+        .select('*', { count: 'exact', head: true })
+        .gt('data->bubbleData->>timeElapsed', timeElapsed)
+        .eq('data->bubbleData->>bubblesPopped', bubblesPopped),
+
+      supabase
+        .from('signups')
+        .select('*', { count: 'exact', head: true }),
+    ]);
+    if (!poppedMoreThan.error && !hadGreaterTime.error && !total.error) {
+      setBubbleStats({
+        poppedMoreThan: poppedMoreThan.count || 0,
+        beatsTimePercent: total.count && total.count > 0 ? Math.round(((hadGreaterTime.count || 0) / total.count) * 100) : 0,
+      });
     }
 
     // Move to question stage after a short delay
     setTimeout(() => {
       setStage('question');
+      setIsLoading(false);
     }, 500);
   };
 
@@ -224,14 +243,17 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
                 })}
               </div>
             </div>
-
-            <button 
-              className={styles.skipButton}
-              onClick={handleSkip}
-              type="button"
-            >
-              Skip →
-            </button>
+            {isLoading ? (
+              <div className={styles.loadingMessage}>One sec ...</div>
+            ) : (
+              <button
+                className={styles.skipButton}
+                onClick={handleSkip}
+                type="button"
+              >
+                Skip →
+              </button>
+            )}
           </div>
         )}
 
@@ -240,13 +262,17 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
             <h2 className={styles.questionTitle}>
               Nice!
             </h2>
-            
-            <p className={styles.questionLabel}>
-              Nice! you popped {bubbleData?.bubblesPopped} bubbles in {formatTime(bubbleData?.timeElapsed || 0)}
-              {bubbleData?.bubblesPopped === 0 && ". Too good for bubbles, huh? no worries, you're still on the list!"}
-              {bubbleData && bubbleData.bubblesPopped > 0 && !bubbleData?.completed && bubbleStats && `. not bad! you popped more bubbles than ${bubbleStats?.poppedMoreThan || 0} other participants.`}
-              {bubbleData?.completed && `. you actually popped them all. that's better than ${bubbleStats ? `${bubbleStats.poppedMoreThan} other participants` : '>90% of all other'} participants.`}
-            </p>
+
+            <div className={styles.questionLabel}>
+              <p>
+                {bubbleData?.bubblesPopped === 0
+                  ? "Too good for bubbles, huh? no worries, you're still on the list!"
+                  : `Nice! you popped ${bubbleData?.bubblesPopped} bubbles in ${formatTime(bubbleData?.timeElapsed || 0)}`
+                }
+                {bubbleData && bubbleData.bubblesPopped > 0 && !bubbleData?.completed && bubbleStats && `. you popped more bubbles than ${bubbleStats?.poppedMoreThan || 0} other participants.`}
+                {bubbleData?.completed && `. you actually popped them all. that's better than ${bubbleStats ? `${bubbleStats.poppedMoreThan} other participants` : '>90% of all other'} participants. faster than ${bubbleStats && bubbleStats.beatsTimePercent ? `${bubbleStats.beatsTimePercent}% of` : 'some'} others too! impressive.`}
+              </p>
+            </div>
           </div>
         )}
       </div>
