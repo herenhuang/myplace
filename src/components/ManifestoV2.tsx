@@ -824,6 +824,11 @@ function ConversationSection() {
           </div>
           <div className={styles.stackedBubblesRow}>
             <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble5}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.5 })}
+            >
+            </motion.div>
+            <motion.div
               className={`${styles.stackedBubble} ${styles.bubble3}`}
               {...getConversationMotionBubbleSettings({ delay: 0.4 })}
             >
@@ -1428,73 +1433,73 @@ function BuildSection() {
         <h3 className={styles.heading}>
           Here's a bit about how MyPlace works:
         </h3>
-        {/* TODO: Style Updates */}
-        <p className={styles.listItem}>
-          <b>1. Play</b> - Quick daily games, different scenarios each time
-        </p>
-        <p className={styles.listItem}>
-          <b>2. Build</b> - Your profile grows with every choice you make
-        </p>
-        <p className={styles.listItem}>
-          <b>3. Discover</b> - See patterns you never knew existed
-        </p>
 
-        <div className={styles.stampbook}>
-          {/* Icon Grid */}
-          <div className={styles.iconGrid}>
-          <h2 className={styles.stampbookTitle}>STAMPBOOK</h2>
-            <div className={styles.gridContainer}>
-              {personalityTraits.map((trait, index) => (
-                <motion.div
-                  key={trait.id}
-                  className={`${styles.iconCard} ${trait.collected ? styles.collected : styles.uncollected} ${selectedTrait === index ? styles.selected : ''}`}
-                  onClick={() => setSelectedTrait(index)}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
-                  whileHover={{ scale: 1.1 }}
-                >
-                  <Image 
-                    src={trait.icon} 
-                    alt={trait.name}
-                    width={50}
-                    height={50}
-                  />
-                </motion.div>
-              ))}
-            </div>
-            <h1 className={styles.placeholder}> Hello </h1>
-             <h1 className={styles.placeholder}> Hello </h1>
-    
+        <div className={styles.buildSectionLayout}>
+          <div className={styles.buildSectionList}>
+            <p className={styles.listItem}>
+              <b>1. Play</b> - Quick daily games, different scenarios each time
+            </p>
+            <p className={styles.listItem}>
+              <b>2. Build</b> - Your profile grows with every choice you make
+            </p>
+            <p className={styles.listItem}>
+              <b>3. Discover</b> - See patterns you never knew existed
+            </p>
           </div>
-
-       
-
-          {/* Magnified Card View */}
-          <div className={styles.magnifiedView}>
-            <div className={styles.detailCard}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardDate}>{personalityTraits[selectedTrait].date}</span>
-                <span className={styles.cardLevel}>LV. {personalityTraits[selectedTrait].level}</span>
+          <div className={styles.stampbook}>
+            {/* Icon Grid */}
+            <div className={styles.iconGrid}>
+            <h2 className={styles.stampbookTitle}>STAMPBOOK</h2>
+              <div className={styles.gridContainer}>
+                {personalityTraits.map((trait, index) => (
+                  <motion.div
+                    key={trait.id}
+                    className={`${styles.iconCard} ${trait.collected ? styles.collected : styles.uncollected} ${selectedTrait === index ? styles.selected : ''}`}
+                    onClick={() => setSelectedTrait(index)}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: false }}
+                    transition={{ duration: 0.3, delay: index * 0.03 }}
+                    whileHover={{ scale: 1.1 }}
+                  >
+                    <Image
+                      src={trait.icon}
+                      alt={trait.name}
+                      width={50}
+                      height={50}
+                    />
+                  </motion.div>
+                ))}
               </div>
-              
-              <div className={styles.cardIconLarge}>
-                <Image 
-                  src={personalityTraits[selectedTrait].icon} 
-                  alt={personalityTraits[selectedTrait].name}
-                  width={70}
-                  height={70}
-                />
-              </div>
-              
-              <h3 className={styles.cardTitleLarge}>{personalityTraits[selectedTrait].name}</h3>
-              <p className={styles.cardDescription}>
-                {personalityTraits[selectedTrait].description}
-              </p>
-              
-              <div className={styles.cardIdentifier}>
-                <span>SIM XX</span>
+              <h1 className={styles.placeholder}> Hello </h1>
+              <h1 className={styles.placeholder}> Hello </h1>
+            </div>
+
+            {/* Magnified Card View */}
+            <div className={styles.magnifiedView}>
+              <div className={styles.detailCard}>
+                <div className={styles.cardHeader}>
+                  <span className={styles.cardDate}>{personalityTraits[selectedTrait].date}</span>
+                  <span className={styles.cardLevel}>LV. {personalityTraits[selectedTrait].level}</span>
+                </div>
+
+                <div className={styles.cardIconLarge}>
+                  <Image
+                    src={personalityTraits[selectedTrait].icon}
+                    alt={personalityTraits[selectedTrait].name}
+                    width={70}
+                    height={70}
+                  />
+                </div>
+
+                <h3 className={styles.cardTitleLarge}>{personalityTraits[selectedTrait].name}</h3>
+                <p className={styles.cardDescription}>
+                  {personalityTraits[selectedTrait].description}
+                </p>
+
+                <div className={styles.cardIdentifier}>
+                  <span>SIM XX</span>
+                </div>
               </div>
             </div>
           </div>

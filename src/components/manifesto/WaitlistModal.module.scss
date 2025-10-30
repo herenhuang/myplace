@@ -13,6 +13,7 @@
   width: 90vw;
   max-height: 85vh;
   overflow: visible;
+  aspect-ratio: 1/1;
   
   // Glassmorphism effect
   background: rgba(255, 255, 255, 0.85);
@@ -30,13 +31,13 @@
   
   @media (max-width: 768px) {
     width: 95vw;
-    // aspect-ratio: 1/1;
   }
 }
 
 .modalContent {
   position: relative;
   padding: 2.5rem;
+  height: 100%;
   
   @media (max-width: 768px) {
     padding: 2rem 1.5rem;
@@ -220,6 +221,7 @@
 .questionStage {
   display: flex;
   flex-direction: column;
+  height: 100%;
   gap: 1.5rem;
 }
 
@@ -249,6 +251,13 @@
   letter-spacing: -.75px;
   width: 80%;
   margin: auto;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+
+  p {
+    transform: translateY(-1.5rem);
+  }
 }
 
 .textarea {
