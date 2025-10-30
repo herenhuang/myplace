@@ -662,8 +662,8 @@ function InvestorPageContent() {
 
       if (response.ok) {
         const welcomeText =
-          "Based on your profile, here's a story that might interest you... \n \nPlay as yourself! There are no wrong answers."
-        const fullWelcomeMessage = data.message + ' \n \n' + welcomeText
+          "\n \nGiven what we know about you, here's a \"What Would You Do\" scenario that might interest you. \n \nJust go with your gut! There are no right or wrong answers."
+        const fullWelcomeMessage = data.message + welcomeText
         setWelcomeMessage(fullWelcomeMessage)
         saveInvestorCache({ emailInput, welcomeMessage: fullWelcomeMessage })
         
