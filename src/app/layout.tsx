@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif, Lora, Newsreader } from "next/font/google";
 import "./globals.css";
-import 'material-symbols';
+import 'material-symbols/outlined.css';
+import 'material-symbols/rounded.css';
 import { AmplitudeProvider } from "@/components/analytics/AmplitudeProvider";
 import { GoogleAnalytics } from '@next/third-parties/google';
 

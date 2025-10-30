@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense } from 'react'
-import InvestorPage from './page-impl'
+import InvestorPage from './page'
 
 export default function InvestorPageWrapper() {
   return (

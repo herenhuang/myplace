@@ -24,9 +24,9 @@ export async function POST(request: Request) {
 }
 
 async function generateNegotiationAnalysis(negotiationState: NegotiationState, transcript: ChatMessage[]) {
-  const { userAskAmount, davidOfferAmount, dealClosed } = negotiationState;
+  const { userAskAmount, davidOfferAmount, dealClosed, dealReached } = negotiationState;
   
-  const finalAgreedAmount = dealClosed ? (davidOfferAmount || 0) : 0;
+  const finalAgreedAmount = (dealClosed && dealReached) ? (davidOfferAmount || 0) : 0;
   
   const conversationForAI = transcript.map(msg => `${msg.sender === 'user' ? 'Investor' : 'David'}: ${msg.text}`).join('\n');
 
@@ -40,7 +40,7 @@ ${conversationForAI}
 Final Negotiation State:
 - Investor's initial ask: ${userAskAmount || 'Not specified'}
 - David's final offer: ${davidOfferAmount || 'Not specified'}
-- Was a deal closed? ${dealClosed ? 'Yes' : 'No'}
+- Was a deal reached? ${dealReached ? 'Yes - Deal was agreed' : 'No - Investor walked away or conversation ended without agreement'}
 - Final Agreed Amount: ${finalAgreedAmount}
 
 Your task is to return a JSON object with two keys:
@@ -92,17 +92,20 @@ Your task is to return a JSON object with two keys:
 
 // This is the old function, now serving as a fallback.
 function generateProgrammaticAnalysis(negotiationState: NegotiationState, transcript: ChatMessage[]) {
-  const { userAskAmount, davidOfferAmount, negotiationCount, dealClosed } = negotiationState;
+  const { userAskAmount, davidOfferAmount, negotiationCount, dealClosed, dealReached } = negotiationState;
   const finalOffer = davidOfferAmount || 0;
   const initialAsk = userAskAmount || 0;
-  const finalAgreedAmount = dealClosed ? finalOffer : 0;
+  const finalAgreedAmount = (dealClosed && dealReached) ? finalOffer : 0;
 
   let archetype = 'The Accommodating Partner';
   let summary = "You were straightforward and accepted a deal without much back-and-forth. This can build goodwill, but remember that most founders expect some level of negotiation.";
 
-  if (!dealClosed) {
+  if (dealClosed && !dealReached) {
+    archetype = "The Principled Investor";
+    summary = "You walked away when the terms didn't align with your expectations. Knowing when to say no is a critical skill in negotiation. Sometimes the best deal is the one you don't make.";
+  } else if (!dealClosed) {
     archetype = "The Missed Opportunity";
-    summary = "The negotiation ended without a deal. It's important to find common ground and be clear about your intentions to successfully close an investment.";
+    summary = "The negotiation ended without a clear conclusion. It's important to find common ground and be clear about your intentions to successfully close an investment.";
   } else if (!userAskAmount) {
     archetype = 'The Conversationalist';
     summary = "You didn't state an investment amount, so the negotiation didn't fully kick off. In investment talks, being direct about your intentions is key to moving things forward.";
@@ -134,7 +137,7 @@ function generateProgrammaticAnalysis(negotiationState: NegotiationState, transc
 
 
 function calculatePentagonScores(negotiationState: NegotiationState, transcript: ChatMessage[]): number[] {
-  const { userAskAmount, davidOfferAmount, negotiationCount, dealClosed } = negotiationState;
+  const { userAskAmount, davidOfferAmount, negotiationCount, dealClosed, dealReached } = negotiationState;
   
   // 1. Assertiveness: Based on negotiation count
   const assertiveness = Math.min(2 + negotiationCount * 4, 10);
@@ -147,7 +150,7 @@ function calculatePentagonScores(negotiationState: NegotiationState, transcript:
 
   // 4. Compromise: Based on the gap between ask and final offer
   let compromise = 5;
-  if (dealClosed && userAskAmount && davidOfferAmount) {
+  if (dealClosed && dealReached && userAskAmount && davidOfferAmount) {
     const gap = userAskAmount - davidOfferAmount;
     if (userAskAmount > 0) {
       const compromiseRatio = gap / userAskAmount;
@@ -156,6 +159,8 @@ function calculatePentagonScores(negotiationState: NegotiationState, transcript:
     } else {
       compromise = 1;
     }
+  } else if (dealClosed && !dealReached) {
+    compromise = 1; // Walked away means no compromise
   } else if (!dealClosed) {
     compromise = 1; // No deal means no compromise
   }

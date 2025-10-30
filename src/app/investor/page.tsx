@@ -65,24 +65,26 @@ const IntroView = ({ onBegin }: { onBegin: () => void }) => {
   useEffect(() => {
     const id = setInterval(() => {
       setIndex((prev) => (prev + 1) % allocations.length)
-    }, 1800)
+    }, 1000)
     return () => clearInterval(id)
   }, [allocations.length])
 
   return (
-    <div className={styles.introContainer}>
-      <h1 className={styles.introTitle}>How Much Allocation Can You Get?</h1>
-      <div className={styles.introAllocation}>
-          <NumberFlow 
-            format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
-            value={allocations[index]}
-            className={styles.introAllocationValue}
-          />
+    <>
+      <div className={styles.introContainer}>
+        <h1 className={styles.introTitle}>How Much Allocation Can You Get?</h1>
+        <div className={styles.introAllocation}>
+            <NumberFlow 
+              format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
+              value={allocations[index]}
+              className={styles.introAllocationValue}
+            />
+        </div>
       </div>
-      <button onClick={onBegin} className={styles.startButton}>
+      <button onClick={onBegin} className={styles.fixedBottomButton}>
         Begin
       </button>
-    </div>
+    </>
   )
 }
 
@@ -97,24 +99,25 @@ const EmailView = ({
   handleEmailSubmit: (e: React.FormEvent) => void
   emailError: string
 }) => (
-  <div className={styles.emailContainer}>
-    <h2 className={styles.emailTitle}>What&apos;s Your Email?</h2>
-    <form onSubmit={handleEmailSubmit} className={styles.emailForm}>
-      <input
-        type="email"
-        value={emailInput}
-        onChange={(e) => setEmailInput(e.target.value)}
-        className={styles.emailInput}
-        placeholder="your.email@example.com"
-        required
-      />
-      <button type="submit" className={styles.emailSubmitButton}>
-        Continue
-        <span className="material-symbols-outlined">arrow_forward</span>
-      </button>
-    </form>
-    {emailError && <p className={styles.emailError}>{emailError}</p>}
-  </div>
+  <>
+    <div className={styles.emailContainer}>
+      <h2 className={styles.emailTitle}>What&apos;s Your Email?</h2>
+      <form onSubmit={handleEmailSubmit} className={styles.emailForm}>
+        <input
+          type="email"
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
+          className={styles.emailInput}
+          placeholder="your.email@example.com"
+          required
+        />
+      </form>
+      {emailError && <p className={styles.emailError}>{emailError}</p>}
+    </div>
+    <button onClick={handleEmailSubmit} className={styles.fixedBottomButton}>
+      Continue
+    </button>
+  </>
 )
 
 const WelcomeView = ({
@@ -124,18 +127,27 @@ const WelcomeView = ({
   welcomeMessage: string
   onBegin: () => void
 }) => (
-  <div className={styles.welcomeContainer}>
-    <div className={styles.scenarioText}>
-        <Image src="/elevate/blobbert.png" alt="Messages" width={120} height={120} className={styles.welcomeImage} />
-        <StreamingText text={welcomeMessage} />
-    </div>
-    <div className={styles.chatInputContainer}>
-      <div className={styles.continueButtonContainer}>
-        <button onClick={onBegin} className={styles.continueButton}>
-          Begin
-        </button>
+  <>
+    <div className={styles.welcomeContainer}>
+      <div className={styles.scenarioText}>
+          <Image src="/elevate/blobbert.png" alt="Messages" width={60} height={60} className={styles.welcomeImage} />
+          <StreamingText text={welcomeMessage} />
       </div>
     </div>
+    <button onClick={onBegin} className={styles.fixedBottomButton}>
+      Begin
+    </button>
+  </>
+)
+
+const LoadingView = ({ message }: { message: string }) => (
+  <div className={styles.loadingContainer}>
+    <div className={styles.loadingSpinner}>
+      <div className={styles.spinnerRing}></div>
+      <div className={styles.spinnerRing}></div>
+      <div className={styles.spinnerRing}></div>
+    </div>
+    <p className={styles.loadingMessage}>{message}</p>
   </div>
 )
 
@@ -211,21 +223,21 @@ const ScenarioView = ({
 )
 
 const TermsView = ({
-  termsStreamedText,
+  termsDisplayedText,
   isTermsStreaming,
   onBeginFinalChat,
 }: {
-  termsStreamedText: string
+  termsDisplayedText: string
   isTermsStreaming: boolean
   onBeginFinalChat: () => void
 }) => (
   <div className={styles.scenarioTextContent}>
     <div className={styles.scenarioText}>
-      {termsStreamedText}
+      {termsDisplayedText}
       {isTermsStreaming && <span className={styles.cursor}>|</span>}
     </div>
     <div className={styles.messagesIconWrapper}>
-      {!isTermsStreaming && termsStreamedText && (
+      {!isTermsStreaming && termsDisplayedText && (
         <div
           className={`${styles.messagesIcon} ${styles.messagesIconVisible}`}
           onClick={onBeginFinalChat}
@@ -443,7 +455,6 @@ const ResultsView = ({
 
       <div className={styles.actions}>
         <button onClick={onRestart} className={styles.restartButton}>
-          <span className={`material-symbols-outlined ${styles.replayIcon}`}>replay</span>
           Replay
         </button>
       </div>
@@ -464,14 +475,16 @@ function InvestorPageContent() {
   const searchParams = useSearchParams()
   const stepParam = searchParams.get('step')
   
-  const [view, setView] = useState<'intro' | 'email' | 'welcome' | 'scenario' | 'chat' | 'terms' | 'final-chat' | 'results'>('intro')
+  const [view, setView] = useState<'intro' | 'email' | 'welcome' | 'creating-story' | 'scenario' | 'chat' | 'terms' | 'final-chat' | 'analyzing' | 'results'>('intro')
   const [showNotification, setShowNotification] = useState(false)
   const [streamedText, setStreamedText] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [showMessagesIcon, setShowMessagesIcon] = useState(false)
   const [showBadge, setShowBadge] = useState(false)
-  const [termsStreamedText, setTermsStreamedText] = useState('')
+  const [termsFullText, setTermsFullText] = useState('')
+  const [termsDisplayedText, setTermsDisplayedText] = useState('')
   const [isTermsStreaming, setIsTermsStreaming] = useState(false)
+  const [isLoadingTermsMessage, setIsLoadingTermsMessage] = useState(false)
   const [displayedTranscript, setDisplayedTranscript] = useState<ChatMessage[]>([])
   const [displayedFinalTranscript, setDisplayedFinalTranscript] = useState<ChatMessage[]>([])
   const [isTypingMessage, setIsTypingMessage] = useState(false)
@@ -497,6 +510,8 @@ function InvestorPageContent() {
     maxNegotiationIncrease: 0,
     allocationPercentage: 7.0,
     dealClosed: false,
+    dealReached: false,
+    userExpressedDisinterest: false,
   })
   const pendingTimeout = useRef<NodeJS.Timeout | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -560,7 +575,7 @@ function InvestorPageContent() {
 
     // Determine which view to show based on URL param or cached step
     const targetStep = stepParam || cached.currentStep
-    if (targetStep && ['intro', 'email', 'welcome', 'scenario', 'chat', 'terms', 'final-chat', 'results'].includes(targetStep)) {
+    if (targetStep && ['intro', 'email', 'welcome', 'creating-story', 'scenario', 'chat', 'terms', 'final-chat', 'analyzing', 'results'].includes(targetStep)) {
       setView(targetStep as typeof view)
     }
   }, [stepParam])
@@ -570,7 +585,7 @@ function InvestorPageContent() {
     if (!hasLoadedCache.current) return
     if (!stepParam) return
 
-    const validSteps = ['intro', 'email', 'welcome', 'scenario', 'chat', 'terms', 'final-chat', 'results']
+    const validSteps = ['intro', 'email', 'welcome', 'creating-story', 'scenario', 'chat', 'terms', 'final-chat', 'analyzing', 'results']
     if (validSteps.includes(stepParam)) {
       setView(stepParam as typeof view)
     }
@@ -581,6 +596,48 @@ function InvestorPageContent() {
     if (!hasLoadedCache.current) return
     saveInvestorCache({ currentStep: view })
   }, [view])
+
+  // Handle automatic transitions for loading screens
+  useEffect(() => {
+    if (view === 'creating-story') {
+      const timer = setTimeout(() => {
+        navigateToStep('scenario')
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [view, navigateToStep])
+
+  // Fetch analysis when analyzing view is entered and auto-transition when complete
+  useEffect(() => {
+    if (view === 'analyzing' && !analysis && !isLoadingAnalysis) {
+      const fetchAnalysis = async () => {
+        setIsLoadingAnalysis(true)
+        try {
+          const response = await fetch('/api/investor/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ negotiationState, transcript: finalTranscript.length > 0 ? finalTranscript : transcript }),
+          })
+          if (response.ok) {
+            const data = await response.json()
+            if (data.success) {
+              setAnalysis(data.analysis)
+              saveInvestorCache({ analysis: data.analysis })
+              // Transition to results after analysis is complete
+              navigateToStep('results')
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch analysis:', error)
+          // Still transition to results even if analysis fails
+          navigateToStep('results')
+        } finally {
+          setIsLoadingAnalysis(false)
+        }
+      }
+      fetchAnalysis()
+    }
+  }, [view, negotiationState, transcript, finalTranscript, analysis, isLoadingAnalysis, navigateToStep])
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -631,19 +688,70 @@ function InvestorPageContent() {
     }
   }, [view])
 
+  // Fetch terms message when terms view is entered
   useEffect(() => {
-    if (view === 'terms') {
-      const fullText = "After your conversation with David, you've reached an agreement. The negotiation has concluded with David offering you a specific allocation amount.\n\nDavid is now preparing the final term sheet with all the details. He'll be sending it over shortly with the complete investment terms."
+    if (view === 'terms' && !termsFullText && !isLoadingTermsMessage) {
+      const fetchTermsMessage = async () => {
+        setIsLoadingTermsMessage(true)
+        try {
+          const response = await fetch('/api/investor/generateTermsMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              transcript, 
+              negotiationState 
+            }),
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            if (data.success && data.message) {
+              // Store the full message to trigger streaming effect
+              setTermsFullText(data.message)
+            }
+          } else {
+            // Fallback to default message if API fails
+            const fallbackText = negotiationState.dealReached
+              ? "After your conversation with David, you've reached an agreement. David is now preparing to share the final terms with you."
+              : "The conversation with David has concluded. David wants to share a final message with you."
+            
+            setTermsFullText(fallbackText)
+          }
+        } catch (error) {
+          console.error('Failed to fetch terms message:', error)
+          // Fallback message
+          const fallbackText = negotiationState.dealReached
+            ? "After your conversation with David, you've reached an agreement. David is now preparing to share the final terms with you."
+            : "The conversation with David has concluded. David wants to share a final message with you."
+          
+          setTermsFullText(fallbackText)
+        } finally {
+          setIsLoadingTermsMessage(false)
+        }
+      }
       
+      fetchTermsMessage()
+    }
+    
+    // Reset terms message when leaving the terms view
+    if (view !== 'terms' && termsFullText) {
+      setTermsFullText('')
+      setTermsDisplayedText('')
+      setIsTermsStreaming(false)
+    }
+  }, [view, termsFullText, isLoadingTermsMessage, transcript, negotiationState])
+  
+  // Handle streaming animation for terms text
+  useEffect(() => {
+    if (view === 'terms' && termsFullText && !isLoadingTermsMessage) {
+      setTermsDisplayedText('')
       setIsTermsStreaming(true)
-      setTermsStreamedText(fullText)
       
       let currentIndex = 0
       const streamInterval = setInterval(() => {
-        if (currentIndex < fullText.length) {
-          // no-op: StreamingText is not used here; retain existing terms typing behavior
-          setTermsStreamedText(fullText.slice(0, currentIndex + 1))
+        if (currentIndex < termsFullText.length) {
           currentIndex++
+          setTermsDisplayedText(termsFullText.slice(0, currentIndex))
         } else {
           clearInterval(streamInterval)
           setIsTermsStreaming(false)
@@ -652,7 +760,7 @@ function InvestorPageContent() {
       
       return () => clearInterval(streamInterval)
     }
-  }, [view])
+  }, [view, termsFullText, isLoadingTermsMessage])
 
   // Reset transcript when chat view is entered
   useEffect(() => {
@@ -690,9 +798,9 @@ function InvestorPageContent() {
           const currentMessage = initialMessages[messageIndex]
           const currentIndex = messageIndex
           
-          if (currentIndex + 1 < initialMessages.length) {
-            setIsTypingMessage(true)
-          }
+          // Show typing indicator before each message
+          setIsTypingMessage(true)
+          
           setTimeout(() => {
             // Verify the message still exists before adding
             if (!currentMessage || !currentMessage.id) {
@@ -710,7 +818,11 @@ function InvestorPageContent() {
             setIsTypingMessage(false)
             setTimeout(() => scrollToBottom(), 100)
             messageIndex++
-            setTimeout(typeNextMessage, 1000)
+            
+            // Continue to next message if there are more
+            if (messageIndex < initialMessages.length) {
+              setTimeout(typeNextMessage, 1000)
+            }
           }, currentMessage.text.length * 30)
         }
       }
@@ -728,7 +840,9 @@ function InvestorPageContent() {
   useEffect(() => {
     if (view === 'final-chat' && finalTranscript.length === 0 && !finalChatInitialized.current) {
       finalChatInitialized.current = true
-      const finalMessages = [
+      
+      // Different messages based on whether a deal was reached
+      const finalMessages = negotiationState.dealReached ? [
         {
           id: 'final-1',
           sender: 'npc' as const,
@@ -753,6 +867,25 @@ function InvestorPageContent() {
           text: "Awesome! Great to have you onboard.",
           elapsedMs: 1200,
         },
+      ] : [
+        {
+          id: 'final-1',
+          sender: 'npc' as const,
+          text: "Hey, I know we couldn't quite align on the numbers this time.",
+          elapsedMs: 0,
+        },
+        {
+          id: 'final-2',
+          sender: 'npc' as const,
+          text: "Really appreciate all the support you've given us over the past few months though.",
+          elapsedMs: 1200,
+        },
+        {
+          id: 'final-3',
+          sender: 'npc' as const,
+          text: "Let's definitely stay in touch - who knows what the future holds!",
+          elapsedMs: 1200,
+        },
       ]
       
       setFinalTranscript(finalMessages)
@@ -766,9 +899,9 @@ function InvestorPageContent() {
           const currentMessage = finalMessages[messageIndex]
           const currentIndex = messageIndex
           
-          if (currentIndex + 1 < finalMessages.length) {
-            setIsTypingMessage(true)
-          }
+          // Show typing indicator before each message
+          setIsTypingMessage(true)
+          
           setTimeout(() => {
             // Verify the message still exists before adding
             if (!currentMessage || !currentMessage.id) {
@@ -786,17 +919,23 @@ function InvestorPageContent() {
             setIsTypingMessage(false)
             setTimeout(() => scrollToBottom(), 100)
 
+            // Show continue button after second-to-last message
             if (currentIndex === finalMessages.length - 2) {
               setShowContinueButton(true)
             }
 
             messageIndex++
-            setTimeout(typeNextMessage, 1000)
+            
+            // Continue to next message if there are more
+            if (messageIndex < finalMessages.length) {
+              setTimeout(typeNextMessage, 1000)
+            } else {
+              // All messages shown, ensure continue button is visible
+              if (!showContinueButton) {
+                setShowContinueButton(true)
+              }
+            }
           }, currentMessage.text.length * 30)
-        } else {
-          if (finalMessages.length < 2 && !showContinueButton) {
-            setShowContinueButton(true)
-          }
         }
       }
 
@@ -873,17 +1012,21 @@ function InvestorPageContent() {
   useEffect(() => {
     if (!canRespond && view === 'chat') {
       setTimeout(() => {
+        // If chat ended but no deal was closed, mark dealReached as false
+        if (!negotiationState.dealClosed) {
+          setNegotiationState(prev => ({ ...prev, dealReached: false }))
+        }
         saveInvestorCache({ 
           negotiationState, 
           transcript,
           userTurns,
         })
         navigateToStep('terms')
-      }, 1500)
+      }, 4000)
     }
   }, [canRespond, negotiationState, transcript, view, navigateToStep, userTurns])
 
-  // Fetch analysis when results view is entered
+  // Fallback: Fetch analysis when results view is entered directly (e.g., from cache/URL)
   useEffect(() => {
     if (view === 'results' && !analysis && !isLoadingAnalysis) {
       const fetchAnalysis = async () => {
@@ -981,6 +1124,7 @@ function InvestorPageContent() {
 
           if (data.negotiationState.dealClosed) {
             setUserTurns(MAX_USER_TURNS)
+            setNegotiationState(prev => ({ ...prev, dealReached: true }))
           }
         } else {
           setIsNpcTyping(false)
@@ -1027,8 +1171,12 @@ function InvestorPageContent() {
                    </div>
                      
               <div className={`${styles.phoneContentView} ${view === 'welcome' ? styles.visible : ''}`}>
-                <WelcomeView welcomeMessage={welcomeMessage} onBegin={() => navigateToStep('scenario')} />
-                       </div>
+                <WelcomeView welcomeMessage={welcomeMessage} onBegin={() => navigateToStep('creating-story')} />
+              </div>
+
+              <div className={`${styles.phoneContentView} ${view === 'creating-story' ? styles.visible : ''}`}>
+                <LoadingView message="Creating a story for you..." />
+              </div>
                     
               <div className={`${styles.phoneContentView} ${view === 'scenario' ? styles.visible : ''}`}>
                 <ScenarioView
@@ -1065,7 +1213,7 @@ function InvestorPageContent() {
               {/* Terms explanation view */}
               <div className={`${styles.phoneContentView} ${view === 'terms' ? styles.visible : ''}`}>
                 <TermsView
-                  termsStreamedText={termsStreamedText}
+                  termsDisplayedText={termsDisplayedText}
                   isTermsStreaming={isTermsStreaming}
                   onBeginFinalChat={() => navigateToStep('final-chat')}
                 />
@@ -1081,9 +1229,14 @@ function InvestorPageContent() {
                   showContinueButton={showContinueButton}
                   onContinue={() => {
                     saveInvestorCache({ negotiationState, finalTranscript })
-                    navigateToStep('results')
+                    navigateToStep('analyzing')
                   }}
                 />
+              </div>
+
+              {/* Analyzing view */}
+              <div className={`${styles.phoneContentView} ${view === 'analyzing' ? styles.visible : ''}`}>
+                <LoadingView message="Understanding your actions..." />
               </div>
 
               {/* Results view */}
@@ -1104,6 +1257,10 @@ function InvestorPageContent() {
                     setShowContinueButton(false)
                     setEmailInput('')
                     setWelcomeMessage('')
+                    setTermsFullText('')
+                    setTermsDisplayedText('')
+                    setIsTermsStreaming(false)
+                    setIsLoadingTermsMessage(false)
                     setNegotiationState({
                       userAskAmount: null,
                       davidOfferAmount: null,
@@ -1113,6 +1270,8 @@ function InvestorPageContent() {
                       maxNegotiationIncrease: 0,
                       allocationPercentage: 7.0,
                       dealClosed: false,
+                      dealReached: false,
+                      userExpressedDisinterest: false,
                     })
                     chatInitialized.current = false
                     finalChatInitialized.current = false

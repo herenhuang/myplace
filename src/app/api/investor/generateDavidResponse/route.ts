@@ -44,7 +44,9 @@ export async function POST(request: NextRequest) {
       "hasAskedForAmount": boolean,
       "hasOffered": boolean,
       "negotiationCount": number,
-      "dealClosed": boolean
+      "dealClosed": boolean,
+      "dealReached": boolean,
+      "userExpressedDisinterest": boolean
     }`;
 
     // Build David's personality and context with natural, human-like negotiation behavior
@@ -108,7 +110,29 @@ STATE UPDATE RULES (VERY IMPORTANT):
 - hasAskedForAmount: set true once you ask their amount.
 - hasOffered: set true once you counter with your number.
 - negotiationCount: increment by 1 each time you reply.
-- dealClosed: set true if they accept or clearly agree to proceed.
+- userExpressedDisinterest: set true if user says they're not interested, can't reach a deal, want to pass, or similar negative signals.
+- dealClosed: ONLY set true after CONFIRMATION. See rules below.
+- dealReached: set true if they accept a deal AND dealClosed is true; set false if they confirm they want to walk away AND dealClosed is true.
+
+ENDING THE CONVERSATION (CRITICAL):
+1. WHEN USER ACCEPTS A DEAL:
+   - First time they accept: Acknowledge positively and briefly confirm the terms
+   - Set dealClosed to true and dealReached to true
+   
+2. WHEN USER EXPRESSES DISINTEREST/INABILITY TO REACH DEAL:
+   - First time: Set userExpressedDisinterest to true, but DO NOT set dealClosed yet
+   - Ask ONE TIME for confirmation: "Just to confirm - you're not interested in moving forward?"
+   - Keep it brief and respectful
+   - Next response: If they confirm (yes/that's right/correct/etc), set dealClosed to true and dealReached to false
+   - If they change their mind or want to continue, reset userExpressedDisinterest to false and continue negotiating
+   
+3. CONFIRMATION SIGNALS:
+   - User confirms disinterest: "yeah", "correct", "that's right", "yes", "I'm out", etc
+   - User wants to continue: "wait", "actually", "let me think", counter-offer, etc
+   
+NEVER end the conversation (set dealClosed) without either:
+A) Clear acceptance of a deal, OR
+B) Confirmation after expressing disinterest
 
 HUMAN-LIKE CLARITY:
 - If they are unclear: briefly ask for clarification ("Sorry—what number were you thinking?").
@@ -198,7 +222,41 @@ EXAMPLE:
     "hasAskedForAmount": true,
     "hasOffered": true,
     "negotiationCount": 0,
-    "dealClosed": false
+    "dealClosed": false,
+    "dealReached": false,
+    "userExpressedDisinterest": false
+  }
+}
+
+EXAMPLE (User expresses disinterest - first time):
+User: "I don't think this is going to work"
+{
+  "content": "Just to confirm - you're not interested in moving forward?",
+  "negotiationState": {
+    "userAskAmount": 100000,
+    "davidOfferAmount": 50000,
+    "hasAskedForAmount": true,
+    "hasOffered": true,
+    "negotiationCount": 3,
+    "dealClosed": false,
+    "dealReached": false,
+    "userExpressedDisinterest": true
+  }
+}
+
+EXAMPLE (User confirms disinterest):
+User: "yeah, that's right"
+{
+  "content": "Totally get it. Thanks for all your help anyway!",
+  "negotiationState": {
+    "userAskAmount": 100000,
+    "davidOfferAmount": 50000,
+    "hasAskedForAmount": true,
+    "hasOffered": true,
+    "negotiationCount": 4,
+    "dealClosed": true,
+    "dealReached": false,
+    "userExpressedDisinterest": true
   }
 }
 

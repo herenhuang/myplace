@@ -16,6 +16,8 @@ export interface NegotiationState {
   maxNegotiationIncrease: number; 
   allocationPercentage: number;
   dealClosed: boolean;
+  dealReached: boolean; // true if deal was successfully closed, false if chat ended without deal
+  userExpressedDisinterest: boolean; // true if user expressed they don't want to proceed (before confirmation)
 }
 
 export interface AnalysisResult {
