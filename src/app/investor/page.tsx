@@ -497,6 +497,8 @@ function InvestorPageContent() {
   const [isNpcTyping, setIsNpcTyping] = useState(false)
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [negotiationStartTime, setNegotiationStartTime] = useState<number | null>(null)
   const [negotiationState, setNegotiationState] = useState<NegotiationState>({
     userAskAmount: null,
     davidOfferAmount: null,
@@ -569,6 +571,8 @@ function InvestorPageContent() {
     if (cached.userTurns !== undefined) setUserTurns(cached.userTurns)
     if (cached.finalUserTurns !== undefined) setFinalUserTurns(cached.finalUserTurns)
     if (cached.analysis) setAnalysis(cached.analysis)
+    if (cached.sessionId) setSessionId(cached.sessionId)
+    if (cached.negotiationStartTime) setNegotiationStartTime(cached.negotiationStartTime)
 
     // Determine which view to show based on URL param or cached step
     const targetStep = stepParam || cached.currentStep
@@ -662,6 +666,35 @@ function InvestorPageContent() {
         const fullWelcomeMessage = data.message + ' \n \n' + welcomeText
         setWelcomeMessage(fullWelcomeMessage)
         saveInvestorCache({ emailInput, welcomeMessage: fullWelcomeMessage })
+        
+        // Create simulation session
+        try {
+          const sessionResponse = await fetch('/api/investor/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_email: emailInput,
+              session_token: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              user_agent: navigator.userAgent,
+              device_fingerprint: 'web-browser',
+              investor_company: data.investor?.company || null,
+              investor_title: data.investor?.title || null
+            })
+          })
+          
+          if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json()
+            if (sessionData.success && sessionData.session) {
+              setSessionId(sessionData.session.id)
+              saveInvestorCache({ sessionId: sessionData.session.id })
+              console.log('✅ Session created:', sessionData.session.id)
+            }
+          }
+        } catch (error) {
+          console.error('Failed to create session:', error)
+          // Continue with simulation even if session creation fails
+        }
+        
         navigateToStep('welcome')
         } else {
         setEmailError(data.message || 'This email is not on our investor list.')
@@ -1081,6 +1114,8 @@ function InvestorPageContent() {
     setIsStreaming(false)
     setShowMessagesIcon(false)
     setShowBadge(false)
+    setSessionId(null)
+    setNegotiationStartTime(null)
     setNegotiationState({
       userAskAmount: null,
       davidOfferAmount: null,
@@ -1162,6 +1197,13 @@ function InvestorPageContent() {
         const data: GenerateDavidResponsePayload = await response.json()
         if (data.success && data.response && data.negotiationState) {
           setNegotiationState(data.negotiationState)
+          
+          // Track when negotiation starts (when user asks for amount)
+          if (data.negotiationState.hasAskedForAmount && !negotiationStartTime) {
+            const startTime = performance.now()
+            setNegotiationStartTime(startTime)
+            saveInvestorCache({ negotiationStartTime: startTime })
+          }
 
           pendingTimeout.current = setTimeout(() => {
             setIsNpcTyping(false)
@@ -1290,8 +1332,44 @@ function InvestorPageContent() {
                     </div>
                 <FinalChatInput
                   showContinueButton={showContinueButton}
-                  onContinue={() => {
+                  onContinue={async () => {
                     saveInvestorCache({ negotiationState, finalTranscript })
+                    
+                    // Save simulation results to database
+                    if (sessionId) {
+                      try {
+                        const playTimeSeconds = Math.round((performance.now() - startTime) / 1000)
+                        const negotiationDurationSeconds = negotiationStartTime 
+                          ? Math.round((performance.now() - negotiationStartTime) / 1000)
+                          : 0
+                        
+                        const response = await fetch('/api/investor/session', {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            session_id: sessionId,
+                            full_transcript: finalTranscript.length > 0 ? finalTranscript : transcript,
+                            is_on_cap_table: negotiationState.dealReached || false,
+                            cap_table_amount: negotiationState.dealReached && negotiationState.davidOfferAmount 
+                              ? negotiationState.davidOfferAmount 
+                              : null,
+                            end_result: negotiationState.dealReached ? 'deal_reached' : 'user_declined',
+                            final_negotiation_state: negotiationState,
+                            play_time_seconds: playTimeSeconds,
+                            negotiation_duration_seconds: negotiationDurationSeconds
+                          })
+                        })
+                        
+                        if (response.ok) {
+                          console.log('✅ Simulation results saved to database')
+                        } else {
+                          console.error('Failed to save simulation results')
+                        }
+                      } catch (error) {
+                        console.error('Error saving simulation results:', error)
+                      }
+                    }
+                    
                     navigateToStep('analyzing')
                   }}
                 />
