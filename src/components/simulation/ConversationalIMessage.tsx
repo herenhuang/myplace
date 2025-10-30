@@ -97,7 +97,7 @@ export default function ConversationalIMessage({
         console.log('Conversation history length:', conversationHistory.length)
         console.log('Full conversation:', conversationHistory)
         
-        const response = await fetch('/api/conversationExchange', {
+        const response = await fetch('/api/conversation-exchange', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
