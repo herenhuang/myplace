@@ -1606,8 +1606,7 @@ function BottomSection() {
   return (
     <ManifestoSection delay={0.5}>
       <div className={styles.bottomSection}>
-
-      <p className={styles.paragraph}>
+        <p className={styles.paragraph}>
           We’re more than just a label. 
         </p>
         <p className={styles.paragraph}>
@@ -1617,8 +1616,7 @@ function BottomSection() {
           So, what's your story?
         </p>
         
-
-      <WaitlistForm />
+        <WaitlistForm />
 
         <motion.div 
           className={styles.bottomIcons}

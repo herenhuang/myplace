@@ -287,7 +287,8 @@ $bg:#f3fcff;
   max-width: 100%;
 
   .highlight{
-    background: rgba(yellow, 0.25);
+    background: linear-gradient(135deg, #E0340C 0%, #ff6b35 100%);
+    color: white;
     font-weight: 700;
     padding: 0 4px;
     border-radius: 4px;

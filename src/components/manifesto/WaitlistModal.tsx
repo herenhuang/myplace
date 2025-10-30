@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './WaitlistModal.module.scss';
+import { createClient } from '@/lib/supabase/client';
 
 interface BubbleData {
   bubblesPopped: number;
@@ -12,9 +13,13 @@ interface BubbleData {
 interface WaitlistModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (message: string, bubbleData: BubbleData) => void;
+  onSubmit: (message: string, bubbleData: BubbleData) => Promise<void>;
   isSubmitting: boolean;
 }
+
+type TBubbleStats = {
+  poppedMoreThan: number;
+};
 
 export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting }: WaitlistModalProps) {
   const [stage, setStage] = useState<'game' | 'question'>('game');
@@ -23,6 +28,7 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
   const [isGameActive, setIsGameActive] = useState(true);
   const [message, setMessage] = useState('');
   const [bubbleData, setBubbleData] = useState<BubbleData | null>(null);
+  const [bubbleStats, setBubbleStats] = useState<TBubbleStats | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -78,7 +84,7 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
     }
   };
 
-  const handleGameComplete = (completed: boolean) => {
+  const handleGameComplete = async (completed: boolean) => {
     setIsGameActive(false);
     const bubblesPopped = bubbles.filter((b) => b).length;
     
@@ -89,7 +95,16 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
     };
     
     setBubbleData(data);
-    
+    await onSubmit(message, data);
+    const supabase = createClient();
+    const { count: bubbleStats } = await supabase
+      .from('signups')
+      .select('*', { count: 'exact', head: true })
+      .lt('data->bubbleData->>bubblesPopped', bubblesPopped);
+    if (bubbleStats !== null) {
+      setBubbleStats({ poppedMoreThan: bubbleStats });
+    }
+
     // Move to question stage after a short delay
     setTimeout(() => {
       setStage('question');
@@ -98,12 +113,6 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
 
   const handleSkip = () => {
     handleGameComplete(false);
-  };
-
-  const handleSubmit = () => {
-    if (bubbleData) {
-      onSubmit(message, bubbleData);
-    }
   };
 
   const formatTime = (seconds: number) => {
@@ -234,26 +243,10 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
             
             <p className={styles.questionLabel}>
               Nice! you popped {bubbleData?.bubblesPopped} bubbles in {formatTime(bubbleData?.timeElapsed || 0)}
-              {bubbleData?.completed && ". you actually popped them all. that's better than >90% of all other participants. you're on the list now - nice!"}
+              {bubbleData?.bubblesPopped === 0 && ". Too good for bubbles, huh? no worries, you're still on the list!"}
+              {bubbleData && bubbleData.bubblesPopped > 0 && !bubbleData?.completed && bubbleStats && `. not bad! you popped more bubbles than ${bubbleStats?.poppedMoreThan || 0} other participants.`}
+              {bubbleData?.completed && ". you actually popped them all. that's better than >90% of all other participants."}
             </p>
-
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Anything you want to tell us?"
-              className={styles.textarea}
-              rows={4}
-              disabled={isSubmitting}
-            />
-
-            <button 
-              className={styles.submitButton}
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              type="button"
-            >
-              {isSubmitting ? 'Joining...' : 'Join Waitlist'}
-            </button>
           </div>
         )}
       </div>
