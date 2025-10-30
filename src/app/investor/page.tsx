@@ -72,6 +72,7 @@ const IntroView = ({ onBegin }: { onBegin: () => void }) => {
   return (
     <>
       <div className={styles.introContainer}>
+        <Image src="/dab.png" alt="Messages" width={100} height={100} className={styles.dabImage} />
         <h1 className={styles.introTitle}>How Much Allocation Can You Get?</h1>
         <div className={styles.introAllocation}>
             <NumberFlow 

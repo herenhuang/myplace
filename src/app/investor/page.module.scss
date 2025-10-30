@@ -100,6 +100,7 @@ $orange: rgb(255, 114, 63);
   justify-content: center;
   text-align: center;
   height: 100%;
+  padding-bottom: 72px;
   animation: fadeIn 0.5s ease-out;
   background: #f7fbff;
   background: $orange;
@@ -256,6 +257,10 @@ $orange: rgb(255, 114, 63);
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.dabImage {
+  filter: drop-shadow(-4px 18px 18px rgba(0, 0, 0, 0.1));
 }
 
 .notificationBadge {
