@@ -155,6 +155,7 @@ const ScenarioView = ({
   showBadge,
   showNotification,
   onBeginChat,
+  showDavidImage,
 }: {
   fullText: string
   onStreamComplete: () => void
@@ -163,10 +164,18 @@ const ScenarioView = ({
   showBadge: boolean
   showNotification: boolean
   onBeginChat: () => void
+  showDavidImage: boolean
 }) => (
   <>
     <div className={styles.scenarioTextContent}>
-      <div className={styles.scenarioText}>
+      <Image 
+        src="/david.png" 
+        alt="Messages" 
+        width={100} 
+        height={100} 
+        className={`${styles.davidImage} ${showDavidImage ? styles.davidImageVisible : ''}`} 
+      />
+      <div className={styles.scenarioText} style={{ height: '240px' }}>
         <StreamingText text={fullText} onComplete={onStreamComplete} />
       </div>
       <div className={styles.messagesIconWrapper}>
@@ -709,6 +718,7 @@ function InvestorPageContent() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [showMessagesIcon, setShowMessagesIcon] = useState(false)
   const [showBadge, setShowBadge] = useState(false)
+  const [showDavidImage, setShowDavidImage] = useState(false)
   const [termsFullText, setTermsFullText] = useState('')
   const [termsDisplayedText, setTermsDisplayedText] = useState('')
   const [isTermsStreaming, setIsTermsStreaming] = useState(false)
@@ -894,7 +904,7 @@ function InvestorPageContent() {
     if (view === 'creating-story') {
       const timer = setTimeout(() => {
         navigateToStep('scenario')
-      }, 2000)
+      }, 5000)
       return () => clearTimeout(timer)
     }
   }, [view, navigateToStep])
@@ -978,11 +988,24 @@ function InvestorPageContent() {
     if (view === 'scenario') {
       const fullText = "David Ahn is building the startup everyone's talking about.  \n \nFor three months, you've been their unofficial advisor - taking calls, making intros, reviewing pitch decks. Every time you brought up investment, David said they weren't fundraising yet. You kept helping anyway.\n\nToday, you get a text."
 
-      setIsStreaming(true)
+      // Reset all states
       setShowMessagesIcon(false)
       setShowBadge(false)
       setShowNotification(false)
-      setStreamedText(fullText)
+      setStreamedText('')
+      setIsStreaming(false)
+      setShowDavidImage(false)
+
+      // Show David image with float animation after a short delay
+      setTimeout(() => {
+        setShowDavidImage(true)
+      }, 1500)
+
+      // Start text streaming after 1 second delay
+      setTimeout(() => {
+        setIsStreaming(true)
+        setStreamedText(fullText)
+      }, 2000)
     }
   }, [view])
 
@@ -1388,6 +1411,7 @@ function InvestorPageContent() {
     setIsStreaming(false)
     setShowMessagesIcon(false)
     setShowBadge(false)
+    setShowDavidImage(false)
     setNegotiationState({
       userAskAmount: null,
       davidOfferAmount: null,
@@ -1548,7 +1572,7 @@ function InvestorPageContent() {
                 <LoadingView message="Creating a story for you..." />
               </div>
                     
-              <div className={`${styles.phoneContentView} ${view === 'scenario' ? styles.visible : ''}`}>
+              <div className={`${styles.phoneContentView} ${view === 'scenario' ? `${styles.visible} ${styles.scenarioView}` : ''}`}>
                 <ScenarioView
                   fullText={streamedText}
                   onStreamComplete={() => {
@@ -1562,6 +1586,7 @@ function InvestorPageContent() {
                   showBadge={showBadge}
                   showNotification={showNotification}
                   onBeginChat={() => navigateToStep('chat')}
+                  showDavidImage={showDavidImage}
                 />
               </div>
 

@@ -74,7 +74,7 @@ $orange: rgb(255, 114, 63);
   left: 0;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 
   display: flex;
   align-items: center;
@@ -86,6 +86,10 @@ $orange: rgb(255, 114, 63);
 .phoneContentView.visible {
   opacity: 1;
   pointer-events: auto;
+}
+
+.phoneContentView.scenarioView {
+  animation: scenarioFadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 // Intro Screen
@@ -177,7 +181,6 @@ $orange: rgb(255, 114, 63);
   text-align: left;
   max-width: 500px;
   width: 100%;
-  animation: fadeIn 0.5s ease-out;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -380,6 +383,17 @@ $orange: rgb(255, 114, 63);
   to { opacity: 1; }
 }
 
+@keyframes scenarioFadeIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes chatZoomIn {
   0% {
     opacity: 0;
@@ -473,9 +487,26 @@ $orange: rgb(255, 114, 63);
   background-repeat: no-repeat;
 }
 
+.davidImage{
+  margin-bottom: 24px;
+  border-radius: 500px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.davidImageVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .chatHeaderName {
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  margin: 4px 0 0 0;
   color: #ffffff;
 }
 
@@ -789,6 +820,7 @@ $orange: rgb(255, 114, 63);
     display: flex;
     flex-direction: column;
     gap: 24px;
+    display: none;
 }
 
 .resetButton {
@@ -842,6 +874,7 @@ $orange: rgb(255, 114, 63);
   display: flex;
   flex-direction: column;
   gap: 20px;
+  display: none;
 
   @media (max-width: 1024px) {
     display: none;
