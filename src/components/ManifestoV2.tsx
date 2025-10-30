@@ -1662,10 +1662,18 @@ function BottomSection() {
   )
 }
 
+const Header = () => (
+  <header className={styles.pageHeader}>
+    <button onClick={() => window?.scrollTo({ top: 0, behavior: 'smooth' })}>Top</button>
+    <button onClick={() => window?.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })}>Join the waitlist</button>
+  </header>
+);
+
 // Main ManifestoV2 Component
 export default function ManifestoV2() {
   return (
     <div className={styles.container}>
+      <Header />
       <HeroSection />
       <GreekSection />
       {/* <TimelineSection /> */}
