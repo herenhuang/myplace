@@ -245,7 +245,7 @@ export default function WaitlistModal({ isOpen, onClose, onSubmit, isSubmitting 
               Nice! you popped {bubbleData?.bubblesPopped} bubbles in {formatTime(bubbleData?.timeElapsed || 0)}
               {bubbleData?.bubblesPopped === 0 && ". Too good for bubbles, huh? no worries, you're still on the list!"}
               {bubbleData && bubbleData.bubblesPopped > 0 && !bubbleData?.completed && bubbleStats && `. not bad! you popped more bubbles than ${bubbleStats?.poppedMoreThan || 0} other participants.`}
-              {bubbleData?.completed && ". you actually popped them all. that's better than >90% of all other participants."}
+              {bubbleData?.completed && `. you actually popped them all. that's better than ${bubbleStats ? `${bubbleStats.poppedMoreThan} other participants` : '>90% of all other'} participants.`}
             </p>
           </div>
         )}
