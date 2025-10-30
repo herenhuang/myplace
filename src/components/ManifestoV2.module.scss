@@ -314,13 +314,16 @@ $bg:#f3fcff;
   margin: 20px 60px auto 20px;
   width: 620px;
   max-width: 100%;
-  align-self: flex-start;
 
   .highlight{
     background: rgba(yellow, 0.25);
     font-weight: 700;
     padding: 0 4px;
     border-radius: 4px;
+  }
+
+  @media (max-width: 1380px) {
+    align-self: flex-start;
   }
 
   @media (max-width: 768px) {
