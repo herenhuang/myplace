@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif, Lora, Newsreader } from "next/font/google";
+import { Inter, Instrument_Serif, Lora, Newsreader, DM_Sans, Radio_Canada_Big } from "next/font/google";
 import "./globals.css";
 import 'material-symbols/outlined.css';
 import 'material-symbols/rounded.css';
@@ -9,6 +9,20 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 const inter = Inter({
   subsets: ["latin"],
   variable: '--font-sans',
+});
+
+const dmSans = DM_Sans({
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  subsets: ["latin"],
+  variable: '--font-dm-sans',
+});
+
+const radioCanadaBig = Radio_Canada_Big({
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  subsets: ["latin"],
+  variable: '--font-radio-canada-big',
 });
 
 const instrumentSerif = Instrument_Serif({
@@ -63,7 +77,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${instrumentSerif.variable} ${lora.variable} ${newsreader.variable} antialiased`}
+        className={`${inter.variable} ${instrumentSerif.variable} ${lora.variable} ${newsreader.variable} ${dmSans.variable} ${radioCanadaBig.variable} antialiased`}
         suppressHydrationWarning
       >
         <GoogleAnalytics gaId="G-HHMB010S76" />
