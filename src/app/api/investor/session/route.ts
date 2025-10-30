@@ -7,7 +7,7 @@ import {
   getSimulationSessionsByEmail,
   getCapTableStats
 } from '../../../../lib/supabase/investor-simulation'
-import type { ChatMessage, NegotiationState } from '../../../app/investor/types'
+import type { ChatMessage, NegotiationState } from '../../../investor/types'
 
 // Create a new simulation session
 export async function POST(request: NextRequest) {
