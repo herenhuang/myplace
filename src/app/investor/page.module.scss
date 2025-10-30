@@ -757,9 +757,9 @@ $orange: rgb(255, 114, 63);
 .chatSendButton {
   position: absolute;
   right: 22px;
-  bottom: 22px;
-  width: 36px;
-  height: 36px;
+  bottom: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: #007aff;
   color: white;
@@ -807,7 +807,20 @@ $orange: rgb(255, 114, 63);
   gap: 6px;
   
   .material-symbols-rounded {
+    font-family: 'Material Symbols Rounded';
+    font-weight: normal;
+    font-style: normal;
     font-size: 18px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: 'liga';
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
   }
 
   &:hover {
@@ -1157,7 +1170,20 @@ $orange: rgb(255, 114, 63);
   gap: 8px;
 
   .material-symbols-rounded {
+    font-family: 'Material Symbols Rounded';
+    font-weight: normal;
+    font-style: normal;
     font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: 'liga';
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
   }
 
   &:hover {
@@ -1239,19 +1265,125 @@ $orange: rgb(255, 114, 63);
 
 @keyframes l2 {to{rotate: 1turn}}
 
-.resultsContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+.resultsWrapper {
+  position: relative;
   width: 100%;
-  max-width: 1000px;
-  padding: 32px;
-  align-items: stretch;
+  height: 100%;
+}
+
+.resultsProgressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  z-index: 3000;
+  pointer-events: none;
+  background: rgb(255, 128, 65);
+}
+
+.resultsProgressSegment {
+  flex: 1;
+  height: 3px;
+  background: rgba(white, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.resultsProgressFill {
+  height: 100%;
+  background: white;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+.resultsScrollContainer {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
   background: rgb(255, 128, 65);
   font-family: 'Radio Canada Big', sans-serif;
-  filter: drop-shadow(-24px 120px 120px rgba(black, 0.15));
-  overflow-y: auto;
+  position: relative;
+  
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
+.resultsSlide {
+  width: 100%;
   height: 100%;
+  min-height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.resultsScrollArrow {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
+  background: rgba(white, 0.95);
+  backdrop-filter: blur(8px);
+  border: 2px solid black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2000;
+  box-shadow: -4px 8px 16px rgba(black, 0.3);
+  transition: all 0.3s ease;
+  animation: bounce 2s infinite;
+  pointer-events: auto;
+  
+  svg {
+    color: black;
+    width: 24px;
+    height: 24px;
+  }
+  
+  &:hover {
+    background: white;
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: -4px 12px 20px rgba(black, 0.35);
+  }
+  
+  &:active {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-8px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-4px);
+  }
 }
 
 .card {
@@ -1259,7 +1391,7 @@ $orange: rgb(255, 114, 63);
   border-radius: 8px;
   border: 2px solid black;
   box-shadow: -8px 24px 24px rgba(black, 0.2);
-  padding: 32px;
+  padding: 24px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -1267,6 +1399,9 @@ $orange: rgb(255, 114, 63);
   gap: 16px;
   animation: fadeInUp 0.5s ease-out;
   transition: all 0.2s ease-out;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 @keyframes fadeInUp {
@@ -1281,13 +1416,14 @@ $orange: rgb(255, 114, 63);
 }
 
 .offerCard {
-  grid-column: 1 / -1;
+  max-width: 400px;
 }
 
 .finalOffer {
   background: none;
   border: none;
   padding: 0;
+  width: 100%;
 }
 
 .offerAmount {
@@ -1341,6 +1477,180 @@ $orange: rgb(255, 114, 63);
   text-align: center;
 }
 
+.keyMomentsSection {
+  text-align: left;
+  padding-top: 0;
+  border-top: none;
+  
+  h3 {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    color: rgba(black, 0.5);
+    margin: 0 0 20px 0;
+    text-align: center;
+  }
+}
+
+.keyMoment {
+  margin-bottom: 24px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.keyMomentTitle {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  color: black;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.keyMomentDescription {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  line-height: 1.4;
+  color: rgba(black, 0.6);
+  margin: 0;
+}
+
+.mbtiCard {
+  text-align: center;
+  padding-top: 0;
+  border-top: none;
+    
+  h3 {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    color: rgba(black, 0.5);
+    margin: 0 0 24px 0;
+  }
+}
+
+.mbtiCombinedCard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.mbtiDivider {
+  width: 60px;
+  height: 2px;
+  background: rgba(black, 0.1);
+  margin: 8px auto 0;
+}
+
+.mbtiTypeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.mbtiLetter {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+  border-radius: 4px;
+  flex: 1;
+  background: $orange;
+  padding: 12px;
+  box-shadow: -4px 8px 16px rgba(black, 0.2);
+}
+
+.mbtiScales {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.mbtiScaleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mbtiScaleLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 72px;
+  font-size: 11px;
+  
+  .material-symbols-rounded {
+    font-family: 'Material Symbols Rounded';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: 'liga';
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    color: rgba(black, 0.5);
+    margin-bottom: 4px;
+  }
+  
+  span:not(.material-symbols-rounded) {
+    color: rgba(black, 0.6);
+    font-weight: 500;
+    text-align: center;
+  }
+}
+
+.mbtiGradientTrack {
+  flex: 1;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(to right, rgba(#f97316, 0.15), rgba(#f9ad16, 0.15));
+  border-radius: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset -2px 2px 8px rgba(black, 0.03);
+}
+
+.mbtiGradientBar {
+  height: 100%;
+  background: $orange;
+  border-radius: 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -2px 2px 8px rgba(black, 0.1);
+  
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    margin: 4px;
+    border-radius: 30px;
+    background: white;
+    box-shadow: -1px 2px 4px rgba(black, 0.08);
+  }
+}
+
 .chartContainer {
   margin-top: 0;
   display: flex;
@@ -1358,10 +1668,12 @@ $orange: rgb(255, 114, 63);
 }
 
 .actions {
-  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .restartButton {
