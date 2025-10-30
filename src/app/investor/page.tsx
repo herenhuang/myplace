@@ -407,6 +407,78 @@ const ResultsView = ({
   onRestart: () => void
 }) => {
   const finalOfferAmount = analysis?.finalAgreedAmount
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [showArrow, setShowArrow] = useState(true)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [maxSlideReached, setMaxSlideReached] = useState(0)
+
+  // Calculate total slides
+  const totalSlides = 1 + // Final offer
+    (analysis ? 1 : 0) + // Negotiating style
+    (analysis?.keyMoments?.length ? 1 : 0) + // Key moments
+    (analysis?.mbtiType ? 1 : 0) + // MBTI (combined into 1 slide)
+    (analysis ? 1 : 0) + // Pentagon chart
+    1 // Actions
+
+  // Handle scroll to track current slide
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const slideHeight = container.clientHeight
+      const scrollPosition = container.scrollTop
+      const newSlide = Math.round(scrollPosition / slideHeight)
+      const exactSlide = scrollPosition / slideHeight
+      const progress = Math.max(0, Math.min(100, (exactSlide - Math.floor(exactSlide)) * 100))
+      
+      setCurrentSlide(newSlide)
+      // Track the highest slide reached for progress bar logic
+      setMaxSlideReached((prev) => Math.max(prev, newSlide))
+      setScrollProgress(progress)
+      setShowArrow(newSlide < totalSlides - 1)
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    // Initial check
+    handleScroll()
+
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [totalSlides])
+
+  // Handle tap to go to next slide
+  const handleContainerClick = useCallback((e: React.MouseEvent) => {
+    // Don't trigger on button clicks or interactive elements
+    if ((e.target as HTMLElement).tagName === 'BUTTON' || 
+        (e.target as HTMLElement).closest('button')) {
+      return
+    }
+
+    const container = scrollContainerRef.current
+    if (!container || currentSlide >= totalSlides - 1) return
+
+    const slideHeight = container.clientHeight
+    const nextSlide = currentSlide + 1
+    container.scrollTo({
+      top: nextSlide * slideHeight,
+      behavior: 'smooth'
+    })
+  }, [currentSlide, totalSlides])
+
+  // Handle arrow click
+  const handleArrowClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    const container = scrollContainerRef.current
+    if (!container || currentSlide >= totalSlides - 1) return
+
+    const slideHeight = container.clientHeight
+    const nextSlide = currentSlide + 1
+    container.scrollTo({
+      top: nextSlide * slideHeight,
+      behavior: 'smooth'
+    })
+  }, [currentSlide, totalSlides])
 
   if (isLoading) {
     return (
@@ -417,43 +489,203 @@ const ResultsView = ({
   }
 
   return (
-    <div className={styles.resultsContainer}>
-      <div className={`${styles.card} ${styles.offerCard}`}>
-        <div className={styles.finalOffer}>
-          <div className={styles.offerAmount}>
-            {finalOfferAmount !== undefined && finalOfferAmount !== null ? formatAmount(finalOfferAmount) : 'No deal'}
+    <div className={styles.resultsWrapper}>
+      {/* Progress Bar */}
+      <div className={styles.resultsProgressBar}>
+        {Array.from({ length: totalSlides }, (_, i) => {
+          const fillPercent = Math.max(
+            0,
+            Math.min(100, 
+              i < currentSlide 
+                ? 100 
+                : i === currentSlide 
+                ? scrollProgress 
+                : 0
+            )
+          )
+          return (
+            <div key={i} className={styles.resultsProgressSegment}>
+              <div
+                className={styles.resultsProgressFill}
+                style={{ width: `${fillPercent}%` }}
+              />
+            </div>
+          )
+        })}
+      </div>
+
+      <div 
+        ref={scrollContainerRef}
+        className={styles.resultsScrollContainer}
+        onClick={handleContainerClick}
+        style={{ cursor: showArrow && currentSlide < totalSlides - 1 ? 'pointer' : 'default' }}
+      >
+      {/* Slide 1: Final Offer */}
+      <div className={styles.resultsSlide}>
+        <div className={`${styles.card} ${styles.offerCard}`}>
+          <div className={styles.finalOffer}>
+            <div className={styles.offerAmount}>
+              {finalOfferAmount !== undefined && finalOfferAmount !== null ? formatAmount(finalOfferAmount) : 'No deal'}
+            </div>
+            <div className={styles.offerLabel}>Final Agreed Allocation</div>
           </div>
-          <div className={styles.offerLabel}>Final Agreed Allocation</div>
         </div>
       </div>
 
       {analysis && (
         <>
-          <div className={styles.card}>
-            <div className={styles.analysisSection}>
-              <h3>Your Negotiating Style</h3>
-              <p className={styles.archetypeTitle}>{analysis.archetype}</p>
-              <p className={styles.analysisFeedback}>{analysis.summary}</p>
+          {/* Slide 2: Negotiating Style */}
+          <div className={styles.resultsSlide}>
+            <div className={styles.card}>
+              <div className={styles.analysisSection}>
+                <h3>Your Negotiating Style</h3>
+                <p className={styles.archetypeTitle}>{analysis.archetype}</p>
+                <p className={styles.analysisFeedback}>{analysis.summary}</p>
+              </div>
             </div>
           </div>
 
-          <div className={styles.card}>
-            <div className={styles.chartContainer}>
-              <PentagonChart 
-                scores={analysis.pentagonScores}
-                labels={analysis.pentagonLabels}
-                size={300}
-              />
+          {/* Slide 3: Key Moments */}
+          {analysis.keyMoments && analysis.keyMoments.length > 0 && (
+            <div className={styles.resultsSlide}>
+              <div className={styles.card}>
+                <div className={styles.keyMomentsSection}>
+                  <h3>Key Moments</h3>
+                  {analysis.keyMoments.map((moment, index) => (
+                    <div key={index} className={styles.keyMoment}>
+                      <h4 className={styles.keyMomentTitle}>{moment.title}</h4>
+                      <p className={styles.keyMomentDescription}>{moment.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {analysis.mbtiType && analysis.personality && (
+            <>
+              {/* Slide 4: MBTI Type + MBTI Scales (Combined) */}
+              <div className={styles.resultsSlide}>
+                <div className={`${styles.card} ${styles.mbtiCombinedCard}`}>
+                  {/* MBTI Type Section */}
+                  <div className={styles.mbtiCard}>
+                    <h3 className={styles.mbtiCardTitle}>Personality Profile</h3>
+                    <div className={styles.mbtiTypeContainer}>
+                      {analysis.mbtiType.split('').map((letter, index) => (
+                        <div key={index} className={styles.mbtiLetter}>
+                          {letter}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className={styles.mbtiDivider} />
+
+                  {/* MBTI Scales Section */}
+                  <div className={styles.mbtiScales}>
+                    {[
+                      { 
+                        key: 'extraversion_introversion', 
+                        lowLabel: 'Introvert (I)', 
+                        highLabel: 'Extravert (E)', 
+                        lowIcon: 'person', 
+                        highIcon: 'groups' 
+                      },
+                      { 
+                        key: 'intuition_sensing', 
+                        lowLabel: 'Sensing (S)', 
+                        highLabel: 'Intuition (N)', 
+                        lowIcon: 'visibility', 
+                        highIcon: 'psychology' 
+                      },
+                      { 
+                        key: 'thinking_feeling', 
+                        lowLabel: 'Thinking (T)', 
+                        highLabel: 'Feeling (F)', 
+                        lowIcon: 'cognition', 
+                        highIcon: 'favorite' 
+                      },
+                      { 
+                        key: 'judging_perceiving', 
+                        lowLabel: 'Judging (J)', 
+                        highLabel: 'Perceiving (P)', 
+                        lowIcon: 'rule', 
+                        highIcon: 'explore' 
+                      },
+                    ].map((axis, idx) => {
+                      const value = analysis.personality![axis.key as keyof typeof analysis.personality] || 50;
+                      return (
+                        <div key={axis.key} className={styles.mbtiScaleRow}>
+                          <div className={styles.mbtiScaleLabel}>
+                            <span className="material-symbols-rounded">{axis.lowIcon}</span>
+                            <span>{axis.lowLabel}</span>
+                          </div>
+                          <div className={styles.mbtiGradientTrack}>
+                            <div
+                              className={styles.mbtiGradientBar}
+                              style={{ width: `${value}%`, transitionDelay: `${idx * 120}ms` }}
+                            />
+                          </div>
+                          <div className={styles.mbtiScaleLabel}>
+                            <span className="material-symbols-rounded">{axis.highIcon}</span>
+                            <span>{axis.highLabel}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Slide 5: Pentagon Chart */}
+          <div className={styles.resultsSlide}>
+            <div className={styles.card}>
+              <div className={styles.chartContainer}>
+                <PentagonChart 
+                  scores={analysis.pentagonScores}
+                  labels={analysis.pentagonLabels}
+                  size={300}
+                />
+              </div>
             </div>
           </div>
         </>
       )}
 
-      <div className={styles.actions}>
-        <button onClick={onRestart} className={styles.restartButton}>
-          Replay
-        </button>
+      {/* Slide 6: Actions */}
+      <div className={styles.resultsSlide}>
+        <div className={styles.actions}>
+          <button onClick={onRestart} className={styles.restartButton}>
+            Replay
+          </button>
+        </div>
       </div>
+
+      </div>
+      
+      {/* Floating Down Arrow - positioned over scroll container */}
+      {showArrow && (
+        <div 
+          className={styles.resultsScrollArrow}
+          onClick={handleArrowClick}
+        >
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      )}
     </div>
   )
 }
@@ -517,6 +749,69 @@ function InvestorPageContent() {
   const finalChatInitialized = useRef(false)
   const hasLoadedCache = useRef(false)
   const latestNegotiationStateRef = useRef<NegotiationState>(negotiationState)
+
+  // Calculate conversation metrics for analysis
+  const calculateConversationMetrics = useCallback((messages: ChatMessage[], currentNegotiationState: NegotiationState) => {
+    const userMessages = messages.filter(m => m.sender === 'user')
+    const npcMessages = messages.filter(m => m.sender === 'npc')
+    
+    // Calculate response times (time between NPC message and user's next message)
+    const responseTimes: number[] = []
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i]
+      if (msg.sender === 'user') {
+        // Find the previous NPC message before this user message
+        for (let j = i - 1; j >= 0; j--) {
+          if (messages[j]?.sender === 'npc') {
+            const npcMsg = messages[j]
+            const responseTime = msg.elapsedMs - npcMsg.elapsedMs
+            if (responseTime > 0) {
+              responseTimes.push(responseTime)
+            }
+            break
+          }
+        }
+      }
+    }
+    
+    const totalDuration = messages.length > 0 
+      ? messages[messages.length - 1].elapsedMs - messages[0].elapsedMs
+      : 0
+    
+    const avgResponseTime = responseTimes.length > 0
+      ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+      : 0
+    
+    const fastestResponse = responseTimes.length > 0 ? Math.min(...responseTimes) : 0
+    const slowestResponse = responseTimes.length > 0 ? Math.max(...responseTimes) : 0
+    
+    // Find key message indices and timestamps
+    const firstAmountAskIndex = messages.findIndex(m => 
+      m.sender === 'user' && 
+      (m.text.toLowerCase().includes('$') || 
+       /\d+\s*(k|grand|million|m)/i.test(m.text))
+    )
+    
+    const firstCounterOfferIndex = messages.findIndex((m, idx) => 
+      idx > firstAmountAskIndex && 
+      m.sender === 'user'
+    )
+    
+    return {
+      totalDuration,
+      userMessageCount: userMessages.length,
+      npcMessageCount: npcMessages.length,
+      responseTimes,
+      avgResponseTime,
+      fastestResponse,
+      slowestResponse,
+      firstAmountAskIndex,
+      firstCounterOfferIndex,
+      firstAmountAskTime: firstAmountAskIndex >= 0 ? messages[firstAmountAskIndex].elapsedMs : null,
+      startTime: messages[0]?.elapsedMs || 0,
+      endTime: messages[messages.length - 1]?.elapsedMs || 0,
+    }
+  }, [])
 
   const updateUrlStep = useCallback((step: string) => {
     const url = new URL(window.location.href)
@@ -610,10 +905,16 @@ function InvestorPageContent() {
       const fetchAnalysis = async () => {
         setIsLoadingAnalysis(true)
         try {
+          const activeTranscript = finalTranscript.length > 0 ? finalTranscript : transcript
+          const metrics = calculateConversationMetrics(activeTranscript, negotiationState)
           const response = await fetch('/api/investor/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ negotiationState, transcript: finalTranscript.length > 0 ? finalTranscript : transcript }),
+            body: JSON.stringify({ 
+              negotiationState, 
+              transcript: activeTranscript,
+              conversationMetrics: metrics,
+            }),
           })
           if (response.ok) {
             const data = await response.json()
@@ -634,7 +935,7 @@ function InvestorPageContent() {
       }
       fetchAnalysis()
     }
-  }, [view, negotiationState, transcript, finalTranscript, analysis, isLoadingAnalysis, navigateToStep])
+  }, [view, negotiationState, transcript, finalTranscript, analysis, isLoadingAnalysis, navigateToStep, calculateConversationMetrics])
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -1025,10 +1326,16 @@ function InvestorPageContent() {
       const fetchAnalysis = async () => {
         setIsLoadingAnalysis(true)
         try {
+          const activeTranscript = finalTranscript.length > 0 ? finalTranscript : transcript
+          const metrics = calculateConversationMetrics(activeTranscript, negotiationState)
           const response = await fetch('/api/investor/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ negotiationState, transcript: finalTranscript.length > 0 ? finalTranscript : transcript }),
+            body: JSON.stringify({ 
+              negotiationState, 
+              transcript: activeTranscript,
+              conversationMetrics: metrics,
+            }),
           })
           if (response.ok) {
             const data = await response.json()
@@ -1045,7 +1352,7 @@ function InvestorPageContent() {
       }
       fetchAnalysis()
     }
-  }, [view, negotiationState, transcript, finalTranscript, analysis, isLoadingAnalysis])
+  }, [view, negotiationState, transcript, finalTranscript, analysis, isLoadingAnalysis, calculateConversationMetrics])
 
   const handleReset = () => {
     clearInvestorCache()
