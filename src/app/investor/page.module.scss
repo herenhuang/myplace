@@ -1225,9 +1225,16 @@ $orange: rgb(255, 114, 63);
 }
 
 .emailError {
-  color: #ff3b30;
+  background: white;
+  color: #f40c00;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  margin-top: 12px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  padding: 14px 20px;
+  font-size: 14px;
+  border-radius: 60px;
 }
 
 .welcomeText {
