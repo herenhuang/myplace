@@ -1426,17 +1426,17 @@ function BuildSection() {
     <ManifestoSection delay={0.4}>
       <div className={styles.buildSection}>
         <h3 className={styles.heading}>
-          Here's how MyPlace works:
+          Here's a bit about how MyPlace works:
         </h3>
         {/* TODO: Style Updates */}
         <p className={styles.listItem}>
-          1. Play - Quick daily games, different scenarios each time
+          <b>1. Play</b> - Quick daily games, different scenarios each time
         </p>
         <p className={styles.listItem}>
-          2. Build - Your profile grows with every choice you make
+          <b>2. Build</b> - Your profile grows with every choice you make
         </p>
         <p className={styles.listItem}>
-          3. Discover - See patterns you never knew existed
+          <b>3. Discover</b> - See patterns you never knew existed
         </p>
 
         <div className={styles.stampbook}>
