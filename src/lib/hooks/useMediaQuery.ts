@@ -5,12 +5,12 @@ const useMediaQuery = (query: string = '') => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const mediaQuery = window.matchMedia(query);
     setMatches(mediaQuery.matches);
-    
+
     const handleChange = (e: MediaQueryListEvent) => setMatches(e.matches);
-    
+
     mediaQuery.addEventListener('change', handleChange);
 
     return () => {

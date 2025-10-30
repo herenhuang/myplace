@@ -4,13 +4,13 @@ import { motion } from 'motion/react';
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import * as d3 from 'd3';
-import { Canvas, useFrame } from '@react-three/fiber';
+// import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import styles from './ManifestoV2.module.scss';
-import SpeechBubbles from '@/components/manifesto/SpeechBubbles';
+// import SpeechBubbles from '@/components/manifesto/SpeechBubbles';
 import WaitlistForm from '@/components/manifesto/WaitlistForm';
-import PentagonChart from '@/components/word-association/PentagonChart';
-import useMediaQuery from '@/lib/hooks/useMediaQuery';
+// import PentagonChart from '@/components/word-association/PentagonChart';
+// import useMediaQuery from '@/lib/hooks/useMediaQuery';
 
 const ManifestoSection: React.FC<{
   children: React.ReactNode;
@@ -36,228 +36,228 @@ const ManifestoSection: React.FC<{
 };
 
 // Combined Timeline + Box Section: Cards absorbed into rotating 3D box
-interface TimelineCard {
-  id: string;
-  label: string;
-}
+// interface TimelineCard {
+//   id: string;
+//   label: string;
+// }
 
-const timelineCards: TimelineCard[] = [
-  { id: 'pm', label: 'Product Manager' },
-  { id: 'enfj', label: 'ENFJ' },
-  { id: 'percent', label: '92%' },
-  { id: 'vc', label: 'VC' },
-  { id: 'exp', label: '5 Years of Experience' },
-  { id: 'uni', label: '[X] University' }
-];
+// const timelineCards: TimelineCard[] = [
+//   { id: 'pm', label: 'Product Manager' },
+//   { id: 'enfj', label: 'ENFJ' },
+//   { id: 'percent', label: '92%' },
+//   { id: 'vc', label: 'VC' },
+//   { id: 'exp', label: '5 Years of Experience' },
+//   { id: 'uni', label: '[X] University' }
+// ];
 
-function RotatingBox({ scrollProgress }: { scrollProgress: number }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+// function RotatingBox({ scrollProgress }: { scrollProgress: number }) {
+//   const meshRef = useRef<THREE.Mesh>(null);
 
-  useFrame(() => {
-    if (!meshRef.current) return;
-    const targetX = scrollProgress * Math.PI * 2;
-    const targetY = scrollProgress * Math.PI * 2.5;
-    const targetZ = scrollProgress * Math.PI * 1.5;
-    meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, targetX, 0.1);
-    meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, targetY, 0.1);
-    meshRef.current.rotation.z = THREE.MathUtils.lerp(meshRef.current.rotation.z, targetZ, 0.1);
-  });
+//   useFrame(() => {
+//     if (!meshRef.current) return;
+//     const targetX = scrollProgress * Math.PI * 2;
+//     const targetY = scrollProgress * Math.PI * 2.5;
+//     const targetZ = scrollProgress * Math.PI * 1.5;
+//     meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, targetX, 0.1);
+//     meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, targetY, 0.1);
+//     meshRef.current.rotation.z = THREE.MathUtils.lerp(meshRef.current.rotation.z, targetZ, 0.1);
+//   });
 
-  // Load all 6 square textures
-  const squareTextures = React.useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const textures = [];
+//   // Load all 6 square textures
+//   const squareTextures = React.useMemo(() => {
+//     const loader = new THREE.TextureLoader();
+//     const textures = [];
     
-    for (let i = 1; i <= 6; i++) {
-      const texture = loader.load(`/square-${i}.png`);
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.needsUpdate = true;
-      textures.push(texture);
-    }
+//     for (let i = 1; i <= 6; i++) {
+//       const texture = loader.load(`/square-${i}.png`);
+//       texture.wrapS = THREE.RepeatWrapping;
+//       texture.wrapT = THREE.RepeatWrapping;
+//       texture.needsUpdate = true;
+//       textures.push(texture);
+//     }
     
-    return textures;
-  }, []);
+//     return textures;
+//   }, []);
 
-  // Create materials array for each face
-  const materials = React.useMemo(() => {
-    return squareTextures.map(texture => new THREE.MeshBasicMaterial({ map: texture }));
-  }, [squareTextures]);
+//   // Create materials array for each face
+//   const materials = React.useMemo(() => {
+//     return squareTextures.map(texture => new THREE.MeshBasicMaterial({ map: texture }));
+//   }, [squareTextures]);
 
-  return (
-    <mesh ref={meshRef} castShadow receiveShadow material={materials}>
-      <boxGeometry args={[1.5, 1.5, 1.5]} />
-    </mesh>
-  );
-}
+//   return (
+//     <mesh ref={meshRef} castShadow receiveShadow material={materials}>
+//       <boxGeometry args={[1.5, 1.5, 1.5]} />
+//     </mesh>
+//   );
+// }
 
 // 3D Card component that flies into the center
-function FlyingCard({ 
-  card, 
-  index, 
-  scrollProgress 
-}: { 
-  card: TimelineCard; 
-  index: number; 
-  scrollProgress: number; 
-}) {
-  const meshRef = useRef<THREE.Mesh>(null);
+// function FlyingCard({ 
+//   card, 
+//   index, 
+//   scrollProgress 
+// }: { 
+//   card: TimelineCard; 
+//   index: number; 
+//   scrollProgress: number; 
+// }) {
+//   const meshRef = useRef<THREE.Mesh>(null);
 
-  useFrame(() => {
-    if (!meshRef.current) return;
+//   useFrame(() => {
+//     if (!meshRef.current) return;
     
-    // Calculate card-specific progress with delay
-    const cardDelay = index * 0.1;
-    const cardProgress = THREE.MathUtils.clamp((scrollProgress - cardDelay) * 1.5, 0, 1);
+//     // Calculate card-specific progress with delay
+//     const cardDelay = index * 0.1;
+//     const cardProgress = THREE.MathUtils.clamp((scrollProgress - cardDelay) * 1.5, 0, 1);
     
-    // Starting positions (spread around the scene)
-    const startPositions = [
-      [-8, 3, -5],   // Top left
-      [-4, 4, -5],   // Top center-left
-      [0, 5, -5],    // Top center
-      [4, 4, -5],    // Top center-right
-      [8, 3, -5],    // Top right
-      [-6, 0, -5],   // Middle left
-    ];
+//     // Starting positions (spread around the scene)
+//     const startPositions = [
+//       [-8, 3, -5],   // Top left
+//       [-4, 4, -5],   // Top center-left
+//       [0, 5, -5],    // Top center
+//       [4, 4, -5],    // Top center-right
+//       [8, 3, -5],    // Top right
+//       [-6, 0, -5],   // Middle left
+//     ];
     
-    const startPos = startPositions[index % startPositions.length];
-    const targetPos = [0, 0, 0]; // Center of the scene
+//     const startPos = startPositions[index % startPositions.length];
+//     const targetPos = [0, 0, 0]; // Center of the scene
     
-    // Interpolate position
-    meshRef.current.position.x = THREE.MathUtils.lerp(startPos[0], targetPos[0], cardProgress);
-    meshRef.current.position.y = THREE.MathUtils.lerp(startPos[1], targetPos[1], cardProgress);
-    meshRef.current.position.z = THREE.MathUtils.lerp(startPos[2], targetPos[2], cardProgress);
+//     // Interpolate position
+//     meshRef.current.position.x = THREE.MathUtils.lerp(startPos[0], targetPos[0], cardProgress);
+//     meshRef.current.position.y = THREE.MathUtils.lerp(startPos[1], targetPos[1], cardProgress);
+//     meshRef.current.position.z = THREE.MathUtils.lerp(startPos[2], targetPos[2], cardProgress);
     
-    // Scale down as it approaches center
-    const scale = 1 - cardProgress * 0.8;
-    meshRef.current.scale.setScalar(scale);
+//     // Scale down as it approaches center
+//     const scale = 1 - cardProgress * 0.8;
+//     meshRef.current.scale.setScalar(scale);
     
-    // Rotate as it flies
-    meshRef.current.rotation.x += 0.01;
-    meshRef.current.rotation.y += 0.01;
-  });
+//     // Rotate as it flies
+//     meshRef.current.rotation.x += 0.01;
+//     meshRef.current.rotation.y += 0.01;
+//   });
 
-  return (
-    <mesh ref={meshRef} castShadow receiveShadow>
-      <boxGeometry args={[1.2, 0.3, 0.1]} />
-      <meshStandardMaterial 
-        color="#ffffff" 
-        metalness={0.1} 
-        roughness={0.3}
-        transparent
-        opacity={1 - scrollProgress * 0.9}
-      />
-    </mesh>
-  );
-}
+//   return (
+//     <mesh ref={meshRef} castShadow receiveShadow>
+//       <boxGeometry args={[1.2, 0.3, 0.1]} />
+//       <meshStandardMaterial 
+//         color="#ffffff" 
+//         metalness={0.1} 
+//         roughness={0.3}
+//         transparent
+//         opacity={1 - scrollProgress * 0.9}
+//       />
+//     </mesh>
+//   );
+// }
 
-function BoxScene({ scrollProgress }: { scrollProgress: number }) {
-  return (
-    <>
-      <ambientLight intensity={1.0} />
-      <directionalLight
-        position={[3, 5, 5]}
-        intensity={1.5}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
-      <pointLight position={[-5, -2, -5]} intensity={0.8} />
-      <pointLight position={[5, 2, 5]} intensity={0.8} />
+// function BoxScene({ scrollProgress }: { scrollProgress: number }) {
+//   return (
+//     <>
+//       <ambientLight intensity={1.0} />
+//       <directionalLight
+//         position={[3, 5, 5]}
+//         intensity={1.5}
+//         castShadow
+//         shadow-mapSize-width={1024}
+//         shadow-mapSize-height={1024}
+//       />
+//       <pointLight position={[-5, -2, -5]} intensity={0.8} />
+//       <pointLight position={[5, 2, 5]} intensity={0.8} />
       
-      {/* Flying cards */}
-      {timelineCards.map((card, index) => (
-        <FlyingCard 
-          key={card.id}
-          card={card} 
-          index={index} 
-          scrollProgress={scrollProgress} 
-        />
-      ))}
+//       {/* Flying cards */}
+//       {timelineCards.map((card, index) => (
+//         <FlyingCard 
+//           key={card.id}
+//           card={card} 
+//           index={index} 
+//           scrollProgress={scrollProgress} 
+//         />
+//       ))}
       
-      <RotatingBox scrollProgress={scrollProgress} />
-    </>
-  );
-}
+//       <RotatingBox scrollProgress={scrollProgress} />
+//     </>
+//   );
+// }
 
-function TimelineSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = React.useState(0);
+// function TimelineSection() {
+//   const sectionRef = useRef<HTMLDivElement>(null);
+//   const [scrollProgress, setScrollProgress] = React.useState(0);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+//   useEffect(() => {
+//     if (typeof window === 'undefined') return;
     
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
+//     const handleScroll = () => {
+//       if (!sectionRef.current) return;
       
-      const rect = sectionRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
+//       const rect = sectionRef.current.getBoundingClientRect();
+//       const viewportHeight = window.innerHeight;
       
-      // Calculate progress: 0 when section enters viewport, 1 when it's centered/past
-      const sectionCenter = rect.top + rect.height / 2;
-      const progress = THREE.MathUtils.clamp(
-        1 - (sectionCenter / viewportHeight),
-        0,
-        1
-      );
+//       // Calculate progress: 0 when section enters viewport, 1 when it's centered/past
+//       const sectionCenter = rect.top + rect.height / 2;
+//       const progress = THREE.MathUtils.clamp(
+//         1 - (sectionCenter / viewportHeight),
+//         0,
+//         1
+//       );
       
-      setScrollProgress(progress);
-    };
+//       setScrollProgress(progress);
+//     };
 
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
+//     handleScroll();
+//     window.addEventListener('scroll', handleScroll, { passive: true });
+//     window.addEventListener('resize', handleScroll);
     
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, []);
+//     return () => {
+//       window.removeEventListener('scroll', handleScroll);
+//       window.removeEventListener('resize', handleScroll);
+//     };
+//   }, []);
 
-  return (
-    <ManifestoSection delay={0.2}>
-      <div ref={sectionRef} className={styles.timeline}>
-        <div className={styles.timelineContainer}>
-          {/* Text section at top */}
-          <motion.div 
-            className={styles.timelineTextSection}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
+//   return (
+//     <ManifestoSection delay={0.2}>
+//       <div ref={sectionRef} className={styles.timeline}>
+//         <div className={styles.timelineContainer}>
+//           {/* Text section at top */}
+//           <motion.div 
+//             className={styles.timelineTextSection}
+//             initial={{ opacity: 0, y: 30 }}
+//             whileInView={{ opacity: 1, y: 0 }}
+//             viewport={{ once: false }}
+//             transition={{ duration: 0.5, delay: 0.1 }}
+//           >
 
-            <p className={styles.paragraph}>
-              But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
-            </p>
+//             <p className={styles.paragraph}>
+//               But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
+//             </p>
   
-          </motion.div>
+//           </motion.div>
           
-          <div className={styles.timelineVisualization}>
-            {/* 3D Canvas with flying cards and rotating box */}
-            <div className={styles.boxContainer}>
-              <Canvas 
-                shadows
-                gl={{ alpha: true, antialias: true }}
-                style={{ width: '100%', height: '100%', background: 'transparent' }} 
-                camera={{ position: [0, 0, 5], fov: 50 }}
-              >
-                <BoxScene scrollProgress={scrollProgress} />
-              </Canvas>
-            </div>
-          </div>
+//           <div className={styles.timelineVisualization}>
+//             {/* 3D Canvas with flying cards and rotating box */}
+//             <div className={styles.boxContainer}>
+//               <Canvas 
+//                 shadows
+//                 gl={{ alpha: true, antialias: true }}
+//                 style={{ width: '100%', height: '100%', background: 'transparent' }} 
+//                 camera={{ position: [0, 0, 5], fov: 50 }}
+//               >
+//                 <BoxScene scrollProgress={scrollProgress} />
+//               </Canvas>
+//             </div>
+//           </div>
 
-          <p className={styles.paragraph}>
-              Yet we're far more multi-dimensional than that.
-            </p>
+//           <p className={styles.paragraph}>
+//               Yet we're far more multi-dimensional than that.
+//             </p>
             
 
 
-        </div>
-      </div>
-    </ManifestoSection>
-  );
-}
+//         </div>
+//       </div>
+//     </ManifestoSection>
+//   );
+// }
 
 // Hero Section Component with D3 Force Simulation
 function HeroSection() {
@@ -618,28 +618,13 @@ function HeroSection() {
   )
 }
 
-function IntroSection() {
-  return (
-    <ManifestoSection delay={0.1}>
-      <div className={styles.introSection}>
-      <p className={styles.paragraph}>
-          You're more than just a label.
-        </p>
-        <p className={styles.paragraph}>
-          You're a <b>living</b>,  <i>moving</i>, and oftentimes <span className={styles.highlight}>contradictory</span> story.
-        </p>
-      </div>
-    </ManifestoSection>
-  )
-}
-
-function SpeechBubblesSection() {
-  return (
-    <div className={styles.speechBubblesSection}>
-      <SpeechBubbles />
-    </div>
-  )
-}
+// function SpeechBubblesSection() {
+//   return (
+//     <div className={styles.speechBubblesSection}>
+//       <SpeechBubbles />
+//     </div>
+//   )
+// }
 
 // Cloud Section Component
 function CloudSection() {
@@ -727,116 +712,138 @@ function CloudSection() {
 // Text Content Section Component
 function GreekSection() {
   return (
-    <ManifestoSection delay={0.1}>
+    <ManifestoSection delay={0}>
       <div className={styles.greekSection}>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, margin: "0px 0px -100px 0px" }}
+          transition={{
+            duration: 0.5,
+            ease: [0.25, 0.1, 0.25, 1],
+            delay: 0.1,
+          }}
+          className={styles.section}
+        >
+          <>
+            <div className={styles.greekContent}>
+              <h3 className={styles.heading}>
+                You're more than just a label.
+              </h3>
+              <p className={styles.paragraph}>
+                You're a <b>living</b>,  <i>moving</i>, and {' '}
+                <span className={styles.strikeThrough}>
+                  sometimes
+                </span> {' '} oftentimes <span className={styles.highlight}>contradictory</span> story.
+              </p>
+              <p className={styles.paragraph}>
+                We as humans have been obsessed with understanding ourselves and others since the beginning of time.
+              </p>
+              <p className={styles.paragraph}>
+                The Ancient Greeks carved 'Know thyself' above their temples, and every generation since has built new mirrors trying to solve it — astrology, Myers-Briggs, Enneagram, whatever's next.
+              </p>
+            </div>
 
-        <div className={styles.greekContent}>
-          <p className={styles.paragraph}>
-            This isn't new. Ancient Greeks carved 'Know thyself' above their temples — even they knew this was the hardest command.
-          </p>
-          <p className={styles.paragraph}>
-            Every generation since has built new mirrors trying to solve it — astrology, Myers-Briggs, Enneagram, whatever's next.
-          </p>
-        </div>
-
-        <Image src="/manifesto/greece-4.png" className={styles.greekBackground} alt="Greek" width={720} height={500} />
-        <Image src="/manifesto/greece-3.png" className={styles.greekForeground} alt="Greek" width={720} height={500} />
-        <Image src="/manifesto/greece-2.png" className={styles.greekImage} alt="Greek" width={720} height={500} />
-        
+            <Image src="/manifesto/greece-4.png" className={styles.greekBackground} alt="Greek" width={720} height={500} />
+            <Image src="/manifesto/greece-3.png" className={styles.greekForeground} alt="Greek" width={720} height={500} />
+            <Image src="/manifesto/greece-2.png" className={styles.greekImage} alt="Greek" width={720} height={500} />
+          </>
+        </motion.div>
       </div>
     </ManifestoSection>
   )
 }
 
-
+type TMotionBubbleSettings = {
+  delay: number;
+}
+const getConversationMotionBubbleSettings = ({ delay = 0 }: TMotionBubbleSettings) => ({
+  initial: { opacity: 0, y: 60, scale: 0.8 },
+  whileInView: {
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 15,
+      delay,
+    }
+  },
+  whileHover: { 
+    scale: 1.02,
+    y: -2,
+    transition: { duration: 0.2 }
+  },
+  viewport: { once: false, amount: 0.2 }
+});
 // Conversation Section Component
 function ConversationSection() {
   return (
     <ManifestoSection delay={0.3}>
       <div className={styles.conversation}>
+        <h3 className={styles.heading}>
+          But who are we really?
+        </h3>
         <p className={styles.paragraph}>
-          And now, as AI can mimic our words and even fake our work, the one thing it can't copy is our <span className={styles.highlight}>judgment</span>, our <span className={styles.highlight}>character</span>, the way we <span className={styles.highlight}>move</span> through the world and build trust with others.
+          We are not what we fill out on a form. We are not what we write in our LinkedIn or Tinder bios.
         </p>
         <p className={styles.paragraph}>
-          That's ours 🧩 to keep. And it's worth sharing with each other, and with the tools we rely on.
+          The systems we have today only capture our answers, and not our actions. Everything is based on what you say, not what you actually do.
+        </p>
+        <p className={styles.paragraph}>
+          And now, as AI can mimic your words and even fake your work, the one thing it can't copy is your <span className={styles.highlight}>character</span>, the way you build trust with others, the way you uniquely <span className={styles.highlight}>move</span> through the world.
         </p>
         
         <div className={styles.stackedBubbles}>
+          <div className={styles.stackedBubblesRow}>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.bubble1}`}
+              {...getConversationMotionBubbleSettings({ delay: 0 })}
+            >
+              In the future, <i>every</i> hire is a personality hire.
+            </motion.div>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble1}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.1 })}
+            >
+            </motion.div>
+          </div>
+          <div className={styles.stackedBubblesRow}>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble2}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.2 })}
+            >
+            </motion.div>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.bubble2}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.3 })}
+            >
+              Every connection starts with <i> character </i>.
+            </motion.div>
+          </div>
+          <div className={styles.stackedBubblesRow}>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.bubble3}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.4 })}
+            >
+              Every relationship begins with the <i>real</i>.
+            </motion.div>
+            <motion.div
+              className={`${styles.stackedBubble} ${styles.fillerBubble3}`}
+              {...getConversationMotionBubbleSettings({ delay: 0.5 })}
+            >
+            </motion.div>
+          </div>
           <motion.div
-            className={`${styles.stackedBubble} ${styles.bubble1}`}
-            initial={{ opacity: 0, y: 60, scale: 0.8 }}
-            whileInView={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
-                delay: 0
-              }
-            }}
-            viewport={{ once: false, amount: 0.2 }}
-            whileHover={{ 
-              scale: 1.02,
-              y: -2,
-              transition: { duration: 0.2 }
-            }}
+            className={`${styles.stackedBubble} ${styles.fillerBubble4}`}
+            {...getConversationMotionBubbleSettings({ delay: 0.6 })}
           >
-            In the future, <i>every</i> hire is a personality hire.
-          </motion.div>
-          
-          <motion.div
-            className={`${styles.stackedBubble} ${styles.bubble2}`}
-            initial={{ opacity: 0, y: 60, scale: 0.8 }}
-            whileInView={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
-                delay: 0.3
-              }
-            }}
-            viewport={{ once: false, amount: 0.2 }}
-            whileHover={{ 
-              scale: 1.02,
-              y: -2,
-              transition: { duration: 0.2 }
-            }}
-          >
-            Every connection starts with <i> character </i>.
-          </motion.div>
-          
-          <motion.div
-            className={`${styles.stackedBubble} ${styles.bubble3}`}
-            initial={{ opacity: 0, y: 60, scale: 0.8 }}
-            whileInView={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
-                delay: 0.6
-              }
-            }}
-            viewport={{ once: false, amount: 0.2 }}
-            whileHover={{ 
-              scale: 1.02,
-              y: -2,
-              transition: { duration: 0.2 }
-            }}
-          >
-            Every relationship begins with the <i>real</i>.
           </motion.div>
         </div>
         
         <p className={styles.paragraph}>
-        But how do we capture that? How do we reveal who we really are without forcing ourselves back into boxes? Without right or wrong answers? Without performing?
+          But how do we capture that? How do we reveal who we really are without forcing ourselves back into boxes? Without right or wrong answers? Without performing?
         </p>
       </div>
     </ManifestoSection>
@@ -844,444 +851,435 @@ function ConversationSection() {
 }
 
 // Box Section Component - Animated timeline cards moving into center
-function BoxSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = React.useState(0);
-  const isMobile = useMediaQuery('(max-width: 768px)');
+// function BoxSection() {
+//   const sectionRef = useRef<HTMLDivElement>(null);
+//   const [scrollProgress, setScrollProgress] = React.useState(0);
+//   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Timeline cards data
-  const cards = [
-    { id: 'pm', label: 'Product Manager' },
-    { id: 'enfj', label: 'ENFJ' },
-    { id: 'percent', label: '92%' },
-    { id: 'vc', label: 'VC' },
-    { id: 'exp', label: '5 Years of Experience' },
-    { id: 'uni', label: '[X] University' }
-  ];
+//   // Timeline cards data
+//   const cards = [
+//     { id: 'pm', label: 'Product Manager' },
+//     { id: 'enfj', label: 'ENFJ' },
+//     { id: 'percent', label: '92%' },
+//     { id: 'vc', label: 'VC' },
+//     { id: 'exp', label: '5 Years of Experience' },
+//     { id: 'uni', label: '[X] University' }
+//   ];
 
-  // Starting positions for cards (horizontal row above the cube)
-  const startPositions = isMobile
-    ? [
-      { x: 50, y: -5 },
-      { x: 50, y: 7 },
-      { x: 50, y: 19 },
-      { x: 50, y: 31 },
-      { x: 50, y: 43 },
-      { x: 50, y: 55 },
-    ] : [
-      { x: 25, y: 5 },    // Left side
-      { x: 36, y: 5 },    // Left-center
-      { x: 44, y: 5 },    // Center-left
-      { x: 51, y: 5 },    // Center-right
-      { x: 63, y: 5 },    // Right-center
-      { x: 78, y: 5 },    // Right side
-    ];
+//   // Starting positions for cards (horizontal row above the cube)
+//   const startPositions = isMobile
+//     ? [
+//       { x: 50, y: -5 },
+//       { x: 50, y: 7 },
+//       { x: 50, y: 19 },
+//       { x: 50, y: 31 },
+//       { x: 50, y: 43 },
+//       { x: 50, y: 55 },
+//     ] : [
+//       { x: 25, y: 5 },    // Left side
+//       { x: 36, y: 5 },    // Left-center
+//       { x: 44, y: 5 },    // Center-left
+//       { x: 51, y: 5 },    // Center-right
+//       { x: 63, y: 5 },    // Right-center
+//       { x: 78, y: 5 },    // Right side
+//     ];
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+//   useEffect(() => {
+//     if (typeof window === 'undefined') return;
     
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
+//     const handleScroll = () => {
+//       if (!sectionRef.current) return;
       
-      const rect = sectionRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
+//       const rect = sectionRef.current.getBoundingClientRect();
+//       const viewportHeight = window.innerHeight;
       
-      // Animation only starts when container reaches top 25% of viewport
-      const animationStartThreshold = viewportHeight * 0;
-      const containerTop = rect.top;
+//       // Animation only starts when container reaches top 25% of viewport
+//       const animationStartThreshold = viewportHeight * 0;
+//       const containerTop = rect.top;
       
-      // Calculate progress: 0 until container hits top 25%, then animate
-      let progress = 0;
-      if (containerTop <= animationStartThreshold) {
-        // Once animation starts, calculate progress based on how far past the threshold
-        const animationDistance = animationStartThreshold - containerTop;
-        const maxAnimationDistance = viewportHeight * 0.8; // Animation completes over next 80% of viewport (slower)
-        progress = Math.min(1, animationDistance / maxAnimationDistance);
-      }
+//       // Calculate progress: 0 until container hits top 25%, then animate
+//       let progress = 0;
+//       if (containerTop <= animationStartThreshold) {
+//         // Once animation starts, calculate progress based on how far past the threshold
+//         const animationDistance = animationStartThreshold - containerTop;
+//         const maxAnimationDistance = viewportHeight * 0.8; // Animation completes over next 80% of viewport (slower)
+//         progress = Math.min(1, animationDistance / maxAnimationDistance);
+//       }
       
-      setScrollProgress(progress);
-    };
+//       setScrollProgress(progress);
+//     };
 
-    const handleResize = () => {
-      handleScroll();
-    };
+//     const handleResize = () => {
+//       handleScroll();
+//     };
 
-    // Initial calculation
-    handleScroll();
+//     // Initial calculation
+//     handleScroll();
     
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleResize);
+//     window.addEventListener('scroll', handleScroll, { passive: true });
+//     window.addEventListener('resize', handleResize);
     
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+//     return () => {
+//       window.removeEventListener('scroll', handleScroll);
+//       window.removeEventListener('resize', handleResize);
+//     };
+//   }, []);
 
-  return (
-    <ManifestoSection delay={0.2}>
-      <div ref={sectionRef} className={styles.boxSection}>
+//   return (
+//     <ManifestoSection delay={0.2}>
+//       <div ref={sectionRef} className={styles.boxSection}>
 
-        <p className={styles.paragraph}>
-          But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
-        </p>
+//         <p className={styles.paragraph}>
+//           But we've been taught to describe ourselves in a broken language. Forced to stay within a single lane.
+//         </p>
         
-        <div className={styles.animatedTimelineContainer}>
-          {/* Timeline cards that move toward center */}
-          {cards.map((card, index) => {
-            const startPos = startPositions[index];
-            // Direct progress calculation - no delays or multipliers
-            const cardProgress = Math.max(0, Math.min(1, scrollProgress));
+//         <div className={styles.animatedTimelineContainer}>
+//           {/* Timeline cards that move toward center */}
+//           {cards.map((card, index) => {
+//             const startPos = startPositions[index];
+//             // Direct progress calculation - no delays or multipliers
+//             const cardProgress = Math.max(0, Math.min(1, scrollProgress));
             
-            // Target position (cube's actual position)
-            const targetX = 50; // 50% - matches cube's left: 50%
-            const targetY = isMobile ? 90 : 75; // 75% - matches cube's bottom: -50% (which is 75% from top)
+//             // Target position (cube's actual position)
+//             const targetX = 50; // 50% - matches cube's left: 50%
+//             const targetY = isMobile ? 90 : 75; // 75% - matches cube's bottom: -50% (which is 75% from top)
             
-            // Direct linear interpolation for immediate response
-            const currentX = startPos.x + (targetX - startPos.x) * cardProgress;
-            const currentY = startPos.y + (targetY - startPos.y) * cardProgress;
+//             // Direct linear interpolation for immediate response
+//             const currentX = startPos.x + (targetX - startPos.x) * cardProgress;
+//             const currentY = startPos.y + (targetY - startPos.y) * cardProgress;
             
-            // Scale and opacity - direct calculation
-            const scale = 1 - cardProgress * 0.8;
-            const opacity = Math.max(0, 1 - cardProgress * 0.9);
+//             // Scale and opacity - direct calculation
+//             const scale = 1 - cardProgress * 0.8;
+//             const opacity = Math.max(0, 1 - cardProgress * 0.9);
             
-            return (
-              <div
-                key={card.id}
-                className={styles.animatedTimelineCard}
-                style={{
-                  left: `${currentX}%`,
-                  top: `${currentY}%`,
-                  transform: `translate3d(-50%, -50%, 0) scale(${scale})`,
-                  opacity: opacity,
-                  zIndex: 10 - index,
-                }}
-              >
-                <h3>{card.label}</h3>
-              </div>
-            );
-          })}
-          {/* Cube in center */}
-          <div className={styles.cubeContainer}>
-            <Image
-              src="/manifesto/cube.png"
-              className={styles.cube}
-              alt="Multidimensional cube"
-              width={400}
-              height={300}
-            />
-          </div>
-        </div>
+//             return (
+//               <div
+//                 key={card.id}
+//                 className={styles.animatedTimelineCard}
+//                 style={{
+//                   left: `${currentX}%`,
+//                   top: `${currentY}%`,
+//                   transform: `translate3d(-50%, -50%, 0) scale(${scale})`,
+//                   opacity: opacity,
+//                   zIndex: 10 - index,
+//                 }}
+//               >
+//                 <h3>{card.label}</h3>
+//               </div>
+//             );
+//           })}
+//           {/* Cube in center */}
+//           <div className={styles.cubeContainer}>
+//             <Image
+//               src="/manifesto/cube.png"
+//               className={styles.cube}
+//               alt="Multidimensional cube"
+//               width={400}
+//               height={300}
+//             />
+//           </div>
+//         </div>
 
-        <p className={styles.paragraph}>
-          Yet we're far more multi-dimensional than that.
-        </p>
+//         <p className={styles.paragraph}>
+//           Yet we're far more multi-dimensional than that.
+//         </p>
 
-      </div>
-    </ManifestoSection>
-  )
-}
-
-function BelieveSection() {
-  return (
-    <ManifestoSection delay={0.3}>
-      <div className={styles.believeSection}>
-        <p className={styles.paragraph}>
-          We believe the answer is in <i>play</i>.
-        </p>
-      </div>
-    </ManifestoSection>
-  )
-}
+//       </div>
+//     </ManifestoSection>
+//   )
+// }
 
 function PlaySection() {
   return (
     <ManifestoSection delay={0.3}>
       <div className={styles.playSection}>
-      <p className={styles.paragraph}>
-        We were built for play. It's how kids learn, how friends bond, how we reveal ourselves without even trying. 
-      </p>
-      <Image src="/manifesto/sticker-play.png" alt="Play" width={1000} height={200} />
-      <p className={styles.paragraph}>
-        When we play, we can't fake it. Our real choices emerge. How we handle pressure, how we build with others, how we move when there's no script.
+        <h3 className={styles.heading}>
+          We believe the answer is in <i>play</i>.
+        </h3>
+        <p className={styles.paragraph}>
+          We were built for play. It's how kids learn, how friends bond, how we reveal ourselves without even trying. 
         </p>
+        <p className={styles.paragraph}>
+          When we play, we can't fake it. Our real choices emerge. How we handle pressure, how we build with others, how we move when there's no script.
+        </p>
+        <Image src="/manifesto/sticker-play.png" alt="Play" width={1000} height={200} />
       </div>
     </ManifestoSection>
   )
 }
 
 // Phone Section Component
-function PhoneSection() {
-  return (
-    <ManifestoSection delay={0.4}>
-      <div className={styles.phoneSection}>
+// function PhoneSection() {
+//   return (
+//     <ManifestoSection delay={0.4}>
+//       <div className={styles.phoneSection}>
 
-        <p className={styles.paragraph}>
-          1) Play - Quick daily stories, different scenarios each time.
-        </p>
+//         <p className={styles.paragraph}>
+//           1) Play - Quick daily stories, different scenarios each time.
+//         </p>
 
-<div className={styles.phoneContent}>
+// <div className={styles.phoneContent}>
 
-        <motion.div 
-          className={styles.phoneContainer}
-          initial={{ opacity: 0, scale: 0.8, y: 50 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-        >
-          <div className={styles.chatContainer}>
-            <Image 
-              src="/iphone-14.png"
-              alt="iPhone frame"
-              layout="fill"
-              className={styles.phoneFrame}
-            />
-            <div className={styles.chatPhone}>
-              <div className={styles.chatHeader}>
-                <button className={styles.chatHeaderBack} aria-label="Back">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                  </svg>
-                </button>
-                <div className={styles.chatHeaderContact}>
-                  <div className={styles.chatHeaderAvatar}>👤</div>
-                  <span className={styles.chatHeaderName}>Alex</span>
-                </div>
-                <button className={styles.chatHeaderVideo} aria-label="Video call">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="m22 8-6 4 6 4V8Z" />
-                    <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
-                  </svg>
-                </button>
-              </div>
-              <div className={styles.chatWindow}>
-                <motion.div 
-                  className={styles.chatBubbleNpc}
-                  initial={{ opacity: 0, y: 8 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.2, delay: 0.3 }}
-                >
-                  <p>Oh nice!!!</p>
-                </motion.div>
-                <motion.div 
-                  className={styles.chatBubbleUser}
-                  initial={{ opacity: 0, y: 8 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.2, delay: 0.4 }}
-                >
-                  <p>I did say my shrimp dinner</p>
-                </motion.div>
-                <motion.div 
-                  className={styles.typingIndicator}
-                  initial={{ opacity: 0, y: 8 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.2, delay: 0.5 }}
-                >
-                  <div className={styles.typingDot}></div>
-                  <div className={styles.typingDot}></div>
-                  <div className={styles.typingDot}></div>
-                </motion.div>
-              </div>
-              <div className={styles.chatInputWrapper}>
-                <div className={styles.chatInput}>
-                  <span className={styles.chatInputPlaceholder}>iMessage</span>
-                </div>
-                <button className={styles.chatSendButton} aria-label="Send message">
-                  <svg className={styles.iconSend} viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className={styles.phoneLabel}>WHAT WOULD YOU MAKE?</div>
-        </motion.div>
+//         <motion.div 
+//           className={styles.phoneContainer}
+//           initial={{ opacity: 0, scale: 0.8, y: 50 }}
+//           whileInView={{ opacity: 1, scale: 1, y: 0 }}
+//           viewport={{ once: false, amount: 0.3 }}
+//           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+//         >
+//           <div className={styles.chatContainer}>
+//             <Image 
+//               src="/iphone-14.png"
+//               alt="iPhone frame"
+//               layout="fill"
+//               className={styles.phoneFrame}
+//             />
+//             <div className={styles.chatPhone}>
+//               <div className={styles.chatHeader}>
+//                 <button className={styles.chatHeaderBack} aria-label="Back">
+//                   <svg
+//                     xmlns="http://www.w3.org/2000/svg"
+//                     width="20"
+//                     height="20"
+//                     viewBox="0 0 24 24"
+//                     fill="none"
+//                     stroke="currentColor"
+//                     strokeWidth="2.5"
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                   >
+//                     <polyline points="15 18 9 12 15 6"></polyline>
+//                   </svg>
+//                 </button>
+//                 <div className={styles.chatHeaderContact}>
+//                   <div className={styles.chatHeaderAvatar}>👤</div>
+//                   <span className={styles.chatHeaderName}>Alex</span>
+//                 </div>
+//                 <button className={styles.chatHeaderVideo} aria-label="Video call">
+//                   <svg
+//                     xmlns="http://www.w3.org/2000/svg"
+//                     width="20"
+//                     height="20"
+//                     viewBox="0 0 24 24"
+//                     fill="none"
+//                     stroke="currentColor"
+//                     strokeWidth="2"
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                   >
+//                     <path d="m22 8-6 4 6 4V8Z" />
+//                     <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+//                   </svg>
+//                 </button>
+//               </div>
+//               <div className={styles.chatWindow}>
+//                 <motion.div 
+//                   className={styles.chatBubbleNpc}
+//                   initial={{ opacity: 0, y: 8 }}
+//                   whileInView={{ opacity: 1, y: 0 }}
+//                   viewport={{ once: false }}
+//                   transition={{ duration: 0.2, delay: 0.3 }}
+//                 >
+//                   <p>Oh nice!!!</p>
+//                 </motion.div>
+//                 <motion.div 
+//                   className={styles.chatBubbleUser}
+//                   initial={{ opacity: 0, y: 8 }}
+//                   whileInView={{ opacity: 1, y: 0 }}
+//                   viewport={{ once: false }}
+//                   transition={{ duration: 0.2, delay: 0.4 }}
+//                 >
+//                   <p>I did say my shrimp dinner</p>
+//                 </motion.div>
+//                 <motion.div 
+//                   className={styles.typingIndicator}
+//                   initial={{ opacity: 0, y: 8 }}
+//                   whileInView={{ opacity: 1, y: 0 }}
+//                   viewport={{ once: false }}
+//                   transition={{ duration: 0.2, delay: 0.5 }}
+//                 >
+//                   <div className={styles.typingDot}></div>
+//                   <div className={styles.typingDot}></div>
+//                   <div className={styles.typingDot}></div>
+//                 </motion.div>
+//               </div>
+//               <div className={styles.chatInputWrapper}>
+//                 <div className={styles.chatInput}>
+//                   <span className={styles.chatInputPlaceholder}>iMessage</span>
+//                 </div>
+//                 <button className={styles.chatSendButton} aria-label="Send message">
+//                   <svg className={styles.iconSend} viewBox="0 0 24 24" fill="currentColor">
+//                     <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+//                   </svg>
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//           <div className={styles.phoneLabel}>WHAT WOULD YOU MAKE?</div>
+//         </motion.div>
 
-        {/* Elevate Simulation Phone */}
-        <motion.div 
-          className={styles.phoneContainer}
-          initial={{ opacity: 0, scale: 0.8, y: 50 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
-        >
-          <div className={styles.elevateContainer}>
-            <Image 
-              src="/iphone-14.png"
-              alt="iPhone frame"
-              layout="fill"
-              className={styles.phoneFrame}
-            />
-            <div className={styles.elevatePhone}>
-              {/* Background Image */}
-              <div 
-                className={styles.elevateBackground}
-                style={{ backgroundImage: 'url(/elevate/orange-2.png)' }}
-              />
+//         {/* Elevate Simulation Phone */}
+//         <motion.div 
+//           className={styles.phoneContainer}
+//           initial={{ opacity: 0, scale: 0.8, y: 50 }}
+//           whileInView={{ opacity: 1, scale: 1, y: 0 }}
+//           viewport={{ once: false, amount: 0.3 }}
+//           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+//         >
+//           <div className={styles.elevateContainer}>
+//             <Image 
+//               src="/iphone-14.png"
+//               alt="iPhone frame"
+//               layout="fill"
+//               className={styles.phoneFrame}
+//             />
+//             <div className={styles.elevatePhone}>
+//               {/* Background Image */}
+//               <div 
+//                 className={styles.elevateBackground}
+//                 style={{ backgroundImage: 'url(/elevate/orange-2.png)' }}
+//               />
               
-              {/* Text Content */}
-              <div className={styles.elevateTextContent}>
-                <div className={styles.elevateStoryText}>
-                  <p>You hesitantly move toward the crowded networking area, glancing at your conference schedule to find your bearings. As you look up to scan the room for familiar faces, you suddenly trip, dropping your bag and scattering its contents everywhere!</p>
-        </div>
+//               {/* Text Content */}
+//               <div className={styles.elevateTextContent}>
+//                 <div className={styles.elevateStoryText}>
+//                   <p>You hesitantly move toward the crowded networking area, glancing at your conference schedule to find your bearings. As you look up to scan the room for familiar faces, you suddenly trip, dropping your bag and scattering its contents everywhere!</p>
+//         </div>
      
-                <div className={styles.elevateQuestion}>
-                  <h2>What ends up falling out?</h2>
-                </div>
-              </div>
+//                 <div className={styles.elevateQuestion}>
+//                   <h2>What ends up falling out?</h2>
+//                 </div>
+//               </div>
               
-              {/* Choice Buttons at Bottom */}
-              <div className={styles.elevateChoices}>
-                <motion.button
-                  className={styles.elevateChoiceButton}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: 0.4 }}
-                >
-                  <span>🤷 I came empty-handed</span>
-                  <span className={styles.elevateArrow}>→</span>
-                </motion.button>
+//               {/* Choice Buttons at Bottom */}
+//               <div className={styles.elevateChoices}>
+//                 <motion.button
+//                   className={styles.elevateChoiceButton}
+//                   initial={{ opacity: 0, y: 20 }}
+//                   whileInView={{ opacity: 1, y: 0 }}
+//                   viewport={{ once: false }}
+//                   transition={{ duration: 0.3, delay: 0.4 }}
+//                 >
+//                   <span>🤷 I came empty-handed</span>
+//                   <span className={styles.elevateArrow}>→</span>
+//                 </motion.button>
                 
-                <motion.button
-                  className={styles.elevateChoiceButton}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: 0.5 }}
-                >
-                  <span>💻 My work laptop</span>
-                  <span className={styles.elevateArrow}>→</span>
-                </motion.button>
+//                 <motion.button
+//                   className={styles.elevateChoiceButton}
+//                   initial={{ opacity: 0, y: 20 }}
+//                   whileInView={{ opacity: 1, y: 0 }}
+//                   viewport={{ once: false }}
+//                   transition={{ duration: 0.3, delay: 0.5 }}
+//                 >
+//                   <span>💻 My work laptop</span>
+//                   <span className={styles.elevateArrow}>→</span>
+//                 </motion.button>
                 
-                <motion.button
-                  className={styles.elevateChoiceButton}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
-                  transition={{ duration: 0.3, delay: 0.6 }}
-                >
-                  <span>📓 Notebook and some pens</span>
-                  <span className={styles.elevateArrow}>→</span>
-                </motion.button>
-              </div>
-            </div>
-          </div>
-          <div className={styles.phoneLabel}>WHAT WOULD YOU DO???</div>
-        </motion.div>
+//                 <motion.button
+//                   className={styles.elevateChoiceButton}
+//                   initial={{ opacity: 0, y: 20 }}
+//                   whileInView={{ opacity: 1, y: 0 }}
+//                   viewport={{ once: false }}
+//                   transition={{ duration: 0.3, delay: 0.6 }}
+//                 >
+//                   <span>📓 Notebook and some pens</span>
+//                   <span className={styles.elevateArrow}>→</span>
+//                 </motion.button>
+//               </div>
+//             </div>
+//           </div>
+//           <div className={styles.phoneLabel}>WHAT WOULD YOU DO???</div>
+//         </motion.div>
 
-        {/* Bouncer Simulation Phone */}
-        <motion.div 
-          className={styles.phoneContainer}
-          initial={{ opacity: 0, scale: 0.8, y: 50 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
-        >
-          <div className={styles.bouncerContainer}>
-            <Image 
-              src="/iphone-14.png"
-              alt="iPhone frame"
-              layout="fill"
-              className={styles.phoneFrame}
-            />
-            <div className={styles.bouncerPhone}>
-              {/* Dark Background with Gradient */}
-              <div className={styles.bouncerBackground} />
+//         {/* Bouncer Simulation Phone */}
+//         <motion.div 
+//           className={styles.phoneContainer}
+//           initial={{ opacity: 0, scale: 0.8, y: 50 }}
+//           whileInView={{ opacity: 1, scale: 1, y: 0 }}
+//           viewport={{ once: false, amount: 0.3 }}
+//           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+//         >
+//           <div className={styles.bouncerContainer}>
+//             <Image 
+//               src="/iphone-14.png"
+//               alt="iPhone frame"
+//               layout="fill"
+//               className={styles.phoneFrame}
+//             />
+//             <div className={styles.bouncerPhone}>
+//               {/* Dark Background with Gradient */}
+//               <div className={styles.bouncerBackground} />
               
-              {/* Bouncer Blob Character */}
-              <motion.div 
-                className={styles.bouncerBlobContainer}
-                initial={{ scale: 0.8, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.3, delay: 0.4 }}
-              >
-                <Image 
-                  src="/bouncerblob.png"
-                  alt="Bouncer Blob"
-                  width={120}
-                  height={120}
-                  className={styles.bouncerBlob}
-                />
-              </motion.div>
+//               {/* Bouncer Blob Character */}
+//               <motion.div 
+//                 className={styles.bouncerBlobContainer}
+//                 initial={{ scale: 0.8, opacity: 0 }}
+//                 whileInView={{ scale: 1, opacity: 1 }}
+//                 viewport={{ once: false }}
+//                 transition={{ duration: 0.3, delay: 0.4 }}
+//               >
+//                 <Image 
+//                   src="/bouncerblob.png"
+//                   alt="Bouncer Blob"
+//                   width={120}
+//                   height={120}
+//                   className={styles.bouncerBlob}
+//                 />
+//               </motion.div>
               
-              {/* Question Bubble */}
-              <motion.div 
-                className={styles.bouncerQuestionBubble}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.3, delay: 0.5 }}
-              >
-                <p>Howdy! You&apos;re on the Luma list... but to get in... I&apos;ma need to ask you some more questions. There are no <i>right</i> answers though, there&apos;s just <i>your</i> answers.</p>
-                <p className={styles.bouncerQuestion}>Anyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up? Tell me a bit about why that time works for you.</p>
-              </motion.div>
+//               {/* Question Bubble */}
+//               <motion.div 
+//                 className={styles.bouncerQuestionBubble}
+//                 initial={{ opacity: 0, y: 20 }}
+//                 whileInView={{ opacity: 1, y: 0 }}
+//                 viewport={{ once: false }}
+//                 transition={{ duration: 0.3, delay: 0.5 }}
+//               >
+//                 <p>Howdy! You&apos;re on the Luma list... but to get in... I&apos;ma need to ask you some more questions. There are no <i>right</i> answers though, there&apos;s just <i>your</i> answers.</p>
+//                 <p className={styles.bouncerQuestion}>Anyhow! The event starts at 5:45 and folks will start being told to leave latest by 8:30. When are you gonna show up? Tell me a bit about why that time works for you.</p>
+//               </motion.div>
               
-              {/* Text Input at Bottom */}
-              <motion.div 
-                className={styles.bouncerInputContainer}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.3, delay: 0.6 }}
-              >
-                <div className={styles.bouncerInputWrapper}>
-                  <input
-                    type="text"
-                    placeholder="Type your answer..."
-                    disabled
-                    className={styles.bouncerInput}
-                  />
-                  <button
-                    disabled
-                    className={styles.bouncerSubmitButton}
-                  >
-                    <span>→</span>
-                  </button>
-                </div>
-                <div className={styles.bouncerProgressIndicator}>
-                  <span className={styles.bouncerProgressDot} />
-                  <span className={styles.bouncerProgressDot} />
-                  <span className={styles.bouncerProgressDot} />
-                  <span className={styles.bouncerProgressDot} />
-                  <span className={styles.bouncerProgressDot} />
-                </div>
-              </motion.div>
-            </div>
-          </div>
-          <div className={styles.phoneLabel}>ARE YOU REALLY IN? 🎟️</div>
-        </motion.div>
+//               {/* Text Input at Bottom */}
+//               <motion.div 
+//                 className={styles.bouncerInputContainer}
+//                 initial={{ opacity: 0, y: 20 }}
+//                 whileInView={{ opacity: 1, y: 0 }}
+//                 viewport={{ once: false }}
+//                 transition={{ duration: 0.3, delay: 0.6 }}
+//               >
+//                 <div className={styles.bouncerInputWrapper}>
+//                   <input
+//                     type="text"
+//                     placeholder="Type your answer..."
+//                     disabled
+//                     className={styles.bouncerInput}
+//                   />
+//                   <button
+//                     disabled
+//                     className={styles.bouncerSubmitButton}
+//                   >
+//                     <span>→</span>
+//                   </button>
+//                 </div>
+//                 <div className={styles.bouncerProgressIndicator}>
+//                   <span className={styles.bouncerProgressDot} />
+//                   <span className={styles.bouncerProgressDot} />
+//                   <span className={styles.bouncerProgressDot} />
+//                   <span className={styles.bouncerProgressDot} />
+//                   <span className={styles.bouncerProgressDot} />
+//                 </div>
+//               </motion.div>
+//             </div>
+//           </div>
+//           <div className={styles.phoneLabel}>ARE YOU REALLY IN? 🎟️</div>
+//         </motion.div>
         
-        </div>
+//         </div>
      
-      </div>
-    </ManifestoSection>
-  )
-}
+//       </div>
+//     </ManifestoSection>
+//   )
+// }
 
 function BuildSection() {
   const [selectedTrait, setSelectedTrait] = React.useState(0);
@@ -1427,14 +1425,22 @@ function BuildSection() {
   return (
     <ManifestoSection delay={0.4}>
       <div className={styles.buildSection}>
-        <p className={styles.paragraph}>
-          2) Build - Your profile grows with every choice you make
+        <h3 className={styles.heading}>
+          Here's a bit about how MyPlace works:
+        </h3>
+        {/* TODO: Style Updates */}
+        <p className={styles.listItem}>
+          <b>1. Play</b> - Quick daily games, different scenarios each time
         </p>
-        
+        <p className={styles.listItem}>
+          <b>2. Build</b> - Your profile grows with every choice you make
+        </p>
+        <p className={styles.listItem}>
+          <b>3. Discover</b> - See patterns you never knew existed
+        </p>
+
         <div className={styles.stampbook}>
           {/* Icon Grid */}
-
-        
           <div className={styles.iconGrid}>
           <h2 className={styles.stampbookTitle}>STAMPBOOK</h2>
             <div className={styles.gridContainer}>
@@ -1498,110 +1504,109 @@ function BuildSection() {
   )
 }
 
-function DiscoverSection() {
-  // Sample user results data
-  const userResults = {
-    personalityScores: [8, 6, 7, 9, 5], // Sample pentagon chart data
-    metascore: 87,
-    archetype: 'The Navigator',
-    summary: 'Based on your responses, you show high levels of creativity and analytical thinking. You tend to approach challenges systematically while maintaining innovative problem-solving strategies.'
-  };
+// function DiscoverSection() {
+//   // Sample user results data
+//   const userResults = {
+//     personalityScores: [8, 6, 7, 9, 5], // Sample pentagon chart data
+//     metascore: 87,
+//     archetype: 'The Navigator',
+//     summary: 'Based on your responses, you show high levels of creativity and analytical thinking. You tend to approach challenges systematically while maintaining innovative problem-solving strategies.'
+//   };
 
-  return (
-    <ManifestoSection delay={0.4}>
-      <div className={styles.discoverSection}>
-        <p className={styles.paragraph}>
-          3) Discover - See patterns you never knew existed
-        </p>
+//   return (
+//     <ManifestoSection delay={0.4}>
+//       <div className={styles.discoverSection}>
+//         <p className={styles.paragraph}>
+//           3) Discover - See patterns you never knew existed
+//         </p>
         
-        <div className={styles.resultsContainer}>
-          {/* Pentagon Chart */}
-          <motion.div 
-            className={`${styles.resultCard} ${styles.pentagonCard}`}
-                  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <div className={styles.pentagonContainer}>
-              <PentagonChart 
-                scores={userResults.personalityScores}
-                size={260}
-              />
-            </div>
-          </motion.div>
+//         <div className={styles.resultsContainer}>
+//           {/* Pentagon Chart */}
+//           <motion.div 
+//             className={`${styles.resultCard} ${styles.pentagonCard}`}
+//                   initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+//             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+//             viewport={{ once: false }}
+//             transition={{ duration: 0.4, delay: 0.1 }}
+//           >
+//             <div className={styles.pentagonContainer}>
+//               <PentagonChart 
+//                 scores={userResults.personalityScores}
+//                 size={260}
+//               />
+//             </div>
+//           </motion.div>
 
-          {/* Metascore */}
-          <motion.div 
-            className={`${styles.resultCard} ${styles.metascoreCard}`}
-            initial={{ opacity: 0, scale: 0.8, rotate: 3 }}
-            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
-            {/* SVG Circular Progress Border */}
-            <svg 
-              className={styles.progressRing}
-              width="296" 
-              height="296"
-              style={{ transform: 'rotate(-90deg)' }}
-            >
-              {/* Background circle */}
-              <circle
-                cx="148"
-                cy="148"
-                r={140}
-                stroke="rgba(229, 231, 235, 1)"
-                strokeWidth="8"
-                fill="none"
-              />
-              {/* Progress circle */}
-              <circle
-                cx="148"
-                cy="148"
-                r={140}
-                stroke="#3B82F6"
-                strokeWidth="8"
-                fill="none"
-                strokeDasharray={2 * Math.PI * 140}
-                strokeDashoffset={2 * Math.PI * 140 * (1 - userResults.metascore / 100)}
-                strokeLinecap="round"
-              />
-            </svg>
+//           {/* Metascore */}
+//           <motion.div 
+//             className={`${styles.resultCard} ${styles.metascoreCard}`}
+//             initial={{ opacity: 0, scale: 0.8, rotate: 3 }}
+//             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+//             viewport={{ once: false }}
+//             transition={{ duration: 0.4, delay: 0.2 }}
+//           >
+//             {/* SVG Circular Progress Border */}
+//             <svg 
+//               className={styles.progressRing}
+//               width="296" 
+//               height="296"
+//               style={{ transform: 'rotate(-90deg)' }}
+//             >
+//               {/* Background circle */}
+//               <circle
+//                 cx="148"
+//                 cy="148"
+//                 r={140}
+//                 stroke="rgba(229, 231, 235, 1)"
+//                 strokeWidth="8"
+//                 fill="none"
+//               />
+//               {/* Progress circle */}
+//               <circle
+//                 cx="148"
+//                 cy="148"
+//                 r={140}
+//                 stroke="#3B82F6"
+//                 strokeWidth="8"
+//                 fill="none"
+//                 strokeDasharray={2 * Math.PI * 140}
+//                 strokeDashoffset={2 * Math.PI * 140 * (1 - userResults.metascore / 100)}
+//                 strokeLinecap="round"
+//               />
+//             </svg>
             
-            <h3 className={styles.resultTitle}>Your Metascore</h3>
-            <div className={styles.metascoreDisplay}>
-              <span className={styles.metascoreNumber}>{userResults.metascore}</span>
-              <span className={styles.metascoreLabel}></span>
-            </div>
-          </motion.div>
+//             <h3 className={styles.resultTitle}>Your Metascore</h3>
+//             <div className={styles.metascoreDisplay}>
+//               <span className={styles.metascoreNumber}>{userResults.metascore}</span>
+//               <span className={styles.metascoreLabel}></span>
+//             </div>
+//           </motion.div>
 
-          {/* Insights */}
-          <motion.div 
-            className={`${styles.resultCard} ${styles.insightsCard}`}
-            initial={{ opacity: 0, scale: 0.8, rotate: -2 }}
-            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
-            <h3 className={styles.resultTitle}>Key Insights</h3>
-            <p className={styles.insightSummary}>
-              {userResults.summary}
-            </p>
-          </motion.div>
-        </div>
-      </div>
-    </ManifestoSection>
-  )
-}
+//           {/* Insights */}
+//           <motion.div 
+//             className={`${styles.resultCard} ${styles.insightsCard}`}
+//             initial={{ opacity: 0, scale: 0.8, rotate: -2 }}
+//             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+//             viewport={{ once: false }}
+//             transition={{ duration: 0.4, delay: 0.3 }}
+//           >
+//             <h3 className={styles.resultTitle}>Key Insights</h3>
+//             <p className={styles.insightSummary}>
+//               {userResults.summary}
+//             </p>
+//           </motion.div>
+//         </div>
+//       </div>
+//     </ManifestoSection>
+//   )
+// }
 
 // Bottom Section Component
 function BottomSection() {
   return (
     <ManifestoSection delay={0.5}>
       <div className={styles.bottomSection}>
-
-      <p className={styles.paragraph}>
+        <p className={styles.paragraph}>
           We’re more than just a label. 
         </p>
         <p className={styles.paragraph}>
@@ -1611,8 +1616,7 @@ function BottomSection() {
           So, what's your story?
         </p>
         
-
-      <WaitlistForm />
+        <WaitlistForm />
 
         <motion.div 
           className={styles.bottomIcons}
@@ -1658,22 +1662,28 @@ function BottomSection() {
   )
 }
 
+const Header = () => (
+  <header className={styles.pageHeader}>
+    <button onClick={() => window?.scrollTo({ top: 0, behavior: 'smooth' })}>Top</button>
+    <button onClick={() => window?.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })}>Join the waitlist</button>
+  </header>
+);
+
 // Main ManifestoV2 Component
 export default function ManifestoV2() {
   return (
     <div className={styles.container}>
+      <Header />
       <HeroSection />
-      <IntroSection />
-      <CloudSection />
       <GreekSection />
       {/* <TimelineSection /> */}
-      <BoxSection />
+      {/* <BoxSection /> */}
       <ConversationSection />
-      <BelieveSection />
       <PlaySection />
-      <PhoneSection />
       <BuildSection />
-      <DiscoverSection />
+      <CloudSection />
+      {/* <PhoneSection /> */}
+      {/* <DiscoverSection /> */}
       <BottomSection />
     </div>
   )
