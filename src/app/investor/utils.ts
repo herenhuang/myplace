@@ -12,6 +12,8 @@ export interface InvestorCache {
   finalUserTurns?: number;
   analysis?: AnalysisResult | null;
   currentStep?: string;
+  sessionId?: string | null;
+  negotiationStartTime?: number | null;
 }
 
 const CACHE_KEY = 'investor-negotiation-cache';
