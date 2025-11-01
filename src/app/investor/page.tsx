@@ -218,7 +218,7 @@ const ScenarioView = ({
           <div className={styles.notificationBody}>
             <span className={styles.notificationSender}>David</span>
             <p className={styles.notificationMessage}>
-              Hey hey, thanks sm for your help these past few months.
+              TY so much for your help these past few months!
             </p>
           </div>
         </div>
@@ -319,18 +319,29 @@ const ChatMessages = ({
     return true
   })
 
+  // Helper function to get max-width class based on character count
+  const getMaxWidthClass = (text: string): string => {
+    const charCount = text.length
+    if (charCount <= 50) return styles.maxWidth60
+    if (charCount <= 100) return styles.maxWidth70
+    return styles.maxWidth75
+  }
+
   return (
     <>
-      {uniqueMessages.map((message) => (
-        <div
-          key={message.id}
-          className={
-            message.sender === 'user' ? styles.chatBubbleUser : styles.chatBubbleNpc
-          }
-        >
-          <p>{message.text}</p>
-        </div>
-      ))}
+      {uniqueMessages.map((message) => {
+        const baseClass = message.sender === 'user' ? styles.chatBubbleUser : styles.chatBubbleNpc
+        const maxWidthClass = getMaxWidthClass(message.text)
+        
+        return (
+          <div
+            key={message.id}
+            className={`${baseClass} ${maxWidthClass}`}
+          >
+            <p>{message.text}</p>
+          </div>
+        )
+      })}
       {isTyping && (
         <div className={styles.typingIndicator}>
           <div className={styles.typingDot}></div>
@@ -919,7 +930,7 @@ function InvestorPageContent() {
       const fetchAnalysis = async () => {
         setIsLoadingAnalysis(true)
         try {
-          const activeTranscript = finalTranscript.length > 0 ? finalTranscript : transcript
+          const activeTranscript = [...transcript, ...finalTranscript]
           const metrics = calculateConversationMetrics(activeTranscript, negotiationState)
           const response = await fetch('/api/investor/analyze', {
             method: 'POST',
@@ -1124,7 +1135,7 @@ function InvestorPageContent() {
         {
           id: 'initial-1',
           sender: 'npc' as const,
-          text: 'Hey hey, thanks sm for your help these past few months.',
+          text: 'TY so much for your help these past few months!',
           elapsedMs: 0,
         },
         {
@@ -1213,7 +1224,7 @@ function InvestorPageContent() {
         {
           id: 'final-1',
           sender: 'npc' as const,
-          text: "Hey, I know we couldn't quite align on the numbers this time.",
+          text: "Sucks we couldn't align on the numbers.",
           elapsedMs: 0,
         },
         {
@@ -1382,7 +1393,7 @@ function InvestorPageContent() {
       const fetchAnalysis = async () => {
         setIsLoadingAnalysis(true)
         try {
-          const activeTranscript = finalTranscript.length > 0 ? finalTranscript : transcript
+          const activeTranscript = [...transcript, ...finalTranscript]
           const metrics = calculateConversationMetrics(activeTranscript, negotiationState)
           const response = await fetch('/api/investor/analyze', {
             method: 'POST',
@@ -1444,9 +1455,9 @@ function InvestorPageContent() {
     setIsStreaming(false)
     setShowMessagesIcon(false)
     setShowBadge(false)
+    setShowDavidImage(false)
     setSessionId(null)
     setNegotiationStartTime(null)
-    setShowDavidImage(false)
     setNegotiationState({
       userAskAmount: null,
       davidOfferAmount: null,
@@ -1680,7 +1691,7 @@ function InvestorPageContent() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             session_id: sessionId,
-                            full_transcript: finalTranscript.length > 0 ? finalTranscript : transcript,
+                            full_transcript: [...transcript, ...finalTranscript],
                             is_on_cap_table: negotiationState.dealReached || false,
                             cap_table_amount: negotiationState.dealReached && negotiationState.davidOfferAmount 
                               ? negotiationState.davidOfferAmount 
