@@ -1447,6 +1447,7 @@ function InvestorPageContent() {
     setShowDavidImage(false)
     setSessionId(null)
     setNegotiationStartTime(null)
+    setShowDavidImage(false)
     setNegotiationState({
       userAskAmount: null,
       davidOfferAmount: null,
