@@ -919,7 +919,7 @@ function InvestorPageContent() {
       const fetchAnalysis = async () => {
         setIsLoadingAnalysis(true)
         try {
-          const activeTranscript = finalTranscript.length > 0 ? finalTranscript : transcript
+          const activeTranscript = [...transcript, ...finalTranscript]
           const metrics = calculateConversationMetrics(activeTranscript, negotiationState)
           const response = await fetch('/api/investor/analyze', {
             method: 'POST',
@@ -1382,7 +1382,7 @@ function InvestorPageContent() {
       const fetchAnalysis = async () => {
         setIsLoadingAnalysis(true)
         try {
-          const activeTranscript = finalTranscript.length > 0 ? finalTranscript : transcript
+          const activeTranscript = [...transcript, ...finalTranscript]
           const metrics = calculateConversationMetrics(activeTranscript, negotiationState)
           const response = await fetch('/api/investor/analyze', {
             method: 'POST',
@@ -1680,7 +1680,7 @@ function InvestorPageContent() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             session_id: sessionId,
-                            full_transcript: finalTranscript.length > 0 ? finalTranscript : transcript,
+                            full_transcript: [...transcript, ...finalTranscript],
                             is_on_cap_table: negotiationState.dealReached || false,
                             cap_table_amount: negotiationState.dealReached && negotiationState.davidOfferAmount 
                               ? negotiationState.davidOfferAmount 
