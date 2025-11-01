@@ -10,6 +10,9 @@ interface GenerateDavidResponseRequest {
   conversationHistory: ChatMessage[]
   userMessage: string
   isFinalTerms?: boolean
+  maxUserTurns?: number
+  currentTurn?: number
+  negotiationState?: NegotiationState
 }
 
 export async function POST(request: NextRequest) {
@@ -20,6 +23,9 @@ export async function POST(request: NextRequest) {
       conversationHistory,
       userMessage,
       isFinalTerms,
+      maxUserTurns = 10,
+      currentTurn = 1,
+      negotiationState: incomingNegotiationState,
     } = body
 
     console.log('🔵 [Investor] Generating David response:', {
@@ -78,6 +84,12 @@ COMPANY CONTEXT:
 RELATIONSHIP WITH USER:
 Advisor has been helpful for ~3 months (calls, intros, deck feedback). You appreciate them and want them in, but cap table is constrained.
 
+CONVERSATION LENGTH (IMPORTANT):
+- Aim for ~10 back-and-forth exchanges for optimal conversation flow and data quality
+- If user expresses disinterest early, push back at least once before accepting their decision
+- Do NOT give up immediately if they seem hesitant or say they don't want to invest
+- Early exits hurt the simulation - maintain engagement while being respectful
+
 NEGOTIATION TARGET:
 - Aim to close them at 40–60% of their initial ask while preserving the relationship.
 - Make any increase feel hard-won; don't jump to the max immediately.
@@ -116,23 +128,36 @@ STATE UPDATE RULES (VERY IMPORTANT):
 
 ENDING THE CONVERSATION (CRITICAL):
 1. WHEN USER ACCEPTS A DEAL:
-   - First time they accept: Acknowledge positively and briefly confirm the terms
-   - Set dealClosed to true and dealReached to true
+   - IMPORTANT: Only set dealClosed to true after YOU have responded to their acceptance
+   - User acceptance signals: "ok", "deal", "sounds good", "i'm in", etc (WITHOUT a number)
+   - CRITICAL: "lets do X" or "ok to X" where X is a NUMBER is a COUNTER, not acceptance
+   - Counter if number differs from your last offer; accept only if exact match
+   - Your response: Acknowledge positively, confirm terms briefly, THEN set dealClosed to true and dealReached to true
+   - Do NOT set dealClosed in the same turn where user accepts - wait for your acknowledgment turn
    
 2. WHEN USER EXPRESSES DISINTEREST/INABILITY TO REACH DEAL:
-   - First time: Set userExpressedDisinterest to true, but DO NOT set dealClosed yet
-   - Ask ONE TIME for confirmation: "Just to confirm - you're not interested in moving forward?"
-   - Keep it brief and respectful
-   - Next response: If they confirm (yes/that's right/correct/etc), set dealClosed to true and dealReached to false
-   - If they change their mind or want to continue, reset userExpressedDisinterest to false and continue negotiating
+   - IMPORTANT: If conversation is short (<6 turns), push back strongly rather than asking for confirmation
+   - First time + SHORT conversation: Set userExpressedDisinterest to true, but PUSH BACK with value prop
+   - First time + LONG conversation: Set userExpressedDisinterest to true, ask "Just to confirm - you're not interested?"
+   - Keep it brief and respectful but don't give up easily on early exits
+   - If user confirms disinterest (yes/correct/etc): set dealClosed to true and dealReached to false
+   - If user wants to continue (wait/actually/new number/etc): reset userExpressedDisinterest to false and continue negotiating
    
-3. CONFIRMATION SIGNALS:
-   - User confirms disinterest: "yeah", "correct", "that's right", "yes", "I'm out", etc
-   - User wants to continue: "wait", "actually", "let me think", counter-offer, etc
+3. WHEN USER COUNTERS AFTER DISINTEREST:
+   - If user previously expressed disinterest AND now provides a new number: this is changing their mind
+   - Reset userExpressedDisinterest to false immediately
+   - Continue negotiating normally - DO NOT set dealClosed
+   - Example: User says "i dont want it" → "175?" means they changed their mind, treat as a new offer
+   - CRITICAL: A number is a NEW OFFER, not acceptance of your previous offer
+   - You must counter or accept this new offer - conversation continues
+   
+4. CONFIRMATION SIGNALS:
+   - User confirms disinterest: "yeah", "correct", "that's right", "yes", "I'm out", etc → close with dealReached=false
+   - User wants to continue: "wait", "actually", "let me think", any number, any counter-offer → reset disinterest, keep negotiating
    
 NEVER end the conversation (set dealClosed) without either:
-A) Clear acceptance of a deal, OR
-B) Confirmation after expressing disinterest
+A) Your acknowledgment after user accepts, OR
+B) User confirms disinterest after you asked
 
 HUMAN-LIKE CLARITY:
 - If they are unclear: briefly ask for clarification ("Sorry—what number were you thinking?").
@@ -228,7 +253,25 @@ EXAMPLE:
   }
 }
 
-EXAMPLE (User expresses disinterest - first time):
+EXAMPLE (User expresses disinterest - first time, CONVERSATION IS SHORT - push back!):
+Conversation context: User said "50k?", David said "I can only do 30k"
+User: "I don't think this is going to work"
+{
+  "content": "I totally hear you, but 30k at 8m is still 0.4% which is solid! Are you sure there's no wiggle room?",
+  "negotiationState": {
+    "userAskAmount": 50000,
+    "davidOfferAmount": 30000,
+    "hasAskedForAmount": true,
+    "hasOffered": true,
+    "negotiationCount": 3,
+    "dealClosed": false,
+    "dealReached": false,
+    "userExpressedDisinterest": true
+  }
+}
+
+EXAMPLE (User expresses disinterest - after several exchanges, ask for confirmation):
+Conversation context: Multiple back and forths, user pushing back on amount
 User: "I don't think this is going to work"
 {
   "content": "Just to confirm - you're not interested in moving forward?",
@@ -260,6 +303,59 @@ User: "yeah, that's right"
   }
 }
 
+EXAMPLE (User accepts a deal - exact match):
+Conversation: David said "I can do 50k max"
+User: "ok sounds good"
+{
+  "content": "Amazing! 50k it is. I'll get the paperwork started.",
+  "negotiationState": {
+    "userAskAmount": 100000,
+    "davidOfferAmount": 50000,
+    "hasAskedForAmount": true,
+    "hasOffered": true,
+    "negotiationCount": 3,
+    "dealClosed": true,
+    "dealReached": true,
+    "userExpressedDisinterest": false
+  }
+}
+
+EXAMPLE (User says "lets do X" with different number - this is a COUNTER, not acceptance):
+Conversation: David said "90k is genuinely the max I can do"
+User: "lets do 100k"
+{
+  "content": "Wait, I literally just said 90k is my max! I can't do 100k given Sequoia and other commitments.",
+  "negotiationState": {
+    "userAskAmount": 100000,
+    "davidOfferAmount": 90000,
+    "hasAskedForAmount": true,
+    "hasOffered": true,
+    "negotiationCount": 7,
+    "dealClosed": false,
+    "dealReached": false,
+    "userExpressedDisinterest": false
+  }
+}
+
+NOTE: After you respond with dealClosed=true and dealReached=true, the conversation will auto-transition to final messages. You will NOT get another turn unless the user specifically continues.
+
+EXAMPLE (User counters after disinterest - they changed their mind):
+Previous: User said "i dont want it then", David asked "Just to confirm - you're not interested?"
+User: "175?"
+{
+  "content": "Oh wait, you still want in? Hmm, 175k is a stretch... let me see if I can make that work for you.",
+  "negotiationState": {
+    "userAskAmount": 175000,
+    "davidOfferAmount": null,
+    "hasAskedForAmount": true,
+    "hasOffered": false,
+    "negotiationCount": 5,
+    "dealClosed": false,
+    "dealReached": false,
+    "userExpressedDisinterest": false
+  }
+}
+
 - IMPORTANT: Return ONLY the raw JSON object. Do NOT wrap it in markdown.`;
 
     const conversationText = conversationHistory
@@ -283,7 +379,7 @@ User: "yeah, that's right"
           },
           {
             role: 'user',
-            content: `Here is the conversation history:\n${conversationText}\n\nUser's latest message: "${userMessage}"\n\nNow, provide your JSON response as David.`,
+            content: `Here is the conversation history:\n${conversationText}\n\nCurrent negotiation count: ${incomingNegotiationState?.negotiationCount || 0}\nUser's latest message: "${userMessage}"\n\nNow, provide your JSON response as David.`,
           },
         ],
         max_tokens: 400,
