@@ -322,7 +322,7 @@ const ChatMessages = ({
   // Helper function to get max-width class based on character count
   const getMaxWidthClass = (text: string): string => {
     const charCount = text.length
-    if (charCount <= 50) return styles.maxWidth60
+    if (charCount <= 50) return '' // Let short messages wrap to content naturally
     if (charCount <= 100) return styles.maxWidth70
     return styles.maxWidth75
   }
