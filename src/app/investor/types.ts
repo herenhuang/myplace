@@ -18,6 +18,7 @@ export interface NegotiationState {
   dealClosed: boolean;
   dealReached: boolean; // true if deal was successfully closed, false if chat ended without deal
   userExpressedDisinterest: boolean; // true if user expressed they don't want to proceed (before confirmation)
+  userSentiment?: string; // Overall emotional state: frustrated, disappointed, happy, satisfied, neutral, excited, relieved, uneasy, or indifferent
 }
 
 export interface KeyMoment {
