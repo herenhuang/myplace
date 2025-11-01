@@ -322,7 +322,7 @@ const ChatMessages = ({
   // Helper function to get max-width class based on character count
   const getMaxWidthClass = (text: string): string => {
     const charCount = text.length
-    if (charCount <= 50) return '' // Let short messages wrap to content naturally
+    if (charCount <= 50) return styles.maxWidth60
     if (charCount <= 100) return styles.maxWidth70
     return styles.maxWidth75
   }
@@ -984,7 +984,7 @@ function InvestorPageContent() {
 
       if (response.ok) {
         const welcomeText =
-          "\n \nGiven what we know about you, here's a \"What Would You Do\" scenario that might interest you. \n \nJust go with your gut! There are no right or wrong answers."
+          "\n \nGiven what we know about you, here's a \"What Would You Do\" scenario designed to reveal your authentic self.\n \nThere are no right answers, so just go with your gut. You only get one playthrough, so stay true to what you would actually do."
         const fullWelcomeMessage = data.message + welcomeText
         setWelcomeMessage(fullWelcomeMessage)
         saveInvestorCache({ emailInput, welcomeMessage: fullWelcomeMessage })
