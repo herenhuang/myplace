@@ -541,14 +541,14 @@ $orange: rgb(255, 114, 63);
   }
 }
 
-// Message bubbles
+// Message bubbles - base styles
 .chatBubbleNpc {
   align-self: flex-start;
   background: #3a3a3c;
   color: #ffffff;
   padding: 10px 14px;
   border-radius: 18px;
-  max-width: 75%;
+  width: fit-content;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
   line-height: 1.2;
@@ -559,6 +559,22 @@ $orange: rgb(255, 114, 63);
   p {
     margin: 0;
     font-family: inherit;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
+
+  // Dynamic max-width based on character count
+  &.maxWidth60 {
+    max-width: 60%;
+  }
+
+  &.maxWidth70 {
+    max-width: 70%;
+  }
+
+  &.maxWidth75 {
+    max-width: 75%;
   }
 
   @media (max-width: 768px) {
@@ -574,7 +590,7 @@ $orange: rgb(255, 114, 63);
   color: white;
   padding: 10px 14px;
   border-radius: 18px;
-  max-width: 75%;
+  width: fit-content;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
   line-height: 1.2;
@@ -585,6 +601,22 @@ $orange: rgb(255, 114, 63);
   p {
     margin: 0;
     font-family: inherit;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
+
+  // Dynamic max-width based on character count
+  &.maxWidth60 {
+    max-width: 60%;
+  }
+
+  &.maxWidth70 {
+    max-width: 70%;
+  }
+
+  &.maxWidth75 {
+    max-width: 75%;
   }
 
   @media (max-width: 768px) {
@@ -611,7 +643,7 @@ $orange: rgb(255, 114, 63);
   background: #3a3a3c;
   padding: 10px 14px;
   border-radius: 18px;
-  max-width: 75%;
+  max-width: 60%;
   display: flex;
   align-items: center;
   justify-content: center;
